@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Globe, Leaf } from "lucide-react";
+import { Menu, X, Globe, Leaf, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 
 const Navigation = () => {
+  const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
 
   const navLinks = [
@@ -61,9 +64,18 @@ const Navigation = () => {
               <Globe className="w-4 h-4 mr-2" />
               Explore
             </Button>
-            <Button variant="hero" size="sm">
-              Join Network
-            </Button>
+            {user ? (
+              <Button variant="hero" size="sm" asChild>
+                <Link to="/dashboard">Dashboard</Link>
+              </Button>
+            ) : (
+              <Button variant="hero" size="sm" asChild>
+                <Link to="/auth">
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Sign In
+                </Link>
+              </Button>
+            )}
           </motion.div>
 
           {/* Mobile Menu Button */}
@@ -101,9 +113,18 @@ const Navigation = () => {
                   <Globe className="w-4 h-4 mr-2" />
                   Explore
                 </Button>
-                <Button variant="hero">
-                  Join Network
-                </Button>
+                {user ? (
+                  <Button variant="hero" asChild>
+                    <Link to="/dashboard">Dashboard</Link>
+                  </Button>
+                ) : (
+                  <Button variant="hero" asChild>
+                    <Link to="/auth">
+                      <LogIn className="w-4 h-4 mr-2" />
+                      Sign In
+                    </Link>
+                  </Button>
+                )}
               </div>
             </div>
           </motion.div>
