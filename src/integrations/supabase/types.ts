@@ -14,6 +14,119 @@ export type Database = {
   }
   public: {
     Tables: {
+      carbon_projects: {
+        Row: {
+          available_credits: number
+          certification: string
+          co2_offset_per_credit: number
+          country: string
+          created_at: string
+          description: string
+          developer_name: string
+          end_date: string | null
+          id: string
+          image_url: string | null
+          location: string
+          methodology: string | null
+          price_per_credit: number
+          project_type: Database["public"]["Enums"]["project_type"]
+          start_date: string | null
+          status: Database["public"]["Enums"]["project_status"]
+          title: string
+          total_credits: number
+          updated_at: string
+          vintage_year: number
+        }
+        Insert: {
+          available_credits: number
+          certification: string
+          co2_offset_per_credit?: number
+          country: string
+          created_at?: string
+          description: string
+          developer_name: string
+          end_date?: string | null
+          id?: string
+          image_url?: string | null
+          location: string
+          methodology?: string | null
+          price_per_credit: number
+          project_type: Database["public"]["Enums"]["project_type"]
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["project_status"]
+          title: string
+          total_credits: number
+          updated_at?: string
+          vintage_year: number
+        }
+        Update: {
+          available_credits?: number
+          certification?: string
+          co2_offset_per_credit?: number
+          country?: string
+          created_at?: string
+          description?: string
+          developer_name?: string
+          end_date?: string | null
+          id?: string
+          image_url?: string | null
+          location?: string
+          methodology?: string | null
+          price_per_credit?: number
+          project_type?: Database["public"]["Enums"]["project_type"]
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["project_status"]
+          title?: string
+          total_credits?: number
+          updated_at?: string
+          vintage_year?: number
+        }
+        Relationships: []
+      }
+      credit_holdings: {
+        Row: {
+          certificate_id: string | null
+          id: string
+          project_id: string
+          purchase_price: number
+          purchased_at: string
+          quantity: number
+          retired: boolean
+          retired_at: string | null
+          user_id: string
+        }
+        Insert: {
+          certificate_id?: string | null
+          id?: string
+          project_id: string
+          purchase_price: number
+          purchased_at?: string
+          quantity: number
+          retired?: boolean
+          retired_at?: string | null
+          user_id: string
+        }
+        Update: {
+          certificate_id?: string | null
+          id?: string
+          project_id?: string
+          purchase_price?: number
+          purchased_at?: string
+          quantity?: number
+          retired?: boolean
+          retired_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_holdings_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "carbon_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -43,6 +156,56 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      transactions: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          payment_method: string | null
+          price_per_credit: number
+          project_id: string
+          quantity: number
+          status: Database["public"]["Enums"]["transaction_status"]
+          total_amount: number
+          transaction_type: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          payment_method?: string | null
+          price_per_credit: number
+          project_id: string
+          quantity: number
+          status?: Database["public"]["Enums"]["transaction_status"]
+          total_amount: number
+          transaction_type?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          payment_method?: string | null
+          price_per_credit?: number
+          project_id?: string
+          quantity?: number
+          status?: Database["public"]["Enums"]["transaction_status"]
+          total_amount?: number
+          transaction_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "carbon_projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -80,6 +243,15 @@ export type Database = {
     }
     Enums: {
       app_role: "investor" | "partner" | "admin"
+      project_status: "active" | "pending" | "completed" | "suspended"
+      project_type:
+        | "reforestation"
+        | "renewable_energy"
+        | "methane_capture"
+        | "ocean_restoration"
+        | "soil_carbon"
+        | "direct_air_capture"
+      transaction_status: "pending" | "completed" | "failed" | "refunded"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -208,6 +380,16 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["investor", "partner", "admin"],
+      project_status: ["active", "pending", "completed", "suspended"],
+      project_type: [
+        "reforestation",
+        "renewable_energy",
+        "methane_capture",
+        "ocean_restoration",
+        "soil_carbon",
+        "direct_air_capture",
+      ],
+      transaction_status: ["pending", "completed", "failed", "refunded"],
     },
   },
 } as const

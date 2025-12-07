@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Globe, Leaf, LogIn } from "lucide-react";
+import { Menu, X, Leaf, LogIn, ShoppingBag, Briefcase, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -10,10 +10,8 @@ const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const navLinks = [
-    { name: "Platform", href: "#platform" },
-    { name: "Layers", href: "#layers" },
-    { name: "Impact", href: "#impact" },
-    { name: "Technology", href: "#technology" },
+    { name: "Marketplace", href: "/marketplace", icon: ShoppingBag },
+    { name: "Portfolio", href: "/portfolio", icon: Briefcase },
   ];
 
   return (
@@ -43,13 +41,14 @@ const Navigation = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
           >
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.name}
-                href={link.href}
-                className="text-muted-foreground hover:text-foreground transition-colors duration-300 font-medium"
+                to={link.href}
+                className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors duration-300 font-medium"
               >
+                <link.icon className="w-4 h-4" />
                 {link.name}
-              </a>
+              </Link>
             ))}
           </motion.div>
 
@@ -60,13 +59,12 @@ const Navigation = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
-            <Button variant="ghost" size="sm">
-              <Globe className="w-4 h-4 mr-2" />
-              Explore
-            </Button>
             {user ? (
               <Button variant="hero" size="sm" asChild>
-                <Link to="/dashboard">Dashboard</Link>
+                <Link to="/dashboard">
+                  <LayoutDashboard className="w-4 h-4 mr-2" />
+                  Dashboard
+                </Link>
               </Button>
             ) : (
               <Button variant="hero" size="sm" asChild>
@@ -99,23 +97,23 @@ const Navigation = () => {
           >
             <div className="container mx-auto px-6 py-6 flex flex-col gap-4">
               {navLinks.map((link) => (
-                <a
+                <Link
                   key={link.name}
-                  href={link.href}
-                  className="text-muted-foreground hover:text-foreground transition-colors py-2 font-medium"
+                  to={link.href}
+                  className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors py-2 font-medium"
                   onClick={() => setIsOpen(false)}
                 >
+                  <link.icon className="w-4 h-4" />
                   {link.name}
-                </a>
+                </Link>
               ))}
               <div className="flex flex-col gap-3 pt-4 border-t border-border">
-                <Button variant="ghost" className="justify-start">
-                  <Globe className="w-4 h-4 mr-2" />
-                  Explore
-                </Button>
                 {user ? (
                   <Button variant="hero" asChild>
-                    <Link to="/dashboard">Dashboard</Link>
+                    <Link to="/dashboard">
+                      <LayoutDashboard className="w-4 h-4 mr-2" />
+                      Dashboard
+                    </Link>
                   </Button>
                 ) : (
                   <Button variant="hero" asChild>
