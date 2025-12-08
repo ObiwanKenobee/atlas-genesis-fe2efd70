@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Minus, Plus, Leaf, ShieldCheck, CreditCard } from 'lucide-react';
+import { Minus, Plus, Leaf, ShieldCheck, CreditCard, Wallet } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -11,7 +11,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { CarbonProject } from '@/types/marketplace';
-import { usePurchaseCredits } from '@/hooks/useMarketplace';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface PurchaseModalProps {
   project: CarbonProject;
@@ -19,21 +21,60 @@ interface PurchaseModalProps {
   onClose: () => void;
 }
 
+type PaymentMethod = 'paystack' | 'paypal';
+
 export function PurchaseModal({ project, isOpen, onClose }: PurchaseModalProps) {
   const [quantity, setQuantity] = useState(1);
-  const purchaseMutation = usePurchaseCredits();
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('paystack');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const { user } = useAuth();
 
   const totalPrice = quantity * project.price_per_credit;
   const totalOffset = quantity * project.co2_offset_per_credit;
   const maxQuantity = Math.min(project.available_credits, 1000);
 
   const handlePurchase = async () => {
-    await purchaseMutation.mutateAsync({
-      projectId: project.id,
-      quantity,
-      pricePerCredit: project.price_per_credit,
-    });
-    onClose();
+    if (!user) {
+      toast.error('Please sign in to purchase credits');
+      return;
+    }
+
+    setIsProcessing(true);
+
+    try {
+      const functionName = paymentMethod === 'paystack' ? 'process-paystack' : 'process-paypal';
+      
+      const { data, error } = await supabase.functions.invoke(functionName, {
+        body: {
+          projectId: project.id,
+          quantity,
+          pricePerCredit: project.price_per_credit,
+          email: user.email,
+          userId: user.id,
+        },
+      });
+
+      if (error) throw error;
+
+      if (!data.success) {
+        throw new Error(data.error || 'Payment initialization failed');
+      }
+
+      // Redirect to payment provider
+      const redirectUrl = paymentMethod === 'paystack' 
+        ? data.authorization_url 
+        : data.approval_url;
+
+      if (redirectUrl) {
+        window.location.href = redirectUrl;
+      } else {
+        throw new Error('No payment URL received');
+      }
+    } catch (error: any) {
+      console.error('Payment error:', error);
+      toast.error(error.message || 'Failed to process payment');
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -91,6 +132,40 @@ export function PurchaseModal({ project, isOpen, onClose }: PurchaseModalProps) 
             </div>
           </div>
 
+          <div className="space-y-3">
+            <p className="text-sm font-medium text-foreground">Select Payment Method</p>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => setPaymentMethod('paystack')}
+                className={`p-4 rounded-lg border-2 transition-all flex flex-col items-center gap-2 ${
+                  paymentMethod === 'paystack'
+                    ? 'border-primary bg-primary/10'
+                    : 'border-border/50 hover:border-border'
+                }`}
+              >
+                <CreditCard className={`w-6 h-6 ${paymentMethod === 'paystack' ? 'text-primary' : 'text-muted-foreground'}`} />
+                <span className={`text-sm font-medium ${paymentMethod === 'paystack' ? 'text-primary' : 'text-foreground'}`}>
+                  Paystack
+                </span>
+                <span className="text-xs text-muted-foreground">Cards, Bank Transfer</span>
+              </button>
+              <button
+                onClick={() => setPaymentMethod('paypal')}
+                className={`p-4 rounded-lg border-2 transition-all flex flex-col items-center gap-2 ${
+                  paymentMethod === 'paypal'
+                    ? 'border-primary bg-primary/10'
+                    : 'border-border/50 hover:border-border'
+                }`}
+              >
+                <Wallet className={`w-6 h-6 ${paymentMethod === 'paypal' ? 'text-primary' : 'text-muted-foreground'}`} />
+                <span className={`text-sm font-medium ${paymentMethod === 'paypal' ? 'text-primary' : 'text-foreground'}`}>
+                  PayPal
+                </span>
+                <span className="text-xs text-muted-foreground">PayPal Balance, Cards</span>
+              </button>
+            </div>
+          </div>
+
           <div className="flex items-center gap-3 p-3 rounded-lg bg-primary/10 border border-primary/20">
             <Leaf className="w-5 h-5 text-primary flex-shrink-0" />
             <p className="text-sm text-foreground/80">
@@ -99,7 +174,7 @@ export function PurchaseModal({ project, isOpen, onClose }: PurchaseModalProps) 
           </div>
 
           <AnimatePresence>
-            {purchaseMutation.isPending && (
+            {isProcessing && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -107,7 +182,7 @@ export function PurchaseModal({ project, isOpen, onClose }: PurchaseModalProps) 
                 className="flex items-center justify-center gap-2 text-primary"
               >
                 <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                <span>Processing transaction...</span>
+                <span>Redirecting to {paymentMethod === 'paystack' ? 'Paystack' : 'PayPal'}...</span>
               </motion.div>
             )}
           </AnimatePresence>
@@ -117,23 +192,27 @@ export function PurchaseModal({ project, isOpen, onClose }: PurchaseModalProps) 
               variant="outline"
               onClick={onClose}
               className="flex-1 border-border/50"
-              disabled={purchaseMutation.isPending}
+              disabled={isProcessing}
             >
               Cancel
             </Button>
             <Button
               onClick={handlePurchase}
               className="flex-1 bg-primary hover:bg-primary/90"
-              disabled={purchaseMutation.isPending}
+              disabled={isProcessing || !user}
             >
-              <CreditCard className="w-4 h-4 mr-2" />
-              Complete Purchase
+              {paymentMethod === 'paystack' ? (
+                <CreditCard className="w-4 h-4 mr-2" />
+              ) : (
+                <Wallet className="w-4 h-4 mr-2" />
+              )}
+              Pay ${totalPrice.toFixed(2)}
             </Button>
           </div>
 
           <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
             <ShieldCheck className="w-4 h-4" />
-            <span>Secure demo transaction</span>
+            <span>Secure payment via {paymentMethod === 'paystack' ? 'Paystack' : 'PayPal'}</span>
           </div>
         </div>
       </DialogContent>

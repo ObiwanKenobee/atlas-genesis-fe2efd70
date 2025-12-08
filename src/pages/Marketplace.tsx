@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Leaf, TrendingUp, Globe, ShieldCheck } from 'lucide-react';
 import Navigation from '@/components/Navigation';
@@ -8,12 +9,64 @@ import { ProjectFilters } from '@/components/marketplace/ProjectFilters';
 import { useProjects } from '@/hooks/useMarketplace';
 import { ProjectType } from '@/types/marketplace';
 import { Skeleton } from '@/components/ui/skeleton';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const Marketplace = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState('');
   const [selectedType, setSelectedType] = useState<ProjectType | undefined>();
 
-  const { data: projects, isLoading, error } = useProjects({ type: selectedType, search });
+  const { data: projects, isLoading, error, refetch } = useProjects({ type: selectedType, search });
+
+  // Handle payment callback
+  useEffect(() => {
+    const paymentStatus = searchParams.get('payment');
+    const reference = searchParams.get('reference');
+    const token = searchParams.get('token'); // PayPal token
+    
+    if (paymentStatus === 'success') {
+      const verifyPayment = async () => {
+        try {
+          // Determine provider based on URL params
+          const isPaystack = !!reference;
+          const isPayPal = !!token;
+          
+          if (isPaystack || isPayPal) {
+            const { data, error } = await supabase.functions.invoke('verify-payment', {
+              body: {
+                provider: isPaystack ? 'paystack' : 'paypal',
+                reference: reference || undefined,
+                orderId: token || undefined,
+              },
+            });
+
+            if (error) throw error;
+
+            if (data.verified) {
+              toast.success('Payment successful! Credits added to your portfolio.');
+              refetch();
+            } else {
+              toast.error('Payment verification failed. Please contact support.');
+            }
+          } else {
+            toast.success('Payment completed successfully!');
+          }
+        } catch (err) {
+          console.error('Verification error:', err);
+          toast.error('Failed to verify payment. Please check your portfolio.');
+        }
+        
+        // Clear URL params
+        setSearchParams({});
+      };
+
+      verifyPayment();
+    } else if (paymentStatus === 'cancelled') {
+      toast.info('Payment was cancelled.');
+      setSearchParams({});
+    }
+  }, [searchParams, setSearchParams, refetch]);
 
   const stats = useMemo(() => {
     if (!projects) return { total: 0, credits: 0, countries: 0 };
