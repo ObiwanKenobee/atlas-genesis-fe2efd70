@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { 
   Leaf, LogOut, User, BarChart3, Globe2, Wallet, 
   TrendingUp, Activity, Layers, Settings, Bell,
-  ChevronRight, ExternalLink
+  ChevronRight, ExternalLink, Shield
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { useIsAdmin } from "@/hooks/useAdmin";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -19,6 +20,7 @@ interface Profile {
 
 const Dashboard = () => {
   const { user, loading, signOut } = useAuth();
+  const { data: isAdmin } = useIsAdmin();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
 
@@ -103,6 +105,14 @@ const Dashboard = () => {
             <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
               <Bell className="w-5 h-5" />
             </Button>
+            {isAdmin && (
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/admin">
+                  <Shield className="w-4 h-4 mr-2" />
+                  Admin
+                </Link>
+              </Button>
+            )}
             <div className="flex items-center gap-3 pl-4 border-l border-border">
               <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center">
                 <User className="w-5 h-5 text-muted-foreground" />
