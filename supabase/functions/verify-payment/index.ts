@@ -113,6 +113,63 @@ serve(async (req) => {
         console.error('Error creating holding:', holdingError);
       }
 
+      // Update available credits on the project
+      const { data: projectData, error: projectError } = await supabase
+        .from('carbon_projects')
+        .select('available_credits, title')
+        .eq('id', metadata.projectId)
+        .single();
+
+      if (!projectError && projectData) {
+        await supabase
+          .from('carbon_projects')
+          .update({ 
+            available_credits: Math.max(0, projectData.available_credits - metadata.quantity) 
+          })
+          .eq('id', metadata.projectId);
+
+        // Send confirmation email (fire and forget)
+        try {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('full_name')
+            .eq('user_id', metadata.userId)
+            .maybeSingle();
+
+          const { data: authUser } = await supabase.auth.admin.getUserById(metadata.userId);
+          
+          if (authUser?.user?.email) {
+            const emailPayload = {
+              type: 'purchase_confirmation',
+              to: authUser.user.email,
+              data: {
+                userName: profile?.full_name || 'Valued Investor',
+                projectTitle: projectData.title,
+                quantity: metadata.quantity,
+                totalAmount: metadata.quantity * metadata.pricePerCredit,
+                transactionId: metadata.projectId,
+                purchaseDate: new Date().toLocaleDateString(),
+              },
+            };
+
+            // Call send-email function
+            const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+            const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+            
+            fetch(`${supabaseUrl}/functions/v1/send-email`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${supabaseAnonKey}`,
+              },
+              body: JSON.stringify(emailPayload),
+            }).catch(err => console.error('Email send error:', err));
+          }
+        } catch (emailErr) {
+          console.error('Error preparing email:', emailErr);
+        }
+      }
+
       return new Response(JSON.stringify({
         success: true,
         verified: true,

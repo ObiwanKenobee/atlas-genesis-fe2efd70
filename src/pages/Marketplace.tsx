@@ -19,6 +19,29 @@ const Marketplace = () => {
 
   const { data: projects, isLoading, error, refetch } = useProjects({ type: selectedType, search });
 
+  // Real-time inventory updates
+  useEffect(() => {
+    const channel = supabase
+      .channel('carbon-projects-realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'carbon_projects',
+        },
+        (payload) => {
+          console.log('Project updated:', payload);
+          refetch();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [refetch]);
+
   // Handle payment callback
   useEffect(() => {
     const paymentStatus = searchParams.get('payment');
