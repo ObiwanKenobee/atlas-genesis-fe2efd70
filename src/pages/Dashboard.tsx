@@ -81,9 +81,9 @@ const Dashboard = () => {
   ];
 
   const quickActions = [
-    { label: "Buy Credits", icon: Wallet, href: "#" },
-    { label: "View Impact", icon: Globe2, href: "#" },
-    { label: "Explore Projects", icon: Layers, href: "#" },
+    { label: "Buy Credits", icon: Wallet, href: "/marketplace" },
+    { label: "My Portfolio", icon: Globe2, href: "/transactions" },
+    { label: "Explore Projects", icon: Layers, href: "/marketplace" },
     { label: "Settings", icon: Settings, href: "#" },
   ];
 

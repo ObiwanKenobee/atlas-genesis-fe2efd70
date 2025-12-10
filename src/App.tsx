@@ -16,6 +16,7 @@ import AdminOverview from "./pages/admin/AdminOverview";
 import AdminProjects from "./pages/admin/AdminProjects";
 import AdminTransactions from "./pages/admin/AdminTransactions";
 import AdminAnalytics from "./pages/admin/AdminAnalytics";
+import Transactions from "./pages/Transactions";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/marketplace" element={<Marketplace />} />
             <Route path="/marketplace/:id" element={<ProjectDetail />} />
             <Route path="/portfolio" element={<Portfolio />} />
+            <Route path="/transactions" element={<Transactions />} />
             
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminLayout />}>

@@ -14,3 +14,9 @@ verify_jwt = false
 
 [functions.webhook-paypal]
 verify_jwt = false
+
+[functions.send-email]
+verify_jwt = true
+
+[functions.generate-certificate]
+verify_jwt = true
