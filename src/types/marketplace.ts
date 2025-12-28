@@ -83,3 +83,153 @@ export const PROJECT_TYPE_ICONS: Record<ProjectType, string> = {
   soil_carbon: '🌱',
   direct_air_capture: '💨',
 };
+
+// ============================================
+// GEOGRAPHIC INTELLIGENCE TYPES
+// ============================================
+export interface GeoPoint {
+  type: 'Point';
+  coordinates: [number, number]; // [longitude, latitude]
+}
+
+export interface GeoPolygon {
+  type: 'Polygon';
+  coordinates: [number, number][][];
+}
+
+export interface BioregionalZone {
+  id: string;
+  zone_name: string;
+  geometry: GeoPolygon | null;
+  climate_classification: ClimateClassification;
+  historical_land_use: string | null;
+  indigenous_land: boolean;
+  indigenous_community_name: string | null;
+  base_credit_multiplier: number;
+  climate_risk_score: number;
+  biodiversity_value_factor: number;
+  region_country: string | null;
+  region_area_km2: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// ============================================
+// MEASUREMENT & VERIFICATION TYPES
+// ============================================
+export interface MeasurementData {
+  id: string;
+  project_id: string;
+  measurement_date: string;
+  satellite_source: SatelliteSource;
+  co2_level: number | null;
+  soil_carbon_ppm: number | null;
+  ndvi_index: number | null; // Normalized Difference Vegetation Index
+  biodiversity_score: number | null; // 0-100
+  temperature_celsius: number | null;
+  precipitation_mm: number | null;
+  confidence_level: number; // 0-1
+  anomaly_flag: boolean;
+  anomaly_reason: string | null;
+  location: GeoPoint | null;
+  source_url: string | null;
+  raw_data: Record<string, unknown> | null;
+  created_at: string;
+}
+
+export interface MeasurementSummary {
+  latest: MeasurementData | null;
+  average_co2_7d: number | null;
+  average_ndvi_7d: number | null;
+  anomalies_count: number;
+  confidence_trend: 'improving' | 'stable' | 'declining';
+  last_updated: string;
+}
+
+// ============================================
+// REGENERATIVE AGRICULTURE & ECOSYSTEM TYPES
+// ============================================
+export interface RegenerativeMetrics {
+  id: string;
+  project_id: string;
+  measurement_date: string;
+  soil_microbiome_health: number | null; // 0-100
+  biodiversity_index: number | null; // 0-100
+  pollinator_count: number | null;
+  native_species_count: number | null;
+  crop_diversity_index: number | null; // 0-100
+  crop_types_count: number | null;
+  mangrove_health_score: number | null;
+  kelp_forest_coverage_percent: number | null;
+  data_source: DataSource;
+  confidence_level: number; // 0-1
+  notes: string | null;
+  created_at: string;
+}
+
+export interface RegenerativeMetricsTrend {
+  microbiome_trend_30d: number | null;
+  biodiversity_trend_30d: number | null;
+  crop_diversity_trend_30d: number | null;
+  pollinator_trend_30d: number | null;
+  latest_scores: RegenerativeMetrics | null;
+  health_status: 'excellent' | 'good' | 'fair' | 'poor';
+}
+
+// ============================================
+// MATHEMATICAL TRUST & VALUATION TYPES
+// ============================================
+export interface ValuationModel {
+  id: string;
+  project_id: string;
+  impact_co2_weight: number;
+  impact_biodiversity_weight: number;
+  impact_health_weight: number;
+  weighted_impact_score: number | null; // 0-100
+  confidence_score: number | null; // 0-1
+  confidence_upper_bound: number | null; // 95% CI upper
+  confidence_lower_bound: number | null; // 95% CI lower
+  reversal_risk_percent: number;
+  reversal_risk_decay_rate: number; // annual (e.g., 0.95 = 5% annual decay)
+  permanence_bond_percent: number;
+  base_credit_price: number | null;
+  dynamic_price_multiplier: number;
+  final_credit_price: number | null;
+  last_recomputed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ImpactBreakdown {
+  co2_component: {
+    value: number;
+    weight: number;
+    contribution: number;
+  };
+  biodiversity_component: {
+    value: number;
+    weight: number;
+    contribution: number;
+  };
+  health_component: {
+    value: number;
+    weight: number;
+    contribution: number;
+  };
+  final_score: number;
+  confidence_interval: [number, number];
+  reversal_risk_adjusted_price: number;
+}
+
+export const CLIMATE_LABELS: Record<ClimateClassification, string> = {
+  tropical_rainforest: '🌴 Tropical Rainforest',
+  tropical_savanna: '🦁 Tropical Savanna',
+  arid_desert: '🏜️ Arid Desert',
+  temperate_grassland: '🌾 Temperate Grassland',
+  boreal_forest: '🌲 Boreal Forest',
+  temperate_deciduous: '🍂 Temperate Deciduous',
+  mediterranean: '🌞 Mediterranean',
+  tundra: '❄️ Tundra',
+  ocean_coastal: '🌊 Ocean Coastal',
+  mountain: '⛰️ Mountain',
+};
