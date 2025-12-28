@@ -1,14 +1,19 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Leaf, TrendingUp, Globe, ShieldCheck } from 'lucide-react';
+import { Leaf, TrendingUp, Globe, ShieldCheck, ChevronDown } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { ProjectCard } from '@/components/marketplace/ProjectCard';
 import { ProjectFilters } from '@/components/marketplace/ProjectFilters';
+import { MeasurementDashboard } from '@/components/marketplace/MeasurementDashboard';
+import { RegenerativeMetricsCard } from '@/components/marketplace/RegenerativeMetricsCard';
+import { ValuationEngineWidget } from '@/components/marketplace/ValuationEngineWidget';
+import { BiogregionalMapComponent } from '@/components/marketplace/BiogregionalMapComponent';
 import { useProjects } from '@/hooks/useMarketplace';
 import { ProjectType } from '@/types/marketplace';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -16,6 +21,8 @@ const Marketplace = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState('');
   const [selectedType, setSelectedType] = useState<ProjectType | undefined>();
+  const [showSystemData, setShowSystemData] = useState(false);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
 
   const { data: projects, isLoading, error, refetch } = useProjects({ type: selectedType, search });
 
@@ -156,6 +163,39 @@ const Marketplace = () => {
           </div>
         </section>
 
+        {/* System Intelligence Section */}
+        {selectedProjectId && showSystemData && (
+          <section className="container mx-auto px-6 py-12 space-y-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="space-y-8"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-2xl font-bold">Regenerative Intelligence</h2>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowSystemData(false)}
+                  >
+                    Close
+                  </Button>
+                </div>
+                <p className="text-muted-foreground mb-6">
+                  Continuous verification via satellite imagery, sensor networks, and ecosystem metrics
+                </p>
+              </div>
+
+              <MeasurementDashboard projectId={selectedProjectId} />
+              <RegenerativeMetricsCard projectId={selectedProjectId} />
+              <ValuationEngineWidget projectId={selectedProjectId} />
+              <BiogregionalMapComponent projectId={selectedProjectId} />
+            </motion.div>
+          </section>
+        )}
+
         {/* Filters & Projects */}
         <section className="container mx-auto px-6 py-12">
           <motion.div
@@ -170,6 +210,30 @@ const Marketplace = () => {
               onTypeChange={setSelectedType}
             />
           </motion.div>
+
+          {/* System Intelligence Toggle */}
+          {selectedProjectId && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="mt-6 mb-8"
+            >
+              <Button
+                onClick={() => setShowSystemData(!showSystemData)}
+                variant={showSystemData ? 'default' : 'outline'}
+                className="w-full"
+              >
+                <Leaf className="w-4 h-4 mr-2" />
+                {showSystemData ? 'Hide' : 'Show'} Regenerative Intelligence
+                <ChevronDown
+                  className={`w-4 h-4 ml-2 transition-transform ${
+                    showSystemData ? 'rotate-180' : ''
+                  }`}
+                />
+              </Button>
+            </motion.div>
+          )}
 
           <div className="mt-8">
             {isLoading ? (
@@ -195,10 +259,20 @@ const Marketplace = () => {
                 <p className="text-muted-foreground text-lg">No projects found matching your criteria.</p>
               </div>
             ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {projects?.map((project, index) => (
-                  <ProjectCard key={project.id} project={project} index={index} />
-                ))}
+              <div className="space-y-6">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {projects?.map((project, index) => (
+                    <div
+                      key={project.id}
+                      onClick={() => {
+                        setSelectedProjectId(project.id);
+                      }}
+                      className="cursor-pointer transition-transform hover:scale-105"
+                    >
+                      <ProjectCard project={project} index={index} />
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
