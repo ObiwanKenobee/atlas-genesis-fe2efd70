@@ -40,10 +40,16 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
         </div>
 
         <CardContent className="p-5 space-y-4">
+          {/* Title and Location */}
           <div>
-            <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1">
-              {project.title}
-            </h3>
+            <div className="flex items-start justify-between gap-2 mb-1">
+              <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1 flex-1">
+                {project.title}
+              </h3>
+              {project.verified_by_system_at && (
+                <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" title="System Verified" />
+              )}
+            </div>
             <div className="flex items-center gap-1.5 text-muted-foreground text-sm mt-1">
               <MapPin className="w-3.5 h-3.5" />
               <span>{project.location}, {project.country}</span>
@@ -54,7 +60,8 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
             {project.description}
           </p>
 
-          <div className="flex items-center gap-4 text-sm">
+          {/* Certification and Impact Score */}
+          <div className="flex items-center gap-2 text-sm flex-wrap">
             <div className="flex items-center gap-1.5">
               <Award className="w-4 h-4 text-accent" />
               <span className="text-foreground/80">{project.certification}</span>
@@ -63,8 +70,17 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
               <Leaf className="w-4 h-4 text-primary" />
               <span className="text-foreground/80">{project.co2_offset_per_credit} tCO₂</span>
             </div>
+            {project.impact_score && (
+              <Badge variant="secondary" className="text-xs">
+                Impact: {project.impact_score.toFixed(0)}/100
+              </Badge>
+            )}
           </div>
 
+          {/* Measurement Mini Chart */}
+          <MeasurementMiniChart projectId={project.id} />
+
+          {/* Availability Bar */}
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Availability</span>
@@ -78,6 +94,18 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
             </div>
           </div>
 
+          {/* Last Verified Info */}
+          {project.last_measurement_at && (
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground px-2 py-1.5 bg-muted/30 rounded border border-border/30">
+              <CheckCircle2 className="w-3 h-3 text-green-500" />
+              <span>
+                Last verified{' '}
+                {new Date(project.last_measurement_at).toLocaleDateString()}
+              </span>
+            </div>
+          )}
+
+          {/* Price and Action */}
           <div className="flex items-center justify-between pt-2 border-t border-border/50">
             <div>
               <div className="flex items-center gap-1">
