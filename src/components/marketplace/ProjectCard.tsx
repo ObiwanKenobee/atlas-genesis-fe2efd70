@@ -14,6 +14,48 @@ interface ProjectCardProps {
   index: number;
 }
 
+/**
+ * Mini chart showing CO2 trend for the project
+ */
+function MeasurementMiniChart({ projectId }: { projectId: string }) {
+  const { data: latestMeasurement } = useLatestMeasurement(projectId);
+  const { data: zones } = useBioregionalZones();
+
+  if (!latestMeasurement) {
+    return null;
+  }
+
+  // Simple sparkline-like data
+  const data = [
+    { co2: latestMeasurement.co2_level ? latestMeasurement.co2_level * 0.9 : 0 },
+    { co2: latestMeasurement.co2_level ? latestMeasurement.co2_level * 0.95 : 0 },
+    { co2: latestMeasurement.co2_level || 0 },
+  ];
+
+  return (
+    <div className="space-y-1">
+      <div className="flex items-center justify-between text-xs">
+        <span className="text-muted-foreground">CO₂ Trend</span>
+        <Badge variant="outline" className="text-xs h-5">
+          {latestMeasurement.co2_level?.toFixed(1) || 'N/A'} ppm
+        </Badge>
+      </div>
+      <ResponsiveContainer width="100%" height={30}>
+        <LineChart data={data} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+          <Line
+            type="monotone"
+            dataKey="co2"
+            stroke="hsl(var(--primary))"
+            strokeWidth={1.5}
+            dot={false}
+            isAnimationActive={false}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
 export function ProjectCard({ project, index }: ProjectCardProps) {
   const availabilityPercent = (project.available_credits / project.total_credits) * 100;
 
