@@ -1,6 +1,9 @@
 export type ProjectType = 'reforestation' | 'renewable_energy' | 'methane_capture' | 'ocean_restoration' | 'soil_carbon' | 'direct_air_capture';
 export type ProjectStatus = 'active' | 'pending' | 'completed' | 'suspended';
 export type TransactionStatus = 'pending' | 'completed' | 'failed' | 'refunded';
+export type ClimateClassification = 'tropical_rainforest' | 'tropical_savanna' | 'arid_desert' | 'temperate_grassland' | 'boreal_forest' | 'temperate_deciduous' | 'mediterranean' | 'tundra' | 'ocean_coastal' | 'mountain';
+export type SatelliteSource = 'Sentinel-2' | 'Landsat-8' | 'Earth-Engine' | 'IoT-Sensor' | 'Manual';
+export type DataSource = 'eDNA-Sample' | 'Bioacoustic' | 'Satellite' | 'Manual';
 
 export interface CarbonProject {
   id: string;
@@ -21,6 +24,16 @@ export interface CarbonProject {
   developer_name: string;
   start_date: string | null;
   end_date: string | null;
+  // New expansion fields
+  measurement_data_id: string | null;
+  bioregional_zone_id: string | null;
+  regenerative_metrics_id: string | null;
+  valuation_model_id: string | null;
+  geometry: GeoPoint | null;
+  verified_by_system_at: string | null;
+  last_measurement_at: string | null;
+  impact_score: number | null;
+  confidence_level: number | null;
   created_at: string;
   updated_at: string;
 }
