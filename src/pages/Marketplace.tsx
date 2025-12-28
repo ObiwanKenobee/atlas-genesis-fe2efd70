@@ -259,10 +259,20 @@ const Marketplace = () => {
                 <p className="text-muted-foreground text-lg">No projects found matching your criteria.</p>
               </div>
             ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {projects?.map((project, index) => (
-                  <ProjectCard key={project.id} project={project} index={index} />
-                ))}
+              <div className="space-y-6">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {projects?.map((project, index) => (
+                    <div
+                      key={project.id}
+                      onClick={() => {
+                        setSelectedProjectId(project.id);
+                      }}
+                      className="cursor-pointer transition-transform hover:scale-105"
+                    >
+                      <ProjectCard project={project} index={index} />
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
