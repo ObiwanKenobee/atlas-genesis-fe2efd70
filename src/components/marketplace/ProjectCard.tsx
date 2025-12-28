@@ -1,10 +1,13 @@
 import { motion } from 'framer-motion';
-import { MapPin, Leaf, Award, TrendingUp } from 'lucide-react';
+import { MapPin, Leaf, Award, TrendingUp, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { LineChart, Line, ResponsiveContainer, Tooltip } from 'recharts';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CarbonProject, PROJECT_TYPE_LABELS, PROJECT_TYPE_ICONS } from '@/types/marketplace';
+import { useLatestMeasurement } from '@/hooks/useMeasurementData';
+import { useBioregionalZones } from '@/hooks/useBioregionalZones';
 
 interface ProjectCardProps {
   project: CarbonProject;
