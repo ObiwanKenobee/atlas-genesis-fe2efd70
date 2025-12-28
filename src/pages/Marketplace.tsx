@@ -1,14 +1,19 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Leaf, TrendingUp, Globe, ShieldCheck } from 'lucide-react';
+import { Leaf, TrendingUp, Globe, ShieldCheck, ChevronDown } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { ProjectCard } from '@/components/marketplace/ProjectCard';
 import { ProjectFilters } from '@/components/marketplace/ProjectFilters';
+import { MeasurementDashboard } from '@/components/marketplace/MeasurementDashboard';
+import { RegenerativeMetricsCard } from '@/components/marketplace/RegenerativeMetricsCard';
+import { ValuationEngineWidget } from '@/components/marketplace/ValuationEngineWidget';
+import { BiogregionalMapComponent } from '@/components/marketplace/BiogregionalMapComponent';
 import { useProjects } from '@/hooks/useMarketplace';
 import { ProjectType } from '@/types/marketplace';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
