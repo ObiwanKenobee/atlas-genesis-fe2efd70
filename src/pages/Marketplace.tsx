@@ -21,6 +21,8 @@ const Marketplace = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState('');
   const [selectedType, setSelectedType] = useState<ProjectType | undefined>();
+  const [showSystemData, setShowSystemData] = useState(false);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
 
   const { data: projects, isLoading, error, refetch } = useProjects({ type: selectedType, search });
 
