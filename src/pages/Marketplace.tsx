@@ -163,6 +163,39 @@ const Marketplace = () => {
           </div>
         </section>
 
+        {/* System Intelligence Section */}
+        {selectedProjectId && showSystemData && (
+          <section className="container mx-auto px-6 py-12 space-y-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="space-y-8"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-2xl font-bold">Regenerative Intelligence</h2>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowSystemData(false)}
+                  >
+                    Close
+                  </Button>
+                </div>
+                <p className="text-muted-foreground mb-6">
+                  Continuous verification via satellite imagery, sensor networks, and ecosystem metrics
+                </p>
+              </div>
+
+              <MeasurementDashboard projectId={selectedProjectId} />
+              <RegenerativeMetricsCard projectId={selectedProjectId} />
+              <ValuationEngineWidget projectId={selectedProjectId} />
+              <BiogregionalMapComponent projectId={selectedProjectId} />
+            </motion.div>
+          </section>
+        )}
+
         {/* Filters & Projects */}
         <section className="container mx-auto px-6 py-12">
           <motion.div
@@ -177,6 +210,30 @@ const Marketplace = () => {
               onTypeChange={setSelectedType}
             />
           </motion.div>
+
+          {/* System Intelligence Toggle */}
+          {selectedProjectId && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="mt-6 mb-8"
+            >
+              <Button
+                onClick={() => setShowSystemData(!showSystemData)}
+                variant={showSystemData ? 'default' : 'outline'}
+                className="w-full"
+              >
+                <Leaf className="w-4 h-4 mr-2" />
+                {showSystemData ? 'Hide' : 'Show'} Regenerative Intelligence
+                <ChevronDown
+                  className={`w-4 h-4 ml-2 transition-transform ${
+                    showSystemData ? 'rotate-180' : ''
+                  }`}
+                />
+              </Button>
+            </motion.div>
+          )}
 
           <div className="mt-8">
             {isLoading ? (
