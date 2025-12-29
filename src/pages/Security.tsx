@@ -157,28 +157,28 @@ const Security = () => {
                   <div className="p-4 border rounded-lg bg-emerald-50">
                     <p className="font-semibold text-sm text-emerald-900 mb-2">CO₂ Measurement Verification</p>
                     <p className="text-sm text-emerald-800">
-                      ✓ Satellite data (Sentinel-2) | ✓ Soil probes | ✓ IoT sensors | ✓ Ground surveys | Consensus required for issuance
+                      Satellite data (Sentinel-2) | Soil probes | IoT sensors | Ground surveys | Consensus required for issuance
                     </p>
                   </div>
 
                   <div className="p-4 border rounded-lg bg-blue-50">
                     <p className="font-semibold text-sm text-blue-900 mb-2">Biodiversity Verification</p>
                     <p className="text-sm text-blue-800">
-                      ✓ eDNA sequencing | ✓ Bioacoustic monitoring | ✓ Visual species surveys | ✓ Community reports | Supermajority agreement
+                      eDNA sequencing | Bioacoustic monitoring | Visual species surveys | Community reports | Supermajority agreement
                     </p>
                   </div>
 
                   <div className="p-4 border rounded-lg bg-purple-50">
                     <p className="font-semibold text-sm text-purple-900 mb-2">Financial Verification</p>
                     <p className="text-sm text-purple-800">
-                      ✓ Trade execution | ✓ Settlement confirmation | ✓ Escrow audit | ✓ Blockchain record | 100% match required
+                      Trade execution | Settlement confirmation | Escrow audit | Blockchain record | 100% match required
                     </p>
                   </div>
 
                   <div className="p-4 border rounded-lg bg-pink-50">
                     <p className="font-semibold text-sm text-pink-900 mb-2">Consent Verification</p>
                     <p className="text-sm text-pink-800">
-                      ✓ Community signatures | ✓ Legal review | ✓ Third-party witness | ✓ Blockchain record | Permanent proof
+                      Community signatures | Legal review | Third-party witness | Blockchain record | Permanent proof
                     </p>
                   </div>
                 </div>
@@ -195,7 +195,7 @@ const Security = () => {
               <CardContent className="space-y-6">
                 <div className="p-4 border-l-4 border-l-orange-500 bg-orange-50 rounded-lg">
                   <p className="text-sm text-orange-800">
-                    Machine learning models trained on millions of legitimate measurements learn what "normal" looks like. Deviations flagged instantly for human review.
+                    Machine learning models trained on millions of legitimate measurements learn what normal looks like. Deviations flagged instantly for human review.
                   </p>
                 </div>
 
@@ -204,8 +204,8 @@ const Security = () => {
                     <h3 className="font-semibold">Detectable Fraud Patterns</h3>
                     <div className="space-y-2 text-sm">
                       <div className="p-3 border rounded-lg">
-                        <p className="font-semibold">Sudden CO₂ Spikes</p>
-                        <p className="text-xs text-muted-foreground">Flagged if measurement deviates >15% from expected curve</p>
+                        <p className="font-semibold">Sudden CO2 Spikes</p>
+                        <p className="text-xs text-muted-foreground">Flagged if measurement deviates beyond 15 percent from expected curve</p>
                       </div>
                       <div className="p-3 border rounded-lg">
                         <p className="font-semibold">Data Manipulation</p>
@@ -299,16 +299,16 @@ const Security = () => {
                   <p className="text-sm font-semibold mb-3">Public Access (No Login Required)</p>
                   <div className="space-y-2 text-sm">
                     <p className="p-3 border rounded-lg bg-blue-50">
-                      ✓ Query any RIU by ID to see full history (issuance, trades, retirement)
+                      Query any RIU by ID to see full history (issuance, trades, retirement)
                     </p>
                     <p className="p-3 border rounded-lg bg-emerald-50">
-                      ✓ Download raw measurement data for any project
+                      Download raw measurement data for any project
                     </p>
                     <p className="p-3 border rounded-lg bg-purple-50">
-                      ✓ View all council voting records and decisions
+                      View all council voting records and decisions
                     </p>
                     <p className="p-3 border rounded-lg bg-amber-50">
-                      ✓ Access published audit reports (monthly & annual)
+                      Access published audit reports (monthly and annual)
                     </p>
                   </div>
                 </div>
