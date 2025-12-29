@@ -1,18 +1,32 @@
-# Welcome to your Lovable project
+# Regenerative Carbon Credit Marketplace
 
-## Project info
+A comprehensive platform for measuring, verifying, and trading regenerative carbon credits across 10 integrated dimensions: planetary measurement, bioregional mapping, regenerative agriculture, credit valuation, ethical governance, marketplace infrastructure, health integration, education, security, and global adoption pathways.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Project Overview
+
+This platform combines:
+- **Planetary Science**: Satellite remote sensing, soil analysis, ocean carbon tracking, biodiversity detection, atmospheric modeling
+- **Geographic Intelligence**: Bioregional zones, historical land-use analysis, climate risk forecasting, indigenous land recognition
+- **Regenerative Impact**: Soil microbiome scoring, crop diversity metrics, mangrove/kelp restoration, pollinator recovery
+- **Financial Mathematics**: Multi-variable impact scoring, confidence-weighted credits, reversal risk management
+- **Ethical Governance**: Community consent, sacred land protection, DAO-style councils, intergenerational equity
+- **Marketplace**: Regenerative Impact Units (RIUs), tiered buyer system, ESG integration, bonds
+- **Health Integration**: Air quality credits, water restoration, urban green scoring
+- **Global Outreach**: Multilingual dashboards, story-based impact, youth education
+- **Security & Transparency**: Tamper-proof records, anomaly detection, public audits
+- **Adoption Pathways**: Role-specific entry for individuals, farmers, cities, corporations, nations
 
 ## How can I edit this code?
 
 There are several ways of editing your application.
 
-**Use Lovable**
+**Use Builder.io**
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+Visit the project dashboard and start prompting to make changes. Changes made via the Builder.io platform will be committed automatically to this repo.
 
-Changes made via Lovable will be committed automatically to this repo.
+**Use Your Preferred IDE**
+
+If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in the Builder.io platform.
 
 **Use your preferred IDE**
 
