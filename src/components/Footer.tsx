@@ -79,11 +79,11 @@ const Footer = () => {
   ];
 
   const socialLinks = [
-    { icon: <Twitter className="w-5 h-5" />, href: "#", label: "Twitter" },
-    { icon: <Facebook className="w-5 h-5" />, href: "#", label: "Facebook" },
+    { icon: <Twitter className="w-5 h-5" />, href: "https://x.com/Atlasanctum", label: "Twitter" },
+    { icon: <Facebook className="w-5 h-5" />, href: "https://web.facebook.com/atlasanctum", label: "Facebook" },
     { icon: <Linkedin className="w-5 h-5" />, href: "#", label: "LinkedIn" },
-    { icon: <Github className="w-5 h-5" />, href: "#", label: "GitHub" },
-    { icon: <Instagram className="w-5 h-5" />, href: "#", label: "Instagram" },
+    { icon: <Github className="w-5 h-5" />, href: "https://github.com/atlasanctum", label: "GitHub" },
+    { icon: <Instagram className="w-5 h-5" />, href: "", label: "https://www.instagram.com/atlasanctum/" },
   ];
 
   return (
@@ -323,7 +323,7 @@ const Footer = () => {
                   </a>
 
                   <a
-                  href="/downloads/app-release.apk"
+                  href="https://drive.google.com/file/d/1QEykzmJOKIKu6sABbPx2zeGXX1MZBcCr/view?usp=sharing"
                   download
                   className="block bg-black/20 rounded-lg p-2 hover:bg-black/30 transition-colors"
                   >
