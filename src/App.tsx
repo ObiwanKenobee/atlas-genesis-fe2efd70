@@ -17,6 +17,15 @@ import AdminProjects from "./pages/admin/AdminProjects";
 import AdminTransactions from "./pages/admin/AdminTransactions";
 import AdminAnalytics from "./pages/admin/AdminAnalytics";
 import Transactions from "./pages/Transactions";
+import Measurements from "./pages/Measurements";
+import Bioregions from "./pages/Bioregions";
+import RegenerativeAgriculture from "./pages/RegenerativeAgriculture";
+import Valuation from "./pages/Valuation";
+import Governance from "./pages/Governance";
+import Health from "./pages/Health";
+import Outreach from "./pages/Outreach";
+import Security from "./pages/Security";
+import Adoption from "./pages/Adoption";
 
 const queryClient = new QueryClient();
 
