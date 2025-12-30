@@ -134,6 +134,9 @@ const Header = () => {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border/50">
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:inline-block p-2">
+        Skip to content
+      </a>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top Navigation Bar */}
         <div className="flex items-center justify-between h-20">
@@ -159,6 +162,8 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <motion.div
+            role="navigation"
+            aria-label="Primary Navigation"
             className="hidden lg:flex items-center gap-1"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -170,7 +175,12 @@ const Header = () => {
               onMouseEnter={() => setActiveMega("features")}
               onMouseLeave={() => setActiveMega(null)}
             >
-              <button className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-all">
+              <button
+                id="features-menu"
+                aria-haspopup="true"
+                aria-expanded={activeMega === "features"}
+                className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-all"
+              >
                 Features
                 <ChevronDown className="w-4 h-4 group-hover:rotate-180 transition-transform" />
               </button>
@@ -237,6 +247,7 @@ const Header = () => {
               <input
                 type="text"
                 placeholder="Search features..."
+                aria-label="Search features"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => setIsSearchFocused(true)}
@@ -294,6 +305,9 @@ const Header = () => {
           <button
             className="lg:hidden p-2 rounded-lg hover:bg-accent transition-colors"
             onClick={() => setIsOpen(!isOpen)}
+            aria-controls="mobile-menu"
+            aria-expanded={isOpen}
+            aria-label="Toggle mobile menu"
           >
             {isOpen ? (
               <X className="w-6 h-6 text-foreground" />
@@ -307,6 +321,9 @@ const Header = () => {
         <AnimatePresence>
           {isOpen && (
             <motion.div
+              id="mobile-menu"
+              role="navigation"
+              aria-label="Mobile Navigation"
               className="lg:hidden pb-6 border-t border-border/50 bg-gradient-to-b from-background to-background/95"
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}

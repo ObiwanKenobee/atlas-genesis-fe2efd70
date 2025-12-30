@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install root deps
+        run: |
+          cd scaffold-mvp/frontend || true
+          echo "(skip)"
+
+      - name: Lint & Typecheck (placeholder)
+        run: echo "Run linter and typecheck here"
+
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install and compile contracts
+        run: |
+          cd scaffold-mvp/contracts || true
+          echo "Compile contracts (hardhat) here"

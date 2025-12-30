@@ -162,16 +162,21 @@ const Footer = () => {
 
             {/* Social Links */}
             <div className="flex gap-3">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  aria-label={social.label}
-                  className="p-2 rounded-lg bg-slate-900/50 text-muted-foreground hover:text-emerald-400 hover:bg-slate-900 transition-all"
-                >
-                  {social.icon}
-                </a>
-              ))}
+              {socialLinks.map((social) => {
+                const href = social.href || "#";
+                const isExternal = href.startsWith("http");
+                return (
+                  <a
+                    key={social.label}
+                    href={href}
+                    aria-label={social.label}
+                    {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                    className="p-2 rounded-lg bg-slate-900/50 text-muted-foreground hover:text-emerald-400 hover:bg-slate-900 transition-all"
+                  >
+                    {social.icon}
+                  </a>
+                );
+              })}
             </div>
           </div>
 
@@ -284,7 +289,7 @@ const Footer = () => {
         <div className="py-8 border-t border-border/30 flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Copyright */}
           <div className="text-sm text-muted-foreground text-center md:text-left">
-            <p>© 2024 Atlas Sanctum. All rights reserved.</p>
+            <p>© 2025 Atlas Sanctum. All rights reserved.</p>
             <p className="mt-1">Regenerating Earth's future through verified, ethical impact.</p>
           </div>
 
@@ -323,18 +328,21 @@ const Footer = () => {
                   </a>
 
                   <a
-                  href="https://drive.google.com/file/d/1QEykzmJOKIKu6sABbPx2zeGXX1MZBcCr/view?usp=sharing"
-                  download
-                  className="block bg-black/20 rounded-lg p-2 hover:bg-black/30 transition-colors"
+                    href="https://drive.google.com/file/d/1QEykzmJOKIKu6sABbPx2zeGXX1MZBcCr/view?usp=sharing"
+                    download
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Download APK (external)"
+                    className="block bg-black/20 rounded-lg p-2 hover:bg-black/30 transition-colors"
                   >
-                  <div className="flex items-center space-x-2">
-                 <span className="text-lg">📦</span>
-                 <div className="text-xs">
-                 <div className="font-semibold">Get APK</div>
-                 <div>Direct Download</div>
-                 </div>
-                </div>
-                </a>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-lg">📦</span>
+                      <div className="text-xs">
+                        <div className="font-semibold">Get APK</div>
+                        <div>Direct Download</div>
+                      </div>
+                    </div>
+                  </a>
 
 
                   <a

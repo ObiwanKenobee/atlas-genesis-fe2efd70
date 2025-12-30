@@ -1,0 +1,13 @@
+{
+  "name": "atlas-contracts-stub",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test"
+  },
+  "devDependencies": {
+    "hardhat": "^2.14.0",
+    "ethers": "^6.6.0"
+  }
+}
