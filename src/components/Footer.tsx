@@ -304,6 +304,40 @@ const Footer = () => {
             </a>
           </div>
 
+           {/* App Store Badges (Hidden in USSD mode) */}
+            
+              <div className="space-y-3">
+                <div className="text-sm font-semibold">📱 Download Apps:</div>
+                <div className="space-y-2">
+                  <a
+                    href="#"
+                    className="block bg-black/20 rounded-lg p-2 hover:bg-black/30 transition-colors"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <span className="text-lg">📱</span>
+                      <div className="text-xs">
+                        <div className="font-semibold">Download on the</div>
+                        <div>App Store</div>
+                      </div>
+                    </div>
+                  </a>
+
+                  <a
+                    href="#"
+                    className="block bg-black/20 rounded-lg p-2 hover:bg-black/30 transition-colors"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <span className="text-lg">🤖</span>
+                      <div className="text-xs">
+                        <div className="font-semibold">Get it on</div>
+                        <div>Google Play</div>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+              </div>
+           
+
           {/* Language & Theme */}
           <div className="flex items-center gap-4">
             <select className="px-3 py-2 rounded-lg bg-slate-900/50 border border-border/30 text-xs text-muted-foreground hover:text-foreground focus:outline-none transition-colors cursor-pointer">
