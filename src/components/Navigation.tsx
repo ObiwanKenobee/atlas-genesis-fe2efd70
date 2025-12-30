@@ -11,6 +11,15 @@ const Navigation = () => {
 
   const navLinks = [
     { name: "Marketplace", href: "/marketplace", icon: ShoppingBag },
+    { name: "Measurements", href: "/measurements", icon: ShoppingBag },
+    { name: "Bioregions", href: "/bioregions", icon: ShoppingBag },
+    { name: "Regeneration", href: "/regenerative-agriculture", icon: ShoppingBag },
+    { name: "Valuation", href: "/valuation", icon: ShoppingBag },
+    { name: "Governance", href: "/governance", icon: ShoppingBag },
+    { name: "Health", href: "/health", icon: ShoppingBag },
+    { name: "Outreach", href: "/outreach", icon: ShoppingBag },
+    { name: "Security", href: "/security", icon: ShoppingBag },
+    { name: "Adoption", href: "/adoption", icon: ShoppingBag },
     { name: "Portfolio", href: "/portfolio", icon: Briefcase },
   ];
 
