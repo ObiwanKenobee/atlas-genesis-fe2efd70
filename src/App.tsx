@@ -44,7 +44,18 @@ const App = () => (
             <Route path="/marketplace/:id" element={<ProjectDetail />} />
             <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/transactions" element={<Transactions />} />
-            
+
+            {/* Feature Routes */}
+            <Route path="/measurements" element={<Measurements />} />
+            <Route path="/bioregions" element={<Bioregions />} />
+            <Route path="/regenerative-agriculture" element={<RegenerativeAgriculture />} />
+            <Route path="/valuation" element={<Valuation />} />
+            <Route path="/governance" element={<Governance />} />
+            <Route path="/health" element={<Health />} />
+            <Route path="/outreach" element={<Outreach />} />
+            <Route path="/security" element={<Security />} />
+            <Route path="/adoption" element={<Adoption />} />
+
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminOverview />} />
@@ -52,8 +63,8 @@ const App = () => (
               <Route path="transactions" element={<AdminTransactions />} />
               <Route path="analytics" element={<AdminAnalytics />} />
             </Route>
-            
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+
+            {/* Catch-all Route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
