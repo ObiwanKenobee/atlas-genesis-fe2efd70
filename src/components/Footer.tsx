@@ -323,6 +323,21 @@ const Footer = () => {
                   </a>
 
                   <a
+                  href="/downloads/app-release.apk"
+                  download
+                  className="block bg-black/20 rounded-lg p-2 hover:bg-black/30 transition-colors"
+                  >
+                  <div className="flex items-center space-x-2">
+                 <span className="text-lg">📦</span>
+                 <div className="text-xs">
+                 <div className="font-semibold">Get APK</div>
+                 <div>Direct Download</div>
+                 </div>
+                </div>
+                </a>
+
+
+                  <a
                     href="#"
                     className="block bg-black/20 rounded-lg p-2 hover:bg-black/30 transition-colors"
                   >
@@ -336,6 +351,8 @@ const Footer = () => {
                   </a>
                 </div>
               </div>
+
+              
            
 
           {/* Language & Theme */}
