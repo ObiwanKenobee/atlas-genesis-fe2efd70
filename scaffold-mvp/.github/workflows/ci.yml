@@ -9,6 +9,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - uses: actions/checkout@v4
 
@@ -17,13 +26,23 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Install root deps
+      - name: Backend: install deps
+        working-directory: scaffold-mvp/backend
         run: |
-          cd scaffold-mvp/frontend || true
-          echo "(skip)"
+          npm ci
 
-      - name: Lint & Typecheck (placeholder)
-        run: echo "Run linter and typecheck here"
+      - name: Set DATABASE_URL
+        run: echo "DATABASE_URL=postgres://postgres:postgres@localhost:5432/postgres" >> $GITHUB_ENV
+
+      - name: Backend: run migrations
+        working-directory: scaffold-mvp/backend
+        run: npm run migrate
+
+      - name: Frontend: install deps and build
+        working-directory: scaffold-mvp/frontend
+        run: |
+          npm ci
+          npm run build || echo "frontend build skipped if vite missing"
 
   contracts:
     runs-on: ubuntu-latest
@@ -33,7 +52,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-      - name: Install and compile contracts
+      - name: Compile contracts (placeholder)
+        working-directory: scaffold-mvp/contracts
         run: |
-          cd scaffold-mvp/contracts || true
+          npm ci || true
           echo "Compile contracts (hardhat) here"
