@@ -47,7 +47,7 @@ const Marketplace = () => {
         </div>
 
         {/* Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
           <Card className="border-l-4 border-l-emerald-500">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center gap-2">
