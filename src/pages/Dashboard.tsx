@@ -161,18 +161,18 @@ const Dashboard = () => {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1 + index * 0.05 }}
-              className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6 hover:border-primary/30 transition-colors"
+              className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-lg sm:rounded-2xl p-4 sm:p-6 hover:border-primary/30 transition-colors"
             >
-              <div className="flex items-start justify-between mb-4">
-                <div className={`w-12 h-12 rounded-xl bg-muted flex items-center justify-center ${stat.color}`}>
-                  <stat.icon className="w-6 h-6" />
+              <div className="flex items-start justify-between mb-3 sm:mb-4">
+                <div className={`w-10 sm:w-12 h-10 sm:h-12 rounded-lg sm:rounded-xl bg-muted flex items-center justify-center ${stat.color}`}>
+                  <stat.icon className="w-5 sm:w-6 h-5 sm:h-6" />
                 </div>
-                <span className="text-sm font-medium text-primary bg-primary/10 px-2 py-1 rounded-full">
+                <span className="text-xs sm:text-sm font-medium text-primary bg-primary/10 px-2 py-1 rounded-full">
                   {stat.change}
                 </span>
               </div>
-              <p className="text-2xl font-bold text-foreground mb-1">{stat.value}</p>
-              <p className="text-sm text-muted-foreground">{stat.label}</p>
+              <p className="text-xl sm:text-2xl font-bold text-foreground mb-1">{stat.value}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">{stat.label}</p>
             </motion.div>
           ))}
         </motion.div>
