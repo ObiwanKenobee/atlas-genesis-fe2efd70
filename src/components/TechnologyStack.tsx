@@ -49,34 +49,34 @@ const technologies = [
 
 const TechnologyStack = () => {
   return (
-    <section id="technology" className="py-32 relative overflow-hidden">
+    <section id="technology" className="py-16 sm:py-24 md:py-32 relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-card/20 to-background" />
-      
-      <div className="container mx-auto px-6 relative z-10">
+
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-20"
+          className="text-center mb-12 sm:mb-16 md:mb-20"
         >
-          <span className="text-ocean font-medium tracking-wider uppercase text-sm">
+          <span className="text-ocean font-medium tracking-wider uppercase text-xs sm:text-sm">
             Technology Stack
           </span>
-          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6">
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mt-3 sm:mt-4 mb-4 sm:mb-6">
             Built for{" "}
             <span className="text-gradient">Scale & Trust</span>
           </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Enterprise-grade infrastructure combining the latest in blockchain, 
+          <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto px-4 sm:px-0">
+            Enterprise-grade infrastructure combining the latest in blockchain,
             AI, and cloud technology to power global regeneration.
           </p>
         </motion.div>
 
         {/* Technology Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
           {technologies.map((tech, index) => (
             <motion.div
               key={tech.title}
