@@ -49,14 +49,14 @@ const Marketplace = () => {
         {/* Key Metrics */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
           <Card className="border-l-4 border-l-emerald-500">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm flex items-center gap-2">
+            <CardHeader className="pb-2 sm:pb-3">
+              <CardTitle className="text-xs sm:text-sm flex items-center gap-2">
                 <ShoppingCart className="h-4 w-4" />
                 RIUs in Circulation
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">24.5M</p>
+              <p className="text-xl sm:text-2xl font-bold">24.5M</p>
               <p className="text-xs text-muted-foreground">Regenerative Impact Units</p>
             </CardContent>
           </Card>
