@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CarbonProject, PROJECT_TYPE_LABELS, PROJECT_TYPE_ICONS } from '@/types/marketplace';
-import { useLatestMeasurement } from '@/hooks/useMeasurementData';
+import { useMeasurementData } from '@/hooks/useMeasurementData';
 import { useBioregionalZones } from '@/hooks/useBioregionalZones';
 
 interface ProjectCardProps {
@@ -18,8 +18,8 @@ interface ProjectCardProps {
  * Mini chart showing CO2 trend for the project
  */
 function MeasurementMiniChart({ projectId }: { projectId: string }) {
-  const { data: latestMeasurement } = useLatestMeasurement(projectId);
-  const { data: zones } = useBioregionalZones();
+  const { data: measurements } = useMeasurementData(projectId, { days: 1 });
+  const latestMeasurement = measurements?.[0] || null;
 
   if (!latestMeasurement) {
     return null;
@@ -89,7 +89,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
                 {project.title}
               </h3>
               {project.verified_by_system_at && (
-                <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" title="System Verified" />
+                <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
               )}
             </div>
             <div className="flex items-center gap-1.5 text-muted-foreground text-sm mt-1">

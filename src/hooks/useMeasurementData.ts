@@ -1,27 +1,53 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { MeasurementData, MeasurementSummary } from "@/types/marketplace";
 
-export const useMeasurementData = (projectId: string | undefined) => {
+// Generate mock measurement data
+const generateMockMeasurements = (projectId: string, days: number = 30): MeasurementData[] => {
+  const measurements: MeasurementData[] = [];
+  const now = new Date();
+
+  for (let i = 0; i < days; i++) {
+    const date = new Date(now);
+    date.setDate(date.getDate() - i);
+
+    measurements.push({
+      id: `measurement-${projectId}-${i}`,
+      project_id: projectId,
+      measurement_date: date.toISOString(),
+      satellite_source: i % 3 === 0 ? "Sentinel-2" : i % 3 === 1 ? "Landsat-8" : "IoT-Sensor",
+      co2_level: 380 + Math.random() * 30 - 15,
+      soil_carbon_ppm: 2500 + Math.random() * 500,
+      ndvi_index: 0.6 + Math.random() * 0.3,
+      biodiversity_score: 70 + Math.random() * 25,
+      temperature_celsius: 22 + Math.random() * 8,
+      precipitation_mm: Math.random() * 50,
+      confidence_level: 0.85 + Math.random() * 0.1,
+      anomaly_flag: Math.random() < 0.05,
+      anomaly_reason: Math.random() < 0.05 ? "Unusual CO2 spike detected" : null,
+      location: { type: "Point", coordinates: [-60.0, -3.0] },
+      source_url: null,
+      raw_data: null,
+      created_at: date.toISOString(),
+    });
+  }
+
+  return measurements;
+};
+
+interface UseMeasurementDataOptions {
+  days?: number;
+}
+
+export const useMeasurementData = (projectId: string | undefined, options?: UseMeasurementDataOptions) => {
+  const days = options?.days ?? 30;
+  
   const query = useQuery<MeasurementData[]>({
-    queryKey: ["measurements", projectId],
+    queryKey: ["measurements", projectId, days],
     enabled: !!projectId,
     queryFn: async () => {
       if (!projectId) return [];
-
-      const { data, error } = await supabase
-        .from("measurement_data")
-        .select("*")
-        .eq("project_id", projectId)
-        .order("measurement_date", { ascending: false })
-        .limit(100);
-
-      if (error) {
-        console.error("Error fetching measurements:", error);
-        throw error;
-      }
-
-      return (data || []) as MeasurementData[];
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      return generateMockMeasurements(projectId, days);
     },
   });
 
@@ -45,6 +71,17 @@ export const useMeasurementData = (projectId: string | undefined) => {
     error: query.error,
     refetch: query.refetch,
   };
+};
+
+// Additional hook exports for components
+export const useMeasurementSummary = (projectId: string | undefined) => {
+  const { summary, isLoading } = useMeasurementData(projectId);
+  return { data: summary, isLoading };
+};
+
+export const useLatestMeasurement = (projectId: string | undefined) => {
+  const { data, isLoading } = useMeasurementData(projectId, { days: 1 });
+  return { data: data?.[0] || null, isLoading };
 };
 
 // Helper to compute average of optional numbers

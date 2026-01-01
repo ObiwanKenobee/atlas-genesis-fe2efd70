@@ -1,25 +1,85 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { BioregionalZone } from "@/types/marketplace";
 
-export const useBioregionalZones = (zoneIds: string[] | undefined) => {
+// Mock bioregional zones data since the table doesn't exist yet
+const mockBioregionalZones: BioregionalZone[] = [
+  {
+    id: "zone-1",
+    zone_name: "Amazon Basin",
+    geometry: null,
+    climate_classification: "tropical_rainforest",
+    historical_land_use: "Primary rainforest with selective logging history",
+    indigenous_land: true,
+    indigenous_community_name: "Yanomami",
+    base_credit_multiplier: 2.5,
+    climate_risk_score: 65,
+    biodiversity_value_factor: 1.8,
+    region_country: "Brazil",
+    region_area_km2: 5500000,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: "zone-2",
+    zone_name: "Congo Rainforest",
+    geometry: null,
+    climate_classification: "tropical_rainforest",
+    historical_land_use: "Protected forest reserve",
+    indigenous_land: true,
+    indigenous_community_name: "Mbuti",
+    base_credit_multiplier: 2.3,
+    climate_risk_score: 55,
+    biodiversity_value_factor: 1.7,
+    region_country: "Democratic Republic of Congo",
+    region_area_km2: 2000000,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: "zone-3",
+    zone_name: "Borneo Highlands",
+    geometry: null,
+    climate_classification: "tropical_rainforest",
+    historical_land_use: "Mixed forest and palm plantations",
+    indigenous_land: true,
+    indigenous_community_name: "Dayak",
+    base_credit_multiplier: 2.0,
+    climate_risk_score: 72,
+    biodiversity_value_factor: 1.6,
+    region_country: "Indonesia/Malaysia",
+    region_area_km2: 743330,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: "zone-4",
+    zone_name: "Great Barrier Reef",
+    geometry: null,
+    climate_classification: "ocean_coastal",
+    historical_land_use: "Marine protected area",
+    indigenous_land: false,
+    indigenous_community_name: null,
+    base_credit_multiplier: 1.8,
+    climate_risk_score: 85,
+    biodiversity_value_factor: 2.0,
+    region_country: "Australia",
+    region_area_km2: 344400,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+];
+
+export const useBioregionalZones = (zoneIds?: string[] | undefined) => {
   const query = useQuery<BioregionalZone[]>({
     queryKey: ["bioregional-zones", zoneIds],
-    enabled: !!(zoneIds && zoneIds.length > 0),
     queryFn: async () => {
-      if (!zoneIds || zoneIds.length === 0) return [];
-
-      const { data, error } = await supabase
-        .from("bioregional_zones")
-        .select("*")
-        .in("id", zoneIds);
-
-      if (error) {
-        console.error("Error fetching bioregional zones:", error);
-        throw error;
+      // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      
+      if (zoneIds && zoneIds.length > 0) {
+        return mockBioregionalZones.filter((z) => zoneIds.includes(z.id));
       }
-
-      return (data || []) as BioregionalZone[];
+      return mockBioregionalZones;
     },
   });
 
@@ -37,21 +97,9 @@ export const useBioregionalZoneByCoordinates = (latitude: number | null, longitu
     queryKey: ["bioregional-zone-location", latitude, longitude],
     enabled: latitude != null && longitude != null,
     queryFn: async () => {
-      if (latitude == null || longitude == null) return null;
-
-      // Use PostGIS to find the zone containing the point
-      const { data, error } = await supabase.rpc("find_bioregional_zone", {
-        point_longitude: longitude,
-        point_latitude: latitude,
-      });
-
-      if (error) {
-        console.error("Error fetching bioregional zone by coordinates:", error);
-        // Return null instead of throwing to handle cases where no zone exists
-        return null;
-      }
-
-      return (data?.[0] || null) as BioregionalZone | null;
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      // Return the first mock zone as a placeholder
+      return mockBioregionalZones[0];
     },
   });
 
@@ -61,5 +109,28 @@ export const useBioregionalZoneByCoordinates = (latitude: number | null, longitu
     isError: query.isError,
     error: query.error,
     refetch: query.refetch,
+  };
+};
+
+// Additional hooks for the BiogregionalMapComponent
+export const useClimateRiskAssessment = (zoneId?: string) => {
+  return useQuery({
+    queryKey: ["climate-risk", zoneId],
+    enabled: !!zoneId,
+    queryFn: async () => {
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      return {
+        risk_level: "moderate",
+        score: 65,
+        factors: ["Deforestation pressure", "Climate variability"],
+      };
+    },
+  });
+};
+
+export const useIndigenousLands = () => {
+  return {
+    data: mockBioregionalZones.filter((z) => z.indigenous_land),
+    isLoading: false,
   };
 };

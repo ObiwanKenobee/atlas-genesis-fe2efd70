@@ -4,7 +4,7 @@ import { AlertCircle, TrendingDown, TrendingUp, Eye, CheckCircle2 } from 'lucide
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useMeasurementData, useMeasurementSummary } from '@/hooks/useMeasurementData';
+import { useMeasurementData } from '@/hooks/useMeasurementData';
 import { MeasurementData } from '@/types/marketplace';
 
 interface MeasurementDashboardProps {
@@ -12,8 +12,7 @@ interface MeasurementDashboardProps {
 }
 
 export function MeasurementDashboard({ projectId }: MeasurementDashboardProps) {
-  const { data: measurements, isLoading } = useMeasurementData(projectId, { days: 30 });
-  const { data: summary } = useMeasurementSummary(projectId);
+  const { data: measurements, summary, isLoading } = useMeasurementData(projectId, { days: 30 });
   const [selectedMetric, setSelectedMetric] = useState<'co2' | 'ndvi' | 'soil_carbon'>('co2');
 
   if (isLoading) {

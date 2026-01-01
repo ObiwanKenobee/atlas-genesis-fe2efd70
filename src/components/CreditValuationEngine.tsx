@@ -222,7 +222,7 @@ export const CreditValuationEngine: React.FC<CreditValuationEngineProps> = ({
                         <Cell key={`cell-${index}`} fill={color} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value) => `${value.toFixed(1)}%`} />
+                    <Tooltip formatter={(value) => typeof value === 'number' ? `${value.toFixed(1)}%` : `${value}%`} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>

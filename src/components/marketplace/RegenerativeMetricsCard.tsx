@@ -11,6 +11,7 @@ import {
   useCropDiversityMetrics,
   useRegenerativeMetricsTrend,
 } from '@/hooks/useRegenerativeMetrics';
+import { RegenerativeMetrics as RegenerativeMetricsType } from '@/types/marketplace';
 import { RegenerativeMetrics } from '@/types/marketplace';
 
 interface RegenerativeMetricsCardProps {
@@ -19,7 +20,7 @@ interface RegenerativeMetricsCardProps {
 }
 
 export function RegenerativeMetricsCard({ projectId, compact = false }: RegenerativeMetricsCardProps) {
-  const { data: metrics, isLoading } = useRegenerativeMetrics(projectId, { days: 30 });
+  const { data: metrics, isLoading } = useRegenerativeMetrics(projectId);
   const { data: soilHealth } = useSoilHealthScore(projectId);
   const { data: biodiversity } = useBiodiversityIndex(projectId);
   const { data: cropDiversity } = useCropDiversityMetrics(projectId);
