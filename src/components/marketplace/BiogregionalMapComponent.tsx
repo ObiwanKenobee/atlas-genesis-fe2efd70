@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Leaf, Shield, Info, MapPin, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useBioregionalZones, useClimateRiskAssessment, useIndigenousLands } from '@/hooks/useBioregionalZones';
+import { useBioregionalZones, useIndigenousLands } from '@/hooks/useBioregionalZones';
 import { BioregionalZone, CLIMATE_LABELS } from '@/types/marketplace';
 
 interface BiogregionalMapComponentProps {
@@ -23,7 +23,8 @@ export function BiogregionalMapComponent({
   onZoneSelect,
 }: BiogregionalMapComponentProps) {
   const { data: zones, isLoading } = useBioregionalZones();
-  const { data: indigenousLands } = useIndigenousLands();
+  const indigenousLandsResult = useIndigenousLands();
+  const indigenousLands = indigenousLandsResult.data;
   const [hoveredZoneId, setHoveredZoneId] = useState<string | null>(null);
   const [selectedZone, setSelectedZone] = useState<BioregionalZone | null>(null);
   const [mapView, setMapView] = useState<'climate-risk' | 'indigenous' | 'multiplier'>('climate-risk');

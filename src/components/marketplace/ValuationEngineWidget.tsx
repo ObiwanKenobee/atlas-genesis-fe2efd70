@@ -12,6 +12,7 @@ import {
   useValuationConfidenceInterval,
   usePriceProjection,
 } from '@/hooks/useValuationModel';
+import { ValuationModel as ValuationModelType } from '@/types/marketplace';
 import { ValuationModel } from '@/types/marketplace';
 
 interface ValuationEngineWidgetProps {
