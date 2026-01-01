@@ -91,34 +91,34 @@ const Dashboard = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
-        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-ocean flex items-center justify-center">
-              <Leaf className="w-5 h-5 text-primary-foreground" />
+        <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className="w-9 sm:w-10 h-9 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-primary to-ocean flex items-center justify-center flex-shrink-0">
+              <Leaf className="w-4 sm:w-5 h-4 sm:h-5 text-primary-foreground" />
             </div>
-            <span className="font-display text-xl font-semibold text-foreground">
+            <span className="font-display text-base sm:text-xl font-semibold text-foreground truncate">
               Atlas Sanctum
             </span>
           </div>
 
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
-              <Bell className="w-5 h-5" />
+          <div className="flex items-center gap-2 sm:gap-4">
+            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground h-10 w-10">
+              <Bell className="w-4 sm:w-5 h-4 sm:h-5" />
             </Button>
             {isAdmin && (
-              <Button variant="outline" size="sm" asChild>
+              <Button variant="outline" size="sm" asChild className="hidden sm:flex">
                 <Link to="/admin">
                   <Shield className="w-4 h-4 mr-2" />
                   Admin
                 </Link>
               </Button>
             )}
-            <div className="flex items-center gap-3 pl-4 border-l border-border">
-              <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center">
-                <User className="w-5 h-5 text-muted-foreground" />
+            <div className="flex items-center gap-2 sm:gap-3 pl-2 sm:pl-4 border-l border-border">
+              <div className="w-8 sm:w-9 h-8 sm:h-9 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+                <User className="w-4 sm:w-5 h-4 sm:h-5 text-muted-foreground" />
               </div>
-              <div className="hidden md:block">
-                <p className="text-sm font-medium text-foreground">
+              <div className="hidden sm:block">
+                <p className="text-xs sm:text-sm font-medium text-foreground">
                   {profile?.full_name || user?.email?.split("@")[0]}
                 </p>
                 <p className="text-xs text-muted-foreground">
@@ -126,24 +126,24 @@ const Dashboard = () => {
                 </p>
               </div>
             </div>
-            <Button variant="ghost" size="icon" onClick={handleSignOut} className="text-muted-foreground hover:text-destructive">
-              <LogOut className="w-5 h-5" />
+            <Button variant="ghost" size="icon" onClick={handleSignOut} className="text-muted-foreground hover:text-destructive h-10 w-10">
+              <LogOut className="w-4 sm:w-5 h-4 sm:h-5" />
             </Button>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-6 py-8">
+      <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Welcome Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="mb-6 sm:mb-8"
         >
-          <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-2">
+          <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2">
             Welcome back, {profile?.full_name?.split(" ")[0] || "Explorer"}
           </h1>
-          <p className="text-muted-foreground text-lg">
+          <p className="text-muted-foreground text-base sm:text-lg">
             Track your regenerative impact and manage your portfolio
           </p>
         </motion.div>
@@ -153,7 +153,7 @@ const Dashboard = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8"
         >
           {stats.map((stat, index) => (
             <motion.div
