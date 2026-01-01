@@ -62,40 +62,40 @@ const Marketplace = () => {
           </Card>
 
           <Card className="border-l-4 border-l-blue-500">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm flex items-center gap-2">
+            <CardHeader className="pb-2 sm:pb-3">
+              <CardTitle className="text-xs sm:text-sm flex items-center gap-2">
                 <TrendingUp className="h-4 w-4" />
                 Market Volume
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">$1.84B</p>
+              <p className="text-xl sm:text-2xl font-bold">$1.84B</p>
               <p className="text-xs text-muted-foreground">Total trading value (YTD)</p>
             </CardContent>
           </Card>
 
           <Card className="border-l-4 border-l-purple-500">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm flex items-center gap-2">
+            <CardHeader className="pb-2 sm:pb-3">
+              <CardTitle className="text-xs sm:text-sm flex items-center gap-2">
                 <Users className="h-4 w-4" />
                 Active Participants
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">25K+</p>
+              <p className="text-xl sm:text-2xl font-bold">25K+</p>
               <p className="text-xs text-muted-foreground">Across all tiers</p>
             </CardContent>
           </Card>
 
           <Card className="border-l-4 border-l-amber-500">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm flex items-center gap-2">
+            <CardHeader className="pb-2 sm:pb-3">
+              <CardTitle className="text-xs sm:text-sm flex items-center gap-2">
                 <DollarSign className="h-4 w-4" />
                 Current Price
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">$82.10</p>
+              <p className="text-xl sm:text-2xl font-bold">$82.10</p>
               <p className="text-xs text-emerald-600">+19.9% YTD</p>
             </CardContent>
           </Card>
