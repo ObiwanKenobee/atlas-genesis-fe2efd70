@@ -62,8 +62,8 @@ const Navigation = () => {
           </motion.div>
 
           {/* Desktop Navigation */}
-          <motion.div 
-            className="hidden md:flex items-center gap-8"
+          <motion.div
+            className="hidden md:flex items-center gap-6 lg:gap-8 overflow-x-auto"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
@@ -72,7 +72,7 @@ const Navigation = () => {
               <Link
                 key={link.name}
                 to={link.href}
-                className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors duration-300 font-medium"
+                className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors duration-300 font-medium whitespace-nowrap"
               >
                 <link.icon className="w-4 h-4" />
                 {link.name}
