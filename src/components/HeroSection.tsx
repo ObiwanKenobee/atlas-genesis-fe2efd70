@@ -82,14 +82,14 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
+            className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-12 sm:mb-16 px-4 sm:px-0 w-full"
           >
-            <Button variant="hero" size="xl">
+            <Button variant="hero" size="lg" className="w-full sm:w-auto">
               Enter the Sanctum
-              <ArrowRight className="w-5 h-5 ml-2" />
+              <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
-            <Button variant="heroOutline" size="xl">
-              <Globe2 className="w-5 h-5 mr-2" />
+            <Button variant="heroOutline" size="lg" className="w-full sm:w-auto">
+              <Globe2 className="w-4 h-4 mr-2" />
               Explore Platform
             </Button>
           </motion.div>
