@@ -122,30 +122,30 @@ const Navigation = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-card/95 backdrop-blur-xl border-b border-border"
+            className="md:hidden bg-card/95 backdrop-blur-xl border-b border-border overflow-hidden"
           >
-            <div className="container mx-auto px-6 py-6 flex flex-col gap-4">
+            <div className="container mx-auto px-4 sm:px-6 py-6 flex flex-col gap-3">
               {navLinks.map((link) => (
                 <Link
                   key={link.name}
                   to={link.href}
-                  className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors py-2 font-medium"
+                  className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors py-3 px-2 rounded-lg font-medium"
                   onClick={() => setIsOpen(false)}
                 >
                   <link.icon className="w-4 h-4" />
                   {link.name}
                 </Link>
               ))}
-              <div className="flex flex-col gap-3 pt-4 border-t border-border">
+              <div className="flex flex-col gap-2 pt-4 border-t border-border">
                 {user ? (
-                  <Button variant="hero" asChild>
+                  <Button variant="hero" asChild className="w-full">
                     <Link to="/dashboard">
                       <LayoutDashboard className="w-4 h-4 mr-2" />
                       Dashboard
                     </Link>
                   </Button>
                 ) : (
-                  <Button variant="hero" asChild>
+                  <Button variant="hero" asChild className="w-full">
                     <Link to="/auth">
                       <LogIn className="w-4 h-4 mr-2" />
                       Sign In
