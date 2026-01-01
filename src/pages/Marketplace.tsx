@@ -34,11 +34,16 @@ const Marketplace = () => {
       <Navigation />
       <main className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-12">
           <h1 className="text-3xl font-bold tracking-tight mb-2">Marketplace & Financial Infrastructure</h1>
           <p className="text-lg text-muted-foreground">
             Regenerative Impact Units (RIUs), tiered buyer system, ESG APIs, and regeneration-backed bonds
           </p>
+        </div>
+
+        {/* Regenerative Marketplace Showcase - Categorical Display */}
+        <div className="mb-16">
+          <RegenerativeMarketplaceShowcase projects={projects} isLoading={isLoading} />
         </div>
 
         {/* Key Metrics */}
