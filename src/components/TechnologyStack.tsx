@@ -86,29 +86,29 @@ const TechnologyStack = () => {
               transition={{ duration: 0.5, delay: index * 0.1 }}
               className="group"
             >
-              <div className="relative bg-card border border-border/50 rounded-2xl p-8 h-full hover:border-primary/30 transition-all duration-500 hover:shadow-glow overflow-hidden">
+              <div className="relative bg-card border border-border/50 rounded-lg sm:rounded-2xl p-4 sm:p-8 h-full hover:border-primary/30 transition-all duration-500 hover:shadow-glow overflow-hidden">
                 {/* Gradient Background on Hover */}
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                
+
                 {/* Icon */}
-                <div className="relative w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-ocean/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform border border-primary/20">
-                  <tech.icon className="w-7 h-7 text-primary" />
+                <div className="relative w-10 sm:w-14 h-10 sm:h-14 rounded-lg sm:rounded-xl bg-gradient-to-br from-primary/20 to-ocean/20 flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 transition-transform border border-primary/20">
+                  <tech.icon className="w-5 sm:w-7 h-5 sm:h-7 text-primary" />
                 </div>
 
                 {/* Content */}
-                <h3 className="relative font-display text-xl font-semibold text-foreground mb-3 group-hover:text-primary transition-colors">
+                <h3 className="relative font-display text-lg sm:text-xl font-semibold text-foreground mb-2 sm:mb-3 group-hover:text-primary transition-colors">
                   {tech.title}
                 </h3>
-                <p className="relative text-muted-foreground leading-relaxed mb-6">
+                <p className="relative text-muted-foreground leading-relaxed mb-4 sm:mb-6 text-sm sm:text-base">
                   {tech.description}
                 </p>
 
                 {/* Tags */}
                 <div className="relative flex flex-wrap gap-2">
                   {tech.tags.map((tag) => (
-                    <span 
+                    <span
                       key={tag}
-                      className="px-3 py-1 rounded-full bg-muted/50 text-xs text-muted-foreground border border-border/50 group-hover:border-primary/20 group-hover:text-foreground transition-colors"
+                      className="px-2 sm:px-3 py-1 rounded-full bg-muted/50 text-xs text-muted-foreground border border-border/50 group-hover:border-primary/20 group-hover:text-foreground transition-colors whitespace-nowrap"
                     >
                       {tag}
                     </span>
