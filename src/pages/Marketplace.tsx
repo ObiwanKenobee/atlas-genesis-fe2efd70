@@ -10,6 +10,7 @@ import { useProjects } from "@/hooks/useMarketplace";
 
 const Marketplace = () => {
   const [selectedFilter, setSelectedFilter] = useState<string>("all");
+  const { data: projects = [], isLoading } = useProjects();
 
   // Sample price data
   const priceHistory = [
