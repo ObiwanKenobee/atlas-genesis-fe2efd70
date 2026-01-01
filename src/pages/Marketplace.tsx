@@ -103,7 +103,7 @@ const Marketplace = () => {
 
         {/* Main Tabs */}
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-6">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 mb-4 sm:mb-6">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="rius">RIUs</TabsTrigger>
             <TabsTrigger value="buyers">Buyers</TabsTrigger>
