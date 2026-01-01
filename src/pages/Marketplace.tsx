@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import Navigation from "@/components/Navigation";
+import { RegenerativeMarketplaceShowcase } from "@/components/marketplace/RegenerativeMarketplaceShowcase";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { ShoppingCart, TrendingUp, Users, Zap, DollarSign, FileText } from "lucide-react";
+import { useProjects } from "@/hooks/useMarketplace";
 
 const Marketplace = () => {
   const [selectedFilter, setSelectedFilter] = useState<string>("all");
+  const { data: projects = [], isLoading } = useProjects();
 
   // Sample price data
   const priceHistory = [
@@ -29,65 +32,70 @@ const Marketplace = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <main className="container mx-auto px-4 py-8 max-w-7xl">
+      <main className="container mx-auto px-4 sm:px-6 py-8 max-w-7xl">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight mb-2">Marketplace & Financial Infrastructure</h1>
-          <p className="text-lg text-muted-foreground">
+        <div className="mb-12 pt-8">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-2">Marketplace & Financial Infrastructure</h1>
+          <p className="text-base sm:text-lg text-muted-foreground">
             Regenerative Impact Units (RIUs), tiered buyer system, ESG APIs, and regeneration-backed bonds
           </p>
         </div>
 
+        {/* Regenerative Marketplace Showcase - Categorical Display */}
+        <div className="mb-16">
+          <RegenerativeMarketplaceShowcase projects={projects} isLoading={isLoading} />
+        </div>
+
         {/* Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
           <Card className="border-l-4 border-l-emerald-500">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm flex items-center gap-2">
+            <CardHeader className="pb-2 sm:pb-3">
+              <CardTitle className="text-xs sm:text-sm flex items-center gap-2">
                 <ShoppingCart className="h-4 w-4" />
                 RIUs in Circulation
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">24.5M</p>
+              <p className="text-xl sm:text-2xl font-bold">24.5M</p>
               <p className="text-xs text-muted-foreground">Regenerative Impact Units</p>
             </CardContent>
           </Card>
 
           <Card className="border-l-4 border-l-blue-500">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm flex items-center gap-2">
+            <CardHeader className="pb-2 sm:pb-3">
+              <CardTitle className="text-xs sm:text-sm flex items-center gap-2">
                 <TrendingUp className="h-4 w-4" />
                 Market Volume
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">$1.84B</p>
+              <p className="text-xl sm:text-2xl font-bold">$1.84B</p>
               <p className="text-xs text-muted-foreground">Total trading value (YTD)</p>
             </CardContent>
           </Card>
 
           <Card className="border-l-4 border-l-purple-500">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm flex items-center gap-2">
+            <CardHeader className="pb-2 sm:pb-3">
+              <CardTitle className="text-xs sm:text-sm flex items-center gap-2">
                 <Users className="h-4 w-4" />
                 Active Participants
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">25K+</p>
+              <p className="text-xl sm:text-2xl font-bold">25K+</p>
               <p className="text-xs text-muted-foreground">Across all tiers</p>
             </CardContent>
           </Card>
 
           <Card className="border-l-4 border-l-amber-500">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm flex items-center gap-2">
+            <CardHeader className="pb-2 sm:pb-3">
+              <CardTitle className="text-xs sm:text-sm flex items-center gap-2">
                 <DollarSign className="h-4 w-4" />
                 Current Price
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">$82.10</p>
+              <p className="text-xl sm:text-2xl font-bold">$82.10</p>
               <p className="text-xs text-emerald-600">+19.9% YTD</p>
             </CardContent>
           </Card>
@@ -95,7 +103,7 @@ const Marketplace = () => {
 
         {/* Main Tabs */}
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-6">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 mb-4 sm:mb-6">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="rius">RIUs</TabsTrigger>
             <TabsTrigger value="buyers">Buyers</TabsTrigger>

@@ -91,34 +91,34 @@ const Dashboard = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
-        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-ocean flex items-center justify-center">
-              <Leaf className="w-5 h-5 text-primary-foreground" />
+        <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className="w-9 sm:w-10 h-9 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-primary to-ocean flex items-center justify-center flex-shrink-0">
+              <Leaf className="w-4 sm:w-5 h-4 sm:h-5 text-primary-foreground" />
             </div>
-            <span className="font-display text-xl font-semibold text-foreground">
+            <span className="font-display text-base sm:text-xl font-semibold text-foreground truncate">
               Atlas Sanctum
             </span>
           </div>
 
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
-              <Bell className="w-5 h-5" />
+          <div className="flex items-center gap-2 sm:gap-4">
+            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground h-10 w-10">
+              <Bell className="w-4 sm:w-5 h-4 sm:h-5" />
             </Button>
             {isAdmin && (
-              <Button variant="outline" size="sm" asChild>
+              <Button variant="outline" size="sm" asChild className="hidden sm:flex">
                 <Link to="/admin">
                   <Shield className="w-4 h-4 mr-2" />
                   Admin
                 </Link>
               </Button>
             )}
-            <div className="flex items-center gap-3 pl-4 border-l border-border">
-              <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center">
-                <User className="w-5 h-5 text-muted-foreground" />
+            <div className="flex items-center gap-2 sm:gap-3 pl-2 sm:pl-4 border-l border-border">
+              <div className="w-8 sm:w-9 h-8 sm:h-9 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+                <User className="w-4 sm:w-5 h-4 sm:h-5 text-muted-foreground" />
               </div>
-              <div className="hidden md:block">
-                <p className="text-sm font-medium text-foreground">
+              <div className="hidden sm:block">
+                <p className="text-xs sm:text-sm font-medium text-foreground">
                   {profile?.full_name || user?.email?.split("@")[0]}
                 </p>
                 <p className="text-xs text-muted-foreground">
@@ -126,24 +126,24 @@ const Dashboard = () => {
                 </p>
               </div>
             </div>
-            <Button variant="ghost" size="icon" onClick={handleSignOut} className="text-muted-foreground hover:text-destructive">
-              <LogOut className="w-5 h-5" />
+            <Button variant="ghost" size="icon" onClick={handleSignOut} className="text-muted-foreground hover:text-destructive h-10 w-10">
+              <LogOut className="w-4 sm:w-5 h-4 sm:h-5" />
             </Button>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-6 py-8">
+      <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Welcome Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="mb-6 sm:mb-8"
         >
-          <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-2">
+          <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2">
             Welcome back, {profile?.full_name?.split(" ")[0] || "Explorer"}
           </h1>
-          <p className="text-muted-foreground text-lg">
+          <p className="text-muted-foreground text-base sm:text-lg">
             Track your regenerative impact and manage your portfolio
           </p>
         </motion.div>
@@ -153,7 +153,7 @@ const Dashboard = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8"
         >
           {stats.map((stat, index) => (
             <motion.div
@@ -161,32 +161,32 @@ const Dashboard = () => {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1 + index * 0.05 }}
-              className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6 hover:border-primary/30 transition-colors"
+              className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-lg sm:rounded-2xl p-4 sm:p-6 hover:border-primary/30 transition-colors"
             >
-              <div className="flex items-start justify-between mb-4">
-                <div className={`w-12 h-12 rounded-xl bg-muted flex items-center justify-center ${stat.color}`}>
-                  <stat.icon className="w-6 h-6" />
+              <div className="flex items-start justify-between mb-3 sm:mb-4">
+                <div className={`w-10 sm:w-12 h-10 sm:h-12 rounded-lg sm:rounded-xl bg-muted flex items-center justify-center ${stat.color}`}>
+                  <stat.icon className="w-5 sm:w-6 h-5 sm:h-6" />
                 </div>
-                <span className="text-sm font-medium text-primary bg-primary/10 px-2 py-1 rounded-full">
+                <span className="text-xs sm:text-sm font-medium text-primary bg-primary/10 px-2 py-1 rounded-full">
                   {stat.change}
                 </span>
               </div>
-              <p className="text-2xl font-bold text-foreground mb-1">{stat.value}</p>
-              <p className="text-sm text-muted-foreground">{stat.label}</p>
+              <p className="text-xl sm:text-2xl font-bold text-foreground mb-1">{stat.value}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">{stat.label}</p>
             </motion.div>
           ))}
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
           {/* Recent Activity */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="lg:col-span-2 bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6"
+            className="lg:col-span-2 bg-card/50 backdrop-blur-sm border border-border/50 rounded-lg sm:rounded-2xl p-4 sm:p-6"
           >
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="font-display text-xl font-semibold text-foreground">Recent Activity</h2>
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h2 className="font-display text-lg sm:text-xl font-semibold text-foreground">Recent Activity</h2>
               <Button variant="ghost" size="sm" className="text-muted-foreground">
                 View all <ChevronRight className="w-4 h-4 ml-1" />
               </Button>

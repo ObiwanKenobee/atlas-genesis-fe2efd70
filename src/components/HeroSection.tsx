@@ -39,17 +39,17 @@ const HeroSection = () => {
         }}
       />
 
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
         <div className="max-w-5xl mx-auto text-center">
           {/* Badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/50 border border-border/50 backdrop-blur-sm mb-8"
+            className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full bg-muted/50 border border-border/50 backdrop-blur-sm mb-6 sm:mb-8 mx-4 sm:mx-0"
           >
-            <Sparkles className="w-4 h-4 text-accent" />
-            <span className="text-sm text-muted-foreground">
+            <Sparkles className="w-4 h-4 text-accent flex-shrink-0" />
+            <span className="text-xs sm:text-sm text-muted-foreground">
               Regenerative Value Exchange • Powered by AI & Blockchain
             </span>
           </motion.div>
@@ -59,7 +59,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="font-display text-5xl md:text-7xl lg:text-8xl font-bold leading-tight mb-8"
+            className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight mb-6 sm:mb-8"
           >
             <span className="text-foreground">Regenerating</span>
             <br />
@@ -71,9 +71,9 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-12 leading-relaxed"
+            className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-3xl mx-auto mb-10 sm:mb-12 leading-relaxed px-4 sm:px-0"
           >
-            The world's first regenerative platform uniting ecosystems across land, 
+            The world's first regenerative platform uniting ecosystems across land,
             oceans, and human health—scaling to trillion-dollar impact with an enduring ethical core.
           </motion.p>
 
@@ -82,14 +82,14 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
+            className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-12 sm:mb-16 px-4 sm:px-0 w-full"
           >
-            <Button variant="hero" size="xl">
+            <Button variant="hero" size="lg" className="w-full sm:w-auto">
               Enter the Sanctum
-              <ArrowRight className="w-5 h-5 ml-2" />
+              <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
-            <Button variant="heroOutline" size="xl">
-              <Globe2 className="w-5 h-5 mr-2" />
+            <Button variant="heroOutline" size="lg" className="w-full sm:w-auto">
+              <Globe2 className="w-4 h-4 mr-2" />
               Explore Platform
             </Button>
           </motion.div>
@@ -99,7 +99,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.8 }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto"
+            className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8 max-w-4xl mx-auto px-4 sm:px-0"
           >
             {[
               { value: "$2.4T", label: "Addressable Market" },
@@ -112,12 +112,12 @@ const HeroSection = () => {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: 1 + index * 0.1 }}
-                className="text-center p-6 rounded-2xl bg-card/50 border border-border/50 backdrop-blur-sm"
+                className="text-center p-3 sm:p-4 md:p-6 rounded-lg sm:rounded-2xl bg-card/50 border border-border/50 backdrop-blur-sm"
               >
-                <div className="text-3xl md:text-4xl font-bold text-gradient-gold mb-2">
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-gradient-gold mb-1 sm:mb-2">
                   {stat.value}
                 </div>
-                <div className="text-sm text-muted-foreground">{stat.label}</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">{stat.label}</div>
               </motion.div>
             ))}
           </motion.div>
