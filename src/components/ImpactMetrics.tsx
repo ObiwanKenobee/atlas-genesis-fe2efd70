@@ -144,13 +144,13 @@ const ImpactMetrics = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.6 }}
-          className="flex items-center justify-center gap-3 mt-12"
+          className="flex items-center justify-center gap-2 sm:gap-3 mt-8 sm:mt-12 px-4 sm:px-0"
         >
           <span className="relative flex h-3 w-3">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
             <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
           </span>
-          <span className="text-muted-foreground">
+          <span className="text-muted-foreground text-sm sm:text-base">
             Live data from 15,000+ IoT sensors worldwide
           </span>
         </motion.div>
