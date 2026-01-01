@@ -28,8 +28,8 @@ const Navigation = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <motion.div 
+          {/* Logo & Enterprise Innovations */}
+          <motion.div
             className="flex items-center gap-3"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -38,9 +38,27 @@ const Navigation = () => {
             <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-ocean flex items-center justify-center shadow-glow">
               <Leaf className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="font-display text-xl font-semibold text-foreground">
-              Atlas <span className="text-gradient">Sanctum</span>
-            </span>
+            <div className="flex flex-col gap-0.5">
+              <div className="flex items-center gap-2">
+                <span className="font-display text-xl font-semibold text-foreground">
+                  Atlas <span className="text-gradient">Sanctum</span>
+                </span>
+              </div>
+              <div className="hidden sm:flex items-center gap-1.5">
+                <Badge variant="secondary" className="h-5 gap-1 text-xs px-2 bg-emerald-500/10 text-emerald-600 border-emerald-500/20">
+                  <Award className="w-3 h-3" />
+                  Enterprise
+                </Badge>
+                <Badge variant="secondary" className="h-5 gap-1 text-xs px-2 bg-blue-500/10 text-blue-600 border-blue-500/20">
+                  <Shield className="w-3 h-3" />
+                  Verified
+                </Badge>
+                <Badge variant="secondary" className="h-5 gap-1 text-xs px-2 bg-amber-500/10 text-amber-600 border-amber-500/20">
+                  <Zap className="w-3 h-3" />
+                  Innovative
+                </Badge>
+              </div>
+            </div>
           </motion.div>
 
           {/* Desktop Navigation */}
