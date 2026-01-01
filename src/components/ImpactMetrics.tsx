@@ -61,38 +61,38 @@ const metrics = [
 
 const ImpactMetrics = () => {
   return (
-    <section id="impact" className="py-32 relative overflow-hidden">
+    <section id="impact" className="py-16 sm:py-24 md:py-32 relative overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-card/30 via-background to-card/30" />
-      
-      {/* Decorative Orbs */}
-      <div className="absolute top-1/4 left-0 w-96 h-96 rounded-full bg-primary/5 blur-3xl" />
-      <div className="absolute bottom-1/4 right-0 w-80 h-80 rounded-full bg-ocean/5 blur-3xl" />
 
-      <div className="container mx-auto px-6 relative z-10">
+      {/* Decorative Orbs */}
+      <div className="absolute top-1/4 left-0 w-64 sm:w-96 h-64 sm:h-96 rounded-full bg-primary/5 blur-3xl" />
+      <div className="absolute bottom-1/4 right-0 w-64 sm:w-80 h-64 sm:h-80 rounded-full bg-ocean/5 blur-3xl" />
+
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-20"
+          className="text-center mb-12 sm:mb-16 md:mb-20"
         >
-          <span className="text-accent font-medium tracking-wider uppercase text-sm">
+          <span className="text-accent font-medium tracking-wider uppercase text-xs sm:text-sm">
             Real-Time Impact
           </span>
-          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6">
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mt-3 sm:mt-4 mb-4 sm:mb-6">
             Measuring{" "}
             <span className="text-gradient-gold">Regeneration</span>
           </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Transparent, verifiable metrics powered by AI oracles and IoT sensors 
+          <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto px-4 sm:px-0">
+            Transparent, verifiable metrics powered by AI oracles and IoT sensors
             tracking our collective impact across all ecosystems.
           </p>
         </motion.div>
 
         {/* Metrics Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {metrics.map((metric, index) => (
             <motion.div
               key={metric.label}
