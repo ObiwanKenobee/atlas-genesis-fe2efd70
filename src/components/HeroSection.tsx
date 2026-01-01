@@ -99,7 +99,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.8 }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto"
+            className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8 max-w-4xl mx-auto px-4 sm:px-0"
           >
             {[
               { value: "$2.4T", label: "Addressable Market" },
@@ -112,12 +112,12 @@ const HeroSection = () => {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: 1 + index * 0.1 }}
-                className="text-center p-6 rounded-2xl bg-card/50 border border-border/50 backdrop-blur-sm"
+                className="text-center p-3 sm:p-4 md:p-6 rounded-lg sm:rounded-2xl bg-card/50 border border-border/50 backdrop-blur-sm"
               >
-                <div className="text-3xl md:text-4xl font-bold text-gradient-gold mb-2">
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-gradient-gold mb-1 sm:mb-2">
                   {stat.value}
                 </div>
-                <div className="text-sm text-muted-foreground">{stat.label}</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">{stat.label}</div>
               </motion.div>
             ))}
           </motion.div>
