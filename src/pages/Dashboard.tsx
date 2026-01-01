@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { 
-  Leaf, LogOut, User, BarChart3, Globe2, Wallet, 
-  TrendingUp, Activity, Layers, Settings, Bell,
-  ChevronRight, ExternalLink, Shield
+import {
+  Leaf, LogOut, User, BarChart3,
+  TrendingUp, Activity, Bell,
+  ChevronRight, Shield
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import QuickActions from "@/components/dashboard/QuickActions";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useAdmin";
 import { supabase } from "@/integrations/supabase/client";
