@@ -81,12 +81,6 @@ const Dashboard = () => {
     { title: "Portfolio update", description: "Quarterly performance report available", time: "2 days ago", type: "report" },
   ];
 
-  const quickActions = [
-    { label: "Buy Credits", icon: Wallet, href: "/marketplace" },
-    { label: "My Portfolio", icon: Globe2, href: "/transactions" },
-    { label: "Explore Projects", icon: Layers, href: "/marketplace" },
-    { label: "Settings", icon: Settings, href: "#" },
-  ];
 
   return (
     <div className="min-h-screen bg-background">
