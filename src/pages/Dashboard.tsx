@@ -177,16 +177,16 @@ const Dashboard = () => {
           ))}
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
           {/* Recent Activity */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="lg:col-span-2 bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6"
+            className="lg:col-span-2 bg-card/50 backdrop-blur-sm border border-border/50 rounded-lg sm:rounded-2xl p-4 sm:p-6"
           >
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="font-display text-xl font-semibold text-foreground">Recent Activity</h2>
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h2 className="font-display text-lg sm:text-xl font-semibold text-foreground">Recent Activity</h2>
               <Button variant="ghost" size="sm" className="text-muted-foreground">
                 View all <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
