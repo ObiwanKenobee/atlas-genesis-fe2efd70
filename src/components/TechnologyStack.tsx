@@ -125,29 +125,29 @@ const TechnologyStack = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="mt-20 p-8 rounded-3xl bg-card-gradient border border-border/50"
+          className="mt-12 sm:mt-16 md:mt-20 p-4 sm:p-8 rounded-2xl sm:rounded-3xl bg-card-gradient border border-border/50"
         >
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-6 sm:gap-8">
             <div className="flex-1">
-              <h3 className="font-display text-2xl font-semibold text-foreground mb-4">
+              <h3 className="font-display text-xl sm:text-2xl font-semibold text-foreground mb-3 sm:mb-4">
                 Decentralized by Design
               </h3>
-              <p className="text-muted-foreground leading-relaxed mb-6">
-                Our architecture ensures no single point of failure, with data distributed 
+              <p className="text-muted-foreground leading-relaxed mb-4 sm:mb-6 text-sm sm:text-base">
+                Our architecture ensures no single point of failure, with data distributed
                 across global nodes and verified through consensus mechanisms.
               </p>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3 sm:gap-4">
                 <div className="flex -space-x-2">
                   {[...Array(4)].map((_, i) => (
-                    <div 
+                    <div
                       key={i}
-                      className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-ocean border-2 border-background flex items-center justify-center text-xs text-primary-foreground font-medium"
+                      className="w-8 sm:w-10 h-8 sm:h-10 rounded-full bg-gradient-to-br from-primary to-ocean border-2 border-background flex items-center justify-center text-xs text-primary-foreground font-medium"
                     >
                       N{i + 1}
                     </div>
                   ))}
                 </div>
-                <span className="text-muted-foreground text-sm">
+                <span className="text-muted-foreground text-xs sm:text-sm">
                   4,000+ global nodes
                 </span>
               </div>
