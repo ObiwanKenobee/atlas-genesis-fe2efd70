@@ -46,10 +46,10 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/50 border border-border/50 backdrop-blur-sm mb-8"
+            className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full bg-muted/50 border border-border/50 backdrop-blur-sm mb-6 sm:mb-8 mx-4 sm:mx-0"
           >
-            <Sparkles className="w-4 h-4 text-accent" />
-            <span className="text-sm text-muted-foreground">
+            <Sparkles className="w-4 h-4 text-accent flex-shrink-0" />
+            <span className="text-xs sm:text-sm text-muted-foreground">
               Regenerative Value Exchange • Powered by AI & Blockchain
             </span>
           </motion.div>
