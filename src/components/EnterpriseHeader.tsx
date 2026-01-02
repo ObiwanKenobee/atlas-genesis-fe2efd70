@@ -8,7 +8,6 @@ import {
   LogIn,
   ChevronDown,
   Settings,
-  Bell,
   User,
   BarChart3,
   ShoppingBag,
@@ -31,9 +30,11 @@ import {
   Layers,
   Database,
   LineChart,
+  CreditCard,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { NotificationCenter } from "@/components/NotificationCenter";
 
 interface DropdownItem {
   name: string;
@@ -267,6 +268,13 @@ const EnterpriseHeader = () => {
               icon: <Phone className="w-5 h-5" />,
               description: "Enterprise inquiries",
             },
+            {
+              name: "Pricing",
+              href: "/pricing",
+              icon: <CreditCard className="w-5 h-5" />,
+              description: "Plans and payment options",
+              badge: "New",
+            },
           ],
         },
       ],
@@ -438,10 +446,7 @@ const EnterpriseHeader = () => {
           <div className="hidden lg:flex items-center gap-3">
             {user ? (
               <>
-                <button className="relative p-2 rounded-lg hover:bg-accent/50 transition-colors">
-                  <Bell className="w-5 h-5 text-muted-foreground" />
-                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full" />
-                </button>
+                <NotificationCenter />
                 <Link
                   to="/settings"
                   className="p-2 rounded-lg hover:bg-accent/50 transition-colors"
