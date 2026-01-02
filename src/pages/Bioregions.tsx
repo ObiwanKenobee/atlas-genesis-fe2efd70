@@ -16,59 +16,65 @@ const Bioregions = () => {
   // Fetch bioregional data
   const bioregions = useBioregionalZones(selectedZoneIds);
 
-  // Generate mock zone data
+  // Generate mock zone data matching new schema
   const mockZones: BioregionalZone[] = [
     {
       id: "zone-1",
-      zone_name: "Amazon Basin",
-      geometry: null,
-      climate_classification: "tropical_rainforest",
-      historical_land_use: "Indigenous territory, historical deforestation 1970-2000",
-      indigenous_land: true,
-      indigenous_community_name: "Yanomami, Kayapo, Xingu peoples",
-      base_credit_multiplier: 3.5,
-      climate_risk_score: 45,
-      biodiversity_value_factor: 2.8,
-      region_country: "Brazil, Peru, Colombia",
-      region_area_km2: 5500000,
+      name: "Amazon Basin",
+      code: "AMZ-001",
+      region: "South America",
+      country: "Brazil",
+      coordinates: null,
+      climate_type: "tropical_rainforest",
+      biodiversity_index: 95,
+      carbon_sequestration_rate: 3.5,
+      active_projects: 12,
+      total_area_hectares: 5500000,
+      risk_level: "medium",
+      description: "Indigenous territory, historical deforestation 1970-2000",
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     },
     {
       id: "zone-2",
-      zone_name: "Boreal Forests",
-      geometry: null,
-      climate_classification: "boreal_forest",
-      historical_land_use: "Commercial forestry, recent conservation 2010-present",
-      indigenous_land: true,
-      indigenous_community_name: "Sámi, First Nations",
-      base_credit_multiplier: 2.2,
-      climate_risk_score: 62,
-      biodiversity_value_factor: 1.9,
-      region_country: "Canada, Russia, Scandinavia",
-      region_area_km2: 11000000,
+      name: "Boreal Forests",
+      code: "BOR-001",
+      region: "North America",
+      country: "Canada",
+      coordinates: null,
+      climate_type: "boreal_forest",
+      biodiversity_index: 72,
+      carbon_sequestration_rate: 2.2,
+      active_projects: 8,
+      total_area_hectares: 11000000,
+      risk_level: "high",
+      description: "Commercial forestry, recent conservation 2010-present",
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     },
     {
       id: "zone-3",
-      zone_name: "Coral Triangle",
-      geometry: null,
-      climate_classification: "ocean_coastal",
-      historical_land_use: "Traditional fishing, marine conservation expanding",
-      indigenous_land: false,
-      indigenous_community_name: null,
-      base_credit_multiplier: 4.1,
-      climate_risk_score: 73,
-      biodiversity_value_factor: 3.4,
-      region_country: "Indonesia, Philippines, Malaysia",
-      region_area_km2: 6000000,
+      name: "Coral Triangle",
+      code: "CRL-001",
+      region: "Southeast Asia",
+      country: "Indonesia",
+      coordinates: null,
+      climate_type: "ocean_coastal",
+      biodiversity_index: 98,
+      carbon_sequestration_rate: 4.1,
+      active_projects: 15,
+      total_area_hectares: 6000000,
+      risk_level: "high",
+      description: "Traditional fishing, marine conservation expanding",
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     },
   ];
 
   const displayZones = bioregions.data.length > 0 ? bioregions.data : mockZones;
+
+  // Check for high biodiversity zones (biodiversity_index > 90)
+  const highBiodiversityZones = displayZones.filter((z) => (z.biodiversity_index || 0) > 90);
 
   return (
     <div className="min-h-screen bg-background">
@@ -114,11 +120,11 @@ const Bioregions = () => {
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center gap-2">
                 <Heart className="h-4 w-4" />
-                Indigenous Lands
+                High Biodiversity
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">{displayZones.filter((z) => z.indigenous_land).length}</p>
+              <p className="text-2xl font-bold">{highBiodiversityZones.length}</p>
               <p className="text-xs text-muted-foreground">Protected territories</p>
             </CardContent>
           </Card>
@@ -358,7 +364,7 @@ const Bioregions = () => {
                   <div className="p-4 border rounded-lg">
                     <h4 className="font-semibold text-sm mb-2">Transparency Archive</h4>
                     <p className="text-sm text-slate-700">
-                      All decisions, votes, and governance actions publicly auditable and immutable on distributed ledger
+                      All governance decisions, credit issuances, and disputes are recorded on-chain
                     </p>
                   </div>
                 </div>

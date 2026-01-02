@@ -12,63 +12,6 @@ const RegenerativeAgriculture = () => {
   // Fetch regenerative metrics
   const metrics = useRegenerativeMetrics(selectedProjectId);
 
-  // Generate sample metrics data for display
-  const sampleMetrics = [
-    {
-      id: "m1",
-      project_id: "sample-project-1",
-      measurement_date: new Date(Date.now() - 0 * 86400000).toISOString(),
-      soil_microbiome_health: 82,
-      biodiversity_index: 78,
-      pollinator_count: 450,
-      native_species_count: 24,
-      crop_diversity_index: 85,
-      crop_types_count: 7,
-      mangrove_health_score: 88,
-      kelp_forest_coverage_percent: 76,
-      data_source: "eDNA-Sample" as const,
-      confidence_level: 0.95,
-      notes: "Excellent ecosystem recovery. Native species returning.",
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: "m2",
-      project_id: "sample-project-1",
-      measurement_date: new Date(Date.now() - 7 * 86400000).toISOString(),
-      soil_microbiome_health: 79,
-      biodiversity_index: 74,
-      pollinator_count: 420,
-      native_species_count: 22,
-      crop_diversity_index: 81,
-      crop_types_count: 7,
-      mangrove_health_score: 85,
-      kelp_forest_coverage_percent: 71,
-      data_source: "Bioacoustic" as const,
-      confidence_level: 0.92,
-      notes: "Pollinator activity increasing. Crop yields stable.",
-      created_at: new Date(Date.now() - 7 * 86400000).toISOString(),
-    },
-    {
-      id: "m3",
-      project_id: "sample-project-1",
-      measurement_date: new Date(Date.now() - 14 * 86400000).toISOString(),
-      soil_microbiome_health: 76,
-      biodiversity_index: 70,
-      pollinator_count: 380,
-      native_species_count: 20,
-      crop_diversity_index: 77,
-      crop_types_count: 6,
-      mangrove_health_score: 80,
-      kelp_forest_coverage_percent: 65,
-      data_source: "eDNA-Sample" as const,
-      confidence_level: 0.91,
-      notes: "Early signs of ecosystem recovery.",
-      created_at: new Date(Date.now() - 14 * 86400000).toISOString(),
-    },
-  ];
-
-  const displayMetrics = metrics.data.length > 0 ? metrics.data : sampleMetrics;
-
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -161,7 +104,7 @@ const RegenerativeAgriculture = () => {
           {/* Recovery Tracker Tab */}
           <TabsContent value="recovery" className="space-y-6">
             <EcosystemRecoveryTracker
-              metrics={displayMetrics}
+              metrics={metrics.data}
               trend={metrics.trend || undefined}
               isLoading={metrics.isLoading}
             />
@@ -376,44 +319,42 @@ const RegenerativeAgriculture = () => {
                   </div>
 
                   <div className="space-y-4">
-                    <h3 className="font-semibold">Premium Market Access</h3>
+                    <h3 className="font-semibold">Stacking Opportunities</h3>
                     <div className="space-y-3">
                       <div className="p-4 border rounded-lg bg-gradient-to-r from-amber-50 to-amber-100">
-                        <h4 className="font-semibold text-sm text-amber-900 mb-2">Certified Regenerative Crops</h4>
+                        <div className="flex justify-between items-start mb-2">
+                          <h4 className="font-semibold text-sm text-amber-900">Carbon Sequestration</h4>
+                          <span className="text-xs bg-amber-200 text-amber-900 px-2 py-1 rounded">Annual</span>
+                        </div>
                         <p className="text-sm text-amber-800 mb-2">
-                          Premium pricing: 15-30% markup over conventional crops
+                          $20-80/ton of CO₂ sequestered in soil and biomass
                         </p>
-                        <p className="text-xs text-amber-700">Direct access to eco-conscious buyers</p>
+                        <p className="text-xs text-amber-700">Verified through soil sampling and satellite imagery</p>
                       </div>
 
                       <div className="p-4 border rounded-lg bg-gradient-to-r from-purple-50 to-purple-100">
-                        <h4 className="font-semibold text-sm text-purple-900 mb-2">Carbon Credit Aggregation</h4>
+                        <div className="flex justify-between items-start mb-2">
+                          <h4 className="font-semibold text-sm text-purple-900">Water Quality Premium</h4>
+                          <span className="text-xs bg-purple-200 text-purple-900 px-2 py-1 rounded">Quarterly</span>
+                        </div>
                         <p className="text-sm text-purple-800 mb-2">
-                          Combine micro-credits with other farms to access larger buyers
+                          Bonus payments for watershed protection and reduced runoff
                         </p>
-                        <p className="text-xs text-purple-700">Pooling mechanism for farmer cooperatives</p>
+                        <p className="text-xs text-purple-700">Measured via downstream water quality sensors</p>
                       </div>
 
                       <div className="p-4 border rounded-lg bg-gradient-to-r from-cyan-50 to-cyan-100">
-                        <h4 className="font-semibold text-sm text-cyan-900 mb-2">Agritourism & Education</h4>
+                        <div className="flex justify-between items-start mb-2">
+                          <h4 className="font-semibold text-sm text-cyan-900">Community Impact</h4>
+                          <span className="text-xs bg-cyan-200 text-cyan-900 px-2 py-1 rounded">Annual</span>
+                        </div>
                         <p className="text-sm text-cyan-800 mb-2">
-                          Partner with platforms to host farm visits, workshops, school programs
+                          Additional payments for educational programs and local hiring
                         </p>
-                        <p className="text-xs text-cyan-700">$5K-50K/year for popular destinations</p>
+                        <p className="text-xs text-cyan-700">Verified through community surveys and employment data</p>
                       </div>
                     </div>
                   </div>
-                </div>
-
-                <div className="p-4 border-l-4 border-l-green-600 bg-green-50 rounded-lg">
-                  <p className="font-semibold text-green-900 mb-2">Annual Income Example (500-acre farm)</p>
-                  <ul className="text-sm text-green-800 space-y-1">
-                    <li>✓ Soil health credits: $30K-90K/year</li>
-                    <li>✓ Biodiversity credits: $50K-150K/year</li>
-                    <li>✓ Pollinator bonuses: $100K-250K/year</li>
-                    <li>✓ Premium crop sales: $25K-75K/year</li>
-                    <li>✓ <strong>Total: $205K-565K/year additional income</strong></li>
-                  </ul>
                 </div>
               </CardContent>
             </Card>
@@ -423,81 +364,25 @@ const RegenerativeAgriculture = () => {
           <TabsContent value="impact" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Regenerative Impact Metrics</CardTitle>
-                <CardDescription>Measurable outcomes from ecosystem recovery</CardDescription>
+                <CardTitle>Ecosystem Impact Dashboard</CardTitle>
+                <CardDescription>Track your regenerative progress over time</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <h3 className="font-semibold">Carbon Sequestration</h3>
-                    <div className="p-4 border rounded-lg">
-                      <p className="text-sm text-muted-foreground mb-2">Annual CO₂ Removal Per Hectare</p>
-                      <p className="text-3xl font-bold text-emerald-600">12.5</p>
-                      <p className="text-xs text-muted-foreground">metric tons CO₂e/ha/year</p>
-                      <p className="text-xs text-emerald-700 mt-3">
-                        Equivalent to taking 2.7 cars off the road for a year
-                      </p>
-                    </div>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="p-6 border rounded-lg text-center">
+                    <div className="text-4xl font-bold text-emerald-600 mb-2">+47%</div>
+                    <p className="text-sm text-muted-foreground">Soil Health Improvement</p>
+                    <p className="text-xs text-muted-foreground mt-1">Last 12 months</p>
                   </div>
-
-                  <div className="space-y-4">
-                    <h3 className="font-semibold">Water Quality</h3>
-                    <div className="p-4 border rounded-lg">
-                      <p className="text-sm text-muted-foreground mb-2">Runoff Reduction</p>
-                      <p className="text-3xl font-bold text-cyan-600">68%</p>
-                      <p className="text-xs text-muted-foreground">compared to conventional farming</p>
-                      <p className="text-xs text-cyan-700 mt-3">
-                        Protects downstream water quality and aquatic ecosystems
-                      </p>
-                    </div>
+                  <div className="p-6 border rounded-lg text-center">
+                    <div className="text-4xl font-bold text-blue-600 mb-2">+32%</div>
+                    <p className="text-sm text-muted-foreground">Biodiversity Recovery</p>
+                    <p className="text-xs text-muted-foreground mt-1">Native species count</p>
                   </div>
-
-                  <div className="space-y-4">
-                    <h3 className="font-semibold">Soil Health</h3>
-                    <div className="p-4 border rounded-lg">
-                      <p className="text-sm text-muted-foreground mb-2">Organic Matter Increase</p>
-                      <p className="text-3xl font-bold text-amber-600">+4.2%</p>
-                      <p className="text-xs text-muted-foreground">per year average</p>
-                      <p className="text-xs text-amber-700 mt-3">
-                        Improved water-holding capacity, microbial activity, and nutrient cycling
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <h3 className="font-semibold">Biodiversity</h3>
-                    <div className="p-4 border rounded-lg">
-                      <p className="text-sm text-muted-foreground mb-2">Species Richness Recovery</p>
-                      <p className="text-3xl font-bold text-blue-600">+127</p>
-                      <p className="text-xs text-muted-foreground">species per hectare (5 years)</p>
-                      <p className="text-xs text-blue-700 mt-3">
-                        Native plants, insects, and wildlife return to managed lands
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <h3 className="font-semibold">Economic Resilience</h3>
-                    <div className="p-4 border rounded-lg">
-                      <p className="text-sm text-muted-foreground mb-2">Yield Stability</p>
-                      <p className="text-3xl font-bold text-purple-600">3x</p>
-                      <p className="text-xs text-muted-foreground">lower variance</p>
-                      <p className="text-xs text-purple-700 mt-3">
-                        Diverse crop systems weather climate shocks better
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <h3 className="font-semibold">Public Health</h3>
-                    <div className="p-4 border rounded-lg">
-                      <p className="text-sm text-muted-foreground mb-2">Pesticide Reduction</p>
-                      <p className="text-3xl font-bold text-red-600">94%</p>
-                      <p className="text-xs text-muted-foreground">less synthetic input</p>
-                      <p className="text-xs text-red-700 mt-3">
-                        Lower soil/water contamination, safer for farm workers
-                      </p>
-                    </div>
+                  <div className="p-6 border rounded-lg text-center">
+                    <div className="text-4xl font-bold text-amber-600 mb-2">2.4t</div>
+                    <p className="text-sm text-muted-foreground">CO₂ Sequestered</p>
+                    <p className="text-xs text-muted-foreground mt-1">Per acre annually</p>
                   </div>
                 </div>
               </CardContent>

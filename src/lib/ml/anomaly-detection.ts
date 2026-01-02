@@ -125,72 +125,48 @@ export function detectMetricsAnomalies(
   const anomalies: string[] = [];
   let anomalyScore = 0;
 
-  // 1. Check valid score ranges
-  if (metrics.soil_microbiome_health !== null && (metrics.soil_microbiome_health < 0 || metrics.soil_microbiome_health > 100)) {
-    anomalies.push('Soil microbiome health score outside [0, 100]');
+  // 1. Check valid score ranges using new schema fields
+  const currentValue = metrics.current_value || 0;
+  
+  if (currentValue < 0 || currentValue > 100) {
+    anomalies.push('Current value outside valid range [0, 100]');
     anomalyScore += 0.3;
-  }
-
-  if (metrics.biodiversity_index !== null && (metrics.biodiversity_index < 0 || metrics.biodiversity_index > 100)) {
-    anomalies.push('Biodiversity index outside valid range');
-    anomalyScore += 0.3;
-  }
-
-  if (metrics.crop_diversity_index !== null && (metrics.crop_diversity_index < 0 || metrics.crop_diversity_index > 100)) {
-    anomalies.push('Crop diversity index out of range');
-    anomalyScore += 0.25;
   }
 
   // 2. Check for impossible improvements
-  if (historicalMetrics.length > 1) {
-    const recent = historicalMetrics[0];
-    const daysDiff = Math.max(1, (new Date(metrics.measurement_date).getTime() - new Date(recent.measurement_date).getTime()) / (1000 * 60 * 60 * 24));
-
-    // Microbiome health can improve at most ~1-2 points per day with intensive management
-    if (metrics.soil_microbiome_health && recent.soil_microbiome_health) {
-      const healthGain = metrics.soil_microbiome_health - recent.soil_microbiome_health;
-      if (healthGain > 5 * daysDiff) {
-        anomalies.push(`Unrealistic microbiome improvement: +${healthGain.toFixed(1)} points in ${daysDiff.toFixed(1)} days`);
-        anomalyScore += 0.25;
-      }
+  if (historicalMetrics.length > 1 && metrics.baseline_value !== null) {
+    const improvement = metrics.improvement_percentage || 0;
+    
+    // Improvement shouldn't exceed reasonable bounds
+    if (improvement > 50) {
+      anomalies.push(`Unrealistic improvement: +${improvement.toFixed(1)}% from baseline`);
+      anomalyScore += 0.25;
     }
+  }
 
-    // Biodiversity shouldn't jump dramatically
-    if (metrics.biodiversity_index && recent.biodiversity_index) {
-      const bioChange = Math.abs(metrics.biodiversity_index - recent.biodiversity_index);
-      if (bioChange > 15) {
-        anomalies.push(`Biodiversity change too large: ±${bioChange.toFixed(1)} points`);
+  // 3. Temporal consistency checks using last_measured_at
+  if (historicalMetrics.length > 0 && metrics.last_measured_at) {
+    const recent = historicalMetrics[0];
+    if (recent.last_measured_at) {
+      const daysDiff = Math.max(1, (new Date(metrics.last_measured_at).getTime() - new Date(recent.last_measured_at).getTime()) / (1000 * 60 * 60 * 24));
+      
+      // Value shouldn't change dramatically in short time
+      const valueChange = Math.abs(currentValue - (recent.current_value || 0));
+      if (valueChange > 15 && daysDiff < 7) {
+        anomalies.push(`Large value change: ±${valueChange.toFixed(1)} points in ${daysDiff.toFixed(1)} days`);
         anomalyScore += 0.2;
       }
     }
   }
 
-  // 3. Logical consistency checks
-  // Monoculture (crop_diversity_index < 30) + high biodiversity is suspicious
-  if (
-    metrics.crop_diversity_index &&
-    metrics.crop_diversity_index < 30 &&
-    metrics.biodiversity_index &&
-    metrics.biodiversity_index > 70
-  ) {
-    anomalies.push('High biodiversity with monoculture agriculture is unlikely');
+  // 4. Trend consistency check
+  if (metrics.trend === 'improving' && (metrics.improvement_percentage || 0) < 0) {
+    anomalies.push('Trend marked as improving but improvement percentage is negative');
     anomalyScore += 0.15;
   }
 
-  // Very poor soil health but high productivity is suspicious
-  if (
-    metrics.soil_microbiome_health &&
-    metrics.soil_microbiome_health < 30 &&
-    metrics.crop_diversity_index &&
-    metrics.crop_diversity_index > 60
-  ) {
-    anomalies.push('High crop diversity with poor soil health is unlikely');
-    anomalyScore += 0.2;
-  }
-
-  // 4. Data source credibility
-  if (metrics.confidence_level < 0.6) {
-    anomalies.push('Low confidence in measurement methodology');
+  if (metrics.trend === 'declining' && (metrics.improvement_percentage || 0) > 0) {
+    anomalies.push('Trend marked as declining but improvement percentage is positive');
     anomalyScore += 0.15;
   }
 

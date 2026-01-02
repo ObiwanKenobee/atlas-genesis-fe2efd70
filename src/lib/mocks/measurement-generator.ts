@@ -81,7 +81,7 @@ export function generateMeasurementData(
 }
 
 /**
- * Generate realistic regenerative metrics
+ * Generate realistic regenerative metrics matching new database schema
  * Simulates ecosystem health from eDNA, bioacoustic, or satellite analysis
  */
 export function generateRegenerativeMetrics(
@@ -94,29 +94,34 @@ export function generateRegenerativeMetrics(
   // Improvement trend over time (regeneration effect)
   const improvementFactor = 1 + daysAgo * 0.002;
 
-  // Base scores with realistic ranges
-  const soil_microbiome_health = parseFloat((50 + Math.random() * 40 + daysAgo * 0.05).toFixed(2));
-  const biodiversity_index = parseFloat((45 + Math.random() * 45 + daysAgo * 0.04).toFixed(2));
-  const pollinator_count = Math.floor((500 + Math.random() * 4500) * improvementFactor);
-  const native_species_count = Math.floor(20 + Math.random() * 80 + daysAgo * 0.01);
-  const crop_diversity_index = parseFloat((30 + Math.random() * 60 + daysAgo * 0.03).toFixed(2));
+  // Generate values for new schema
+  const currentValue = parseFloat((50 + Math.random() * 40 + daysAgo * 0.05).toFixed(2));
+  const baselineValue = parseFloat((40 + Math.random() * 20).toFixed(2));
+  const targetValue = parseFloat((80 + Math.random() * 15).toFixed(2));
+  const improvementPercentage = parseFloat((((currentValue - baselineValue) / baselineValue) * 100).toFixed(2));
+
+  const categories = ['soil_health', 'biodiversity', 'carbon_sequestration', 'water_quality'];
+  const metricNames = ['Soil Microbiome Health', 'Biodiversity Index', 'Carbon Capture Rate', 'Water Retention'];
+  const units = ['%', 'index', 'tons/ha/yr', '%'];
+  const trends = ['improving', 'stable', 'declining'] as const;
+  
+  const categoryIndex = Math.floor(Math.random() * categories.length);
 
   return {
     id: `regen-${projectId}-${daysAgo}-${Date.now()}`,
     project_id: projectId,
-    measurement_date: measurementDate.toISOString(),
-    soil_microbiome_health: Math.min(100, soil_microbiome_health),
-    biodiversity_index: Math.min(100, biodiversity_index),
-    pollinator_count,
-    native_species_count,
-    crop_diversity_index: Math.min(100, crop_diversity_index),
-    crop_types_count: Math.floor(1 + Math.random() * 8),
-    mangrove_health_score: Math.random() > 0.5 ? parseFloat((60 + Math.random() * 35).toFixed(2)) : null,
-    kelp_forest_coverage_percent: Math.random() > 0.5 ? parseFloat((30 + Math.random() * 60).toFixed(2)) : null,
-    data_source: (['eDNA-Sample', 'Bioacoustic', 'Satellite'] as const)[Math.floor(Math.random() * 3)],
-    confidence_level: parseFloat((0.80 + Math.random() * 0.18).toFixed(2)),
-    notes: null,
+    zone_id: null,
+    metric_name: metricNames[categoryIndex],
+    metric_category: categories[categoryIndex],
+    current_value: Math.min(100, currentValue),
+    baseline_value: baselineValue,
+    target_value: targetValue,
+    improvement_percentage: improvementPercentage,
+    unit: units[categoryIndex],
+    trend: trends[Math.floor(Math.random() * 3)],
+    last_measured_at: measurementDate.toISOString(),
     created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
   };
 }
 
@@ -253,7 +258,7 @@ export function detectAnomalies(measurements: MeasurementData[]): { [key: string
   );
 
   // Flag points > 2 standard deviations from mean
-  measurements.forEach((m, i) => {
+  measurements.forEach((m) => {
     const co2Anomaly = Math.abs((m.co2_level || 0) - co2Mean) > 2 * co2StdDev;
     const ndviAnomaly = Math.abs((m.ndvi_index || 0) - ndviMean) > 2 * ndviStdDev;
 
@@ -305,12 +310,8 @@ export function forecastCO2Trend(measurements: MeasurementData[], daysAhead: num
  * Calculate credit multiplier based on ecosystem health metrics
  */
 export function calculateEcosystemMultiplier(metrics: RegenerativeMetrics): number {
-  const microbiomeScore = (metrics.soil_microbiome_health || 0) / 100;
-  const biodiversityScore = (metrics.biodiversity_index || 0) / 100;
-  const cropDiversityScore = (metrics.crop_diversity_index || 0) / 100;
-
-  // Weighted average of three factors
-  const healthScore = microbiomeScore * 0.4 + biodiversityScore * 0.4 + cropDiversityScore * 0.2;
+  // Use current_value as the primary score
+  const healthScore = (metrics.current_value || 0) / 100;
 
   // Convert to price multiplier (0.5x to 1.5x)
   return 0.5 + healthScore * 1.0;
