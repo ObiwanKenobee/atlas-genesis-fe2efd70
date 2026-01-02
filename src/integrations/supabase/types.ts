@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      bioregional_zones: {
+        Row: {
+          active_projects: number | null
+          biodiversity_index: number | null
+          carbon_sequestration_rate: number | null
+          climate_type: string | null
+          code: string
+          coordinates: Json | null
+          country: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          region: string
+          risk_level: string | null
+          total_area_hectares: number | null
+          updated_at: string
+        }
+        Insert: {
+          active_projects?: number | null
+          biodiversity_index?: number | null
+          carbon_sequestration_rate?: number | null
+          climate_type?: string | null
+          code: string
+          coordinates?: Json | null
+          country: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          region: string
+          risk_level?: string | null
+          total_area_hectares?: number | null
+          updated_at?: string
+        }
+        Update: {
+          active_projects?: number | null
+          biodiversity_index?: number | null
+          carbon_sequestration_rate?: number | null
+          climate_type?: string | null
+          code?: string
+          coordinates?: Json | null
+          country?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          region?: string
+          risk_level?: string | null
+          total_area_hectares?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       carbon_projects: {
         Row: {
           available_credits: number
@@ -127,6 +181,102 @@ export type Database = {
           },
         ]
       }
+      measurement_data: {
+        Row: {
+          confidence_level: number | null
+          created_at: string
+          id: string
+          measured_at: string
+          measurement_type: string
+          metadata: Json | null
+          project_id: string | null
+          source: string | null
+          unit: string
+          value: number
+          verified: boolean | null
+          verified_at: string | null
+          verified_by: string | null
+          zone_id: string | null
+        }
+        Insert: {
+          confidence_level?: number | null
+          created_at?: string
+          id?: string
+          measured_at?: string
+          measurement_type: string
+          metadata?: Json | null
+          project_id?: string | null
+          source?: string | null
+          unit: string
+          value: number
+          verified?: boolean | null
+          verified_at?: string | null
+          verified_by?: string | null
+          zone_id?: string | null
+        }
+        Update: {
+          confidence_level?: number | null
+          created_at?: string
+          id?: string
+          measured_at?: string
+          measurement_type?: string
+          metadata?: Json | null
+          project_id?: string | null
+          source?: string | null
+          unit?: string
+          value?: number
+          verified?: boolean | null
+          verified_at?: string | null
+          verified_by?: string | null
+          zone_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "measurement_data_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "carbon_projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "measurement_data_zone_id_fkey"
+            columns: ["zone_id"]
+            isOneToOne: false
+            referencedRelation: "bioregional_zones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      newsletter_subscriptions: {
+        Row: {
+          email: string
+          id: string
+          subscribed: boolean | null
+          subscribed_at: string
+          subscription_type: string | null
+          unsubscribed_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          email: string
+          id?: string
+          subscribed?: boolean | null
+          subscribed_at?: string
+          subscription_type?: string | null
+          unsubscribed_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          email?: string
+          id?: string
+          subscribed?: boolean | null
+          subscribed_at?: string
+          subscription_type?: string | null
+          unsubscribed_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -156,6 +306,72 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      regenerative_metrics: {
+        Row: {
+          baseline_value: number | null
+          created_at: string
+          current_value: number
+          id: string
+          improvement_percentage: number | null
+          last_measured_at: string | null
+          metric_category: string
+          metric_name: string
+          project_id: string | null
+          target_value: number | null
+          trend: string | null
+          unit: string
+          updated_at: string
+          zone_id: string | null
+        }
+        Insert: {
+          baseline_value?: number | null
+          created_at?: string
+          current_value: number
+          id?: string
+          improvement_percentage?: number | null
+          last_measured_at?: string | null
+          metric_category: string
+          metric_name: string
+          project_id?: string | null
+          target_value?: number | null
+          trend?: string | null
+          unit: string
+          updated_at?: string
+          zone_id?: string | null
+        }
+        Update: {
+          baseline_value?: number | null
+          created_at?: string
+          current_value?: number
+          id?: string
+          improvement_percentage?: number | null
+          last_measured_at?: string | null
+          metric_category?: string
+          metric_name?: string
+          project_id?: string | null
+          target_value?: number | null
+          trend?: string | null
+          unit?: string
+          updated_at?: string
+          zone_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "regenerative_metrics_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "carbon_projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "regenerative_metrics_zone_id_fkey"
+            columns: ["zone_id"]
+            isOneToOne: false
+            referencedRelation: "bioregional_zones"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       transactions: {
         Row: {
@@ -206,6 +422,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_preferences: {
+        Row: {
+          created_at: string
+          email_notifications: boolean | null
+          id: string
+          impact_updates: boolean | null
+          investment_goals: string[] | null
+          marketing_emails: boolean | null
+          monthly_budget: string | null
+          newsletter_subscribed: boolean | null
+          organization_type: string | null
+          project_interests: string[] | null
+          transaction_alerts: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email_notifications?: boolean | null
+          id?: string
+          impact_updates?: boolean | null
+          investment_goals?: string[] | null
+          marketing_emails?: boolean | null
+          monthly_budget?: string | null
+          newsletter_subscribed?: boolean | null
+          organization_type?: string | null
+          project_interests?: string[] | null
+          transaction_alerts?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email_notifications?: boolean | null
+          id?: string
+          impact_updates?: boolean | null
+          investment_goals?: string[] | null
+          marketing_emails?: boolean | null
+          monthly_budget?: string | null
+          newsletter_subscribed?: boolean | null
+          organization_type?: string | null
+          project_interests?: string[] | null
+          transaction_alerts?: boolean | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
