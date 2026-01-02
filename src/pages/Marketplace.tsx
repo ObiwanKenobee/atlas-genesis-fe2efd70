@@ -1,16 +1,52 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import Navigation from "@/components/Navigation";
 import { RegenerativeMarketplaceShowcase } from "@/components/marketplace/RegenerativeMarketplaceShowcase";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { ShoppingCart, TrendingUp, Users, Zap, DollarSign, FileText } from "lucide-react";
+import { ShoppingCart, TrendingUp, Users, Zap, DollarSign, FileText, Search, Filter, X } from "lucide-react";
 import { useProjects } from "@/hooks/useMarketplace";
 
 const Marketplace = () => {
   const [selectedFilter, setSelectedFilter] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [sortBy, setSortBy] = useState<"newest" | "trending" | "price">("trending");
   const { data: projects = [], isLoading } = useProjects();
+
+  // Filter and sort projects
+  const filteredProjects = useMemo(() => {
+    let filtered = projects;
+
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(project =>
+        project.title?.toLowerCase().includes(query) ||
+        project.description?.toLowerCase().includes(query) ||
+        project.location?.toLowerCase().includes(query)
+      );
+    }
+
+    // Apply category filter
+    if (selectedFilter !== "all") {
+      filtered = filtered.filter(project => project.project_type === selectedFilter);
+    }
+
+    // Apply sorting
+    const sorted = [...filtered];
+    if (sortBy === "trending") {
+      sorted.sort((a, b) => (b.verified_credits || 0) - (a.verified_credits || 0));
+    } else if (sortBy === "price") {
+      sorted.sort((a, b) => (a.price_per_unit || 0) - (b.price_per_unit || 0));
+    } else if (sortBy === "newest") {
+      sorted.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
+    }
+
+    return sorted;
+  }, [projects, searchQuery, selectedFilter, sortBy]);
 
   // Sample price data
   const priceHistory = [
@@ -34,16 +70,92 @@ const Marketplace = () => {
       <Navigation />
       <main className="container mx-auto px-4 sm:px-6 py-8 max-w-7xl">
         {/* Header */}
-        <div className="mb-12 pt-8">
+        <div className="mb-8 pt-8">
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-2">Marketplace & Financial Infrastructure</h1>
           <p className="text-base sm:text-lg text-muted-foreground">
             Regenerative Impact Units (RIUs), tiered buyer system, ESG APIs, and regeneration-backed bonds
           </p>
         </div>
 
+        {/* Search and Filter Section */}
+        <Card className="mb-8 bg-card/50 border-border/50">
+          <CardContent className="p-6">
+            <div className="space-y-4">
+              {/* Search Bar */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <Input
+                  placeholder="Search projects by name, location, or description..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 bg-background border-border/50 focus:border-primary/50"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    aria-label="Clear search"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+
+              {/* Category Filters */}
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant={selectedFilter === "all" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setSelectedFilter("all")}
+                  className="gap-1.5"
+                >
+                  <Filter className="w-4 h-4" />
+                  All Projects
+                </Button>
+                {["reforestation", "renewable_energy", "soil_carbon", "ocean_restoration"].map((filter) => (
+                  <Button
+                    key={filter}
+                    variant={selectedFilter === filter ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSelectedFilter(filter)}
+                  >
+                    {filter.replace(/_/g, " ").charAt(0).toUpperCase() + filter.replace(/_/g, " ").slice(1)}
+                  </Button>
+                ))}
+              </div>
+
+              {/* Sort Options */}
+              <div className="flex flex-wrap gap-2 items-center">
+                <span className="text-sm text-muted-foreground">Sort by:</span>
+                {[
+                  { value: "trending" as const, label: "Trending" },
+                  { value: "newest" as const, label: "Newest" },
+                  { value: "price" as const, label: "Price (Low to High)" },
+                ].map((option) => (
+                  <Button
+                    key={option.value}
+                    variant={sortBy === option.value ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSortBy(option.value)}
+                  >
+                    {option.label}
+                  </Button>
+                ))}
+              </div>
+
+              {/* Results Count */}
+              {searchQuery || selectedFilter !== "all" ? (
+                <div className="text-sm text-muted-foreground">
+                  Found <span className="font-semibold text-foreground">{filteredProjects.length}</span> project{filteredProjects.length !== 1 ? "s" : ""}
+                </div>
+              ) : null}
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Regenerative Marketplace Showcase - Categorical Display */}
         <div className="mb-16">
-          <RegenerativeMarketplaceShowcase projects={projects} isLoading={isLoading} />
+          <RegenerativeMarketplaceShowcase projects={filteredProjects} isLoading={isLoading} />
         </div>
 
         {/* Key Metrics */}

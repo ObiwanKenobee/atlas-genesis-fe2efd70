@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Leaf, LogIn, ShoppingBag, Briefcase, LayoutDashboard, Crown, Award, Zap, Shield } from "lucide-react";
+import { Menu, X, Leaf, LogIn, ShoppingBag, Briefcase, LayoutDashboard, Crown, Award, Zap, Shield, TrendingUp, Globe, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
@@ -12,15 +12,15 @@ const Navigation = () => {
 
   const navLinks = [
     { name: "Marketplace", href: "/marketplace", icon: ShoppingBag },
-    { name: "Measurements", href: "/measurements", icon: ShoppingBag },
-    { name: "Bioregions", href: "/bioregions", icon: ShoppingBag },
-    { name: "Regeneration", href: "/regenerative-agriculture", icon: ShoppingBag },
-    { name: "Valuation", href: "/valuation", icon: ShoppingBag },
-    { name: "Governance", href: "/governance", icon: ShoppingBag },
-    { name: "Health", href: "/health", icon: ShoppingBag },
-    { name: "Outreach", href: "/outreach", icon: ShoppingBag },
-    { name: "Security", href: "/security", icon: ShoppingBag },
-    { name: "Adoption", href: "/adoption", icon: ShoppingBag },
+    { name: "Measurements", href: "/measurements", icon: LayoutDashboard },
+    { name: "Bioregions", href: "/bioregions", icon: Briefcase },
+    { name: "Regeneration", href: "/regenerative-agriculture", icon: Award },
+    { name: "Valuation", href: "/valuation", icon: TrendingUp },
+    { name: "Governance", href: "/governance", icon: Crown },
+    { name: "Health", href: "/health", icon: Heart },
+    { name: "Outreach", href: "/outreach", icon: Globe },
+    { name: "Security", href: "/security", icon: Shield },
+    { name: "Adoption", href: "/adoption", icon: Zap },
     { name: "Portfolio", href: "/portfolio", icon: Briefcase },
   ];
 
@@ -62,23 +62,25 @@ const Navigation = () => {
           </motion.div>
 
           {/* Desktop Navigation */}
-          <motion.div
+          <motion.nav
             className="hidden md:flex items-center gap-6 lg:gap-8 overflow-x-auto"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
+            aria-label="Main navigation"
           >
             {navLinks.map((link) => (
               <Link
                 key={link.name}
                 to={link.href}
-                className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors duration-300 font-medium whitespace-nowrap"
+                className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary rounded-md px-2 py-1 transition-colors duration-300 font-medium whitespace-nowrap"
+                aria-label={link.name}
               >
-                <link.icon className="w-4 h-4" />
+                <link.icon className="w-4 h-4" aria-hidden="true" />
                 {link.name}
               </Link>
             ))}
-          </motion.div>
+          </motion.nav>
 
           {/* Desktop CTA */}
           <motion.div 
@@ -123,16 +125,19 @@ const Navigation = () => {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             className="md:hidden bg-card/95 backdrop-blur-xl border-b border-border overflow-hidden"
+            role="navigation"
+            aria-label="Mobile navigation menu"
           >
             <div className="container mx-auto px-4 sm:px-6 py-6 flex flex-col gap-3">
               {navLinks.map((link) => (
                 <Link
                   key={link.name}
                   to={link.href}
-                  className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors py-3 px-2 rounded-lg font-medium"
+                  className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary rounded-lg transition-colors py-3 px-2 font-medium"
                   onClick={() => setIsOpen(false)}
+                  aria-label={link.name}
                 >
-                  <link.icon className="w-4 h-4" />
+                  <link.icon className="w-4 h-4" aria-hidden="true" />
                   {link.name}
                 </Link>
               ))}

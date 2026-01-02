@@ -60,6 +60,7 @@ const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
             className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight mb-6 sm:mb-8"
+            role="main"
           >
             <span className="text-foreground">Regenerating</span>
             <br />
@@ -83,13 +84,25 @@ const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-12 sm:mb-16 px-4 sm:px-0 w-full"
+            role="group"
+            aria-label="Primary call-to-action buttons"
           >
-            <Button variant="hero" size="lg" className="w-full sm:w-auto">
+            <Button
+              variant="hero"
+              size="lg"
+              className="w-full sm:w-auto focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background transition-all"
+              aria-label="Enter the Atlas Sanctum marketplace"
+            >
               Enter the Sanctum
-              <ArrowRight className="w-4 h-4 ml-2" />
+              <ArrowRight className="w-4 h-4 ml-2" aria-hidden="true" />
             </Button>
-            <Button variant="heroOutline" size="lg" className="w-full sm:w-auto">
-              <Globe2 className="w-4 h-4 mr-2" />
+            <Button
+              variant="heroOutline"
+              size="lg"
+              className="w-full sm:w-auto focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background transition-all"
+              aria-label="Explore the full Atlas platform features"
+            >
+              <Globe2 className="w-4 h-4 mr-2" aria-hidden="true" />
               Explore Platform
             </Button>
           </motion.div>

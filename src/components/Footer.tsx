@@ -58,24 +58,24 @@ const Footer = () => {
   ];
 
   const resourceLinks = [
-    { name: "Documentation", href: "/docs" },
-    { name: "API Reference", href: "/api" },
-    { name: "Community", href: "/community" },
-    { name: "Blog", href: "/blog" },
+    { name: "API Documentation", href: "#" },
+    { name: "Impact Guides", href: "#" },
+    { name: "Community Forum", href: "#" },
+    { name: "Case Studies", href: "#" },
   ];
 
   const legalLinks = [
-    { name: "Privacy Policy", href: "/privacy" },
-    { name: "Terms of Service", href: "/terms" },
-    { name: "Cookie Policy", href: "/cookies" },
-    { name: "Accessibility", href: "/accessibility" },
+    { name: "Privacy Policy", href: "#" },
+    { name: "Terms of Service", href: "#" },
+    { name: "Cookie Policy", href: "#" },
+    { name: "Accessibility Statement", href: "#" },
   ];
 
   const companyLinks = [
-    { name: "About Us", href: "/about" },
-    { name: "Careers", href: "/careers" },
-    { name: "Press", href: "/press" },
-    { name: "Contact", href: "/contact" },
+    { name: "About Atlas", href: "#" },
+    { name: "Join Our Team", href: "#" },
+    { name: "Media Kit", href: "#" },
+    { name: "Get in Touch", href: "#" },
   ];
 
   const socialLinks = [
@@ -162,12 +162,13 @@ const Footer = () => {
 
             {/* Social Links */}
             <div className="flex gap-3">
-              {socialLinks.map((social) => {
+              {socialLinks.map((social, index) => {
                 const href = social.href || "#";
-                const isExternal = href.startsWith("http");
-                return (
+                const isExternal = href && href.startsWith("http");
+                const isValid = href && href !== "#";
+                return isValid ? (
                   <a
-                    key={social.label}
+                    key={`social-${social.label}-${index}`}
                     href={href}
                     aria-label={social.label}
                     {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
@@ -175,7 +176,7 @@ const Footer = () => {
                   >
                     {social.icon}
                   </a>
-                );
+                ) : null;
               })}
             </div>
           </div>
@@ -185,7 +186,7 @@ const Footer = () => {
             <h4 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider">Features</h4>
             <ul className="space-y-3">
               {featureLinks.slice(0, 4).map((link) => (
-                <li key={link.href}>
+                <li key={`feature-${link.name}`}>
                   <Link
                     to={link.href}
                     className="flex items-center gap-2 text-sm text-muted-foreground hover:text-emerald-400 transition-colors group"
@@ -204,7 +205,7 @@ const Footer = () => {
             <h4 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider">More Features</h4>
             <ul className="space-y-3">
               {featureLinks.slice(4).map((link) => (
-                <li key={link.href}>
+                <li key={`feature-${link.name}`}>
                   <Link
                     to={link.href}
                     className="flex items-center gap-2 text-sm text-muted-foreground hover:text-emerald-400 transition-colors group"
@@ -223,7 +224,7 @@ const Footer = () => {
             <h4 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider">Platform</h4>
             <ul className="space-y-3 mb-6">
               {platformLinks.map((link) => (
-                <li key={link.href}>
+                <li key={`platform-${link.name}`}>
                   <Link
                     to={link.href}
                     className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors flex items-center gap-2 group"
@@ -238,7 +239,7 @@ const Footer = () => {
             <h4 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider">Resources</h4>
             <ul className="space-y-3">
               {resourceLinks.map((link) => (
-                <li key={link.href}>
+                <li key={`resource-${link.name}`}>
                   <Link
                     to={link.href}
                     className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors flex items-center gap-2 group"
@@ -256,7 +257,7 @@ const Footer = () => {
             <h4 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider">Legal</h4>
             <ul className="space-y-3 mb-6">
               {legalLinks.map((link) => (
-                <li key={link.href}>
+                <li key={`legal-${link.name}`}>
                   <Link
                     to={link.href}
                     className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors flex items-center gap-2 group"
@@ -271,7 +272,7 @@ const Footer = () => {
             <h4 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider">Company</h4>
             <ul className="space-y-3">
               {companyLinks.map((link) => (
-                <li key={link.href}>
+                <li key={`company-${link.name}`}>
                   <Link
                     to={link.href}
                     className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors flex items-center gap-2 group"
@@ -297,70 +298,17 @@ const Footer = () => {
           <div className="flex flex-wrap justify-center gap-6 text-xs text-muted-foreground">
             <a href="#" className="hover:text-emerald-400 transition-colors flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-              Platform Status
+              All Systems Operational
             </a>
             <a href="#" className="hover:text-emerald-400 transition-colors flex items-center gap-2">
               <Globe className="w-3 h-3" />
-              Global
+              Global Network
             </a>
             <a href="#" className="hover:text-emerald-400 transition-colors flex items-center gap-2">
               <Lock className="w-3 h-3" />
-              Secure
+              Enterprise Security
             </a>
-          </div>
-
-           {/* App Store Badges (Hidden in USSD mode) */}
-            
-              <div className="space-y-3">
-                <div className="text-sm font-semibold">📱 Download Apps:</div>
-                <div className="space-y-2">
-                  <a
-                    href="#"
-                    className="block bg-black/20 rounded-lg p-2 hover:bg-black/30 transition-colors"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <span className="text-lg">📱</span>
-                      <div className="text-xs">
-                        <div className="font-semibold">Download on the</div>
-                        <div>App Store</div>
-                      </div>
-                    </div>
-                  </a>
-
-                  <a
-                    href="https://drive.google.com/file/d/1QEykzmJOKIKu6sABbPx2zeGXX1MZBcCr/view?usp=sharing"
-                    download
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="Download APK (external)"
-                    className="block bg-black/20 rounded-lg p-2 hover:bg-black/30 transition-colors"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <span className="text-lg">📦</span>
-                      <div className="text-xs">
-                        <div className="font-semibold">Get APK</div>
-                        <div>Direct Download</div>
-                      </div>
-                    </div>
-                  </a>
-
-
-                  <a
-                    href="#"
-                    className="block bg-black/20 rounded-lg p-2 hover:bg-black/30 transition-colors"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <span className="text-lg">🤖</span>
-                      <div className="text-xs">
-                        <div className="font-semibold">Get it on</div>
-                        <div>Google Play</div>
-                      </div>
-                    </div>
-                  </a>
-                </div>
-              </div>
-
-              
+          </div>              
            
 
           {/* Language & Theme */}
