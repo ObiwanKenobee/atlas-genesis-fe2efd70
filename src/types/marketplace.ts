@@ -99,17 +99,18 @@ export interface GeoPolygon {
 
 export interface BioregionalZone {
   id: string;
-  zone_name: string;
-  geometry: GeoPolygon | null;
-  climate_classification: ClimateClassification;
-  historical_land_use: string | null;
-  indigenous_land: boolean;
-  indigenous_community_name: string | null;
-  base_credit_multiplier: number;
-  climate_risk_score: number;
-  biodiversity_value_factor: number;
-  region_country: string | null;
-  region_area_km2: number | null;
+  name: string;
+  code: string;
+  region: string;
+  country: string;
+  climate_type: string | null;
+  description: string | null;
+  coordinates: any | null;
+  biodiversity_index: number | null;
+  carbon_sequestration_rate: number | null;
+  active_projects: number | null;
+  total_area_hectares: number | null;
+  risk_level: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -151,20 +152,19 @@ export interface MeasurementSummary {
 // ============================================
 export interface RegenerativeMetrics {
   id: string;
-  project_id: string;
-  measurement_date: string;
-  soil_microbiome_health: number | null; // 0-100
-  biodiversity_index: number | null; // 0-100
-  pollinator_count: number | null;
-  native_species_count: number | null;
-  crop_diversity_index: number | null; // 0-100
-  crop_types_count: number | null;
-  mangrove_health_score: number | null;
-  kelp_forest_coverage_percent: number | null;
-  data_source: DataSource;
-  confidence_level: number; // 0-1
-  notes: string | null;
+  project_id: string | null;
+  zone_id: string | null;
+  metric_name: string;
+  metric_category: string;
+  current_value: number;
+  baseline_value: number | null;
+  target_value: number | null;
+  improvement_percentage: number | null;
+  unit: string;
+  trend: string | null;
+  last_measured_at: string | null;
   created_at: string;
+  updated_at: string;
 }
 
 export interface RegenerativeMetricsTrend {

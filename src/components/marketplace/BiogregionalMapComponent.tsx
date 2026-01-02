@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Leaf, Shield, Info, MapPin, AlertTriangle } from 'lucide-react';
+import { Info, MapPin } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useBioregionalZones, useIndigenousLands } from '@/hooks/useBioregionalZones';
-import { BioregionalZone, CLIMATE_LABELS } from '@/types/marketplace';
+import { useBioregionalZones } from '@/hooks/useBioregionalZones';
+import { BioregionalZone } from '@/types/marketplace';
 
 interface BiogregionalMapComponentProps {
   projectId?: string;
@@ -15,7 +15,6 @@ interface BiogregionalMapComponentProps {
 /**
  * Simple map visualization component
  * Shows bioregional zones with climate risk color coding
- * Note: This is a simplified implementation. For production, use Leaflet.js or Mapbox GL
  */
 export function BiogregionalMapComponent({
   projectId,
@@ -23,11 +22,9 @@ export function BiogregionalMapComponent({
   onZoneSelect,
 }: BiogregionalMapComponentProps) {
   const { data: zones, isLoading } = useBioregionalZones();
-  const indigenousLandsResult = useIndigenousLands();
-  const indigenousLands = indigenousLandsResult.data;
   const [hoveredZoneId, setHoveredZoneId] = useState<string | null>(null);
   const [selectedZone, setSelectedZone] = useState<BioregionalZone | null>(null);
-  const [mapView, setMapView] = useState<'climate-risk' | 'indigenous' | 'multiplier'>('climate-risk');
+  const [mapView, setMapView] = useState<'risk' | 'biodiversity' | 'carbon'>('risk');
 
   if (isLoading || !zones) {
     return (
@@ -52,25 +49,40 @@ export function BiogregionalMapComponent({
     }
   };
 
-  // Get color for climate risk
-  const getClimateRiskColor = (risk: number): string => {
-    if (risk >= 80) return 'bg-red-500/30';
-    if (risk >= 60) return 'bg-orange-500/30';
-    if (risk >= 40) return 'bg-yellow-500/30';
-    return 'bg-green-500/30';
+  // Get color for risk level
+  const getRiskColor = (riskLevel: string | null): string => {
+    switch (riskLevel) {
+      case 'critical': return 'bg-red-500/30';
+      case 'high': return 'bg-orange-500/30';
+      case 'medium': return 'bg-yellow-500/30';
+      case 'low': return 'bg-green-500/30';
+      default: return 'bg-gray-500/30';
+    }
   };
 
-  const getRiskBadgeColor = (risk: number): string => {
-    if (risk >= 80) return 'bg-red-500/20 text-red-700 border-red-300';
-    if (risk >= 60) return 'bg-orange-500/20 text-orange-700 border-orange-300';
-    if (risk >= 40) return 'bg-yellow-500/20 text-yellow-700 border-yellow-300';
-    return 'bg-green-500/20 text-green-700 border-green-300';
+  const getRiskBadgeColor = (riskLevel: string | null): string => {
+    switch (riskLevel) {
+      case 'critical': return 'bg-red-500/20 text-red-700 border-red-300';
+      case 'high': return 'bg-orange-500/20 text-orange-700 border-orange-300';
+      case 'medium': return 'bg-yellow-500/20 text-yellow-700 border-yellow-300';
+      case 'low': return 'bg-green-500/20 text-green-700 border-green-300';
+      default: return 'bg-gray-500/20 text-gray-700 border-gray-300';
+    }
   };
 
-  const getMultiplierColor = (multiplier: number): string => {
-    if (multiplier >= 2.0) return 'bg-purple-500/30';
-    if (multiplier >= 1.5) return 'bg-blue-500/30';
-    if (multiplier >= 1.0) return 'bg-cyan-500/30';
+  const getBiodiversityColor = (index: number | null): string => {
+    const value = (index || 0) * 100;
+    if (value >= 90) return 'bg-emerald-500/30';
+    if (value >= 80) return 'bg-green-500/30';
+    if (value >= 70) return 'bg-lime-500/30';
+    return 'bg-gray-500/30';
+  };
+
+  const getCarbonColor = (rate: number | null): string => {
+    const value = rate || 0;
+    if (value >= 10) return 'bg-purple-500/30';
+    if (value >= 8) return 'bg-blue-500/30';
+    if (value >= 5) return 'bg-cyan-500/30';
     return 'bg-gray-500/30';
   };
 
@@ -80,7 +92,7 @@ export function BiogregionalMapComponent({
         <div className="flex items-start justify-between">
           <div>
             <CardTitle>Bioregional Intelligence</CardTitle>
-            <CardDescription>Geographic zones with climate risk & ecological multipliers</CardDescription>
+            <CardDescription>Geographic zones with climate risk & ecological data</CardDescription>
           </div>
           <Info className="w-5 h-5 text-muted-foreground" />
         </div>
@@ -88,7 +100,7 @@ export function BiogregionalMapComponent({
       <CardContent className="space-y-6">
         {/* View Toggle */}
         <div className="flex gap-2 border-b border-border">
-          {(['climate-risk', 'indigenous', 'multiplier'] as const).map((view) => (
+          {(['risk', 'biodiversity', 'carbon'] as const).map((view) => (
             <button
               key={view}
               onClick={() => setMapView(view)}
@@ -98,219 +110,127 @@ export function BiogregionalMapComponent({
                   : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
-              {view === 'climate-risk' ? '🌡️ Climate Risk' : view === 'indigenous' ? '🏠 Indigenous Lands' : '⚖️ Multipliers'}
+              {view === 'risk' ? '🌡️ Risk Level' : view === 'biodiversity' ? '🌿 Biodiversity' : '🌲 Carbon Rate'}
             </button>
           ))}
         </div>
 
-        {/* Zone List / Grid */}
+        {/* Zone List */}
         <div className="space-y-3">
-          {mapView === 'climate-risk' && (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-xs text-muted-foreground px-2 py-1 bg-muted/30 rounded">
-                <span>Climate Risk Scale</span>
-                <div className="flex gap-3">
+          <div className="flex items-center justify-between text-xs text-muted-foreground px-2 py-1 bg-muted/30 rounded">
+            <span>{zones.length} Bioregional Zones</span>
+            <div className="flex gap-3">
+              {mapView === 'risk' && (
+                <>
                   <div className="flex items-center gap-1">
                     <div className="w-2 h-2 rounded-full bg-red-500"></div>
-                    <span>Critical (80+)</span>
+                    <span>Critical</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
-                    <span>Moderate (40-60)</span>
+                    <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                    <span>Low</span>
                   </div>
-                </div>
-              </div>
-
-              {zones.map((zone, i) => (
-                <motion.div
-                  key={zone.id}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  onClick={() => handleZoneSelect(zone)}
-                  onMouseEnter={() => setHoveredZoneId(zone.id)}
-                  onMouseLeave={() => setHoveredZoneId(null)}
-                  className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                    hoveredZoneId === zone.id
-                      ? 'border-primary/50 shadow-lg'
-                      : selectedZone?.id === zone.id
-                        ? 'border-primary bg-primary/5'
-                        : 'border-border/30'
-                  } ${getClimateRiskColor(zone.climate_risk_score || 0)}`}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold text-foreground">{zone.zone_name}</h4>
-                      <p className="text-xs text-muted-foreground">
-                        {zone.region_country}
-                        {zone.indigenous_land && ' • 🏠 Indigenous Land'}
-                      </p>
-                    </div>
-                    <Badge
-                      variant="outline"
-                      className={`${getRiskBadgeColor(zone.climate_risk_score || 0)} text-xs`}
-                    >
-                      {zone.climate_risk_score?.toFixed(0) || 0}% Risk
-                    </Badge>
-                  </div>
-
-                  {/* Expanded Details */}
-                  {selectedZone?.id === zone.id && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      transition={{ duration: 0.3 }}
-                      className="mt-3 pt-3 border-t border-border/30 space-y-2"
-                    >
-                      <div className="grid grid-cols-2 gap-3 text-xs">
-                        <div>
-                          <p className="text-muted-foreground mb-1">Climate</p>
-                          <p className="font-medium text-foreground">
-                            {CLIMATE_LABELS[zone.climate_classification]}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground mb-1">Credit Multiplier</p>
-                          <p className="font-medium text-foreground">
-                            {zone.base_credit_multiplier.toFixed(2)}×
-                          </p>
-                        </div>
-                        {zone.region_area_km2 && (
-                          <div>
-                            <p className="text-muted-foreground mb-1">Area</p>
-                            <p className="font-medium text-foreground">
-                              {zone.region_area_km2.toLocaleString()} km²
-                            </p>
-                          </div>
-                        )}
-                        <div>
-                          <p className="text-muted-foreground mb-1">Biodiversity Factor</p>
-                          <p className="font-medium text-foreground">
-                            {zone.biodiversity_value_factor.toFixed(2)}×
-                          </p>
-                        </div>
-                      </div>
-
-                      {zone.historical_land_use && (
-                        <div className="pt-2 border-t border-border/30">
-                          <p className="text-xs font-medium text-foreground mb-1">Historical Use</p>
-                          <p className="text-xs text-muted-foreground">{zone.historical_land_use}</p>
-                        </div>
-                      )}
-                    </motion.div>
-                  )}
-                </motion.div>
-              ))}
-            </div>
-          )}
-
-          {mapView === 'indigenous' && (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-xs text-muted-foreground px-2 py-1 bg-muted/30 rounded">
-                <span>Indigenous Land Recognition</span>
-                <Badge variant="outline" className="text-xs">
-                  {indigenousLands.length} protected zone{indigenousLands.length !== 1 ? 's' : ''}
-                </Badge>
-              </div>
-
-              {indigenousLands.length > 0 ? (
-                indigenousLands.map((zone, i) => (
-                  <motion.div
-                    key={zone.id}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.05 }}
-                    className="p-4 rounded-lg border-2 border-green-300/50 bg-green-500/10"
-                  >
-                    <div className="flex items-start gap-3">
-                      <Leaf className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-foreground">{zone.zone_name}</h4>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          <strong>Indigenous Community:</strong> {zone.indigenous_community_name || 'Recognized'}
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {zone.historical_land_use && `Traditional use: ${zone.historical_land_use}`}
-                        </p>
-                      </div>
-                      <Badge className="bg-green-600 text-white text-xs">Protected</Badge>
-                    </div>
-                  </motion.div>
-                ))
-              ) : (
-                <div className="p-4 text-center text-sm text-muted-foreground bg-muted/30 rounded-lg">
-                  No indigenous land zones mapped
-                </div>
+                </>
               )}
             </div>
-          )}
+          </div>
 
-          {mapView === 'multiplier' && (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-xs text-muted-foreground px-2 py-1 bg-muted/30 rounded">
-                <span>Credit Price Multiplier</span>
-                <div className="flex gap-3 text-xs">
-                  <span>Low (0.5x)</span>
-                  <span>High (2.5x+)</span>
+          {zones.map((zone, i) => (
+            <motion.div
+              key={zone.id}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.05 }}
+              onClick={() => handleZoneSelect(zone)}
+              onMouseEnter={() => setHoveredZoneId(zone.id)}
+              onMouseLeave={() => setHoveredZoneId(null)}
+              className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                hoveredZoneId === zone.id
+                  ? 'border-primary/50 shadow-lg'
+                  : selectedZone?.id === zone.id
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border/30'
+              } ${
+                mapView === 'risk' 
+                  ? getRiskColor(zone.risk_level)
+                  : mapView === 'biodiversity'
+                    ? getBiodiversityColor(zone.biodiversity_index)
+                    : getCarbonColor(zone.carbon_sequestration_rate)
+              }`}
+            >
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-semibold text-foreground">{zone.name}</h4>
+                  <p className="text-xs text-muted-foreground">
+                    {zone.country} • {zone.region}
+                  </p>
                 </div>
+                {mapView === 'risk' && (
+                  <Badge
+                    variant="outline"
+                    className={`${getRiskBadgeColor(zone.risk_level)} text-xs`}
+                  >
+                    {zone.risk_level || 'Unknown'}
+                  </Badge>
+                )}
+                {mapView === 'biodiversity' && (
+                  <Badge variant="outline" className="bg-emerald-500/20 text-emerald-700 border-emerald-300 text-xs">
+                    {((zone.biodiversity_index || 0) * 100).toFixed(0)}%
+                  </Badge>
+                )}
+                {mapView === 'carbon' && (
+                  <Badge variant="outline" className="bg-purple-500/20 text-purple-700 border-purple-300 text-xs">
+                    {zone.carbon_sequestration_rate?.toFixed(1) || 0} t/ha/yr
+                  </Badge>
+                )}
               </div>
 
-              {zones.map((zone, i) => (
+              {/* Expanded Details */}
+              {selectedZone?.id === zone.id && (
                 <motion.div
-                  key={zone.id}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  className={`p-4 rounded-lg border-2 transition-all ${
-                    hoveredZoneId === zone.id
-                      ? 'border-primary/50 shadow-lg'
-                      : 'border-border/30'
-                  } ${getMultiplierColor(zone.base_credit_multiplier)}`}
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  transition={{ duration: 0.3 }}
+                  className="mt-3 pt-3 border-t border-border/30 space-y-2"
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="grid grid-cols-2 gap-3 text-xs">
                     <div>
-                      <h4 className="font-semibold text-foreground">{zone.zone_name}</h4>
-                      <p className="text-xs text-muted-foreground">
-                        {CLIMATE_LABELS[zone.climate_classification]}
+                      <p className="text-muted-foreground mb-1">Climate</p>
+                      <p className="font-medium text-foreground">
+                        {zone.climate_type || "Not specified"}
                       </p>
                     </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-primary">
-                        {zone.base_credit_multiplier.toFixed(2)}×
+                    <div>
+                      <p className="text-muted-foreground mb-1">Active Projects</p>
+                      <p className="font-medium text-foreground">
+                        {zone.active_projects || 0}
+                      </p>
+                    </div>
+                    {zone.total_area_hectares && (
+                      <div>
+                        <p className="text-muted-foreground mb-1">Area</p>
+                        <p className="font-medium text-foreground">
+                          {zone.total_area_hectares.toLocaleString()} ha
+                        </p>
                       </div>
-                      <p className="text-xs text-muted-foreground">multiplier</p>
+                    )}
+                    <div>
+                      <p className="text-muted-foreground mb-1">Biodiversity</p>
+                      <p className="font-medium text-foreground">
+                        {((zone.biodiversity_index || 0) * 100).toFixed(0)}%
+                      </p>
                     </div>
                   </div>
 
-                  {/* Multiplier Breakdown */}
-                  <div className="mt-3 pt-3 border-t border-border/30 space-y-1 text-xs">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Base Rate</span>
-                      <span className="font-medium text-foreground">{zone.base_credit_multiplier.toFixed(2)}×</span>
+                  {zone.description && (
+                    <div className="pt-2 border-t border-border/30">
+                      <p className="text-xs text-muted-foreground">{zone.description}</p>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Climate Risk Adjustment</span>
-                      <span className="font-medium text-foreground">
-                        {(1 + (zone.climate_risk_score || 0) / 100 * 0.25).toFixed(2)}×
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Biodiversity Factor</span>
-                      <span className="font-medium text-foreground">
-                        {zone.biodiversity_value_factor.toFixed(2)}×
-                      </span>
-                    </div>
-                    <div className="flex justify-between font-medium pt-2 border-t border-border/30">
-                      <span className="text-foreground">Composite</span>
-                      <span className="text-primary">
-                        {(zone.base_credit_multiplier * (1 + (zone.climate_risk_score || 0) / 100 * 0.25) * zone.biodiversity_value_factor).toFixed(2)}×
-                      </span>
-                    </div>
-                  </div>
+                  )}
                 </motion.div>
-              ))}
-            </div>
-          )}
+              )}
+            </motion.div>
+          ))}
         </div>
 
         {/* Legend/Info Box */}
@@ -319,8 +239,7 @@ export function BiogregionalMapComponent({
           <div>
             <p className="font-medium mb-1">Bioregional Pricing</p>
             <p>
-              Credits are dynamically priced based on geographic zone, climate risk, and biodiversity importance. Higher-risk areas
-              and high-biodiversity zones command premium prices to reflect their strategic importance.
+              Credits are dynamically priced based on geographic zone, climate risk, and biodiversity importance.
             </p>
           </div>
         </div>
