@@ -62,23 +62,25 @@ const Navigation = () => {
           </motion.div>
 
           {/* Desktop Navigation */}
-          <motion.div
+          <motion.nav
             className="hidden md:flex items-center gap-6 lg:gap-8 overflow-x-auto"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
+            aria-label="Main navigation"
           >
             {navLinks.map((link) => (
               <Link
                 key={link.name}
                 to={link.href}
-                className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors duration-300 font-medium whitespace-nowrap"
+                className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary rounded-md px-2 py-1 transition-colors duration-300 font-medium whitespace-nowrap"
+                aria-label={link.name}
               >
-                <link.icon className="w-4 h-4" />
+                <link.icon className="w-4 h-4" aria-hidden="true" />
                 {link.name}
               </Link>
             ))}
-          </motion.div>
+          </motion.nav>
 
           {/* Desktop CTA */}
           <motion.div 
