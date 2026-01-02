@@ -21,38 +21,41 @@ export function useRealtimeSync(config: RealtimeSyncConfig) {
   const channelRef = useRef<RealtimeChannel | null>(null);
 
   const subscribe = useCallback(() => {
-    const channel = supabase
-      .channel(`${config.table}-changes`)
-      .on(
-        'postgres_changes',
-        {
-          event: config.event || '*',
-          schema: 'public',
-          table: config.table,
-          filter: config.filter,
-        },
-        (payload) => {
-          try {
-            if (payload.eventType === 'INSERT' && config.onInsert) {
-              config.onInsert(payload.new);
-            } else if (payload.eventType === 'UPDATE' && config.onUpdate) {
-              config.onUpdate(payload.new);
-            } else if (payload.eventType === 'DELETE' && config.onDelete) {
-              config.onDelete(payload.old);
-            }
-          } catch (error) {
-            console.error('Error handling realtime event:', error);
-            config.onError?.(error as Error);
+    const channelName = `${config.table}-changes-${Date.now()}`;
+    
+    const channel = supabase.channel(channelName);
+    
+    channel.on(
+      'postgres_changes' as any,
+      {
+        event: config.event || '*',
+        schema: 'public',
+        table: config.table,
+        filter: config.filter,
+      },
+      (payload: any) => {
+        try {
+          if (payload.eventType === 'INSERT' && config.onInsert) {
+            config.onInsert(payload.new);
+          } else if (payload.eventType === 'UPDATE' && config.onUpdate) {
+            config.onUpdate(payload.new);
+          } else if (payload.eventType === 'DELETE' && config.onDelete) {
+            config.onDelete(payload.old);
           }
+        } catch (error) {
+          console.error('Error handling realtime event:', error);
+          config.onError?.(error as Error);
         }
-      )
-      .subscribe((status) => {
-        if (status === 'SUBSCRIBED') {
-          console.log(`✓ Real-time sync active for ${config.table}`);
-        } else if (status === 'CHANNEL_ERROR') {
-          toast.error(`Failed to sync ${config.table} data`);
-        }
-      });
+      }
+    );
+
+    channel.subscribe((status) => {
+      if (status === 'SUBSCRIBED') {
+        console.log(`✓ Real-time sync active for ${config.table}`);
+      } else if (status === 'CHANNEL_ERROR') {
+        toast.error(`Failed to sync ${config.table} data`);
+      }
+    });
 
     channelRef.current = channel;
   }, [config]);
@@ -76,7 +79,7 @@ export function useRealtimeSync(config: RealtimeSyncConfig) {
  * Specialized hook for monitoring marketplace transactions in real-time
  */
 export function useTransactionSync(userId: string) {
-  const { onUpdate } = useRealtimeSync({
+  useRealtimeSync({
     table: 'transactions',
     event: 'UPDATE',
     filter: `user_id=eq.${userId}`,
@@ -89,14 +92,14 @@ export function useTransactionSync(userId: string) {
     },
   });
 
-  return { onUpdate };
+  return {};
 }
 
 /**
  * Specialized hook for monitoring carbon credit holdings changes
  */
 export function useCreditHoldingsSync(userId: string) {
-  const { onInsert, onUpdate, onDelete } = useRealtimeSync({
+  useRealtimeSync({
     table: 'credit_holdings',
     filter: `user_id=eq.${userId}`,
     onInsert: (holding) => {
@@ -112,14 +115,14 @@ export function useCreditHoldingsSync(userId: string) {
     },
   });
 
-  return { onInsert, onUpdate, onDelete };
+  return {};
 }
 
 /**
  * Specialized hook for monitoring project updates in real-time
  */
 export function useProjectSync(projectId: string) {
-  const { onUpdate } = useRealtimeSync({
+  useRealtimeSync({
     table: 'carbon_projects',
     event: 'UPDATE',
     filter: `id=eq.${projectId}`,
@@ -130,7 +133,7 @@ export function useProjectSync(projectId: string) {
     },
   });
 
-  return { onUpdate };
+  return {};
 }
 
 /**
@@ -157,7 +160,7 @@ export function useMarketWatchSync(filters?: {
     filterString = conditions.join(',');
   }
 
-  const { onInsert } = useRealtimeSync({
+  useRealtimeSync({
     table: 'carbon_projects',
     event: 'INSERT',
     filter: filterString || undefined,
@@ -168,5 +171,5 @@ export function useMarketWatchSync(filters?: {
     },
   });
 
-  return { onInsert };
+  return {};
 }
