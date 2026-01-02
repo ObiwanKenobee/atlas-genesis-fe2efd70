@@ -1,13 +1,15 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Leaf, Award, TrendingUp, CheckCircle2, AlertCircle } from 'lucide-react';
+import { MapPin, Leaf, Award, TrendingUp, CheckCircle2, Bell } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { LineChart, Line, ResponsiveContainer, Tooltip } from 'recharts';
+import { LineChart, Line, ResponsiveContainer } from 'recharts';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CarbonProject, PROJECT_TYPE_LABELS, PROJECT_TYPE_ICONS } from '@/types/marketplace';
 import { useMeasurementData } from '@/hooks/useMeasurementData';
-import { useBioregionalZones } from '@/hooks/useBioregionalZones';
+import { PriceAlertModal } from '@/components/PriceAlertModal';
+import { useAuth } from '@/hooks/useAuth';
 
 interface ProjectCardProps {
   project: CarbonProject;
@@ -57,6 +59,8 @@ function MeasurementMiniChart({ projectId }: { projectId: string }) {
 }
 
 export function ProjectCard({ project, index }: ProjectCardProps) {
+  const { user } = useAuth();
+  const [showPriceAlert, setShowPriceAlert] = useState(false);
   const availabilityPercent = (project.available_credits / project.total_credits) * 100;
 
   return (
@@ -156,12 +160,38 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
               </div>
               <span className="text-xs text-muted-foreground">per credit</span>
             </div>
-            <Button asChild size="sm" className="bg-primary hover:bg-primary/90">
-              <Link to={`/marketplace/${project.id}`}>View Details</Link>
-            </Button>
+            <div className="flex items-center gap-2">
+              {user && (
+                <Button 
+                  variant="outline" 
+                  size="icon"
+                  onClick={() => setShowPriceAlert(true)}
+                  className="h-9 w-9"
+                  title="Set price alert"
+                >
+                  <Bell className="w-4 h-4" />
+                </Button>
+              )}
+              <Button asChild size="sm" className="bg-primary hover:bg-primary/90">
+                <Link to={`/marketplace/${project.id}`}>View Details</Link>
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
+
+      {/* Price Alert Modal */}
+      {showPriceAlert && (
+        <PriceAlertModal
+          isOpen={showPriceAlert}
+          onClose={() => setShowPriceAlert(false)}
+          project={{
+            id: project.id,
+            title: project.title,
+            price_per_credit: project.price_per_credit,
+          }}
+        />
+      )}
     </motion.div>
   );
 }
