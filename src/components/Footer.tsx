@@ -58,24 +58,24 @@ const Footer = () => {
   ];
 
   const resourceLinks = [
-    { name: "Documentation", href: "/docs" },
-    { name: "API Reference", href: "/api" },
-    { name: "Community", href: "/community" },
-    { name: "Blog", href: "/blog" },
+    { name: "API Documentation", href: "#" },
+    { name: "Impact Guides", href: "#" },
+    { name: "Community Forum", href: "#" },
+    { name: "Case Studies", href: "#" },
   ];
 
   const legalLinks = [
-    { name: "Privacy Policy", href: "/privacy" },
-    { name: "Terms of Service", href: "/terms" },
-    { name: "Cookie Policy", href: "/cookies" },
-    { name: "Accessibility", href: "/accessibility" },
+    { name: "Privacy Policy", href: "#" },
+    { name: "Terms of Service", href: "#" },
+    { name: "Cookie Policy", href: "#" },
+    { name: "Accessibility Statement", href: "#" },
   ];
 
   const companyLinks = [
-    { name: "About Us", href: "/about" },
-    { name: "Careers", href: "/careers" },
-    { name: "Press", href: "/press" },
-    { name: "Contact", href: "/contact" },
+    { name: "About Atlas", href: "#" },
+    { name: "Join Our Team", href: "#" },
+    { name: "Media Kit", href: "#" },
+    { name: "Get in Touch", href: "#" },
   ];
 
   const socialLinks = [
