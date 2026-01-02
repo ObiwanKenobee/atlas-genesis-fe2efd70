@@ -164,8 +164,9 @@ const Footer = () => {
             <div className="flex gap-3">
               {socialLinks.map((social) => {
                 const href = social.href || "#";
-                const isExternal = href.startsWith("http");
-                return (
+                const isExternal = href && href.startsWith("http");
+                const isValid = href && href !== "#";
+                return isValid ? (
                   <a
                     key={social.label}
                     href={href}
@@ -175,7 +176,7 @@ const Footer = () => {
                   >
                     {social.icon}
                   </a>
-                );
+                ) : null;
               })}
             </div>
           </div>
