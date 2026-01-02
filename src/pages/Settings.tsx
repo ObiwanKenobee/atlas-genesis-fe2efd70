@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useTheme } from "next-themes";
 import { 
   User, Lock, Bell, Shield, LogOut, Save, ArrowLeft,
   Mail, Building2, Globe, Target, TreePine, Waves, Zap, CircleDot,
-  Check, RefreshCw
+  Check, RefreshCw, Moon, Sun, Monitor
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -76,7 +77,8 @@ const Settings = () => {
     organization: "",
     email: "",
   });
-  const [activeTab, setActiveTab] = useState<"profile" | "preferences" | "notifications" | "security">("profile");
+  const [activeTab, setActiveTab] = useState<"profile" | "preferences" | "notifications" | "security" | "appearance">("profile");
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -227,6 +229,7 @@ const Settings = () => {
     { id: "profile", label: "Profile", icon: User },
     { id: "preferences", label: "Preferences", icon: Target },
     { id: "notifications", label: "Notifications", icon: Bell },
+    { id: "appearance", label: "Appearance", icon: Moon },
     { id: "security", label: "Security", icon: Shield },
   ];
 
@@ -521,6 +524,77 @@ const Settings = () => {
                   <Save className="w-4 h-4 mr-2" />
                   {isSavingPrefs ? "Saving..." : "Save Notification Settings"}
                 </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {/* Appearance Tab */}
+        {activeTab === "appearance" && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Moon className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle>Appearance</CardTitle>
+                    <CardDescription>Customize how Atlas Sanctum looks</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <Label className="text-sm font-medium mb-4 block">Theme</Label>
+                  <div className="grid grid-cols-3 gap-3">
+                    <button
+                      onClick={() => setTheme("light")}
+                      className={`flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all ${
+                        theme === "light"
+                          ? "border-primary bg-primary/10"
+                          : "border-border hover:border-primary/50"
+                      }`}
+                    >
+                      <div className="w-10 h-10 rounded-lg bg-background border border-border flex items-center justify-center">
+                        <Sun className="w-5 h-5 text-accent" />
+                      </div>
+                      <span className="text-sm font-medium text-foreground">Light</span>
+                    </button>
+                    <button
+                      onClick={() => setTheme("dark")}
+                      className={`flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all ${
+                        theme === "dark"
+                          ? "border-primary bg-primary/10"
+                          : "border-border hover:border-primary/50"
+                      }`}
+                    >
+                      <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+                        <Moon className="w-5 h-5 text-primary" />
+                      </div>
+                      <span className="text-sm font-medium text-foreground">Dark</span>
+                    </button>
+                    <button
+                      onClick={() => setTheme("system")}
+                      className={`flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all ${
+                        theme === "system"
+                          ? "border-primary bg-primary/10"
+                          : "border-border hover:border-primary/50"
+                      }`}
+                    >
+                      <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+                        <Monitor className="w-5 h-5 text-muted-foreground" />
+                      </div>
+                      <span className="text-sm font-medium text-foreground">System</span>
+                    </button>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Your theme preference is automatically saved and will persist across sessions.
+                </p>
               </CardContent>
             </Card>
           </motion.div>
