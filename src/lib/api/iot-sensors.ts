@@ -111,7 +111,7 @@ export function generateMicrobiomeReading(healthLevel: 'excellent' | 'good' | 'p
 
 /**
  * Convert IoT sensor readings to RegenerativeMetrics score
- * Aggregates soil, bioacoustic, and microbiome data
+ * Aggregates soil, bioacoustic, and microbiome data - matches new database schema
  */
 export function iotReadingsToMetrics(
   projectId: string,
@@ -124,32 +124,27 @@ export function iotReadingsToMetrics(
   const phScore = Math.max(0, 100 - Math.abs(soilReading.ph - 6.5) * 20);
   const moistureScore = Math.max(0, 100 - Math.abs(soilReading.moisture - 60) * 1.5);
   const conductivityScore = soilReading.conductivity > 500 && soilReading.conductivity < 1500 ? 100 : 60;
-  const soil_microbiome_health = (phScore + moistureScore + conductivityScore) / 3;
+  const soilHealthScore = (phScore + moistureScore + conductivityScore) / 3;
 
   // Biodiversity scoring from microbiome diversity
   // Shannon index > 3.5 = diverse; < 2.5 = low
-  const biodiversity_index = Math.min(100, Math.max(0, (microbiome.bacterial_diversity / 4) * 100));
+  const biodiversityScore = Math.min(100, Math.max(0, (microbiome.bacterial_diversity / 4) * 100));
 
-  // Pollinator presence from bioacoustic sensor
-  const pollinator_count = Math.round(bioacoustics.activity_index * 50); // Scale to 0-5000
-
-  // Native species estimate (proxy from microbiome diversity)
-  const native_species_count = Math.round(microbiome.bacterial_diversity * 15);
-
-  // Crop diversity is harder to estimate from IoT; use organic matter as proxy
-  const crop_diversity_index = Math.min(100, microbiome.organic_matter * 15);
+  // Overall current value (weighted average)
+  const currentValue = parseFloat(((soilHealthScore * 0.4 + biodiversityScore * 0.4 + bioacoustics.activity_index * 0.2)).toFixed(2));
 
   return {
     project_id: projectId,
-    measurement_date: new Date().toISOString(),
-    soil_microbiome_health: parseFloat(soil_microbiome_health.toFixed(2)),
-    biodiversity_index: parseFloat(biodiversity_index.toFixed(2)),
-    pollinator_count,
-    native_species_count,
-    crop_diversity_index: parseFloat(crop_diversity_index.toFixed(2)),
-    crop_types_count: Math.floor(1 + microbiome.organic_matter * 2),
-    data_source: 'eDNA-Sample',
-    confidence_level: 0.85,
+    zone_id: null,
+    metric_name: 'Ecosystem Health Index',
+    metric_category: 'soil_health',
+    current_value: currentValue,
+    baseline_value: 50,
+    target_value: 85,
+    improvement_percentage: parseFloat(((currentValue - 50) / 50 * 100).toFixed(2)),
+    unit: '%',
+    trend: currentValue > 60 ? 'improving' : currentValue < 40 ? 'declining' : 'stable',
+    last_measured_at: new Date().toISOString(),
   };
 }
 

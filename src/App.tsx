@@ -27,6 +27,7 @@ import Health from "./pages/Health";
 import Outreach from "./pages/Outreach";
 import Security from "./pages/Security";
 import Adoption from "./pages/Adoption";
+import Settings from "./pages/Settings";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +58,7 @@ const App = () => (
             <Route path="/outreach" element={<Outreach />} />
             <Route path="/security" element={<Security />} />
             <Route path="/adoption" element={<Adoption />} />
+            <Route path="/settings" element={<Settings />} />
 
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminLayout />}>
