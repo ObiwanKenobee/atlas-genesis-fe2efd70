@@ -38,9 +38,9 @@ const Marketplace = () => {
     // Apply sorting
     const sorted = [...filtered];
     if (sortBy === "trending") {
-      sorted.sort((a, b) => (b.verified_credits || 0) - (a.verified_credits || 0));
+      sorted.sort((a, b) => (b.available_credits || 0) - (a.available_credits || 0));
     } else if (sortBy === "price") {
-      sorted.sort((a, b) => (a.price_per_unit || 0) - (b.price_per_unit || 0));
+      sorted.sort((a, b) => (a.price_per_credit || 0) - (b.price_per_credit || 0));
     } else if (sortBy === "newest") {
       sorted.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
     }
