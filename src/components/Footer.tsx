@@ -162,13 +162,13 @@ const Footer = () => {
 
             {/* Social Links */}
             <div className="flex gap-3">
-              {socialLinks.map((social) => {
+              {socialLinks.map((social, index) => {
                 const href = social.href || "#";
                 const isExternal = href && href.startsWith("http");
                 const isValid = href && href !== "#";
                 return isValid ? (
                   <a
-                    key={social.label}
+                    key={`social-${social.label}-${index}`}
                     href={href}
                     aria-label={social.label}
                     {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
