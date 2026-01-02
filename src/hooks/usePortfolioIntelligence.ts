@@ -304,36 +304,24 @@ export function usePortfolioIntelligence(userId?: string) {
  * Hook for portfolio comparison and benchmarking
  */
 export function usePortfolioBenchmark(userPortfolioMetrics?: PortfolioMetrics) {
-  const [benchmarkData, setBenchmarkData] = useState<any>(null);
-
-  const calculateBenchmark = useCallback(async () => {
-    // This would fetch aggregate data from other investors
-    try {
-      const { data, error } = await supabase
-        .rpc('get_portfolio_benchmark', {});
-
-      if (error) throw error;
-      setBenchmarkData(data);
-    } catch (error) {
-      console.error('Error fetching benchmark:', error);
-    }
-  }, []);
+  // Mock benchmark data since we don't have aggregate data yet
+  const benchmarkData = useMemo(() => ({
+    avg_diversification: 55,
+    avg_yield: 12,
+    avg_value: 5000,
+  }), []);
 
   const comparison = useMemo(() => {
-    if (!userPortfolioMetrics || !benchmarkData) return null;
+    if (!userPortfolioMetrics) return null;
 
     return {
       diversificationVsAverage:
-        userPortfolioMetrics.diversificationScore - (benchmarkData.avg_diversification || 50),
+        userPortfolioMetrics.diversificationScore - benchmarkData.avg_diversification,
       yieldVsAverage:
-        userPortfolioMetrics.currentYield - (benchmarkData.avg_yield || 12),
-      valueVsAverage: userPortfolioMetrics.totalValue - (benchmarkData.avg_value || 5000),
+        userPortfolioMetrics.currentYield - benchmarkData.avg_yield,
+      valueVsAverage: userPortfolioMetrics.totalValue - benchmarkData.avg_value,
     };
   }, [userPortfolioMetrics, benchmarkData]);
-
-  useEffect(() => {
-    calculateBenchmark();
-  }, [calculateBenchmark]);
 
   return { benchmarkData, comparison };
 }
