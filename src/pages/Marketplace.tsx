@@ -1,16 +1,52 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import Navigation from "@/components/Navigation";
 import { RegenerativeMarketplaceShowcase } from "@/components/marketplace/RegenerativeMarketplaceShowcase";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { ShoppingCart, TrendingUp, Users, Zap, DollarSign, FileText } from "lucide-react";
+import { ShoppingCart, TrendingUp, Users, Zap, DollarSign, FileText, Search, Filter, X } from "lucide-react";
 import { useProjects } from "@/hooks/useMarketplace";
 
 const Marketplace = () => {
   const [selectedFilter, setSelectedFilter] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [sortBy, setSortBy] = useState<"newest" | "trending" | "price">("trending");
   const { data: projects = [], isLoading } = useProjects();
+
+  // Filter and sort projects
+  const filteredProjects = useMemo(() => {
+    let filtered = projects;
+
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(project =>
+        project.title?.toLowerCase().includes(query) ||
+        project.description?.toLowerCase().includes(query) ||
+        project.location?.toLowerCase().includes(query)
+      );
+    }
+
+    // Apply category filter
+    if (selectedFilter !== "all") {
+      filtered = filtered.filter(project => project.project_type === selectedFilter);
+    }
+
+    // Apply sorting
+    const sorted = [...filtered];
+    if (sortBy === "trending") {
+      sorted.sort((a, b) => (b.verified_credits || 0) - (a.verified_credits || 0));
+    } else if (sortBy === "price") {
+      sorted.sort((a, b) => (a.price_per_unit || 0) - (b.price_per_unit || 0));
+    } else if (sortBy === "newest") {
+      sorted.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
+    }
+
+    return sorted;
+  }, [projects, searchQuery, selectedFilter, sortBy]);
 
   // Sample price data
   const priceHistory = [
