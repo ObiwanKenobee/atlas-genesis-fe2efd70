@@ -277,6 +277,53 @@ export type Database = {
         }
         Relationships: []
       }
+      price_alerts: {
+        Row: {
+          active: boolean | null
+          created_at: string
+          direction: string
+          id: string
+          project_id: string
+          target_price: number
+          triggered: boolean | null
+          triggered_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string
+          direction: string
+          id?: string
+          project_id: string
+          target_price: number
+          triggered?: boolean | null
+          triggered_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string
+          direction?: string
+          id?: string
+          project_id?: string
+          target_price?: number
+          triggered?: boolean | null
+          triggered_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_alerts_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "carbon_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -488,6 +535,39 @@ export type Database = {
           created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_tour_progress: {
+        Row: {
+          completed_at: string | null
+          completed_steps: string[] | null
+          id: string
+          started_at: string
+          tour_completed: boolean | null
+          tour_skipped: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          completed_steps?: string[] | null
+          id?: string
+          started_at?: string
+          tour_completed?: boolean | null
+          tour_skipped?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          completed_steps?: string[] | null
+          id?: string
+          started_at?: string
+          tour_completed?: boolean | null
+          tour_skipped?: boolean | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []

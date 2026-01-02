@@ -4,18 +4,19 @@ import { motion } from "framer-motion";
 import {
   Leaf, LogOut, User, BarChart3, ShoppingCart, Briefcase,
   TrendingUp, Activity, Bell, Settings, Globe, TreePine,
-  ChevronRight, Shield, Wallet, ArrowUpRight, Plus
+  ChevronRight, Shield, Wallet, ArrowUpRight, Plus, HelpCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import QuickActions from "@/components/dashboard/QuickActions";
+import { OnboardingTour } from "@/components/OnboardingTour";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useAdmin";
+import { useOnboardingTour } from "@/hooks/useOnboardingTour";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-
 interface Profile {
   full_name: string | null;
   organization: string | null;
@@ -36,12 +37,12 @@ interface CreditHolding {
 const Dashboard = () => {
   const { user, loading, signOut } = useAuth();
   const { data: isAdmin } = useIsAdmin();
+  const { startTour, tourCompleted } = useOnboardingTour();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [holdings, setHoldings] = useState<CreditHolding[]>([]);
   const [totalCredits, setTotalCredits] = useState(0);
   const [portfolioValue, setPortfolioValue] = useState(0);
-  const [onboardingComplete, setOnboardingComplete] = useState(true);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -167,6 +168,9 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Onboarding Tour */}
+      <OnboardingTour />
+
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-4">
@@ -180,9 +184,25 @@ const Dashboard = () => {
           </Link>
 
           <div className="flex items-center gap-2 sm:gap-4">
-            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground h-10 w-10">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="text-muted-foreground hover:text-foreground h-10 w-10"
+              data-tour="notifications"
+            >
               <Bell className="w-4 sm:w-5 h-4 sm:h-5" />
             </Button>
+            {tourCompleted && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={startTour}
+                className="text-muted-foreground hover:text-foreground h-10 w-10"
+                title="Restart tour"
+              >
+                <HelpCircle className="w-4 sm:w-5 h-4 sm:h-5" />
+              </Button>
+            )}
             {isAdmin && (
               <Button variant="outline" size="sm" asChild className="hidden sm:flex">
                 <Link to="/admin">
@@ -217,6 +237,7 @@ const Dashboard = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-6 sm:mb-8"
+          data-tour="welcome"
         >
           <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2">
             Welcome back, {profile?.full_name?.split(" ")[0] || "Explorer"}
@@ -276,6 +297,7 @@ const Dashboard = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8"
+          data-tour="stats"
         >
           {stats.map((stat, index) => (
             <motion.div
@@ -310,6 +332,7 @@ const Dashboard = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
           className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 sm:mb-8"
+          data-tour="quick-links"
         >
           {quickLinks.map((link, index) => (
             <Link key={link.label} to={link.href}>
