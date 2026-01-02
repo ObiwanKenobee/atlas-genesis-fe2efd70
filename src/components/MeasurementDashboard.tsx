@@ -34,13 +34,11 @@ export const MeasurementDashboard: React.FC<MeasurementDashboardProps> = ({
     biodiversity: m.biodiversity_score || 0,
   }));
 
-  // Regenerative metrics pie data
-  const healthMetrics = regenerativeMetrics[0];
-  const healthPieData = [
-    { name: "Microbiome Health", value: healthMetrics?.soil_microbiome_health || 0 },
-    { name: "Biodiversity", value: healthMetrics?.biodiversity_index || 0 },
-    { name: "Crop Diversity", value: healthMetrics?.crop_diversity_index || 0 },
-  ];
+  // Regenerative metrics pie data - use the new schema
+  const healthPieData = regenerativeMetrics.slice(0, 5).map((m) => ({
+    name: m.metric_name,
+    value: m.current_value,
+  }));
 
   if (isLoading) {
     return (
@@ -222,63 +220,37 @@ export const MeasurementDashboard: React.FC<MeasurementDashboardProps> = ({
       </Card>
 
       {/* Regenerative Metrics */}
-      {healthMetrics && (
+      {regenerativeMetrics.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>Regenerative Ecosystem Health</CardTitle>
-            <CardDescription>Soil microbiome, biodiversity, and crop diversity metrics</CardDescription>
+            <CardDescription>Environmental metrics from database</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Health Scores */}
               <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between mb-2">
-                    <span className="text-sm font-medium">Soil Microbiome Health</span>
-                    <span className="text-sm font-bold text-emerald-600">{healthMetrics.soil_microbiome_health}%</span>
+                {regenerativeMetrics.slice(0, 5).map((metric) => (
+                  <div key={metric.id}>
+                    <div className="flex justify-between mb-2">
+                      <span className="text-sm font-medium">{metric.metric_name}</span>
+                      <span className="text-sm font-bold text-emerald-600">
+                        {metric.current_value.toFixed(1)} {metric.unit}
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-emerald-500 h-2 rounded-full transition-all"
+                        style={{ width: `${Math.min((metric.current_value / (metric.target_value || 100)) * 100, 100)}%` }}
+                      />
+                    </div>
+                    {metric.improvement_percentage && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {metric.improvement_percentage > 0 ? '+' : ''}{metric.improvement_percentage.toFixed(1)}% improvement
+                      </p>
+                    )}
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-emerald-500 h-2 rounded-full transition-all"
-                      style={{ width: `${healthMetrics.soil_microbiome_health}%` }}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex justify-between mb-2">
-                    <span className="text-sm font-medium">Biodiversity Index</span>
-                    <span className="text-sm font-bold text-blue-600">{healthMetrics.biodiversity_index}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-blue-500 h-2 rounded-full transition-all"
-                      style={{ width: `${healthMetrics.biodiversity_index}%` }}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex justify-between mb-2">
-                    <span className="text-sm font-medium">Crop Diversity Index</span>
-                    <span className="text-sm font-bold text-amber-600">{healthMetrics.crop_diversity_index}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-amber-500 h-2 rounded-full transition-all"
-                      style={{ width: `${healthMetrics.crop_diversity_index}%` }}
-                    />
-                  </div>
-                </div>
-
-                <div className="mt-4 pt-4 border-t">
-                  <p className="text-xs text-muted-foreground">
-                    Data Source: <span className="font-semibold">{healthMetrics.data_source}</span>
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Confidence: <span className="font-semibold">{(healthMetrics.confidence_level * 100).toFixed(0)}%</span>
-                  </p>
-                </div>
+                ))}
               </div>
 
               {/* Health Pie Chart */}
@@ -289,7 +261,7 @@ export const MeasurementDashboard: React.FC<MeasurementDashboardProps> = ({
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={({ name, value }) => `${name}: ${value}%`}
+                    label={({ name, value }) => `${name}: ${value.toFixed(1)}`}
                     outerRadius={80}
                     fill="#8884d8"
                     dataKey="value"
@@ -298,7 +270,7 @@ export const MeasurementDashboard: React.FC<MeasurementDashboardProps> = ({
                       <Cell key={`cell-${index}`} fill={color} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value) => `${value}%`} />
+                  <Tooltip formatter={(value) => (typeof value === 'number' ? value.toFixed(1) : value)} />
                 </PieChart>
               </ResponsiveContainer>
             </div>

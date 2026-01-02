@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BioregionalZone, CLIMATE_LABELS, ClimateClassification } from "@/types/marketplace";
+import { BioregionalZone } from "@/types/marketplace";
 import { MapPin, Shield, AlertTriangle, Globe, BarChart3 } from "lucide-react";
 
 interface BioregionalMapProps {
@@ -11,17 +11,22 @@ interface BioregionalMapProps {
   isLoading?: boolean;
 }
 
-const CLIMATE_COLORS: Record<ClimateClassification, string> = {
-  tropical_rainforest: "bg-emerald-700",
-  tropical_savanna: "bg-amber-700",
-  arid_desert: "bg-yellow-600",
-  temperate_grassland: "bg-lime-600",
-  boreal_forest: "bg-slate-600",
-  temperate_deciduous: "bg-orange-600",
-  mediterranean: "bg-orange-500",
-  tundra: "bg-blue-400",
-  ocean_coastal: "bg-blue-600",
-  mountain: "bg-gray-700",
+const getRiskColor = (riskLevel: string | null): string => {
+  switch (riskLevel) {
+    case "critical": return "bg-red-600";
+    case "high": return "bg-orange-600";
+    case "medium": return "bg-yellow-600";
+    case "low": return "bg-green-600";
+    default: return "bg-gray-600";
+  }
+};
+
+const getClimateColor = (climateType: string | null): string => {
+  if (!climateType) return "bg-gray-600";
+  if (climateType.toLowerCase().includes("tropical")) return "bg-emerald-700";
+  if (climateType.toLowerCase().includes("marine")) return "bg-blue-600";
+  if (climateType.toLowerCase().includes("temperate")) return "bg-orange-600";
+  return "bg-slate-600";
 };
 
 export const BioregionalMap: React.FC<BioregionalMapProps> = ({
@@ -33,10 +38,10 @@ export const BioregionalMap: React.FC<BioregionalMapProps> = ({
   // Simple statistical summary of zones
   const zoneStats = useMemo(() => {
     return {
-      total_area: zones.reduce((sum, z) => sum + (z.region_area_km2 || 0), 0),
-      avg_climate_risk: zones.reduce((sum, z) => sum + z.climate_risk_score, 0) / zones.length,
-      indigenous_zones: zones.filter((z) => z.indigenous_land).length,
-      avg_biodiversity_value: zones.reduce((sum, z) => sum + z.biodiversity_value_factor, 0) / zones.length,
+      total_area: zones.reduce((sum, z) => sum + (z.total_area_hectares || 0), 0),
+      avg_biodiversity: zones.reduce((sum, z) => sum + (z.biodiversity_index || 0), 0) / (zones.length || 1),
+      critical_zones: zones.filter((z) => z.risk_level === "critical" || z.risk_level === "high").length,
+      avg_carbon_rate: zones.reduce((sum, z) => sum + (z.carbon_sequestration_rate || 0), 0) / (zones.length || 1),
     };
   }, [zones]);
 
@@ -66,7 +71,7 @@ export const BioregionalMap: React.FC<BioregionalMapProps> = ({
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">{(zoneStats.total_area / 1000).toFixed(0)}K</p>
-            <p className="text-xs text-muted-foreground">km²</p>
+            <p className="text-xs text-muted-foreground">hectares</p>
           </CardContent>
         </Card>
 
@@ -74,12 +79,12 @@ export const BioregionalMap: React.FC<BioregionalMapProps> = ({
           <CardHeader className="pb-3">
             <CardTitle className="text-sm flex items-center gap-2">
               <AlertTriangle className="h-4 w-4" />
-              Climate Risk
+              High Risk Zones
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">{zoneStats.avg_climate_risk.toFixed(1)}</p>
-            <p className="text-xs text-muted-foreground">Average Score</p>
+            <p className="text-2xl font-bold">{zoneStats.critical_zones}</p>
+            <p className="text-xs text-muted-foreground">Require attention</p>
           </CardContent>
         </Card>
 
@@ -87,12 +92,12 @@ export const BioregionalMap: React.FC<BioregionalMapProps> = ({
           <CardHeader className="pb-3">
             <CardTitle className="text-sm flex items-center gap-2">
               <Shield className="h-4 w-4" />
-              Indigenous Lands
+              Carbon Rate
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">{zoneStats.indigenous_zones}</p>
-            <p className="text-xs text-muted-foreground">Protected Zones</p>
+            <p className="text-2xl font-bold">{zoneStats.avg_carbon_rate.toFixed(1)}</p>
+            <p className="text-xs text-muted-foreground">t CO₂/ha/yr avg</p>
           </CardContent>
         </Card>
 
@@ -104,8 +109,8 @@ export const BioregionalMap: React.FC<BioregionalMapProps> = ({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">{zoneStats.avg_biodiversity_value.toFixed(2)}</p>
-            <p className="text-xs text-muted-foreground">Value Factor</p>
+            <p className="text-2xl font-bold">{(zoneStats.avg_biodiversity * 100).toFixed(0)}%</p>
+            <p className="text-xs text-muted-foreground">Average Index</p>
           </CardContent>
         </Card>
       </div>
@@ -140,87 +145,66 @@ export const BioregionalMap: React.FC<BioregionalMapProps> = ({
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <CardTitle className="text-base">{zone.zone_name}</CardTitle>
-                    <CardDescription className="text-xs mt-1">{zone.region_country}</CardDescription>
+                    <CardTitle className="text-base">{zone.name}</CardTitle>
+                    <CardDescription className="text-xs mt-1">{zone.country} • {zone.region}</CardDescription>
                   </div>
-                  <div className={`${CLIMATE_COLORS[zone.climate_classification]} rounded-full p-2`}>
+                  <div className={`${getClimateColor(zone.climate_type)} rounded-full p-2`}>
                     <Globe className="h-4 w-4 text-white" />
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
-                {/* Climate Classification */}
+                {/* Climate Type */}
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs font-medium">Climate Type</span>
-                    <Badge variant="outline">{CLIMATE_LABELS[zone.climate_classification]}</Badge>
+                    <Badge variant="outline">{zone.climate_type || "Unknown"}</Badge>
                   </div>
                 </div>
 
                 {/* Area */}
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Area</span>
-                  <span className="font-semibold">{zone.region_area_km2?.toLocaleString() || "—"} km²</span>
+                  <span className="font-semibold">{zone.total_area_hectares?.toLocaleString() || "—"} ha</span>
                 </div>
 
-                {/* Climate Risk Score */}
+                {/* Risk Level */}
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-medium text-orange-700">Climate Risk</span>
-                    <span className="text-xs font-bold text-orange-700">{zone.climate_risk_score.toFixed(1)}</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-orange-500 h-2 rounded-full"
-                      style={{
-                        width: `${Math.min((zone.climate_risk_score / 100) * 100, 100)}%`,
-                      }}
-                    />
+                    <span className="text-xs font-medium text-orange-700">Risk Level</span>
+                    <Badge className={`${getRiskColor(zone.risk_level)} text-white`}>
+                      {zone.risk_level || "Unknown"}
+                    </Badge>
                   </div>
                 </div>
 
-                {/* Biodiversity Value Factor */}
+                {/* Carbon Sequestration */}
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Carbon Rate</span>
+                  <span className="font-bold text-emerald-600">{zone.carbon_sequestration_rate?.toFixed(1) || "—"} t/ha/yr</span>
+                </div>
+
+                {/* Biodiversity Index */}
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-medium text-emerald-700">Biodiversity Value</span>
-                    <span className="text-xs font-bold text-emerald-700">{zone.biodiversity_value_factor.toFixed(2)}x</span>
+                    <span className="text-xs font-medium text-emerald-700">Biodiversity Index</span>
+                    <span className="text-xs font-bold text-emerald-700">{((zone.biodiversity_index || 0) * 100).toFixed(0)}%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
                       className="bg-emerald-500 h-2 rounded-full"
                       style={{
-                        width: `${Math.min(zone.biodiversity_value_factor * 20, 100)}%`,
+                        width: `${Math.min((zone.biodiversity_index || 0) * 100, 100)}%`,
                       }}
                     />
                   </div>
                 </div>
 
-                {/* Base Credit Multiplier */}
+                {/* Active Projects */}
                 <div className="flex items-center justify-between text-sm pt-2 border-t">
-                  <span className="text-muted-foreground">Credit Multiplier</span>
-                  <span className="font-bold text-purple-600">{zone.base_credit_multiplier.toFixed(2)}x</span>
+                  <span className="text-muted-foreground">Active Projects</span>
+                  <span className="font-bold text-purple-600">{zone.active_projects || 0}</span>
                 </div>
-
-                {/* Indigenous Land Badge */}
-                {zone.indigenous_land && (
-                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                    <div className="flex items-start gap-2">
-                      <Shield className="h-4 w-4 text-amber-700 mt-0.5 flex-shrink-0" />
-                      <div className="text-sm">
-                        <p className="font-semibold text-amber-900">Indigenous Land</p>
-                        <p className="text-xs text-amber-700">{zone.indigenous_community_name || "Protected territory"}</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Historical Land Use */}
-                {zone.historical_land_use && (
-                  <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-xs font-medium text-blue-700 mb-1">Historical Land Use</p>
-                    <p className="text-xs text-blue-600">{zone.historical_land_use}</p>
-                  </div>
-                )}
               </CardContent>
             </Card>
           ))}
@@ -239,17 +223,17 @@ export const BioregionalMap: React.FC<BioregionalMapProps> = ({
               <div className="space-y-4">
                 <div>
                   <h4 className="font-semibold text-sm text-muted-foreground">Zone Name</h4>
-                  <p className="text-lg font-bold">{selectedZone.zone_name}</p>
+                  <p className="text-lg font-bold">{selectedZone.name}</p>
                 </div>
 
                 <div>
-                  <h4 className="font-semibold text-sm text-muted-foreground">Country</h4>
-                  <p className="text-lg font-bold">{selectedZone.region_country || "Unknown"}</p>
+                  <h4 className="font-semibold text-sm text-muted-foreground">Location</h4>
+                  <p className="text-lg font-bold">{selectedZone.country}, {selectedZone.region}</p>
                 </div>
 
                 <div>
-                  <h4 className="font-semibold text-sm text-muted-foreground">Climate Classification</h4>
-                  <p className="text-lg">{CLIMATE_LABELS[selectedZone.climate_classification]}</p>
+                  <h4 className="font-semibold text-sm text-muted-foreground">Climate Type</h4>
+                  <p className="text-lg">{selectedZone.climate_type || "Not specified"}</p>
                 </div>
               </div>
 
@@ -257,20 +241,29 @@ export const BioregionalMap: React.FC<BioregionalMapProps> = ({
               <div className="space-y-4">
                 <div>
                   <h4 className="font-semibold text-sm text-muted-foreground">Area</h4>
-                  <p className="text-lg font-bold">{selectedZone.region_area_km2?.toLocaleString() || "N/A"} km²</p>
+                  <p className="text-lg font-bold">{selectedZone.total_area_hectares?.toLocaleString() || "N/A"} hectares</p>
                 </div>
 
                 <div>
-                  <h4 className="font-semibold text-sm text-muted-foreground">Climate Risk Score</h4>
-                  <p className="text-lg font-bold text-orange-600">{selectedZone.climate_risk_score.toFixed(2)}</p>
+                  <h4 className="font-semibold text-sm text-muted-foreground">Risk Level</h4>
+                  <Badge className={`${getRiskColor(selectedZone.risk_level)} text-white`}>
+                    {selectedZone.risk_level || "Unknown"}
+                  </Badge>
                 </div>
 
                 <div>
-                  <h4 className="font-semibold text-sm text-muted-foreground">Base Credit Multiplier</h4>
-                  <p className="text-lg font-bold text-purple-600">{selectedZone.base_credit_multiplier.toFixed(2)}x</p>
+                  <h4 className="font-semibold text-sm text-muted-foreground">Carbon Sequestration</h4>
+                  <p className="text-lg font-bold text-emerald-600">{selectedZone.carbon_sequestration_rate?.toFixed(2) || "N/A"} t CO₂/ha/yr</p>
                 </div>
               </div>
             </div>
+
+            {selectedZone.description && (
+              <div className="mt-6 pt-4 border-t">
+                <h4 className="font-semibold text-sm text-muted-foreground mb-2">Description</h4>
+                <p className="text-sm text-foreground">{selectedZone.description}</p>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}

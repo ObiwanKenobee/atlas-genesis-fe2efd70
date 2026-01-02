@@ -1,16 +1,17 @@
-import Navigation from "@/components/Navigation";
+import EnterpriseHeader from "@/components/EnterpriseHeader";
 import HeroSection from "@/components/HeroSection";
 import PlatformLayers from "@/components/PlatformLayers";
 import ImpactMetrics from "@/components/ImpactMetrics";
 import TechnologyStack from "@/components/TechnologyStack";
 import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
+import NewsletterBanner from "@/components/NewsletterBanner";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
-      <main>
+      <EnterpriseHeader />
+      <main className="pt-[104px]">
         <HeroSection />
         <PlatformLayers />
         <ImpactMetrics />
@@ -18,6 +19,7 @@ const Index = () => {
         <CTASection />
       </main>
       <Footer />
+      <NewsletterBanner />
     </div>
   );
 };

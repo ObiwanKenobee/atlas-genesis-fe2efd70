@@ -1,63 +1,72 @@
 import { useQuery } from "@tanstack/react-query";
-import { RegenerativeMetrics, RegenerativeMetricsTrend } from "@/types/marketplace";
+import { supabase } from "@/integrations/supabase/client";
 
-// Generate mock regenerative metrics
-const generateMockMetrics = (projectId: string, days: number = 30): RegenerativeMetrics[] => {
-  const metrics: RegenerativeMetrics[] = [];
-  const now = new Date();
+export interface RegenerativeMetric {
+  id: string;
+  project_id: string | null;
+  zone_id: string | null;
+  metric_name: string;
+  metric_category: string;
+  current_value: number;
+  baseline_value: number | null;
+  target_value: number | null;
+  improvement_percentage: number | null;
+  unit: string;
+  trend: string | null;
+  last_measured_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
 
-  for (let i = 0; i < days; i++) {
-    const date = new Date(now);
-    date.setDate(date.getDate() - i);
-
-    metrics.push({
-      id: `regen-${projectId}-${i}`,
-      project_id: projectId,
-      measurement_date: date.toISOString(),
-      soil_microbiome_health: 65 + Math.random() * 25,
-      biodiversity_index: 70 + Math.random() * 20,
-      pollinator_count: Math.floor(50 + Math.random() * 100),
-      native_species_count: Math.floor(20 + Math.random() * 30),
-      crop_diversity_index: 60 + Math.random() * 30,
-      crop_types_count: Math.floor(3 + Math.random() * 8),
-      mangrove_health_score: 75 + Math.random() * 15,
-      kelp_forest_coverage_percent: 40 + Math.random() * 30,
-      data_source: i % 2 === 0 ? "eDNA-Sample" : "Satellite",
-      confidence_level: 0.8 + Math.random() * 0.15,
-      notes: null,
-      created_at: date.toISOString(),
-    });
-  }
-
-  return metrics;
-};
+interface RegenerativeMetricsTrend {
+  microbiome_trend_30d: number | null;
+  biodiversity_trend_30d: number | null;
+  crop_diversity_trend_30d: number | null;
+  pollinator_trend_30d: number | null;
+  latest_scores: RegenerativeMetric | null;
+  health_status: "excellent" | "good" | "fair" | "poor";
+}
 
 interface UseRegenerativeMetricsOptions {
   days?: number;
 }
 
-export const useRegenerativeMetrics = (projectId: string | undefined, options?: UseRegenerativeMetricsOptions) => {
-  const days = options?.days ?? 30;
-
-  const query = useQuery<RegenerativeMetrics[]>({
-    queryKey: ["regenerative-metrics", projectId, days],
-    enabled: !!projectId,
+export const useRegenerativeMetrics = (
+  projectId: string | undefined,
+  options?: UseRegenerativeMetricsOptions
+) => {
+  const query = useQuery<RegenerativeMetric[]>({
+    queryKey: ["regenerative-metrics", projectId, options?.days],
     queryFn: async () => {
-      if (!projectId) return [];
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      return generateMockMetrics(projectId, days);
+      let queryBuilder = supabase
+        .from("regenerative_metrics")
+        .select("*")
+        .order("last_measured_at", { ascending: false });
+
+      if (projectId) {
+        queryBuilder = queryBuilder.eq("project_id", projectId);
+      }
+
+      const { data, error } = await queryBuilder;
+
+      if (error) {
+        console.error("Error fetching regenerative metrics:", error);
+        throw error;
+      }
+
+      return data || [];
     },
   });
 
   // Compute trend from latest measurements
-  const trend: RegenerativeMetricsTrend | null = query.data
+  const trend: RegenerativeMetricsTrend | null = query.data?.length
     ? {
-        microbiome_trend_30d: computeTrend(query.data.slice(0, 30).map((m) => m.soil_microbiome_health)),
-        biodiversity_trend_30d: computeTrend(query.data.slice(0, 30).map((m) => m.biodiversity_index)),
-        crop_diversity_trend_30d: computeTrend(query.data.slice(0, 30).map((m) => m.crop_diversity_index)),
-        pollinator_trend_30d: computeTrend(query.data.slice(0, 30).map((m) => m.pollinator_count)),
+        microbiome_trend_30d: computeTrendFromMetrics(query.data, "Soil"),
+        biodiversity_trend_30d: computeTrendFromMetrics(query.data, "Biodiversity"),
+        crop_diversity_trend_30d: computeTrendFromMetrics(query.data, "Land Use"),
+        pollinator_trend_30d: null,
         latest_scores: query.data[0] || null,
-        health_status: computeHealthStatus(query.data[0]),
+        health_status: computeHealthStatus(query.data),
       }
     : null;
 
@@ -71,86 +80,101 @@ export const useRegenerativeMetrics = (projectId: string | undefined, options?: 
   };
 };
 
-// Additional exported hooks
 export const useSoilHealthScore = (projectId: string | undefined) => {
-  const { data } = useRegenerativeMetrics(projectId, { days: 7 });
-  const latest = data?.[0];
-  
+  const { data } = useRegenerativeMetrics(projectId);
+  const soilMetric = data?.find((m) => m.metric_category === "Soil");
+
   return {
-    data: latest ? {
-      score: latest.soil_microbiome_health || 0,
-      level: (latest.soil_microbiome_health || 0) >= 80 ? "excellent" : 
-             (latest.soil_microbiome_health || 0) >= 60 ? "good" : 
-             (latest.soil_microbiome_health || 0) >= 40 ? "fair" : "poor",
-      recommendations: [
-        "Increase cover crop diversity",
-        "Reduce tillage frequency",
-        "Add organic matter amendments",
-      ],
-    } : null,
+    data: soilMetric
+      ? {
+          score: soilMetric.current_value,
+          level:
+            soilMetric.current_value >= 80
+              ? "excellent"
+              : soilMetric.current_value >= 60
+                ? "good"
+                : soilMetric.current_value >= 40
+                  ? "fair"
+                  : "poor",
+          recommendations: [
+            "Increase cover crop diversity",
+            "Reduce tillage frequency",
+            "Add organic matter amendments",
+          ],
+        }
+      : null,
   };
 };
 
 export const useBiodiversityIndex = (projectId: string | undefined) => {
-  const { data } = useRegenerativeMetrics(projectId, { days: 7 });
-  const latest = data?.[0];
-  
+  const { data } = useRegenerativeMetrics(projectId);
+  const bioMetric = data?.find((m) => m.metric_category === "Biodiversity");
+
   return {
-    data: latest ? {
-      index: latest.biodiversity_index || 0,
-      status: (latest.biodiversity_index || 0) >= 80 ? "high" : 
-              (latest.biodiversity_index || 0) >= 50 ? "moderate" : "low",
-      species_estimate: latest.native_species_count || 0,
-      pollinator_presence: (latest.pollinator_count || 0) > 30,
-      conservation_priority: (latest.biodiversity_index || 0) >= 85,
-    } : null,
+    data: bioMetric
+      ? {
+          index: bioMetric.current_value * 100,
+          status:
+            bioMetric.current_value >= 0.8
+              ? "high"
+              : bioMetric.current_value >= 0.5
+                ? "moderate"
+                : "low",
+          species_estimate: Math.floor(bioMetric.current_value * 100),
+          pollinator_presence: bioMetric.current_value > 0.6,
+          conservation_priority: bioMetric.current_value >= 0.85,
+        }
+      : null,
   };
 };
 
 export const useCropDiversityMetrics = (projectId: string | undefined) => {
-  const { data } = useRegenerativeMetrics(projectId, { days: 7 });
-  const latest = data?.[0];
-  
+  const { data } = useRegenerativeMetrics(projectId);
+  const landMetric = data?.find((m) => m.metric_category === "Land Use");
+
   return {
-    data: latest ? {
-      diversity_index: latest.crop_diversity_index || 0,
-      diversity_level: (latest.crop_diversity_index || 0) >= 70 ? "high" : 
-                       (latest.crop_diversity_index || 0) >= 40 ? "moderate" : "low",
-      crop_count: latest.crop_types_count || 0,
-      is_monoculture: (latest.crop_types_count || 0) <= 2,
-    } : null,
+    data: landMetric
+      ? {
+          diversity_index: landMetric.current_value,
+          diversity_level:
+            landMetric.current_value >= 70
+              ? "high"
+              : landMetric.current_value >= 40
+                ? "moderate"
+                : "low",
+          crop_count: Math.floor(landMetric.current_value / 10),
+          is_monoculture: landMetric.current_value < 30,
+        }
+      : null,
   };
 };
 
 export const useRegenerativeMetricsTrend = (projectId: string | undefined) => {
-  const { trend } = useRegenerativeMetrics(projectId, { days: 30 });
+  const { trend } = useRegenerativeMetrics(projectId);
   return { data: trend };
 };
 
-// Helper to compute trend (percentage change)
-function computeTrend(values: (number | null | undefined)[]): number | null {
-  const filtered = values.filter((v): v is number => v != null);
-  if (filtered.length < 2) return null;
-
-  const newest = filtered[0];
-  const oldest = filtered[filtered.length - 1];
-
-  if (oldest === 0) return null;
-  return ((newest - oldest) / oldest) * 100;
+// Helper to compute trend from metrics by category
+function computeTrendFromMetrics(
+  metrics: RegenerativeMetric[],
+  category: string
+): number | null {
+  const categoryMetric = metrics.find((m) => m.metric_category === category);
+  return categoryMetric?.improvement_percentage || null;
 }
 
 // Helper to compute health status
-function computeHealthStatus(metrics: RegenerativeMetrics | null | undefined): "excellent" | "good" | "fair" | "poor" {
-  if (!metrics) return "fair";
+function computeHealthStatus(
+  metrics: RegenerativeMetric[]
+): "excellent" | "good" | "fair" | "poor" {
+  if (!metrics.length) return "fair";
 
-  const avgScore =
-    ((metrics.soil_microbiome_health || 0) +
-      (metrics.biodiversity_index || 0) +
-      (metrics.crop_diversity_index || 0)) /
-    3;
+  const avgImprovement =
+    metrics.reduce((sum, m) => sum + (m.improvement_percentage || 0), 0) /
+    metrics.length;
 
-  if (avgScore >= 80) return "excellent";
-  if (avgScore >= 60) return "good";
-  if (avgScore >= 40) return "fair";
+  if (avgImprovement >= 40) return "excellent";
+  if (avgImprovement >= 25) return "good";
+  if (avgImprovement >= 10) return "fair";
   return "poor";
 }
