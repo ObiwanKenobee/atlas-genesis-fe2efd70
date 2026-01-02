@@ -102,10 +102,14 @@ const ImpactMetrics = () => {
               transition={{ duration: 0.5, delay: index * 0.1 }}
               className="group"
             >
-              <div className="relative bg-card-gradient border border-border/50 rounded-lg sm:rounded-2xl p-4 sm:p-8 hover:border-primary/30 transition-all duration-500 hover:shadow-glow h-full">
+              <div
+                className="relative bg-card-gradient border border-border/50 rounded-lg sm:rounded-2xl p-4 sm:p-8 hover:border-primary/30 focus-within:ring-2 focus-within:ring-primary transition-all duration-500 hover:shadow-glow h-full"
+                role="region"
+                aria-label={`${metric.label}: ${metric.value} ${metric.unit}`}
+              >
                 {/* Icon */}
                 <div className={`w-10 sm:w-14 h-10 sm:h-14 rounded-lg sm:rounded-xl bg-muted/50 flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 transition-transform ${metric.color}`}>
-                  <metric.icon className="w-5 sm:w-7 h-5 sm:h-7" />
+                  <metric.icon className="w-5 sm:w-7 h-5 sm:h-7" aria-hidden="true" />
                 </div>
 
                 {/* Value */}
@@ -125,7 +129,7 @@ const ImpactMetrics = () => {
 
                 {/* Change Indicator */}
                 <div className="flex items-center gap-2">
-                  <span className="px-2 py-1 rounded-md bg-primary/10 text-primary text-xs sm:text-sm font-medium">
+                  <span className="px-2 py-1 rounded-md bg-primary/10 text-primary text-xs sm:text-sm font-medium" aria-label={`${metric.change} change`}>
                     {metric.change}
                   </span>
                   <span className="text-muted-foreground text-xs sm:text-sm">vs last year</span>
