@@ -29,6 +29,8 @@ const Footer = () => {
   const [email, setEmail] = useState("");
   const [subscribeStatus, setSubscribeStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 
+  const [ussdMode, setUssdMode] = useState(false);
+
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
     setSubscribeStatus("loading");
@@ -200,6 +202,68 @@ const Footer = () => {
             </ul>
           </div>
 
+          <div className="space-y-3">
+                <div className="text-sm font-semibold">📱 Download Apps:</div>
+                <div className="space-y-2">
+                  <a
+                    href="#"
+                    className="block bg-black/20 rounded-lg p-2 hover:bg-black/30 transition-colors"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <span className="text-lg">📱</span>
+                      <div className="text-xs">
+                        <div className="font-semibold">Download on the</div>
+                        <div>App Store</div>
+                      </div>
+                    </div>
+                  </a>
+
+                  <a
+  href="https://drive.google.com/file/d/1QEykzmJOKIKu6sABbPx2zeGXX1MZBcCr/view"
+  className="block bg-black/20 rounded-lg p-2 hover:bg-black/30 transition-colors"
+>
+  <div className="flex items-center space-x-2">
+    <span className="text-lg">📦</span>
+    <div className="text-xs leading-tight">
+      <div className="font-semibold">Download</div>
+      <div>APK</div>
+    </div>
+  </div>
+</a>
+
+
+                  <a
+                    href="#"
+                    className="block bg-black/20 rounded-lg p-2 hover:bg-black/30 transition-colors"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <span className="text-lg">🤖</span>
+                      <div className="text-xs">
+                        <div className="font-semibold">Get it on</div>
+                        <div>Google Play</div>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            
+
+            {/* USSD Alternative */}
+            {ussdMode && (
+              <div className="bg-green-600/30 p-3 rounded-lg">
+                <div className="text-sm font-semibold mb-2">
+                  📱 No App Needed!
+                </div>
+                <div className="text-lg font-bold">*384*7#</div>
+                <div className="text-xs text-orange-200">
+                  Works on any phone
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      
+
           {/* More Features */}
           <div>
             <h4 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider">More Features</h4>
@@ -284,7 +348,7 @@ const Footer = () => {
               ))}
             </ul>
           </div>
-        </div>
+
 
         {/* Bottom Footer */}
         <div className="py-8 border-t border-border/30 flex flex-col md:flex-row items-center justify-between gap-6">
@@ -333,7 +397,6 @@ const Footer = () => {
             </Button>
           </div>
         </div>
-      </div>
     </footer>
   );
 };
