@@ -125,16 +125,19 @@ const Navigation = () => {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             className="md:hidden bg-card/95 backdrop-blur-xl border-b border-border overflow-hidden"
+            role="navigation"
+            aria-label="Mobile navigation menu"
           >
             <div className="container mx-auto px-4 sm:px-6 py-6 flex flex-col gap-3">
               {navLinks.map((link) => (
                 <Link
                   key={link.name}
                   to={link.href}
-                  className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors py-3 px-2 rounded-lg font-medium"
+                  className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary rounded-lg transition-colors py-3 px-2 font-medium"
                   onClick={() => setIsOpen(false)}
+                  aria-label={link.name}
                 >
-                  <link.icon className="w-4 h-4" />
+                  <link.icon className="w-4 h-4" aria-hidden="true" />
                   {link.name}
                 </Link>
               ))}
