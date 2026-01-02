@@ -186,7 +186,7 @@ const Footer = () => {
             <h4 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider">Features</h4>
             <ul className="space-y-3">
               {featureLinks.slice(0, 4).map((link) => (
-                <li key={link.href}>
+                <li key={`feature-${link.name}`}>
                   <Link
                     to={link.href}
                     className="flex items-center gap-2 text-sm text-muted-foreground hover:text-emerald-400 transition-colors group"
@@ -205,7 +205,7 @@ const Footer = () => {
             <h4 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider">More Features</h4>
             <ul className="space-y-3">
               {featureLinks.slice(4).map((link) => (
-                <li key={link.href}>
+                <li key={`feature-${link.name}`}>
                   <Link
                     to={link.href}
                     className="flex items-center gap-2 text-sm text-muted-foreground hover:text-emerald-400 transition-colors group"
@@ -224,7 +224,7 @@ const Footer = () => {
             <h4 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider">Platform</h4>
             <ul className="space-y-3 mb-6">
               {platformLinks.map((link) => (
-                <li key={link.href}>
+                <li key={`platform-${link.name}`}>
                   <Link
                     to={link.href}
                     className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors flex items-center gap-2 group"
@@ -239,7 +239,7 @@ const Footer = () => {
             <h4 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider">Resources</h4>
             <ul className="space-y-3">
               {resourceLinks.map((link) => (
-                <li key={link.href}>
+                <li key={`resource-${link.name}`}>
                   <Link
                     to={link.href}
                     className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors flex items-center gap-2 group"
@@ -257,7 +257,7 @@ const Footer = () => {
             <h4 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider">Legal</h4>
             <ul className="space-y-3 mb-6">
               {legalLinks.map((link) => (
-                <li key={link.href}>
+                <li key={`legal-${link.name}`}>
                   <Link
                     to={link.href}
                     className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors flex items-center gap-2 group"
@@ -272,7 +272,7 @@ const Footer = () => {
             <h4 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider">Company</h4>
             <ul className="space-y-3">
               {companyLinks.map((link) => (
-                <li key={link.href}>
+                <li key={`company-${link.name}`}>
                   <Link
                     to={link.href}
                     className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors flex items-center gap-2 group"
