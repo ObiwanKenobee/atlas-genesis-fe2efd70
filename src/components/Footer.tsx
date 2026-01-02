@@ -298,70 +298,17 @@ const Footer = () => {
           <div className="flex flex-wrap justify-center gap-6 text-xs text-muted-foreground">
             <a href="#" className="hover:text-emerald-400 transition-colors flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-              Platform Status
+              All Systems Operational
             </a>
             <a href="#" className="hover:text-emerald-400 transition-colors flex items-center gap-2">
               <Globe className="w-3 h-3" />
-              Global
+              Global Network
             </a>
             <a href="#" className="hover:text-emerald-400 transition-colors flex items-center gap-2">
               <Lock className="w-3 h-3" />
-              Secure
+              Enterprise Security
             </a>
-          </div>
-
-           {/* App Store Badges (Hidden in USSD mode) */}
-            
-              <div className="space-y-3">
-                <div className="text-sm font-semibold">📱 Download Apps:</div>
-                <div className="space-y-2">
-                  <a
-                    href="#"
-                    className="block bg-black/20 rounded-lg p-2 hover:bg-black/30 transition-colors"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <span className="text-lg">📱</span>
-                      <div className="text-xs">
-                        <div className="font-semibold">Download on the</div>
-                        <div>App Store</div>
-                      </div>
-                    </div>
-                  </a>
-
-                  <a
-                    href="https://drive.google.com/file/d/1QEykzmJOKIKu6sABbPx2zeGXX1MZBcCr/view?usp=sharing"
-                    download
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="Download APK (external)"
-                    className="block bg-black/20 rounded-lg p-2 hover:bg-black/30 transition-colors"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <span className="text-lg">📦</span>
-                      <div className="text-xs">
-                        <div className="font-semibold">Get APK</div>
-                        <div>Direct Download</div>
-                      </div>
-                    </div>
-                  </a>
-
-
-                  <a
-                    href="#"
-                    className="block bg-black/20 rounded-lg p-2 hover:bg-black/30 transition-colors"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <span className="text-lg">🤖</span>
-                      <div className="text-xs">
-                        <div className="font-semibold">Get it on</div>
-                        <div>Google Play</div>
-                      </div>
-                    </div>
-                  </a>
-                </div>
-              </div>
-
-              
+          </div>              
            
 
           {/* Language & Theme */}
