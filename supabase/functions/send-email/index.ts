@@ -9,7 +9,7 @@ const corsHeaders = {
 };
 
 interface EmailRequest {
-  type: "purchase_confirmation" | "certificate" | "milestone" | "newsletter_welcome";
+  type: "purchase_confirmation" | "certificate" | "milestone" | "newsletter_welcome" | "price_alert";
   to: string;
   data: {
     userName?: string;
@@ -22,6 +22,10 @@ interface EmailRequest {
     milestoneName?: string;
     milestoneDescription?: string;
     impactAchieved?: string;
+    currentPrice?: number;
+    targetPrice?: number;
+    alertDirection?: string;
+    priceChange?: string;
   };
 }
 
@@ -189,62 +193,63 @@ const handler = async (req: Request): Promise<Response> => {
         </body>
         </html>
       `;
-    } else if (type === "newsletter_welcome") {
-      subject = `Welcome to Atlas Sanctum Newsletter! 🌱`;
+    } else if (type === "price_alert") {
+      const direction = data.alertDirection === 'above' ? 'risen above' : 'dropped below';
+      const emoji = data.alertDirection === 'above' ? '📈' : '📉';
+      subject = `${emoji} Price Alert: ${data.projectTitle} has ${direction} your target`;
       html = `
         <!DOCTYPE html>
         <html>
         <head>
           <style>
             body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; }
-            .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; }
-            .header { background: linear-gradient(135deg, #10b981, #059669); padding: 50px 30px; text-align: center; }
-            .header h1 { color: #ffffff; margin: 0; font-size: 32px; }
-            .header p { color: rgba(255,255,255,0.9); margin: 15px 0 0; font-size: 18px; }
+            .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+            .header { background: linear-gradient(135deg, #8b5cf6, #6366f1); padding: 40px 30px; text-align: center; }
+            .header h1 { color: #ffffff; margin: 0; font-size: 28px; }
             .content { padding: 40px 30px; }
-            .feature { display: flex; align-items: flex-start; margin: 20px 0; }
-            .feature-icon { font-size: 24px; margin-right: 15px; }
-            .feature-text h3 { margin: 0 0 5px; color: #1e293b; }
-            .feature-text p { margin: 0; color: #64748b; font-size: 14px; }
+            .alert-icon { text-align: center; margin-bottom: 30px; }
+            .alert-icon span { display: inline-block; width: 80px; height: 80px; background: ${data.alertDirection === 'above' ? '#10b981' : '#ef4444'}; border-radius: 50%; line-height: 80px; font-size: 40px; }
+            .price-box { background: #f8fafc; border-radius: 12px; padding: 24px; margin: 24px 0; text-align: center; }
+            .price-label { color: #64748b; font-size: 14px; margin-bottom: 8px; }
+            .current-price { font-size: 48px; font-weight: 700; color: ${data.alertDirection === 'above' ? '#10b981' : '#ef4444'}; }
+            .target-price { font-size: 18px; color: #64748b; margin-top: 8px; }
+            .btn { display: inline-block; background: #8b5cf6; color: #ffffff; padding: 16px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-top: 20px; }
             .footer { padding: 30px; background: #f8fafc; text-align: center; }
           </style>
         </head>
         <body>
           <div class="container">
             <div class="header">
-              <h1>Welcome! 🌱</h1>
-              <p>You're now part of our regenerative community</p>
+              <h1>🔔 Price Alert Triggered!</h1>
             </div>
             <div class="content">
-              <h2 style="color: #1e293b;">What to expect from our newsletter:</h2>
+              <div class="alert-icon">
+                <span>${emoji}</span>
+              </div>
+              <h2 style="text-align: center; color: #1e293b;">Your Price Target Was Hit!</h2>
+              <p style="text-align: center; color: #64748b;">
+                Good news, ${data.userName || 'Valued Investor'}! The price for <strong>${data.projectTitle}</strong> has ${direction} your target.
+              </p>
               
-              <div class="feature">
-                <span class="feature-icon">📊</span>
-                <div class="feature-text">
-                  <h3>Weekly Market Insights</h3>
-                  <p>Stay updated on carbon credit market trends and opportunities</p>
-                </div>
+              <div class="price-box">
+                <div class="price-label">Current Price</div>
+                <div class="current-price">$${data.currentPrice?.toFixed(2)}</div>
+                <div class="target-price">Your target: $${data.targetPrice?.toFixed(2)}</div>
               </div>
 
-              <div class="feature">
-                <span class="feature-icon">🌍</span>
-                <div class="feature-text">
-                  <h3>Impact Stories</h3>
-                  <p>Real stories of regeneration from projects around the world</p>
-                </div>
-              </div>
+              <p style="text-align: center; color: #64748b;">
+                ${data.alertDirection === 'below' 
+                  ? 'This might be a great opportunity to add more credits to your portfolio!' 
+                  : 'Your investment is performing well! Consider your next move.'}
+              </p>
 
-              <div class="feature">
-                <span class="feature-icon">💡</span>
-                <div class="feature-text">
-                  <h3>Exclusive Opportunities</h3>
-                  <p>Be the first to know about new projects and investment options</p>
-                </div>
-              </div>
+              <p style="text-align: center;">
+                <a href="#" class="btn">View Project</a>
+              </p>
             </div>
             <div class="footer">
-              <p style="color: #64748b; margin: 0;">Together, we're building a regenerative future.</p>
-              <p style="color: #94a3b8; font-size: 12px; margin: 15px 0 0;">You can unsubscribe at any time from your account settings.</p>
+              <p style="color: #64748b; margin: 0;">Stay ahead of the market with Atlas Sanctum alerts.</p>
+              <p style="color: #94a3b8; font-size: 12px; margin: 15px 0 0;">You can manage your price alerts in your account settings.</p>
             </div>
           </div>
         </body>

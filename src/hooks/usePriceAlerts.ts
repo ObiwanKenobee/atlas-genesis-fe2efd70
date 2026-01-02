@@ -80,6 +80,58 @@ export function usePriceAlerts() {
     },
   });
 
+  // Check and trigger price alerts
+  const checkPriceAlerts = async () => {
+    if (!user || alerts.length === 0) return;
+
+    for (const alert of alerts) {
+      if (!alert.carbon_projects || alert.triggered) continue;
+
+      const currentPrice = alert.carbon_projects.price_per_credit;
+      const targetPrice = alert.target_price;
+      const shouldTrigger = 
+        (alert.direction === 'above' && currentPrice >= targetPrice) ||
+        (alert.direction === 'below' && currentPrice <= targetPrice);
+
+      if (shouldTrigger) {
+        // Mark alert as triggered
+        await supabase
+          .from('price_alerts')
+          .update({ triggered: true, triggered_at: new Date().toISOString() })
+          .eq('id', alert.id);
+
+        // Send email notification
+        try {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('full_name')
+            .eq('user_id', user.id)
+            .maybeSingle();
+
+          await supabase.functions.invoke('send-email', {
+            body: {
+              type: 'price_alert',
+              to: user.email,
+              data: {
+                userName: profile?.full_name || 'Investor',
+                projectTitle: alert.carbon_projects.title,
+                currentPrice,
+                targetPrice,
+                alertDirection: alert.direction,
+              },
+            },
+          });
+
+          toast.success(`Price alert triggered for ${alert.carbon_projects.title}!`);
+        } catch (error) {
+          console.error('Failed to send price alert email:', error);
+        }
+
+        queryClient.invalidateQueries({ queryKey: ['price-alerts'] });
+      }
+    }
+  };
+
   const deleteAlert = useMutation({
     mutationFn: async (alertId: string) => {
       const { error } = await supabase
@@ -119,5 +171,6 @@ export function usePriceAlerts() {
     createAlert,
     deleteAlert,
     toggleAlert,
+    checkPriceAlerts,
   };
 }
