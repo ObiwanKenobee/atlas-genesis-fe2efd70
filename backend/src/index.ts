@@ -1,4 +1,5 @@
 import express from 'express';
+import passport from './config/passport';
 import { query } from './db';
 
 import authRouter from './routes/auth';
@@ -43,6 +44,9 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Passport middleware
+app.use(passport.initialize());
 
 // Request logging middleware (development only)
 if (process.env.NODE_ENV !== 'production') {
