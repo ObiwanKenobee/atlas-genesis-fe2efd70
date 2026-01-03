@@ -59,15 +59,21 @@ const Footer = () => {
   ];
 
   const resourceLinks = [
-    { name: "API Documentation", href: "#" },
+    { name: "API Documentation", href: "/help/documentation" },
     { name: "Impact Guides", href: "#" },
     { name: "Community Forum", href: "#" },
     { name: "Case Studies", href: "#" },
   ];
 
+  const supportLinks = [
+    { name: "Help Center", href: "/help" },
+    { name: "Contact Support", href: "/contact" },
+    { name: "Documentation", href: "/help/documentation" },
+  ];
+
   const legalLinks = [
-    { name: "Privacy Policy", href: "#" },
-    { name: "Terms of Service", href: "#" },
+    { name: "Privacy Policy", href: "/privacy-policy" },
+    { name: "Terms of Service", href: "/terms-of-service" },
     { name: "Cookie Policy", href: "#" },
     { name: "Accessibility Statement", href: "#" },
   ];
@@ -297,19 +303,34 @@ const Footer = () => {
             </ul>
 
             <h4 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider">Resources</h4>
-            <ul className="space-y-3">
-              {resourceLinks.map((link) => (
-                <li key={`resource-${link.name}`}>
-                  <Link
-                    to={link.href}
-                    className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors flex items-center gap-2 group"
-                  >
-                    {link.name}
-                    <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all" />
-                  </Link>
-                </li>
-              ))}
-            </ul>
+             <ul className="space-y-3">
+               {resourceLinks.map((link) => (
+                 <li key={`resource-${link.name}`}>
+                   <Link
+                     to={link.href}
+                     className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors flex items-center gap-2 group"
+                   >
+                     {link.name}
+                     <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all" />
+                   </Link>
+                 </li>
+               ))}
+             </ul>
+
+             <h4 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider mt-6">Support</h4>
+             <ul className="space-y-3">
+               {supportLinks.map((link) => (
+                 <li key={`support-${link.name}`}>
+                   <Link
+                     to={link.href}
+                     className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors flex items-center gap-2 group"
+                   >
+                     {link.name}
+                     <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all" />
+                   </Link>
+                 </li>
+               ))}
+             </ul>
           </div>
 
           {/* Legal & Company */}

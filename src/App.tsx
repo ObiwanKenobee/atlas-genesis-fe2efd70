@@ -31,6 +31,13 @@ import Outreach from "./pages/Outreach";
 import Security from "./pages/Security";
 import Adoption from "./pages/Adoption";
 import Settings from "./pages/Settings";
+import Profile from "./pages/Profile";
+import HelpCenter from "./pages/HelpCenter";
+import Contact from "./pages/Contact";
+import ReportsAnalytics from "./pages/ReportsAnalytics";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import UserManagement from "./pages/admin/UserManagement";
 
 const queryClient = new QueryClient();
 
@@ -66,6 +73,12 @@ const App = () => (
               <Route path="/security" element={<Security />} />
               <Route path="/adoption" element={<Adoption />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/help" element={<HelpCenter />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/reports" element={<ReportsAnalytics />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms-of-service" element={<TermsOfService />} />
 
               {/* Admin Routes */}
               <Route path="/admin" element={<AdminLayout />}>
@@ -73,6 +86,7 @@ const App = () => (
                 <Route path="projects" element={<AdminProjects />} />
                 <Route path="transactions" element={<AdminTransactions />} />
                 <Route path="analytics" element={<AdminAnalytics />} />
+                <Route path="users" element={<UserManagement />} />
               </Route>
 
               {/* Catch-all Route */}

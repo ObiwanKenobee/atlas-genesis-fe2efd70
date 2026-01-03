@@ -23,6 +23,7 @@ import governanceRouter from './routes/governance';
 import ethicsRouter from './routes/ethics';
 import identityRouter from './routes/identity';
 import auditRouter from './routes/audit';
+import auditPublicRouter from './routes/audit-public';
 import paymentsRouter from './routes/payments';
 
 // V2 Routes with enhanced functionality
@@ -97,6 +98,7 @@ app.use('/api/governance', governanceRouter);
 app.use('/api/ethics', ethicsRouter);
 app.use('/api/identity', identityRouter);
 app.use('/api/audit', auditRouter);
+app.use('/api/audit-public', auditPublicRouter);
 app.use('/api/payments', paymentsRouter);
 
 // V2 API Routes with enhanced functionality

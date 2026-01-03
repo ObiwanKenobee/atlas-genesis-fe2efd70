@@ -23,6 +23,14 @@ import {
   Lock,
   Map,
   Sprout,
+  User,
+  HelpCircle,
+  Phone,
+  FileText,
+  LogOut,
+  Shield,
+  BellRing,
+  BarChart3,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -41,9 +49,10 @@ interface NavSection {
 }
 
 const Header = () => {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [activeMega, setActiveMega] = useState<string | null>(null);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [isDark, setIsDark] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -221,17 +230,209 @@ const Header = () => {
               </AnimatePresence>
             </div>
 
-            {/* Platform Links */}
-            {platformLinks.map((link) => (
-              <Link
-                key={link.href}
-                to={link.href}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-all"
+            {/* Navigation Hubs Dropdown */}
+            <div
+              className="relative group"
+              onMouseEnter={() => setActiveDropdown("navigation")}
+              onMouseLeave={() => setActiveDropdown(null)}
+            >
+              <button
+                id="navigation-menu"
+                aria-haspopup="true"
+                aria-expanded={activeDropdown === "navigation"}
+                className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-all"
               >
-                {link.icon}
-                {link.name}
-              </Link>
-            ))}
+                Navigation
+                <ChevronDown className="w-4 h-4 group-hover:rotate-180 transition-transform" />
+              </button>
+
+              <AnimatePresence>
+                {activeDropdown === "navigation" && (
+                  <motion.div
+                    className="absolute left-0 top-full mt-0 w-48 bg-background border border-border rounded-xl shadow-2xl p-2"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                  >
+                    <div className="space-y-1">
+                      {platformLinks.map((link) => (
+                        <Link
+                          key={link.href}
+                          to={link.href}
+                          className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors group"
+                        >
+                          <div className="text-emerald-600 group-hover:text-emerald-700">{link.icon}</div>
+                          <div className="font-medium text-sm text-foreground">{link.name}</div>
+                        </Link>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* User Profile Dropdown */}
+            {user && (
+              <div
+                className="relative group"
+                onMouseEnter={() => setActiveDropdown("user")}
+                onMouseLeave={() => setActiveDropdown(null)}
+              >
+                <button
+                  id="user-menu"
+                  aria-haspopup="true"
+                  aria-expanded={activeDropdown === "user"}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-all"
+                >
+                  <User className="w-4 h-4" />
+                  {user.displayName || user.email}
+                  <ChevronDown className="w-4 h-4 group-hover:rotate-180 transition-transform" />
+                </button>
+
+                <AnimatePresence>
+                  {activeDropdown === "user" && (
+                    <motion.div
+                      className="absolute left-0 top-full mt-0 w-48 bg-background border border-border rounded-xl shadow-2xl p-2"
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                    >
+                      <div className="space-y-1">
+                        <Link
+                          to="/profile"
+                          className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors group"
+                        >
+                          <User className="w-4 h-4 text-emerald-600 group-hover:text-emerald-700" />
+                          <div className="font-medium text-sm text-foreground">Profile</div>
+                        </Link>
+                        <Link
+                          to="/settings"
+                          className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors group"
+                        >
+                          <Settings className="w-4 h-4 text-emerald-600 group-hover:text-emerald-700" />
+                          <div className="font-medium text-sm text-foreground">Account Settings</div>
+                        </Link>
+                        <button
+                          onClick={async () => {
+                            await signOut();
+                          }}
+                          className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors group w-full text-left"
+                        >
+                          <LogOut className="w-4 h-4 text-emerald-600 group-hover:text-emerald-700" />
+                          <div className="font-medium text-sm text-foreground">Logout</div>
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
+
+            {/* Settings Dropdown */}
+            <div
+              className="relative group"
+              onMouseEnter={() => setActiveDropdown("settings")}
+              onMouseLeave={() => setActiveDropdown(null)}
+            >
+              <button
+                id="settings-menu"
+                aria-haspopup="true"
+                aria-expanded={activeDropdown === "settings"}
+                className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-all"
+              >
+                <Settings className="w-4 h-4" />
+                Settings
+                <ChevronDown className="w-4 h-4 group-hover:rotate-180 transition-transform" />
+              </button>
+
+              <AnimatePresence>
+                {activeDropdown === "settings" && (
+                  <motion.div
+                    className="absolute left-0 top-full mt-0 w-48 bg-background border border-border rounded-xl shadow-2xl p-2"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                  >
+                    <div className="space-y-1">
+                      <Link
+                        to="/settings"
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors group"
+                      >
+                        <Settings className="w-4 h-4 text-emerald-600 group-hover:text-emerald-700" />
+                        <div className="font-medium text-sm text-foreground">General</div>
+                      </Link>
+                      <Link
+                        to="/settings/security"
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors group"
+                      >
+                        <Shield className="w-4 h-4 text-emerald-600 group-hover:text-emerald-700" />
+                        <div className="font-medium text-sm text-foreground">Security</div>
+                      </Link>
+                      <Link
+                        to="/settings/notifications"
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors group"
+                      >
+                        <BellRing className="w-4 h-4 text-emerald-600 group-hover:text-emerald-700" />
+                        <div className="font-medium text-sm text-foreground">Notifications</div>
+                      </Link>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Help Center Dropdown */}
+            <div
+              className="relative group"
+              onMouseEnter={() => setActiveDropdown("help")}
+              onMouseLeave={() => setActiveDropdown(null)}
+            >
+              <button
+                id="help-menu"
+                aria-haspopup="true"
+                aria-expanded={activeDropdown === "help"}
+                className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-all"
+              >
+                <HelpCircle className="w-4 h-4" />
+                Help
+                <ChevronDown className="w-4 h-4 group-hover:rotate-180 transition-transform" />
+              </button>
+
+              <AnimatePresence>
+                {activeDropdown === "help" && (
+                  <motion.div
+                    className="absolute left-0 top-full mt-0 w-48 bg-background border border-border rounded-xl shadow-2xl p-2"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                  >
+                    <div className="space-y-1">
+                      <Link
+                        to="/help"
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors group"
+                      >
+                        <HelpCircle className="w-4 h-4 text-emerald-600 group-hover:text-emerald-700" />
+                        <div className="font-medium text-sm text-foreground">Help Center</div>
+                      </Link>
+                      <Link
+                        to="/help/documentation"
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors group"
+                      >
+                        <FileText className="w-4 h-4 text-emerald-600 group-hover:text-emerald-700" />
+                        <div className="font-medium text-sm text-foreground">Documentation</div>
+                      </Link>
+                      <Link
+                        to="/contact"
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors group"
+                      >
+                        <Phone className="w-4 h-4 text-emerald-600 group-hover:text-emerald-700" />
+                        <div className="font-medium text-sm text-foreground">Contact Support</div>
+                      </Link>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </motion.div>
 
           {/* Right Section */}
@@ -282,16 +483,7 @@ const Header = () => {
             </button>
 
             {/* Auth Section */}
-            {user ? (
-              <div className="flex items-center gap-4 pl-4 border-l border-border">
-                <button className="p-2 rounded-lg hover:bg-accent transition-colors">
-                  <Settings className="w-5 h-5 text-muted-foreground hover:text-foreground" />
-                </button>
-                <Button size="sm" asChild>
-                  <Link to="/dashboard">Dashboard</Link>
-                </Button>
-              </div>
-            ) : (
+            {!user && (
               <Button size="sm" asChild className="gap-2">
                 <Link to="/auth">
                   <LogIn className="w-4 h-4" />
@@ -362,39 +554,140 @@ const Header = () => {
                   </div>
                 ))}
 
-                {/* Mobile Platform Links */}
+                {/* Mobile Navigation Hubs */}
                 <div className="px-2 border-t border-border/50 pt-4">
-                  {platformLinks.map((link) => (
+                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                    Navigation
+                  </h4>
+                  <div className="space-y-1">
+                    {platformLinks.map((link) => (
+                      <Link
+                        key={link.href}
+                        to={link.href}
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-all"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        {link.icon}
+                        {link.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Mobile User Menu */}
+                {user && (
+                  <div className="px-2 border-t border-border/50 pt-4">
+                    <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                      Account
+                    </h4>
+                    <div className="space-y-1">
+                      <Link
+                        to="/profile"
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-all"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <User className="w-4 h-4" />
+                        Profile
+                      </Link>
+                      <Link
+                        to="/settings"
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-all"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <Settings className="w-4 h-4" />
+                        Account Settings
+                      </Link>
+                      <button
+                        onClick={async () => {
+                          await signOut();
+                          setIsOpen(false);
+                        }}
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-all w-full text-left"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Logout
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Mobile Settings */}
+                <div className="px-2 border-t border-border/50 pt-4">
+                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                    Settings
+                  </h4>
+                  <div className="space-y-1">
                     <Link
-                      key={link.href}
-                      to={link.href}
+                      to="/settings"
                       className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-all"
                       onClick={() => setIsOpen(false)}
                     >
-                      {link.icon}
-                      {link.name}
+                      <Settings className="w-4 h-4" />
+                      General
                     </Link>
-                  ))}
+                    <Link
+                      to="/settings/security"
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-all"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <Shield className="w-4 h-4" />
+                      Security
+                    </Link>
+                    <Link
+                      to="/settings/notifications"
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-all"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <BellRing className="w-4 h-4" />
+                      Notifications
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Mobile Help */}
+                <div className="px-2 border-t border-border/50 pt-4">
+                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                    Help & Support
+                  </h4>
+                  <div className="space-y-1">
+                    <Link
+                      to="/help"
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-all"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <HelpCircle className="w-4 h-4" />
+                      Help Center
+                    </Link>
+                    <Link
+                      to="/help/documentation"
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-all"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <FileText className="w-4 h-4" />
+                      Documentation
+                    </Link>
+                    <Link
+                      to="/contact"
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-all"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <Phone className="w-4 h-4" />
+                      Contact Support
+                    </Link>
+                  </div>
                 </div>
 
                 {/* Mobile Auth */}
-                <div className="px-2 border-t border-border/50 pt-4">
-                  {user ? (
-                    <Button size="sm" asChild className="w-full justify-center gap-2">
-                      <Link to="/dashboard">
-                        <Settings className="w-4 h-4" />
-                        Dashboard
-                      </Link>
-                    </Button>
-                  ) : (
+                {!user && (
+                  <div className="px-2 border-t border-border/50 pt-4">
                     <Button size="sm" asChild className="w-full justify-center gap-2">
                       <Link to="/auth">
                         <LogIn className="w-4 h-4" />
                         Sign In
                       </Link>
                     </Button>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             </motion.div>
           )}
