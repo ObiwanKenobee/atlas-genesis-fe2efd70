@@ -5,10 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:full": "concurrently \"npm run dev\" \"npm run dev:backend\"",
+    "dev:backend": "cd scaffold-mvp/backend && npm run dev",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "lint:fix": "eslint . --fix",
+    "preview": "vite preview",
+    "setup": "npm install && cd scaffold-mvp/backend && npm install",
+    "check:api": "curl -f http://localhost:3001/health || echo 'Backend not running'"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
