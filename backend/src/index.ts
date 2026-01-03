@@ -10,6 +10,7 @@ import governanceRouter from './routes/governance';
 import ethicsRouter from './routes/ethics';
 import identityRouter from './routes/identity';
 import auditRouter from './routes/audit';
+import paymentsRouter from './routes/payments';
 
 // V2 Routes with enhanced functionality
 import authV2Router from './routes/auth-v2';
@@ -71,6 +72,7 @@ app.use('/api/governance', governanceRouter);
 app.use('/api/ethics', ethicsRouter);
 app.use('/api/identity', identityRouter);
 app.use('/api/audit', auditRouter);
+app.use('/api/payments', paymentsRouter);
 
 // V2 API Routes with enhanced functionality
 app.use('/api/v2/auth', authV2Router);
@@ -100,7 +102,8 @@ app.get('/api', (req, res) => {
       projects: '/api/v2/projects',
       governance: '/api/governance',
       assets: '/api/assets',
-      ethics: '/api/ethics'
+      ethics: '/api/ethics',
+      payments: '/api/payments'
     },
     documentation: 'https://docs.atlas-genesis.com'
   });

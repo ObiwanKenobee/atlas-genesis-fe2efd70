@@ -1,5 +1,6 @@
 import express from 'express';
 import { query } from '../db';
+import { PaymentService } from '../services/payment';
 
 const router = express.Router();
 
@@ -25,10 +26,56 @@ router.post('/listings', async (req, res) => {
 
 router.post('/:id/purchase', async (req, res) => {
   const listingId = req.params.id;
-  const { buyerId } = req.body;
+  const { buyerId, quantity, amount, email } = req.body;
+
+  if (!buyerId || !quantity || !amount || !email) {
+    return res.status(400).json({
+      code: 'invalid_request',
+      message: 'Missing required fields: buyerId, quantity, amount, email'
+    });
+  }
+
   try {
-    const result = await query('INSERT INTO orders (listing_id, buyer_id, status) VALUES ($1,$2,$3) RETURNING *', [listingId, buyerId || null, 'pending']);
-    res.status(201).json(result.rows[0]);
+    // Create order with payment details
+    const orderResult = await PaymentService.createOrder(listingId, buyerId, quantity, amount);
+    if (!orderResult.success) {
+      return res.status(500).json({
+        code: 'order_creation_failed',
+        message: orderResult.error
+      });
+    }
+
+    // Generate unique reference
+    const reference = `atlas_${orderResult.order.id}_${Date.now()}`;
+
+    // Initialize payment with Paystack
+    const paymentResult = await PaymentService.initializePayment({
+      amount: amount,
+      email: email,
+      reference: reference,
+      metadata: {
+        orderId: orderResult.order.id,
+        listingId: listingId,
+        quantity: quantity,
+        buyerId: buyerId,
+      },
+      callback_url: `${process.env.FRONTEND_URL}/payment/callback`,
+    });
+
+    if (!paymentResult.success) {
+      return res.status(500).json({
+        code: 'payment_init_failed',
+        message: paymentResult.error
+      });
+    }
+
+    // Update order with payment reference
+    await PaymentService.updateOrderStatus(orderResult.order.id, 'pending', reference);
+
+    res.status(201).json({
+      order: orderResult.order,
+      payment: paymentResult.data,
+    });
   } catch (err: any) {
     res.status(500).json({ code: 'server_error', message: err.message });
   }
