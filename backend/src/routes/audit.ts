@@ -1,18 +1,43 @@
 import express from 'express';
 import crypto from 'crypto';
 import { query } from '../db';
+import { authenticate, authorize } from '../middleware/auth';
+import { validateAuditLog } from '../middleware/validation';
+import { logSecurityEvent } from '../utils/logger';
 
 const router = express.Router();
 
-router.post('/', async (req, res) => {
+// All audit routes require authentication and admin privileges
+router.use(authenticate);
+router.use(authorize('admin', 'auditor'));
+
+router.post('/', validateAuditLog, async (req, res) => {
   const { eventType, payload, actorId } = req.body;
-  if (!eventType || !payload) return res.status(422).json({ code: 'invalid' });
+
   const payloadStr = JSON.stringify(payload);
   const hash = crypto.createHash('sha256').update(payloadStr).digest('hex');
+
   try {
-    const result = await query('INSERT INTO audits (event_type, actor_id, payload, payload_hash) VALUES ($1,$2,$3,$4) RETURNING id,payload_hash', [eventType, actorId || null, payload, hash]);
+    const result = await query(
+      'INSERT INTO audits (event_type, actor_id, payload, payload_hash) VALUES ($1,$2,$3,$4) RETURNING id,payload_hash',
+      [eventType, actorId || null, payload, hash]
+    );
+
+    // Log the audit event creation
+    logSecurityEvent('audit_log_created', req.user!.id, {
+      auditId: result.rows[0].id,
+      eventType,
+      actorId
+    }, 'low');
+
     res.status(201).json(result.rows[0]);
   } catch (err: any) {
+    logSecurityEvent('audit_log_creation_failed', req.user!.id, {
+      error: err.message,
+      eventType,
+      actorId
+    }, 'medium');
+
     res.status(500).json({ code: 'server_error', message: err.message });
   }
 });

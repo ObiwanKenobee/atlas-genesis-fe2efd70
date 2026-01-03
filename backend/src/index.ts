@@ -1,7 +1,20 @@
 import express from 'express';
+import cors from 'cors';
 import passport from './config/passport';
 import { query } from './db';
 
+// Import security middleware
+import {
+  generalRateLimit,
+  authRateLimit,
+  strictRateLimit,
+  securityHeaders,
+  sanitizeInput,
+  securityLogger
+} from './middleware/security';
+import { requestLogger, logSecurityEvent } from './utils/logger';
+
+// Import routes
 import authRouter from './routes/auth';
 import assetsRouter from './routes/assets';
 import measurementsRouter from './routes/measurements';
@@ -20,7 +33,10 @@ import projectsRouter from './routes/projects';
 
 const app = express();
 
-// CORS Configuration
+// Security headers (must be first)
+app.use(securityHeaders);
+
+// Enhanced CORS configuration
 const allowedOrigins = [
   'http://localhost:8080',
   'http://localhost:5173',
@@ -28,37 +44,46 @@ const allowedOrigins = [
   process.env.FRONTEND_URL,
 ].filter(Boolean) as string[];
 
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  if (origin && allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
-  }
-  next();
-});
+const corsOptions = {
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    // Allow requests with no origin (mobile apps, etc.)
+    if (!origin) return callback(null, true);
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      logSecurityEvent('cors_violation', null, { origin, userAgent: 'unknown' }, 'medium');
+      return callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  maxAge: 86400, // 24 hours
+};
+
+app.use(cors(corsOptions));
+
+// Rate limiting
+app.use('/api/auth', authRateLimit); // Stricter limits for auth endpoints
+app.use('/api/payments', strictRateLimit); // Very strict for payments
+app.use(generalRateLimit); // General rate limiting for all other routes
+
+// Body parsing with size limits
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Input sanitization
+app.use(sanitizeInput);
+
+// Security logging
+app.use(securityLogger);
+
+// Request logging
+app.use(requestLogger);
 
 // Passport middleware
 app.use(passport.initialize());
-
-// Request logging middleware (development only)
-if (process.env.NODE_ENV !== 'production') {
-  app.use((req, res, next) => {
-    console.log(`${req.method} ${req.path}`, {
-      query: req.query,
-      body: req.method !== 'GET' ? req.body : undefined,
-    });
-    next();
-  });
-}
 
 // Health check
 app.get('/health', (req, res) => res.json({ status: 'ok', timestamp: new Date() }));
@@ -111,10 +136,23 @@ app.get('/api', (req, res) => {
 
 // Global error handler
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  // Log security-related errors
+  if (err.message.includes('CORS') || err.message.includes('rate limit')) {
+    logSecurityEvent('security_error', (req as any).user?.id || null, {
+      error: err.message,
+      path: req.path,
+      method: req.method,
+      ip: req.ip,
+      userAgent: req.get('User-Agent')
+    }, 'medium');
+  }
+
+  // Log all errors
   console.error('Unhandled error:', err);
-  res.status(500).json({
-    error: process.env.NODE_ENV === 'production' 
-      ? 'Internal server error' 
+
+  res.status(err.message.includes('CORS') ? 403 : 500).json({
+    error: process.env.NODE_ENV === 'production'
+      ? 'Internal server error'
       : err.message,
     ...(process.env.NODE_ENV !== 'production' && { stack: err.stack }),
   });

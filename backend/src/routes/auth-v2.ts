@@ -18,27 +18,14 @@ import {
 } from '../utils/auth';
 import { emailService } from '../services/email';
 import { authenticate, requireEmailVerification, checkLoginAttempts, resetLoginAttempts, AuthenticatedRequest } from '../middleware/auth';
+import { validateUserRegistration, validateUserLogin, validateWithJoi, userProfileSchema } from '../middleware/validation';
+import { logSecurityEvent } from '../utils/logger';
 
 const router = express.Router();
 
 // Sign Up
-router.post('/signup', async (req: Request, res: Response) => {
+router.post('/signup', validateUserRegistration, async (req: Request, res: Response) => {
   const { email, password, displayName, role = 'individual' } = req.body;
-
-  if (!email || !password) {
-    return res.status(422).json({ code: 'invalid', message: 'Email and password required' });
-  }
-
-  // Basic email validation
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    return res.status(422).json({ code: 'invalid', message: 'Invalid email format' });
-  }
-
-  // Password strength validation
-  if (password.length < 8) {
-    return res.status(422).json({ code: 'invalid', message: 'Password must be at least 8 characters long' });
-  }
 
   try {
     const hashedPassword = await hashPassword(password);
@@ -50,6 +37,14 @@ router.post('/signup', async (req: Request, res: Response) => {
     );
 
     const user = result.rows[0];
+
+    // Log successful registration
+    logSecurityEvent('user_registration', user.id, {
+      email: user.email,
+      role: user.role,
+      ip: req.ip,
+      userAgent: req.get('User-Agent')
+    }, 'low');
 
     // Create email verification token
     const verificationToken = await createEmailVerificationToken(user.id);
@@ -75,23 +70,37 @@ router.post('/signup', async (req: Request, res: Response) => {
     });
   } catch (err: any) {
     if (err.code === '23505') { // Unique violation
+      logSecurityEvent('registration_failed', null, {
+        reason: 'email_exists',
+        email: email.toLowerCase(),
+        ip: req.ip,
+        userAgent: req.get('User-Agent')
+      }, 'low');
       return res.status(409).json({ code: 'email_exists', message: 'Email already registered' });
     }
     console.error('Signup error:', err);
+    logSecurityEvent('registration_failed', null, {
+      reason: 'server_error',
+      error: err.message,
+      ip: req.ip,
+      userAgent: req.get('User-Agent')
+    }, 'medium');
     res.status(500).json({ code: 'server_error', message: 'Failed to create account' });
   }
 });
 
 // Login
-router.post('/login', async (req: Request, res: Response) => {
+router.post('/login', validateUserLogin, async (req: Request, res: Response) => {
   const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.status(422).json({ code: 'invalid', message: 'Email and password required' });
-  }
 
   // Check login attempts
   if (!checkLoginAttempts(email.toLowerCase())) {
+    logSecurityEvent('login_failed', null, {
+      reason: 'rate_limited',
+      email: email.toLowerCase(),
+      ip: req.ip,
+      userAgent: req.get('User-Agent')
+    }, 'medium');
     return res.status(429).json({
       code: 'too_many_attempts',
       message: 'Too many failed login attempts. Please try again later.'
@@ -100,21 +109,33 @@ router.post('/login', async (req: Request, res: Response) => {
 
   try {
     const result = await query(
-      'SELECT id, email, display_name, password_hash, role, tenant_id, email_verified, mfa_enabled, login_attempts, locked_until FROM users WHERE email = $1',
+      'SELECT id, email, display_name, password_hash, role, tenant_id, email_verified, mfa_enabled, login_attempts, locked_until, account_locked FROM users WHERE email = $1',
       [email.toLowerCase()]
     );
 
     if (result.rowCount === 0) {
+      logSecurityEvent('login_failed', null, {
+        reason: 'user_not_found',
+        email: email.toLowerCase(),
+        ip: req.ip,
+        userAgent: req.get('User-Agent')
+      }, 'low');
       return res.status(401).json({ code: 'invalid_credentials', message: 'Invalid email or password' });
     }
 
     const user = result.rows[0];
 
     // Check if account is locked
-    if (user.locked_until && new Date(user.locked_until) > new Date()) {
+    if (user.account_locked || (user.locked_until && new Date(user.locked_until) > new Date())) {
+      logSecurityEvent('login_failed', user.id, {
+        reason: 'account_locked',
+        email: user.email,
+        ip: req.ip,
+        userAgent: req.get('User-Agent')
+      }, 'high');
       return res.status(423).json({
         code: 'account_locked',
-        message: 'Account is temporarily locked due to too many failed attempts'
+        message: 'Account is locked'
       });
     }
 
@@ -134,6 +155,13 @@ router.post('/login', async (req: Request, res: Response) => {
       }
 
       await query(updateQuery, updateParams);
+
+      logSecurityEvent('login_failed', user.id, {
+        reason: 'invalid_password',
+        attemptCount: newAttempts,
+        ip: req.ip,
+        userAgent: req.get('User-Agent')
+      }, 'medium');
 
       return res.status(401).json({ code: 'invalid_credentials', message: 'Invalid email or password' });
     }
@@ -172,6 +200,13 @@ router.post('/login', async (req: Request, res: Response) => {
       req.get('User-Agent') || undefined
     );
 
+    // Log successful login
+    logSecurityEvent('login_success', user.id, {
+      ip: req.ip,
+      userAgent: req.get('User-Agent'),
+      email: user.email
+    }, 'low');
+
     // Send login notification (async, don't wait)
     try {
       emailService.sendLoginNotification(user.email, user.display_name || user.email, {
@@ -200,6 +235,12 @@ router.post('/login', async (req: Request, res: Response) => {
     });
   } catch (err: any) {
     console.error('Login error:', err);
+    logSecurityEvent('login_error', null, {
+      error: err.message,
+      email: email.toLowerCase(),
+      ip: req.ip,
+      userAgent: req.get('User-Agent')
+    }, 'medium');
     res.status(500).json({ code: 'server_error', message: 'Login failed' });
   }
 });
@@ -286,7 +327,7 @@ router.get('/me', authenticate, async (req: AuthenticatedRequest, res: Response)
 });
 
 // Update Profile
-router.put('/profile', authenticate, async (req: AuthenticatedRequest, res: Response) => {
+router.put('/profile', authenticate, validateWithJoi(userProfileSchema), async (req: AuthenticatedRequest, res: Response) => {
   const { displayName, bio, avatar, preferences } = req.body;
   const userId = req.user!.id;
 
@@ -303,10 +344,89 @@ router.put('/profile', authenticate, async (req: AuthenticatedRequest, res: Resp
       return res.status(404).json({ code: 'not_found', message: 'User not found' });
     }
 
+    // Log profile update
+    logSecurityEvent('profile_updated', userId, {
+      fields: Object.keys(req.body),
+      ip: req.ip,
+      userAgent: req.get('User-Agent')
+    }, 'low');
+
     res.json(result.rows[0]);
   } catch (err: any) {
     console.error('Profile update error:', err);
+    logSecurityEvent('profile_update_failed', userId, {
+      error: err.message,
+      ip: req.ip,
+      userAgent: req.get('User-Agent')
+    }, 'low');
     res.status(500).json({ code: 'server_error', message: 'Failed to update profile' });
+  }
+});
+
+// Update Email Preferences
+router.put('/email-preferences', authenticate, async (req: AuthenticatedRequest, res: Response) => {
+  const { marketing, transactional, notifications } = req.body;
+  const userId = req.user!.id;
+
+  // Validate input
+  if (typeof marketing !== 'boolean' || typeof transactional !== 'boolean' || typeof notifications !== 'boolean') {
+    return res.status(422).json({ code: 'invalid', message: 'All email preferences must be boolean values' });
+  }
+
+  try {
+    // Get current preferences
+    const userResult = await query('SELECT preferences FROM users WHERE id = $1', [userId]);
+    if (userResult.rowCount === 0) {
+      return res.status(404).json({ code: 'not_found', message: 'User not found' });
+    }
+
+    const currentPrefs = userResult.rows[0].preferences || {};
+    const updatedPrefs = {
+      ...currentPrefs,
+      email: {
+        marketing,
+        transactional,
+        notifications
+      }
+    };
+
+    // Update preferences
+    await query('UPDATE users SET preferences = $1 WHERE id = $2', [updatedPrefs, userId]);
+
+    res.json({
+      message: 'Email preferences updated successfully',
+      preferences: updatedPrefs
+    });
+  } catch (err: any) {
+    console.error('Email preferences update error:', err);
+    res.status(500).json({ code: 'server_error', message: 'Failed to update email preferences' });
+  }
+});
+
+// Get Email Preferences
+router.get('/email-preferences', authenticate, async (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.user!.id;
+
+  try {
+    const result = await query('SELECT preferences FROM users WHERE id = $1', [userId]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ code: 'not_found', message: 'User not found' });
+    }
+
+    const preferences = result.rows[0].preferences || {};
+    const emailPrefs = preferences.email || {
+      marketing: true,
+      transactional: true,
+      notifications: true
+    };
+
+    res.json({
+      preferences: emailPrefs
+    });
+  } catch (err: any) {
+    console.error('Email preferences fetch error:', err);
+    res.status(500).json({ code: 'server_error', message: 'Failed to fetch email preferences' });
   }
 });
 

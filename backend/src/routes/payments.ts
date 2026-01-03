@@ -1,6 +1,7 @@
 import express from 'express';
 import { PaymentService } from '../services/payment';
 import { query } from '../db';
+import { emailService } from '../services/email';
 
 const router = express.Router();
 
@@ -128,7 +129,29 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
       const orderId = event.data.metadata?.orderId;
 
       if (orderId) {
-        await PaymentService.updateOrderStatus(orderId, 'completed', reference);
+        const updateResult = await PaymentService.updateOrderStatus(orderId, 'completed', reference);
+
+        // Send payment confirmation email
+        if (updateResult.success && updateResult.order) {
+          try {
+            // Get buyer details
+            const buyerResult = await query('SELECT email, display_name FROM users WHERE id = $1', [updateResult.order.buyer_id]);
+            if (buyerResult.rowCount > 0) {
+              const buyer = buyerResult.rows[0];
+              await emailService.sendPaymentConfirmation(
+                buyer.email,
+                buyer.display_name || buyer.email,
+                {
+                  amount: updateResult.order.price_amount,
+                  reference: reference,
+                  description: `Order #${orderId}`
+                }
+              );
+            }
+          } catch (emailError) {
+            console.error('Failed to send payment confirmation email:', emailError);
+          }
+        }
       }
     }
 

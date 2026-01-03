@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import { query } from '../db';
+import { emailService } from '../services/email';
 
 const router = express.Router();
 
@@ -122,6 +123,50 @@ router.post('/riums/:id/purchase', async (req: Request, res: Response) => {
       'UPDATE riums SET quantity = quantity - $1 WHERE id = $2',
       [quantity, id]
     );
+
+    // Send purchase confirmation email to buyer
+    try {
+      const buyerResult = await query('SELECT email, display_name FROM users WHERE id = $1', [buyerId]);
+      if (buyerResult.rowCount > 0) {
+        const buyer = buyerResult.rows[0];
+        await emailService.sendMarketplacePurchaseNotification(
+          buyer.email,
+          buyer.display_name || buyer.email,
+          {
+            itemName: `RIU #${id}`,
+            quantity: quantity,
+            totalAmount: totalPrice || quantity * riu.price,
+            transactionId: txResult.rows[0].id
+          }
+        );
+      }
+    } catch (emailError) {
+      console.error('Failed to send purchase confirmation email:', emailError);
+    }
+
+    // Send sale notification email to seller
+    try {
+      const sellerResult = await query('SELECT email, display_name FROM users WHERE id = $1', [riu.seller_id]);
+      if (sellerResult.rowCount > 0) {
+        const seller = sellerResult.rows[0];
+        const buyerResult = await query('SELECT display_name FROM users WHERE id = $1', [buyerId]);
+        const buyerName = buyerResult.rowCount > 0 ? buyerResult.rows[0].display_name || 'Anonymous' : 'Anonymous';
+
+        await emailService.sendMarketplaceSaleNotification(
+          seller.email,
+          seller.display_name || seller.email,
+          {
+            itemName: `RIU #${id}`,
+            quantity: quantity,
+            amount: totalPrice || quantity * riu.price,
+            buyerName: buyerName,
+            transactionId: txResult.rows[0].id
+          }
+        );
+      }
+    } catch (emailError) {
+      console.error('Failed to send sale notification email:', emailError);
+    }
 
     res.status(201).json({
       transaction: txResult.rows[0],

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyAccessToken, checkPermission, checkTenantAccess, User } from '../utils/auth';
 import { query } from '../db';
+import { logSecurityEvent } from '../utils/logger';
 
 export interface AuthenticatedRequest extends Request {
   user?: User;
@@ -11,6 +12,13 @@ export const authenticate = async (req: AuthenticatedRequest, res: Response, nex
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      logSecurityEvent('authentication_failed', null, {
+        reason: 'no_token',
+        path: req.path,
+        method: req.method,
+        ip: req.ip,
+        userAgent: req.get('User-Agent')
+      }, 'low');
       return res.status(401).json({ code: 'unauthorized', message: 'No token provided' });
     }
 
@@ -19,15 +27,35 @@ export const authenticate = async (req: AuthenticatedRequest, res: Response, nex
 
     // Fetch user from database to ensure they still exist and get latest data
     const result = await query(
-      'SELECT id, email, display_name, role, tenant_id, email_verified, mfa_enabled, last_login FROM users WHERE id = $1',
+      'SELECT id, email, display_name, role, tenant_id, email_verified, mfa_enabled, last_login, account_locked FROM users WHERE id = $1',
       [payload.userId]
     );
 
     if (result.rowCount === 0) {
+      logSecurityEvent('authentication_failed', payload.userId, {
+        reason: 'user_not_found',
+        path: req.path,
+        method: req.method,
+        ip: req.ip,
+        userAgent: req.get('User-Agent')
+      }, 'medium');
       return res.status(401).json({ code: 'unauthorized', message: 'User not found' });
     }
 
     const user = result.rows[0];
+
+    // Check if account is locked
+    if (user.account_locked) {
+      logSecurityEvent('authentication_failed', user.id, {
+        reason: 'account_locked',
+        path: req.path,
+        method: req.method,
+        ip: req.ip,
+        userAgent: req.get('User-Agent')
+      }, 'high');
+      return res.status(403).json({ code: 'account_locked', message: 'Account is locked' });
+    }
+
     req.user = {
       id: user.id,
       email: user.email,
@@ -39,8 +67,24 @@ export const authenticate = async (req: AuthenticatedRequest, res: Response, nex
       lastLogin: user.last_login
     };
 
+    // Log successful authentication
+    logSecurityEvent('authentication_success', user.id, {
+      path: req.path,
+      method: req.method,
+      ip: req.ip,
+      userAgent: req.get('User-Agent')
+    }, 'low');
+
     next();
   } catch (error) {
+    logSecurityEvent('authentication_failed', null, {
+      reason: 'invalid_token',
+      error: (error as Error).message,
+      path: req.path,
+      method: req.method,
+      ip: req.ip,
+      userAgent: req.get('User-Agent')
+    }, 'medium');
     return res.status(401).json({ code: 'unauthorized', message: 'Invalid token' });
   }
 };
@@ -49,12 +93,34 @@ export const authenticate = async (req: AuthenticatedRequest, res: Response, nex
 export const authorize = (...allowedRoles: string[]) => {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     if (!req.user) {
+      logSecurityEvent('authorization_failed', null, {
+        reason: 'not_authenticated',
+        requiredRoles: allowedRoles,
+        path: req.path,
+        method: req.method,
+        ip: req.ip,
+        userAgent: req.get('User-Agent')
+      }, 'medium');
       return res.status(401).json({ code: 'unauthorized', message: 'Authentication required' });
     }
 
     const hasPermission = allowedRoles.some(role => checkPermission(req.user!.role, role));
     if (!hasPermission) {
-      return res.status(403).json({ code: 'forbidden', message: 'Insufficient permissions' });
+      logSecurityEvent('authorization_failed', req.user.id, {
+        reason: 'insufficient_permissions',
+        userRole: req.user.role,
+        requiredRoles: allowedRoles,
+        path: req.path,
+        method: req.method,
+        ip: req.ip,
+        userAgent: req.get('User-Agent')
+      }, 'high');
+      return res.status(403).json({
+        code: 'forbidden',
+        message: 'Insufficient permissions',
+        requiredRoles: allowedRoles,
+        userRole: req.user.role
+      });
     }
 
     next();

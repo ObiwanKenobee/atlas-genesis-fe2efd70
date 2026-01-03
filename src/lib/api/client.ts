@@ -272,6 +272,24 @@ class ApiService {
         `${API_V2_BASE_URL}/measurements/bioregion/${bioregionId}`
       ),
   };
+
+  // Payments API
+  payments = {
+    initializePayment: (data: { listingId: string; quantity: number; buyerId: string; email: string; amount: number }) =>
+      this.request<any>(
+        `${API_BASE_URL}/payments/initialize`,
+        {
+          method: 'POST',
+          body: JSON.stringify(data),
+        }
+      ),
+
+    verifyPayment: (reference: string) =>
+      this.request<any>(`${API_BASE_URL}/payments/verify/${reference}`),
+
+    getPaymentStatus: (orderId: string) =>
+      this.request<any>(`${API_BASE_URL}/payments/status/${orderId}`),
+  };
 }
 
 export const apiService = new ApiService();

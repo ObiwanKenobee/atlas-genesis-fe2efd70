@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { CarbonProject } from '@/types/marketplace';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
+import { apiService } from '@/lib/api/client';
 import { toast } from 'sonner';
 
 interface PurchaseModalProps {
@@ -42,28 +42,25 @@ export function PurchaseModal({ project, isOpen, onClose }: PurchaseModalProps) 
     setIsProcessing(true);
 
     try {
-      const functionName = paymentMethod === 'paystack' ? 'process-paystack' : 'process-paypal';
-      
-      const { data, error } = await supabase.functions.invoke(functionName, {
-        body: {
-          projectId: project.id,
-          quantity,
-          pricePerCredit: project.price_per_credit,
-          email: user.email,
-          userId: user.id,
-        },
-      });
+      if (paymentMethod !== 'paystack') {
+        toast.error('Only Paystack payments are currently supported');
+        setIsProcessing(false);
+        return;
+      }
 
-      if (error) throw error;
+      const data = await apiService.payments.initializePayment({
+        listingId: project.id,
+        quantity,
+        buyerId: user.id,
+        email: user.email,
+        amount: totalPrice,
+      });
 
       if (!data.success) {
         throw new Error(data.error || 'Payment initialization failed');
       }
 
-      // Redirect to payment provider
-      const redirectUrl = paymentMethod === 'paystack' 
-        ? data.authorization_url 
-        : data.approval_url;
+      const redirectUrl = data.payment.authorization_url;
 
       if (redirectUrl) {
         window.location.href = redirectUrl;
