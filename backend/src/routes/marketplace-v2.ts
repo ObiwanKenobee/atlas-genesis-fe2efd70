@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import { query } from '../db';
 import { emailService } from '../services/email';
+import { SocketEmitter } from '../utils/socket';
 
 const router = express.Router();
 
@@ -83,6 +84,29 @@ router.post('/riums', async (req: Request, res: Response) => {
       [sellerId, projectId || null, quantity, price, impactScore || 0, confidenceInterval || 0.95]
     );
 
+    const newListing = result.rows[0];
+
+    // Emit real-time marketplace activity
+    SocketEmitter.emitMarketplaceActivity({
+      type: 'listing_created',
+      listingId: newListing.id,
+      userId: sellerId,
+      data: {
+        quantity: newListing.quantity,
+        price: newListing.price,
+        impactScore: newListing.impact_score
+      }
+    });
+
+    // Notify seller of successful listing
+    SocketEmitter.emitNotification(sellerId, {
+      id: `listing-${newListing.id}`,
+      type: 'marketplace',
+      title: 'RIU Listing Created',
+      message: `Your RIU listing for ${quantity} units at $${price} each has been created successfully.`,
+      data: { listingId: newListing.id }
+    });
+
     res.status(201).json(result.rows[0]);
   } catch (err: any) {
     res.status(500).json({ code: 'server_error', message: err.message });
@@ -123,6 +147,37 @@ router.post('/riums/:id/purchase', async (req: Request, res: Response) => {
       'UPDATE riums SET quantity = quantity - $1 WHERE id = $2',
       [quantity, id]
     );
+
+    // Emit real-time marketplace activity for purchase
+    SocketEmitter.emitMarketplaceActivity({
+      type: 'purchase',
+      listingId: id,
+      userId: buyerId,
+      data: {
+        sellerId: riu.seller_id,
+        quantity: quantity,
+        amount: totalPrice || quantity * riu.price,
+        transactionId: txResult.rows[0].id
+      }
+    });
+
+    // Notify buyer of successful purchase
+    SocketEmitter.emitNotification(buyerId, {
+      id: `purchase-${txResult.rows[0].id}`,
+      type: 'marketplace',
+      title: 'RIU Purchase Successful',
+      message: `You have successfully purchased ${quantity} RIUs for $${totalPrice || quantity * riu.price}.`,
+      data: { transactionId: txResult.rows[0].id, listingId: id }
+    });
+
+    // Notify seller of sale
+    SocketEmitter.emitNotification(riu.seller_id, {
+      id: `sale-${txResult.rows[0].id}`,
+      type: 'marketplace',
+      title: 'RIU Sale Completed',
+      message: `${quantity} of your RIUs have been sold for $${totalPrice || quantity * riu.price}.`,
+      data: { transactionId: txResult.rows[0].id, listingId: id }
+    });
 
     // Send purchase confirmation email to buyer
     try {

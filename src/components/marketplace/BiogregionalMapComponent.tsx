@@ -109,6 +109,8 @@ export function BiogregionalMapComponent({
                   ? 'border-primary text-primary'
                   : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
+              aria-pressed={mapView === view}
+              aria-label={`View ${view} data`}
             >
               {view === 'risk' ? '🌡️ Risk Level' : view === 'biodiversity' ? '🌿 Biodiversity' : '🌲 Carbon Rate'}
             </button>
@@ -116,7 +118,7 @@ export function BiogregionalMapComponent({
         </div>
 
         {/* Zone List */}
-        <div className="space-y-3">
+        <div className="space-y-3" role="list" aria-label="Bioregional zones">
           <div className="flex items-center justify-between text-xs text-muted-foreground px-2 py-1 bg-muted/30 rounded">
             <span>{zones.length} Bioregional Zones</span>
             <div className="flex gap-3">
@@ -151,12 +153,16 @@ export function BiogregionalMapComponent({
                     ? 'border-primary bg-primary/5'
                     : 'border-border/30'
               } ${
-                mapView === 'risk' 
+                mapView === 'risk'
                   ? getRiskColor(zone.risk_level)
                   : mapView === 'biodiversity'
                     ? getBiodiversityColor(zone.biodiversity_index)
                     : getCarbonColor(zone.carbon_sequestration_rate)
               }`}
+              role="listitem"
+              aria-selected={selectedZone?.id === zone.id}
+              aria-expanded={selectedZone?.id === zone.id}
+              aria-label={`Bioregional zone ${zone.name}`}
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
@@ -192,6 +198,7 @@ export function BiogregionalMapComponent({
                   animate={{ opacity: 1, height: 'auto' }}
                   transition={{ duration: 0.3 }}
                   className="mt-3 pt-3 border-t border-border/30 space-y-2"
+                  aria-live="polite"
                 >
                   <div className="grid grid-cols-2 gap-3 text-xs">
                     <div>

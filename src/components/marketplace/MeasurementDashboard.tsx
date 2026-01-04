@@ -151,6 +151,8 @@ export function MeasurementDashboard({ projectId }: MeasurementDashboardProps) {
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-muted text-muted-foreground hover:bg-muted/80'
                   }`}
+                  aria-pressed={selectedMetric === metric}
+                  aria-label={`View ${metric} measurement data`}
                 >
                   {metric === 'co2' ? 'CO₂' : metric === 'ndvi' ? 'NDVI' : 'Soil C'}
                 </button>
@@ -159,7 +161,7 @@ export function MeasurementDashboard({ projectId }: MeasurementDashboardProps) {
           </div>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={300} aria-label={`30-day ${selectedMetric} measurement trends chart`}>
             <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id={`gradient-${selectedMetric}`} x1="0" y1="0" x2="0" y2="1">
@@ -202,6 +204,7 @@ export function MeasurementDashboard({ projectId }: MeasurementDashboardProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
+          aria-live="polite"
         >
           <Card className="bg-destructive/5 border-destructive/20">
             <CardHeader>

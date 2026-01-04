@@ -32,7 +32,7 @@
     --accent-foreground: 200 25% 8%;
 
     --muted: 200 10% 92%;
-    --muted-foreground: 200 10% 40%;
+    --muted-foreground: 200 10% 25%;
 
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 100%;
@@ -94,7 +94,7 @@
     --accent-foreground: 200 25% 8%;
 
     --muted: 200 15% 15%;
-    --muted-foreground: 200 10% 60%;
+    --muted-foreground: 200 10% 70%;
 
     --destructive: 0 70% 50%;
     --destructive-foreground: 45 20% 98%;
@@ -122,6 +122,30 @@
     --sidebar-accent-foreground: 45 20% 95%;
     --sidebar-border: 200 20% 15%;
     --sidebar-ring: 168 60% 40%;
+  }
+}
+
+@media (prefers-contrast: high) {
+  :root {
+    --muted-foreground: 200 10% 15%;
+    --border: 200 15% 75%;
+    --input: 200 15% 85%;
+  }
+
+  .dark {
+    --muted-foreground: 200 10% 85%;
+    --border: 200 20% 25%;
+    --input: 200 20% 20%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 

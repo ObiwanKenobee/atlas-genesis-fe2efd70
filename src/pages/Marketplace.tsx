@@ -1,4 +1,6 @@
 import React, { useState, useMemo } from "react";
+import SEO from "@/components/SEO";
+import { useSEO } from "@/hooks/useSEO";
 import Navigation from "@/components/Navigation";
 import { RegenerativeMarketplaceShowcase } from "@/components/marketplace/RegenerativeMarketplaceShowcase";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,12 +11,47 @@ import { Input } from "@/components/ui/input";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { ShoppingCart, TrendingUp, Users, Zap, DollarSign, FileText, Search, Filter, X } from "lucide-react";
 import { useProjects } from "@/hooks/useMarketplace";
+import { useSocket, useRealtimeMarketplace } from "@/hooks/useSocket";
 
 const Marketplace = () => {
   const [selectedFilter, setSelectedFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [sortBy, setSortBy] = useState<"newest" | "trending" | "price">("trending");
   const { data: projects = [], isLoading } = useProjects();
+
+  // Real-time hooks
+  const { isConnected } = useSocket({ channels: ['marketplace'] });
+  const { marketplaceActivity } = useRealtimeMarketplace();
+
+  const seoData = useSEO({
+    structuredData: {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "Regenerative Agriculture Marketplace",
+      "description": "Browse and invest in regenerative agriculture projects, carbon credits, and sustainable farming initiatives",
+      "url": "https://atlasgenesis.com/marketplace",
+      "mainEntity": {
+        "@type": "ItemList",
+        "numberOfItems": projects.length,
+        "itemListElement": projects.slice(0, 10).map((project, index) => ({
+          "@type": "ListItem",
+          "position": index + 1,
+          "item": {
+            "@type": "Product",
+            "name": project.title,
+            "description": project.description,
+            "offers": {
+              "@type": "Offer",
+              "price": project.price_per_credit,
+              "priceCurrency": "USD",
+              "availability": "https://schema.org/InStock"
+            },
+            "category": project.project_type
+          }
+        }))
+      }
+    }
+  });
 
   // Filter and sort projects
   const filteredProjects = useMemo(() => {
@@ -66,12 +103,22 @@ const Marketplace = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
+    <>
+      <SEO {...seoData} />
+      <div className="min-h-screen bg-background">
+        <Navigation />
       <main className="container mx-auto px-4 sm:px-6 py-8 max-w-7xl">
         {/* Header */}
         <div className="mb-8 pt-8">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-2">Marketplace & Financial Infrastructure</h1>
+          <div className="flex items-center gap-4 mb-4">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Marketplace & Financial Infrastructure</h1>
+            <div className="flex items-center gap-2">
+              <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} />
+              <span className="text-sm text-muted-foreground">
+                {isConnected ? 'Live' : 'Offline'}
+              </span>
+            </div>
+          </div>
           <p className="text-base sm:text-lg text-muted-foreground">
             Regenerative Impact Units (RIUs), tiered buyer system, ESG APIs, and regeneration-backed bonds
           </p>
@@ -157,6 +204,37 @@ const Marketplace = () => {
         <div className="mb-16">
           <RegenerativeMarketplaceShowcase projects={filteredProjects} isLoading={isLoading} />
         </div>
+
+        {/* Real-time Activity Feed */}
+        {marketplaceActivity.length > 0 && (
+          <Card className="mb-8 border-l-4 border-l-green-500">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Zap className="w-5 h-5 text-green-500" />
+                Live Marketplace Activity
+              </CardTitle>
+              <CardDescription>Recent transactions and listings</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {marketplaceActivity.slice(0, 5).map((activity, index) => (
+                  <div key={`${activity.listingId}-${index}`} className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">
+                        {activity.type === 'listing_created' && `New RIU listing: ${activity.data.quantity} units`}
+                        {activity.type === 'purchase' && `RIU purchase: ${activity.data.quantity} units for $${activity.data.amount}`}
+                        {activity.type === 'bid' && `New bid placed`}
+                        {activity.type === 'offer' && `New offer submitted`}
+                      </p>
+                      <p className="text-xs text-muted-foreground">Just now</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Key Metrics */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
@@ -563,6 +641,7 @@ const Marketplace = () => {
         </Tabs>
       </main>
     </div>
+    </>
   );
 };
 

@@ -1,3 +1,5 @@
+import SEO from "@/components/SEO";
+import { useSEO } from "@/hooks/useSEO";
 import EnterpriseHeader from "@/components/EnterpriseHeader";
 import HeroSection from "@/components/HeroSection";
 import PlatformLayers from "@/components/PlatformLayers";
@@ -8,9 +10,32 @@ import Footer from "@/components/Footer";
 import NewsletterBanner from "@/components/NewsletterBanner";
 
 const Index = () => {
+  const seoData = useSEO({
+    structuredData: {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Atlas Genesis",
+      "description": "Leading platform for regenerative agriculture, carbon credits, and sustainable farming solutions",
+      "url": "https://atlasgenesis.com",
+      "logo": "https://atlasgenesis.com/logo.png",
+      "sameAs": [
+        "https://twitter.com/atlasgenesis",
+        "https://linkedin.com/company/atlas-genesis"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+1-555-123-4567",
+        "contactType": "customer service",
+        "availableLanguage": "English"
+      }
+    }
+  });
+
   return (
-    <div className="min-h-screen bg-background">
-      <EnterpriseHeader />
+    <>
+      <SEO {...seoData} />
+      <div className="min-h-screen bg-background">
+        <EnterpriseHeader />
       <main className="pt-[104px]">
         <HeroSection />
         <PlatformLayers />
@@ -21,6 +46,7 @@ const Index = () => {
       <Footer />
       <NewsletterBanner />
     </div>
+    </>
   );
 };
 

@@ -29,6 +29,8 @@ export function ProjectFilters({ search, onSearchChange, selectedType, onTypeCha
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
           className="pl-10 bg-card border-border/50 focus:border-primary/50"
+          aria-label="Search projects"
+          autoComplete="off"
         />
       </div>
 
@@ -38,6 +40,7 @@ export function ProjectFilters({ search, onSearchChange, selectedType, onTypeCha
           size="sm"
           onClick={() => onTypeChange(undefined)}
           className={selectedType === undefined ? 'bg-primary' : 'border-border/50 hover:border-primary/30'}
+          aria-pressed={selectedType === undefined}
         >
           All Projects
         </Button>
@@ -48,6 +51,7 @@ export function ProjectFilters({ search, onSearchChange, selectedType, onTypeCha
             size="sm"
             onClick={() => onTypeChange(type)}
             className={selectedType === type ? 'bg-primary' : 'border-border/50 hover:border-primary/30'}
+            aria-pressed={selectedType === type}
           >
             {PROJECT_TYPE_ICONS[type]} {PROJECT_TYPE_LABELS[type]}
           </Button>

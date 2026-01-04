@@ -19,7 +19,7 @@ interface ProjectCardProps {
 /**
  * Mini chart showing CO2 trend for the project
  */
-function MeasurementMiniChart({ projectId }: { projectId: string }) {
+function MeasurementMiniChart({ projectId, title }: { projectId: string; title: string }) {
   const { data: measurements } = useMeasurementData(projectId, { days: 1 });
   const latestMeasurement = measurements?.[0] || null;
 
@@ -42,7 +42,7 @@ function MeasurementMiniChart({ projectId }: { projectId: string }) {
           {latestMeasurement.co2_level?.toFixed(1) || 'N/A'} ppm
         </Badge>
       </div>
-      <ResponsiveContainer width="100%" height={30}>
+      <ResponsiveContainer width="100%" height={30} aria-label={`CO2 trend chart for ${title}`}>
         <LineChart data={data} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
           <Line
             type="monotone"
@@ -69,7 +69,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
     >
-      <Card className="group overflow-hidden bg-card-gradient border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-glow">
+      <Card className="group overflow-hidden bg-card-gradient border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-glow" role="article" aria-labelledby={`project-title-${project.id}`}>
         <div className="relative h-48 overflow-hidden">
           <img
             src={project.image_url || 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800'}
@@ -89,7 +89,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
           {/* Title and Location */}
           <div>
             <div className="flex items-start justify-between gap-2 mb-1">
-              <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1 flex-1">
+              <h3 id={`project-title-${project.id}`} className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1 flex-1">
                 {project.title}
               </h3>
               {project.verified_by_system_at && (
@@ -124,7 +124,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
           </div>
 
           {/* Measurement Mini Chart */}
-          <MeasurementMiniChart projectId={project.id} />
+          <MeasurementMiniChart projectId={project.id} title={project.title} />
 
           {/* Availability Bar */}
           <div className="space-y-2">
@@ -132,12 +132,12 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
               <span className="text-muted-foreground">Availability</span>
               <span className="text-foreground">{project.available_credits.toLocaleString()} credits</span>
             </div>
-            <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-primary to-accent rounded-full transition-all duration-500"
-                style={{ width: `${availabilityPercent}%` }}
-              />
-            </div>
+            <progress
+              value={availabilityPercent}
+              max="100"
+              aria-label={`Credit availability: ${availabilityPercent.toFixed(0)}%`}
+              className="w-full h-1.5 rounded-full [&::-webkit-progress-bar]:bg-muted [&::-webkit-progress-value]:bg-gradient-to-r [&::-webkit-progress-value]:from-primary [&::-webkit-progress-value]:to-accent [&::-moz-progress-bar]:bg-gradient-to-r [&::-moz-progress-bar]:from-primary [&::-moz-progress-bar]:to-accent"
+            />
           </div>
 
           {/* Last Verified Info */}
@@ -162,18 +162,18 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
             </div>
             <div className="flex items-center gap-2">
               {user && (
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="icon"
                   onClick={() => setShowPriceAlert(true)}
                   className="h-9 w-9"
-                  title="Set price alert"
+                  aria-label={`Set price alert for ${project.title}`}
                 >
                   <Bell className="w-4 h-4" />
                 </Button>
               )}
               <Button asChild size="sm" className="bg-primary hover:bg-primary/90">
-                <Link to={`/marketplace/${project.id}`}>View Details</Link>
+                <Link to={`/marketplace/${project.id}`} aria-label={`View details for ${project.title}`}>View Details</Link>
               </Button>
             </div>
           </div>

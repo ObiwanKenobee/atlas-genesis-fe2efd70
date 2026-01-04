@@ -122,7 +122,11 @@ export const BioregionalMap: React.FC<BioregionalMapProps> = ({
           <CardDescription>Interactive PostGIS-powered geospatial visualization</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="w-full h-96 bg-gradient-to-br from-blue-50 via-emerald-50 to-slate-100 rounded-lg border-2 border-dashed border-slate-300 flex items-center justify-center">
+          <div
+            className="w-full h-96 bg-gradient-to-br from-blue-50 via-emerald-50 to-slate-100 rounded-lg border-2 border-dashed border-slate-300 flex items-center justify-center"
+            aria-label="Bioregional map visualization"
+            role="img"
+          >
             <div className="text-center">
               <MapPin className="h-12 w-12 text-slate-400 mx-auto mb-3" />
               <p className="text-slate-600 font-semibold">Bioregional Map</p>
@@ -141,6 +145,16 @@ export const BioregionalMap: React.FC<BioregionalMapProps> = ({
               key={zone.id}
               className={`cursor-pointer transition-all ${selectedZone?.id === zone.id ? "ring-2 ring-primary" : "hover:shadow-lg"}`}
               onClick={() => onSelectZone?.(zone)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onSelectZone?.(zone);
+                }
+              }}
+              role="button"
+              aria-label={`Select bioregional zone: ${zone.name}`}
+              aria-pressed={selectedZone?.id === zone.id}
+              tabIndex={0}
             >
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
@@ -190,14 +204,12 @@ export const BioregionalMap: React.FC<BioregionalMapProps> = ({
                     <span className="text-xs font-medium text-emerald-700">Biodiversity Index</span>
                     <span className="text-xs font-bold text-emerald-700">{((zone.biodiversity_index || 0) * 100).toFixed(0)}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-emerald-500 h-2 rounded-full"
-                      style={{
-                        width: `${Math.min((zone.biodiversity_index || 0) * 100, 100)}%`,
-                      }}
-                    />
-                  </div>
+                  <progress
+                    value={(zone.biodiversity_index || 0) * 100}
+                    max="100"
+                    aria-label={`Biodiversity index: ${((zone.biodiversity_index || 0) * 100).toFixed(0)}%`}
+                    className="w-full h-2 rounded-full [&::-webkit-progress-bar]:bg-gray-200 [&::-webkit-progress-value]:bg-emerald-500 [&::-moz-progress-bar]:bg-emerald-500"
+                  />
                 </div>
 
                 {/* Active Projects */}
@@ -213,7 +225,11 @@ export const BioregionalMap: React.FC<BioregionalMapProps> = ({
 
       {/* Zone Details Panel */}
       {selectedZone && (
-        <Card className="border-2 border-primary bg-gradient-to-br from-slate-50 to-blue-50">
+        <Card
+          className="border-2 border-primary bg-gradient-to-br from-slate-50 to-blue-50"
+          aria-live="polite"
+          aria-label="Selected zone details"
+        >
           <CardHeader>
             <CardTitle>Selected Zone Details</CardTitle>
           </CardHeader>

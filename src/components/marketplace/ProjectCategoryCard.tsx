@@ -80,14 +80,14 @@ export function ProjectCategoryCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
     >
-      <Card className={`overflow-hidden border-2 ${colors.border} ${colors.bg} hover:shadow-lg transition-all duration-300`}>
+      <Card className={`overflow-hidden border-2 ${colors.border} ${colors.bg} hover:shadow-lg transition-all duration-300`} role="article" aria-labelledby={`category-title-${type}`}>
         <CardHeader className="pb-4">
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
                 <span className="text-3xl">{PROJECT_TYPE_ICONS[type]}</span>
                 <div>
-                  <CardTitle className={`text-2xl ${colors.text}`}>
+                  <CardTitle id={`category-title-${type}`} className={`text-2xl ${colors.text}`}>
                     {PROJECT_TYPE_LABELS[type]}
                   </CardTitle>
                 </div>
@@ -173,7 +173,7 @@ export function ProjectCategoryCard({
             asChild
             className="w-full bg-primary hover:bg-primary/90 text-primary-foreground gap-2"
           >
-            <Link to={`/marketplace?type=${type}`}>
+            <Link to={`/marketplace?type=${type}`} aria-label={`Explore ${PROJECT_TYPE_LABELS[type]} category`}>
               Explore Category
               <ArrowRight className="w-4 h-4" />
             </Link>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Edit, Trash2, Plus, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -31,11 +31,53 @@ import ProjectFormModal from "./ProjectFormModal";
 import type { CarbonProject } from "@/types/marketplace";
 
 const ProjectsTable = () => {
-  const { data: projects, isLoading } = useAllProjects();
-  const queryClient = useQueryClient();
-  const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [editProject, setEditProject] = useState<CarbonProject | null>(null);
-  const [isFormOpen, setIsFormOpen] = useState(false);
+   const { data: projects, isLoading } = useAllProjects();
+   const queryClient = useQueryClient();
+   const [deleteId, setDeleteId] = useState<string | null>(null);
+   const [editProject, setEditProject] = useState<CarbonProject | null>(null);
+   const [isFormOpen, setIsFormOpen] = useState(false);
+   const tableRef = useRef<HTMLTableElement>(null);
+
+   useEffect(() => {
+     const table = tableRef.current;
+     if (!table) return;
+
+     const handleKeyDown = (event: KeyboardEvent) => {
+       const target = event.target as HTMLElement;
+       if (!table.contains(target)) return;
+
+       const cells = Array.from(table.querySelectorAll('td, th'));
+       const currentIndex = cells.indexOf(target.closest('td, th') as HTMLElement);
+
+       if (currentIndex === -1) return;
+
+       let newIndex = currentIndex;
+
+       switch (event.key) {
+         case 'ArrowRight':
+           newIndex = Math.min(currentIndex + 1, cells.length - 1);
+           break;
+         case 'ArrowLeft':
+           newIndex = Math.max(currentIndex - 1, 0);
+           break;
+         case 'ArrowDown':
+           // Assuming 6 columns
+           newIndex = Math.min(currentIndex + 6, cells.length - 1);
+           break;
+         case 'ArrowUp':
+           newIndex = Math.max(currentIndex - 6, 0);
+           break;
+         default:
+           return;
+       }
+
+       event.preventDefault();
+       (cells[newIndex] as HTMLElement).focus();
+     };
+
+     table.addEventListener('keydown', handleKeyDown);
+     return () => table.removeEventListener('keydown', handleKeyDown);
+   }, [projects]);
 
   const handleDelete = async () => {
     if (!deleteId) return;
@@ -90,21 +132,21 @@ const ProjectsTable = () => {
         </div>
         
         <div className="overflow-x-auto">
-          <Table>
+          <Table ref={tableRef} tabIndex={0} aria-label="Carbon projects table">
             <TableHeader>
               <TableRow>
-                <TableHead>Project</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Credits</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead tabIndex={0}>Project</TableHead>
+                <TableHead tabIndex={0}>Type</TableHead>
+                <TableHead tabIndex={0}>Status</TableHead>
+                <TableHead tabIndex={0}>Price</TableHead>
+                <TableHead tabIndex={0}>Credits</TableHead>
+                <TableHead tabIndex={0} className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {projects?.map((project) => (
                 <TableRow key={project.id}>
-                  <TableCell>
+                  <TableCell tabIndex={0}>
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-lg">
                         {PROJECT_TYPE_ICONS[project.project_type]}
@@ -115,41 +157,41 @@ const ProjectsTable = () => {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell tabIndex={0}>
                     <span className="text-sm text-muted-foreground">
                       {PROJECT_TYPE_LABELS[project.project_type]}
                     </span>
                   </TableCell>
-                  <TableCell>
+                  <TableCell tabIndex={0}>
                     <Badge variant="outline" className={statusColors[project.status]}>
                       {project.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>
+                  <TableCell tabIndex={0}>
                     <span className="font-medium">${project.price_per_credit}</span>
                   </TableCell>
-                  <TableCell>
+                  <TableCell tabIndex={0}>
                     <span className="text-sm">
                       {project.available_credits.toLocaleString()} / {project.total_credits.toLocaleString()}
                     </span>
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell tabIndex={0} className="text-right">
                     <div className="flex items-center justify-end gap-2">
                       <Button variant="ghost" size="icon" asChild>
                         <Link to={`/marketplace/${project.id}`}>
                           <Eye className="w-4 h-4" />
                         </Link>
                       </Button>
-                      <Button 
-                        variant="ghost" 
+                      <Button
+                        variant="ghost"
                         size="icon"
                         onClick={() => { setEditProject(project); setIsFormOpen(true); }}
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         className="text-destructive hover:text-destructive"
                         onClick={() => setDeleteId(project.id)}
                       >

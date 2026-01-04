@@ -2,84 +2,67 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
-import { 
+import {
   User, Lock, Bell, Shield, LogOut, Save, ArrowLeft,
   Mail, Building2, Globe, Target, TreePine, Waves, Zap, CircleDot,
-  Check, RefreshCw, Moon, Sun, Monitor
+  Check, RefreshCw, Moon, Sun, Monitor, Eye, EyeOff, AlertCircle, CheckCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { PriceAlertsList } from "@/components/PriceAlertsList";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-interface Profile {
-  full_name: string | null;
-  organization: string | null;
-  avatar_url: string | null;
+interface EmailPreferences {
+  marketing: boolean;
+  transactional: boolean;
+  notifications: boolean;
 }
 
-interface Preferences {
-  organization_type: string | null;
-  investment_goals: string[] | null;
-  project_interests: string[] | null;
-  monthly_budget: string | null;
-  email_notifications: boolean;
-  transaction_alerts: boolean;
-  impact_updates: boolean;
-  marketing_emails: boolean;
-  newsletter_subscribed: boolean;
+interface UserPreferences {
+  organization_type?: string;
+  investment_goals?: string[];
+  project_interests?: string[];
+  monthly_budget?: string;
 }
 
-const INVESTMENT_GOALS = [
-  { id: "offset", label: "Carbon Offsetting", icon: TreePine },
-  { id: "impact", label: "Impact Investment", icon: Target },
-  { id: "compliance", label: "Regulatory Compliance", icon: Check },
-  { id: "exploration", label: "Just Exploring", icon: Globe },
-];
-
-const PROJECT_INTERESTS = [
-  { id: "reforestation", label: "Reforestation", icon: TreePine },
-  { id: "ocean_restoration", label: "Ocean Restoration", icon: Waves },
-  { id: "renewable_energy", label: "Renewable Energy", icon: Zap },
-  { id: "soil_carbon", label: "Soil Carbon", icon: CircleDot },
-];
-
-const BUDGET_RANGES = [
-  { id: "starter", label: "Under $1,000" },
-  { id: "growth", label: "$1,000 - $10,000" },
-  { id: "scale", label: "$10,000 - $50,000" },
-  { id: "enterprise", label: "$50,000+" },
-];
 
 const Settings = () => {
-  const { user, loading, signOut } = useAuth();
+  const { user, tokens, loading, signOut, updateProfile } = useAuth();
   const navigate = useNavigate();
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [preferences, setPreferences] = useState<Preferences>({
-    organization_type: null,
-    investment_goals: [],
-    project_interests: [],
-    monthly_budget: null,
-    email_notifications: true,
-    transaction_alerts: true,
-    impact_updates: true,
-    marketing_emails: false,
-    newsletter_subscribed: false,
+  const [emailPreferences, setEmailPreferences] = useState<EmailPreferences>({
+    marketing: true,
+    transactional: true,
+    notifications: true,
   });
+  const [userPreferences, setUserPreferences] = useState<UserPreferences>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isSavingPrefs, setIsSavingPrefs] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [formData, setFormData] = useState({
-    full_name: "",
-    organization: "",
+    displayName: "",
     email: "",
   });
-  const [activeTab, setActiveTab] = useState<"profile" | "preferences" | "notifications" | "security" | "appearance">("profile");
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false,
+  });
+  const [activeTab, setActiveTab] = useState<"profile" | "notifications" | "security" | "preferences" | "appearance">("profile");
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const { theme, setTheme } = useTheme();
+
+  const API_BASE = process.env.NODE_ENV === 'production'
+    ? 'https://api.atlas-genesis.com'
+    : 'http://localhost:4000';
 
   useEffect(() => {
     if (!loading && !user) {
@@ -90,41 +73,25 @@ const Settings = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (user) {
-        // Fetch profile
-        const { data: profileData } = await supabase
-          .from("profiles")
-          .select("full_name, organization, avatar_url")
-          .eq("user_id", user.id)
-          .maybeSingle();
+        // Set form data from user
+        setFormData({
+          displayName: user.displayName || "",
+          email: user.email || "",
+        });
 
-        if (profileData) {
-          setProfile(profileData);
-          setFormData({
-            full_name: profileData.full_name || "",
-            organization: profileData.organization || "",
-            email: user.email || "",
+        // Fetch email preferences
+        try {
+          const response = await fetch(`${API_BASE}/api/v2/auth/email-preferences`, {
+            headers: {
+              'Authorization': `Bearer ${tokens?.accessToken}`,
+            },
           });
-        }
-
-        // Fetch preferences
-        const { data: prefsData } = await supabase
-          .from("user_preferences")
-          .select("*")
-          .eq("user_id", user.id)
-          .maybeSingle();
-
-        if (prefsData) {
-          setPreferences({
-            organization_type: prefsData.organization_type,
-            investment_goals: prefsData.investment_goals || [],
-            project_interests: prefsData.project_interests || [],
-            monthly_budget: prefsData.monthly_budget,
-            email_notifications: prefsData.email_notifications ?? true,
-            transaction_alerts: prefsData.transaction_alerts ?? true,
-            impact_updates: prefsData.impact_updates ?? true,
-            marketing_emails: prefsData.marketing_emails ?? false,
-            newsletter_subscribed: prefsData.newsletter_subscribed ?? false,
-          });
+          if (response.ok) {
+            const data = await response.json();
+            setEmailPreferences(data.preferences);
+          }
+        } catch (error) {
+          console.error('Failed to fetch email preferences:', error);
         }
       }
     };
@@ -137,74 +104,141 @@ const Settings = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSaveProfile = async () => {
-    if (!user) return;
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setPasswordData((prev) => ({ ...prev, [name]: value }));
+  };
 
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsLoading(true);
-    try {
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          full_name: formData.full_name,
-          organization: formData.organization,
-        })
-        .eq("user_id", user.id);
+    setMessage(null);
 
-      if (error) throw error;
-      toast.success("Profile updated successfully");
+    // Validation
+    if (!formData.displayName.trim()) {
+      setMessage({ type: 'error', text: 'Display name is required' });
+      setIsLoading(false);
+      return;
+    }
+
+    if (formData.displayName.length > 50) {
+      setMessage({ type: 'error', text: 'Display name must be less than 50 characters' });
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const result = await updateProfile({
+        displayName: formData.displayName.trim(),
+      });
+
+      if (result.error) {
+        setMessage({ type: 'error', text: result.error.message });
+      } else {
+        setMessage({ type: 'success', text: 'Profile updated successfully!' });
+      }
     } catch (error) {
-      toast.error("Failed to update profile");
-      console.error(error);
+      setMessage({ type: 'error', text: 'An unexpected error occurred' });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSavePreferences = async () => {
-    if (!user) return;
+  const handleSaveEmailPreferences = async () => {
+    if (!tokens?.accessToken) return;
 
     setIsSavingPrefs(true);
     try {
-      const { error } = await supabase
-        .from("user_preferences")
-        .upsert({
-          user_id: user.id,
-          organization_type: preferences.organization_type,
-          investment_goals: preferences.investment_goals,
-          project_interests: preferences.project_interests,
-          monthly_budget: preferences.monthly_budget,
-          email_notifications: preferences.email_notifications,
-          transaction_alerts: preferences.transaction_alerts,
-          impact_updates: preferences.impact_updates,
-          marketing_emails: preferences.marketing_emails,
-          newsletter_subscribed: preferences.newsletter_subscribed,
-        }, { onConflict: 'user_id' });
+      const response = await fetch(`${API_BASE}/api/v2/auth/email-preferences`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${tokens.accessToken}`,
+        },
+        body: JSON.stringify(emailPreferences),
+      });
 
-      if (error) throw error;
-      toast.success("Preferences saved successfully");
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to update email preferences');
+      }
+
+      toast.success("Email preferences updated successfully");
     } catch (error) {
-      toast.error("Failed to save preferences");
-      console.error(error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update email preferences';
+      toast.error(errorMessage);
+      console.error('Email preferences update error:', error);
     } finally {
       setIsSavingPrefs(false);
     }
   };
 
-  const toggleInterest = (id: string) => {
-    setPreferences((prev) => ({
-      ...prev,
-      project_interests: prev.project_interests?.includes(id)
-        ? prev.project_interests.filter((i) => i !== id)
-        : [...(prev.project_interests || []), id],
-    }));
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!tokens?.accessToken) return;
+
+    setMessage(null);
+
+    // Validation
+    if (!passwordData.currentPassword) {
+      setMessage({ type: 'error', text: 'Current password is required' });
+      return;
+    }
+
+    if (!passwordData.newPassword) {
+      setMessage({ type: 'error', text: 'New password is required' });
+      return;
+    }
+
+    if (passwordData.newPassword.length < 8) {
+      setMessage({ type: 'error', text: 'Password must be at least 8 characters long' });
+      return;
+    }
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setMessage({ type: 'error', text: 'New passwords do not match' });
+      return;
+    }
+
+    if (passwordData.currentPassword === passwordData.newPassword) {
+      setMessage({ type: 'error', text: 'New password must be different from current password' });
+      return;
+    }
+
+    setIsChangingPassword(true);
+
+    try {
+      const response = await fetch(`${API_BASE}/api/v2/auth/change-password`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${tokens.accessToken}`,
+        },
+        body: JSON.stringify({
+          currentPassword: passwordData.currentPassword,
+          newPassword: passwordData.newPassword,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to change password');
+      }
+
+      setMessage({ type: 'success', text: 'Password changed successfully!' });
+      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    } catch (error) {
+      setMessage({ type: 'error', text: error instanceof Error ? error.message : 'Failed to change password' });
+    } finally {
+      setIsChangingPassword(false);
+    }
   };
 
-  const toggleGoal = (id: string) => {
-    setPreferences((prev) => ({
+  const toggleEmailPreference = (key: keyof EmailPreferences) => {
+    setEmailPreferences((prev) => ({
       ...prev,
-      investment_goals: prev.investment_goals?.includes(id)
-        ? prev.investment_goals.filter((i) => i !== id)
-        : [...(prev.investment_goals || []), id],
+      [key]: !prev[key],
     }));
   };
 
@@ -228,10 +262,9 @@ const Settings = () => {
 
   const tabs = [
     { id: "profile", label: "Profile", icon: User },
-    { id: "preferences", label: "Preferences", icon: Target },
     { id: "notifications", label: "Notifications", icon: Bell },
-    { id: "appearance", label: "Appearance", icon: Moon },
     { id: "security", label: "Security", icon: Shield },
+    { id: "appearance", label: "Appearance", icon: Moon },
   ];
 
   return (
@@ -302,31 +335,16 @@ const Settings = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="full_name" className="flex items-center gap-2">
+                  <Label htmlFor="displayName" className="flex items-center gap-2">
                     <User className="w-4 h-4" />
-                    Full Name
+                    Display Name
                   </Label>
                   <Input
-                    id="full_name"
-                    name="full_name"
-                    value={formData.full_name}
+                    id="displayName"
+                    name="displayName"
+                    value={formData.displayName}
                     onChange={handleInputChange}
-                    placeholder="Enter your full name"
-                    className="border-border/50"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="organization" className="flex items-center gap-2">
-                    <Building2 className="w-4 h-4" />
-                    Organization
-                  </Label>
-                  <Input
-                    id="organization"
-                    name="organization"
-                    value={formData.organization}
-                    onChange={handleInputChange}
-                    placeholder="Your organization or role"
+                    placeholder="Enter your display name"
                     className="border-border/50"
                   />
                 </div>
@@ -344,115 +362,13 @@ const Settings = () => {
           </motion.div>
         )}
 
-        {/* Preferences Tab */}
-        {activeTab === "preferences" && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-6"
-          >
-            {/* Investment Goals */}
-            <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-              <CardHeader>
-                <CardTitle className="text-lg">Investment Goals</CardTitle>
-                <CardDescription>What brings you to Atlas Sanctum?</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-3">
-                  {INVESTMENT_GOALS.map((goal) => (
-                    <button
-                      key={goal.id}
-                      onClick={() => toggleGoal(goal.id)}
-                      className={`flex items-center gap-3 p-4 rounded-xl border-2 text-left transition-all ${
-                        preferences.investment_goals?.includes(goal.id)
-                          ? "border-primary bg-primary/10"
-                          : "border-border hover:border-primary/50"
-                      }`}
-                    >
-                      <goal.icon className={`w-5 h-5 ${
-                        preferences.investment_goals?.includes(goal.id) ? "text-primary" : "text-muted-foreground"
-                      }`} />
-                      <span className="font-medium text-sm text-foreground">{goal.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Project Interests */}
-            <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-              <CardHeader>
-                <CardTitle className="text-lg">Project Interests</CardTitle>
-                <CardDescription>Select the project types you're interested in</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-3">
-                  {PROJECT_INTERESTS.map((interest) => (
-                    <button
-                      key={interest.id}
-                      onClick={() => toggleInterest(interest.id)}
-                      className={`flex items-center gap-3 p-4 rounded-xl border-2 text-left transition-all ${
-                        preferences.project_interests?.includes(interest.id)
-                          ? "border-primary bg-primary/10"
-                          : "border-border hover:border-primary/50"
-                      }`}
-                    >
-                      <interest.icon className={`w-5 h-5 ${
-                        preferences.project_interests?.includes(interest.id) ? "text-primary" : "text-muted-foreground"
-                      }`} />
-                      <span className="font-medium text-sm text-foreground">{interest.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Monthly Budget */}
-            <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-              <CardHeader>
-                <CardTitle className="text-lg">Investment Capacity</CardTitle>
-                <CardDescription>Your monthly investment budget</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-3">
-                  {BUDGET_RANGES.map((budget) => (
-                    <button
-                      key={budget.id}
-                      onClick={() => setPreferences(prev => ({ ...prev, monthly_budget: budget.id }))}
-                      className={`p-4 rounded-xl border-2 text-left transition-all ${
-                        preferences.monthly_budget === budget.id
-                          ? "border-primary bg-primary/10"
-                          : "border-border hover:border-primary/50"
-                      }`}
-                    >
-                      <span className="font-medium text-sm text-foreground">{budget.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Button 
-              onClick={handleSavePreferences}
-              disabled={isSavingPrefs}
-              className="w-full"
-            >
-              <RefreshCw className={`w-4 h-4 mr-2 ${isSavingPrefs ? "animate-spin" : ""}`} />
-              {isSavingPrefs ? "Saving..." : "Save Preferences"}
-            </Button>
-          </motion.div>
-        )}
 
         {/* Notifications Tab */}
         {activeTab === "notifications" && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="space-y-6"
           >
-            {/* Price Alerts */}
-            <PriceAlertsList />
-
             <Card className="bg-card/50 backdrop-blur-sm border-border/50">
               <CardHeader>
                 <div className="flex items-center gap-3">
@@ -460,74 +376,52 @@ const Settings = () => {
                     <Bell className="w-6 h-6 text-accent" />
                   </div>
                   <div>
-                    <CardTitle>Notification Preferences</CardTitle>
-                    <CardDescription>Manage how you receive updates</CardDescription>
+                    <CardTitle>Email Preferences</CardTitle>
+                    <CardDescription>Manage how you receive email notifications</CardDescription>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between p-4 rounded-lg bg-muted/30">
                   <div>
-                    <p className="font-medium text-foreground">Email Notifications</p>
-                    <p className="text-xs sm:text-sm text-muted-foreground">Get updates about your portfolio</p>
+                    <p className="font-medium text-foreground">Transactional Emails</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">Important account and transaction notifications</p>
                   </div>
-                  <Switch 
-                    checked={preferences.email_notifications}
-                    onCheckedChange={(checked) => setPreferences(prev => ({ ...prev, email_notifications: checked }))}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between p-4 rounded-lg bg-muted/30">
-                  <div>
-                    <p className="font-medium text-foreground">Transaction Alerts</p>
-                    <p className="text-xs sm:text-sm text-muted-foreground">Notify me of purchase and sale activity</p>
-                  </div>
-                  <Switch 
-                    checked={preferences.transaction_alerts}
-                    onCheckedChange={(checked) => setPreferences(prev => ({ ...prev, transaction_alerts: checked }))}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between p-4 rounded-lg bg-muted/30">
-                  <div>
-                    <p className="font-medium text-foreground">Impact Updates</p>
-                    <p className="text-xs sm:text-sm text-muted-foreground">Share updates about environmental impact</p>
-                  </div>
-                  <Switch 
-                    checked={preferences.impact_updates}
-                    onCheckedChange={(checked) => setPreferences(prev => ({ ...prev, impact_updates: checked }))}
+                  <Switch
+                    checked={emailPreferences.transactional}
+                    onCheckedChange={() => toggleEmailPreference('transactional')}
                   />
                 </div>
 
                 <div className="flex items-center justify-between p-4 rounded-lg bg-muted/30">
                   <div>
                     <p className="font-medium text-foreground">Marketing Emails</p>
-                    <p className="text-xs sm:text-sm text-muted-foreground">New projects and special offers</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">New projects, features, and special offers</p>
                   </div>
-                  <Switch 
-                    checked={preferences.marketing_emails}
-                    onCheckedChange={(checked) => setPreferences(prev => ({ ...prev, marketing_emails: checked }))}
+                  <Switch
+                    checked={emailPreferences.marketing}
+                    onCheckedChange={() => toggleEmailPreference('marketing')}
                   />
                 </div>
 
                 <div className="flex items-center justify-between p-4 rounded-lg bg-muted/30">
                   <div>
-                    <p className="font-medium text-foreground">Newsletter</p>
-                    <p className="text-xs sm:text-sm text-muted-foreground">Weekly insights on regenerative impact</p>
+                    <p className="font-medium text-foreground">General Notifications</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">Updates about projects and platform activity</p>
                   </div>
-                  <Switch 
-                    checked={preferences.newsletter_subscribed}
-                    onCheckedChange={(checked) => setPreferences(prev => ({ ...prev, newsletter_subscribed: checked }))}
+                  <Switch
+                    checked={emailPreferences.notifications}
+                    onCheckedChange={() => toggleEmailPreference('notifications')}
                   />
                 </div>
 
-                <Button 
-                  onClick={handleSavePreferences}
+                <Button
+                  onClick={handleSaveEmailPreferences}
                   disabled={isSavingPrefs}
                   className="w-full mt-4"
                 >
                   <Save className="w-4 h-4 mr-2" />
-                  {isSavingPrefs ? "Saving..." : "Save Notification Settings"}
+                  {isSavingPrefs ? "Saving..." : "Save Email Preferences"}
                 </Button>
               </CardContent>
             </Card>
@@ -612,6 +506,103 @@ const Settings = () => {
             animate={{ opacity: 1, y: 0 }}
             className="space-y-6"
           >
+            {/* Change Password */}
+            <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Lock className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle>Change Password</CardTitle>
+                    <CardDescription>Update your account password</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {message && (
+                  <Alert className={`mb-6 ${message.type === 'error' ? 'border-red-200 bg-red-50' : 'border-green-200 bg-green-50'}`}>
+                    {message.type === 'error' ? <AlertCircle className="h-4 w-4" /> : <CheckCircle className="h-4 w-4" />}
+                    <AlertDescription>{message.text}</AlertDescription>
+                  </Alert>
+                )}
+
+                <form onSubmit={handleChangePassword} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="currentPassword">Current Password</Label>
+                    <div className="relative">
+                      <Input
+                        id="currentPassword"
+                        name="currentPassword"
+                        type={showPasswords.current ? "text" : "password"}
+                        value={passwordData.currentPassword}
+                        onChange={handlePasswordChange}
+                        placeholder="Enter current password"
+                        className="pr-10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPasswords(prev => ({ ...prev, current: !prev.current }))}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      >
+                        {showPasswords.current ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="newPassword">New Password</Label>
+                    <div className="relative">
+                      <Input
+                        id="newPassword"
+                        name="newPassword"
+                        type={showPasswords.new ? "text" : "password"}
+                        value={passwordData.newPassword}
+                        onChange={handlePasswordChange}
+                        placeholder="Enter new password"
+                        className="pr-10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPasswords(prev => ({ ...prev, new: !prev.new }))}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      >
+                        {showPasswords.new ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                    <div className="relative">
+                      <Input
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        type={showPasswords.confirm ? "text" : "password"}
+                        value={passwordData.confirmPassword}
+                        onChange={handlePasswordChange}
+                        placeholder="Confirm new password"
+                        className="pr-10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPasswords(prev => ({ ...prev, confirm: !prev.confirm }))}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      >
+                        {showPasswords.confirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <Button type="submit" disabled={isChangingPassword} className="w-full">
+                    {isChangingPassword && <RefreshCw className="mr-2 h-4 w-4 animate-spin" />}
+                    Change Password
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+
+            {/* Account Security Status */}
             <Card className="bg-card/50 backdrop-blur-sm border-border/50">
               <CardHeader>
                 <div className="flex items-center gap-3">
@@ -619,24 +610,39 @@ const Settings = () => {
                     <Shield className="w-6 h-6 text-amber-600" />
                   </div>
                   <div>
-                    <CardTitle>Security Settings</CardTitle>
-                    <CardDescription>Protect your account and data</CardDescription>
+                    <CardTitle>Account Security</CardTitle>
+                    <CardDescription>Current security status of your account</CardDescription>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                <Button variant="outline" className="w-full justify-start">
-                  <Lock className="w-4 h-4 mr-2" />
-                  Change Password
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <Globe className="w-4 h-4 mr-2" />
-                  Two-Factor Authentication
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <Mail className="w-4 h-4 mr-2" />
-                  Recovery Email Address
-                </Button>
+                <div className="flex items-center justify-between p-4 rounded-lg bg-muted/30">
+                  <div>
+                    <p className="font-medium text-foreground">Email Verification</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">
+                      {user?.emailVerified ? "Your email is verified" : "Please verify your email"}
+                    </p>
+                  </div>
+                  {user?.emailVerified ? (
+                    <CheckCircle className="w-5 h-5 text-green-500" />
+                  ) : (
+                    <AlertCircle className="w-5 h-5 text-amber-500" />
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between p-4 rounded-lg bg-muted/30">
+                  <div>
+                    <p className="font-medium text-foreground">Two-Factor Authentication</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">
+                      {user?.mfaEnabled ? "Enabled" : "Not configured"}
+                    </p>
+                  </div>
+                  {user?.mfaEnabled ? (
+                    <CheckCircle className="w-5 h-5 text-green-500" />
+                  ) : (
+                    <Button variant="outline" size="sm">Enable</Button>
+                  )}
+                </div>
               </CardContent>
             </Card>
 
@@ -644,18 +650,19 @@ const Settings = () => {
             <Card className="bg-destructive/10 border-destructive/20">
               <CardHeader>
                 <CardTitle className="text-destructive">Danger Zone</CardTitle>
+                <CardDescription>Irreversible actions for your account</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-full justify-start border-destructive/20 text-destructive hover:bg-destructive/10"
                   onClick={handleSignOut}
                 >
                   <LogOut className="w-4 h-4 mr-2" />
                   Sign Out
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-full justify-start border-destructive/50 text-destructive hover:bg-destructive/10"
                 >
                   Delete Account

@@ -7,11 +7,28 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Search, BookOpen, MessageCircle, FileText, HelpCircle, ChevronRight, ExternalLink } from "lucide-react";
+import SEO from "@/components/SEO";
+import { useSEO } from "@/hooks/useSEO";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 const HelpCenter = () => {
   const [searchQuery, setSearchQuery] = useState("");
+
+  const seoData = useSEO({
+    structuredData: {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": faqs.map(faq => ({
+        "@type": "Question",
+        "name": faq.question,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": faq.answer
+        }
+      }))
+    }
+  });
 
   const faqs = [
     {
@@ -74,8 +91,10 @@ const HelpCenter = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
+    <>
+      <SEO {...seoData} />
+      <div className="min-h-screen bg-background">
+        <Header />
       <main className="container mx-auto px-4 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -191,6 +210,7 @@ const HelpCenter = () => {
       </main>
       <Footer />
     </div>
+    </>
   );
 };
 

@@ -48,9 +48,9 @@ export function ProjectComparisonModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto bg-card border-border/50">
+      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto bg-card border-border/50" aria-labelledby="compare-projects-title">
         <DialogHeader>
-          <DialogTitle className="text-foreground">Compare Projects</DialogTitle>
+          <DialogTitle id="compare-projects-title" className="text-foreground">Compare Projects</DialogTitle>
           <DialogDescription className="text-muted-foreground">
             Select up to {maxCompare} projects to compare side-by-side
           </DialogDescription>
@@ -79,6 +79,8 @@ export function ProjectComparisonModal({
                         ? 'border-border/30 bg-muted/30 opacity-50 cursor-not-allowed'
                         : 'border-border/50 hover:border-primary/30 bg-card/50'
                     }`}
+                    aria-label={`${isSelected ? 'Deselect' : 'Select'} ${project.title} for comparison`}
+                    aria-pressed={!!isSelected}
                   >
                     <div className="min-w-0 flex-1">
                       <p className="font-medium text-foreground truncate">{project.title}</p>

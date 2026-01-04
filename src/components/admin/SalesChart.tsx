@@ -51,17 +51,17 @@ const SalesChart = () => {
       <h2 className="font-display text-xl font-semibold text-foreground mb-6">Revenue (Last 30 Days)</h2>
       
       <div className="h-64">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" aria-label="Revenue bar chart for last 30 days" aria-describedby="sales-chart-desc">
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-            <XAxis 
-              dataKey="date" 
+            <XAxis
+              dataKey="date"
               stroke="hsl(var(--muted-foreground))"
               fontSize={12}
               tickLine={false}
               axisLine={false}
             />
-            <YAxis 
+            <YAxis
               stroke="hsl(var(--muted-foreground))"
               fontSize={12}
               tickLine={false}
@@ -77,13 +77,16 @@ const SalesChart = () => {
               labelStyle={{ color: 'hsl(var(--foreground))' }}
               formatter={(value: number) => [`$${value.toLocaleString()}`, 'Revenue']}
             />
-            <Bar 
-              dataKey="revenue" 
-              fill="hsl(var(--primary))" 
+            <Bar
+              dataKey="revenue"
+              fill="hsl(var(--primary))"
               radius={[4, 4, 0, 0]}
             />
           </BarChart>
         </ResponsiveContainer>
+        <div id="sales-chart-desc" className="sr-only">
+          Bar chart showing daily revenue in USD for the last 30 days. Total revenue ranges from ${Math.min(...chartData.map(d => d.revenue))} to ${Math.max(...chartData.map(d => d.revenue))}, with an average of ${(chartData.reduce((sum, d) => sum + d.revenue, 0) / chartData.length).toFixed(2)}.
+        </div>
       </div>
     </motion.div>
   );

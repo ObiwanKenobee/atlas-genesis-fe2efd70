@@ -7,10 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
-import { z } from "zod";
-
-const emailSchema = z.string().email("Please enter a valid email address");
-const passwordSchema = z.string().min(6, "Password must be at least 6 characters");
+import { loginSchema, registerSchema, sanitizeFormData } from "@/lib/validation";
+import { sanitizeEmail } from "@/lib/utils/sanitization";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -75,17 +73,22 @@ const Auth = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Validate inputs
-    const emailResult = emailSchema.safeParse(email);
-    if (!emailResult.success) {
-      toast.error(emailResult.error.errors[0].message);
-      return;
-    }
 
-    const passwordResult = passwordSchema.safeParse(password);
-    if (!passwordResult.success) {
-      toast.error(passwordResult.error.errors[0].message);
+    // Sanitize inputs
+    const sanitizedData = sanitizeFormData({
+      email: email.trim(),
+      password,
+      ...(isLogin ? {} : { fullName: fullName.trim() })
+    });
+
+    // Validate inputs
+    const validationResult = isLogin
+      ? loginSchema.safeParse(sanitizedData)
+      : registerSchema.safeParse({ ...sanitizedData, userType: 'individual' });
+
+    if (!validationResult.success) {
+      const errorMessage = validationResult.error.errors[0]?.message || 'Validation failed';
+      toast.error(errorMessage);
       return;
     }
 
@@ -93,7 +96,7 @@ const Auth = () => {
 
     try {
       if (isLogin) {
-        const { error } = await signIn(email, password);
+        const { error } = await signIn(sanitizedData.email, sanitizedData.password);
         if (error) {
           if (error.message.includes("Invalid email or password")) {
             toast.error("Invalid email or password. Please try again.");
@@ -109,7 +112,7 @@ const Auth = () => {
           navigate("/dashboard");
         }
       } else {
-        const { error } = await signUp(email, password, fullName, 'individual');
+        const { error } = await signUp(sanitizedData.email, sanitizedData.password, sanitizedData.fullName, 'individual');
         if (error) {
           if (error.message.includes("Email already registered")) {
             toast.error("An account with this email already exists. Please sign in instead.");

@@ -92,16 +92,20 @@ export function PurchaseModal({ project, isOpen, onClose }: PurchaseModalProps) 
               onClick={() => setQuantity(Math.max(1, quantity - 1))}
               disabled={quantity <= 1}
               className="border-border/50"
+              aria-label="Decrease quantity"
             >
               <Minus className="w-4 h-4" />
             </Button>
+            <label className="sr-only" htmlFor="quantity-input">Quantity of carbon credits</label>
             <Input
+              id="quantity-input"
               type="number"
               value={quantity}
               onChange={(e) => setQuantity(Math.max(1, Math.min(maxQuantity, parseInt(e.target.value) || 1)))}
               className="w-24 text-center bg-muted border-border/50"
               min={1}
               max={maxQuantity}
+              autoComplete="off"
             />
             <Button
               variant="outline"
@@ -109,6 +113,7 @@ export function PurchaseModal({ project, isOpen, onClose }: PurchaseModalProps) 
               onClick={() => setQuantity(Math.min(maxQuantity, quantity + 1))}
               disabled={quantity >= maxQuantity}
               className="border-border/50"
+              aria-label="Increase quantity"
             >
               <Plus className="w-4 h-4" />
             </Button>
@@ -131,7 +136,7 @@ export function PurchaseModal({ project, isOpen, onClose }: PurchaseModalProps) 
 
           <div className="space-y-3">
             <p className="text-sm font-medium text-foreground">Select Payment Method</p>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3" role="radiogroup" aria-label="Select payment method">
               <button
                 onClick={() => setPaymentMethod('paystack')}
                 className={`p-4 rounded-lg border-2 transition-all flex flex-col items-center gap-2 ${
@@ -139,6 +144,9 @@ export function PurchaseModal({ project, isOpen, onClose }: PurchaseModalProps) 
                     ? 'border-primary bg-primary/10'
                     : 'border-border/50 hover:border-border'
                 }`}
+                role="radio"
+                aria-checked={paymentMethod === 'paystack' ? 'true' : 'false'}
+                aria-label="Paystack - Cards, Bank Transfer"
               >
                 <CreditCard className={`w-6 h-6 ${paymentMethod === 'paystack' ? 'text-primary' : 'text-muted-foreground'}`} />
                 <span className={`text-sm font-medium ${paymentMethod === 'paystack' ? 'text-primary' : 'text-foreground'}`}>
@@ -153,6 +161,9 @@ export function PurchaseModal({ project, isOpen, onClose }: PurchaseModalProps) 
                     ? 'border-primary bg-primary/10'
                     : 'border-border/50 hover:border-border'
                 }`}
+                role="radio"
+                aria-checked={paymentMethod === 'paypal' ? 'true' : 'false'}
+                aria-label="PayPal - PayPal Balance, Cards"
               >
                 <Wallet className={`w-6 h-6 ${paymentMethod === 'paypal' ? 'text-primary' : 'text-muted-foreground'}`} />
                 <span className={`text-sm font-medium ${paymentMethod === 'paypal' ? 'text-primary' : 'text-foreground'}`}>

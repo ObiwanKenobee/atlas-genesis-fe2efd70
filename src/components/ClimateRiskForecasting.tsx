@@ -141,7 +141,7 @@ export const ClimateRiskForecasting: React.FC<ClimateRiskForecastingProps> = ({
           <CardDescription>12-month retrospective analysis (2023)</CardDescription>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={300} aria-label="Historical climate trends area chart" aria-describedby="historical-chart-desc">
             <AreaChart data={historical}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
@@ -153,6 +153,9 @@ export const ClimateRiskForecasting: React.FC<ClimateRiskForecastingProps> = ({
               <Line yAxisId="right" type="monotone" dataKey="risk_score" stroke="#ea580c" strokeWidth={2} />
             </AreaChart>
           </ResponsiveContainer>
+          <div id="historical-chart-desc" className="sr-only">
+            Area chart displaying historical temperature changes in degrees Celsius and risk scores over 12 months from 2023. Temperature changes range from {Math.min(...historical.map(d => d.temperature_change))} to {Math.max(...historical.map(d => d.temperature_change))} degrees, with risk scores from {Math.min(...historical.map(d => d.risk_score))} to {Math.max(...historical.map(d => d.risk_score))}.
+          </div>
         </CardContent>
       </Card>
 
@@ -163,7 +166,7 @@ export const ClimateRiskForecasting: React.FC<ClimateRiskForecastingProps> = ({
           <CardDescription>Earth system models (ensemble prediction)</CardDescription>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={300} aria-label="12-month climate forecast line chart" aria-describedby="forecast-chart-desc">
             <LineChart data={forecast}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
@@ -174,6 +177,9 @@ export const ClimateRiskForecasting: React.FC<ClimateRiskForecastingProps> = ({
               <Line type="monotone" dataKey="temperature_change" stroke="#3b82f6" strokeWidth={2} dot={false} />
             </LineChart>
           </ResponsiveContainer>
+          <div id="forecast-chart-desc" className="sr-only">
+            Line chart forecasting risk scores and temperature changes in degrees Celsius for the next 12 months. Risk scores range from {Math.min(...forecast.map(d => d.risk_score))} to {Math.max(...forecast.map(d => d.risk_score))}, temperature changes from {Math.min(...forecast.map(d => d.temperature_change))} to {Math.max(...forecast.map(d => d.temperature_change))} degrees.
+          </div>
         </CardContent>
       </Card>
 
@@ -184,7 +190,7 @@ export const ClimateRiskForecasting: React.FC<ClimateRiskForecastingProps> = ({
           <CardDescription>Bayesian inference from climate models</CardDescription>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={300} aria-label="Extreme event risk probability bar chart" aria-describedby="extreme-chart-desc">
             <BarChart data={forecast}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
@@ -194,6 +200,9 @@ export const ClimateRiskForecasting: React.FC<ClimateRiskForecastingProps> = ({
               <Bar dataKey="extreme_event_probability" fill="#ef4444" />
             </BarChart>
           </ResponsiveContainer>
+          <div id="extreme-chart-desc" className="sr-only">
+            Bar chart showing extreme event probability as percentages for each month. Probabilities range from {(Math.min(...forecast.map(d => d.extreme_event_probability)) * 100).toFixed(1)}% to {(Math.max(...forecast.map(d => d.extreme_event_probability)) * 100).toFixed(1)}%.
+          </div>
         </CardContent>
       </Card>
 

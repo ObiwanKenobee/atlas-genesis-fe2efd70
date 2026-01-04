@@ -174,259 +174,290 @@ const ProjectFormModal = ({ open, onOpenChange, project }: ProjectFormModalProps
         </DialogHeader>
         
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem className="col-span-2">
-                    <FormLabel>Title</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Amazon Rainforest Conservation" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="project_type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Project Type</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {Object.entries(PROJECT_TYPE_LABELS).map(([value, label]) => (
-                          <SelectItem key={value} value={value}>{label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="pending">Pending</SelectItem>
-                        <SelectItem value="completed">Completed</SelectItem>
-                        <SelectItem value="suspended">Suspended</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem className="col-span-2">
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} rows={3} placeholder="Describe the project..." />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="location"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Location</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Amazon Basin" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="country"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Country</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Brazil" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="price_per_credit"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Price per Credit ($)</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        step="0.01"
-                        {...field} 
-                        onChange={e => field.onChange(parseFloat(e.target.value))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="total_credits"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Total Credits</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number"
-                        {...field} 
-                        onChange={e => field.onChange(parseInt(e.target.value))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="available_credits"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Available Credits</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number"
-                        {...field} 
-                        onChange={e => field.onChange(parseInt(e.target.value))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="vintage_year"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Vintage Year</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number"
-                        {...field} 
-                        onChange={e => field.onChange(parseInt(e.target.value))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="certification"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Certification</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Verra VCS" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="developer_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Developer Name</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Conservation International" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="co2_offset_per_credit"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>CO2 Offset per Credit (tons)</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number"
-                        step="0.01"
-                        {...field} 
-                        onChange={e => field.onChange(parseFloat(e.target.value))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="methodology"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Methodology (Optional)</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="VM0007" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="image_url"
-                render={({ field }) => (
-                  <FormItem className="col-span-2">
-                    <FormLabel>Image URL (Optional)</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="https://example.com/image.jpg" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+           <div aria-live="polite" aria-atomic="true" className="sr-only">
+             {Object.keys(form.formState.errors).length > 0 && "Form contains errors. Please review and correct the highlighted fields."}
+           </div>
+           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+             <fieldset className="space-y-4">
+               <legend className="text-lg font-semibold text-foreground">Basic Information</legend>
+               <div className="grid grid-cols-2 gap-4">
+                 <FormField
+                   control={form.control}
+                   name="title"
+                   render={({ field }) => (
+                     <FormItem className="col-span-2">
+                       <FormLabel>Title</FormLabel>
+                       <FormControl>
+                         <Input {...field} placeholder="Amazon Rainforest Conservation" autoComplete="name" />
+                       </FormControl>
+                       <FormMessage />
+                     </FormItem>
+                   )}
+                 />
+
+                 <FormField
+                   control={form.control}
+                   name="description"
+                   render={({ field }) => (
+                     <FormItem className="col-span-2">
+                       <FormLabel>Description</FormLabel>
+                       <FormControl>
+                         <Textarea {...field} rows={3} placeholder="Describe the project..." autoComplete="off" />
+                       </FormControl>
+                       <FormMessage />
+                     </FormItem>
+                   )}
+                 />
+               </div>
+             </fieldset>
+
+             <fieldset className="space-y-4">
+               <legend className="text-lg font-semibold text-foreground">Location</legend>
+               <div className="grid grid-cols-2 gap-4">
+                 <FormField
+                   control={form.control}
+                   name="location"
+                   render={({ field }) => (
+                     <FormItem>
+                       <FormLabel>Location</FormLabel>
+                       <FormControl>
+                         <Input {...field} placeholder="Amazon Basin" autoComplete="address-level2" />
+                       </FormControl>
+                       <FormMessage />
+                     </FormItem>
+                   )}
+                 />
+
+                 <FormField
+                   control={form.control}
+                   name="country"
+                   render={({ field }) => (
+                     <FormItem>
+                       <FormLabel>Country</FormLabel>
+                       <FormControl>
+                         <Input {...field} placeholder="Brazil" autoComplete="country" />
+                       </FormControl>
+                       <FormMessage />
+                     </FormItem>
+                   )}
+                 />
+               </div>
+             </fieldset>
+
+             <fieldset className="space-y-4">
+               <legend className="text-lg font-semibold text-foreground">Project Details</legend>
+               <div className="grid grid-cols-2 gap-4">
+                 <FormField
+                   control={form.control}
+                   name="project_type"
+                   render={({ field }) => (
+                     <FormItem>
+                       <FormLabel>Project Type</FormLabel>
+                       <Select onValueChange={field.onChange} value={field.value}>
+                         <FormControl>
+                           <SelectTrigger>
+                             <SelectValue />
+                           </SelectTrigger>
+                         </FormControl>
+                         <SelectContent>
+                           {Object.entries(PROJECT_TYPE_LABELS).map(([value, label]) => (
+                             <SelectItem key={value} value={value}>{label}</SelectItem>
+                           ))}
+                         </SelectContent>
+                       </Select>
+                       <FormMessage />
+                     </FormItem>
+                   )}
+                 />
+
+                 <FormField
+                   control={form.control}
+                   name="status"
+                   render={({ field }) => (
+                     <FormItem>
+                       <FormLabel>Status</FormLabel>
+                       <Select onValueChange={field.onChange} value={field.value}>
+                         <FormControl>
+                           <SelectTrigger>
+                             <SelectValue />
+                           </SelectTrigger>
+                         </FormControl>
+                         <SelectContent>
+                           <SelectItem value="active">Active</SelectItem>
+                           <SelectItem value="pending">Pending</SelectItem>
+                           <SelectItem value="completed">Completed</SelectItem>
+                           <SelectItem value="suspended">Suspended</SelectItem>
+                         </SelectContent>
+                       </Select>
+                       <FormMessage />
+                     </FormItem>
+                   )}
+                 />
+
+                 <FormField
+                   control={form.control}
+                   name="vintage_year"
+                   render={({ field }) => (
+                     <FormItem>
+                       <FormLabel>Vintage Year</FormLabel>
+                       <FormControl>
+                         <Input
+                           type="number"
+                           {...field}
+                           onChange={e => field.onChange(parseInt(e.target.value))}
+                           autoComplete="off"
+                         />
+                       </FormControl>
+                       <FormMessage />
+                     </FormItem>
+                   )}
+                 />
+
+                 <FormField
+                   control={form.control}
+                   name="certification"
+                   render={({ field }) => (
+                     <FormItem>
+                       <FormLabel>Certification</FormLabel>
+                       <FormControl>
+                         <Input {...field} placeholder="Verra VCS" autoComplete="off" />
+                       </FormControl>
+                       <FormMessage />
+                     </FormItem>
+                   )}
+                 />
+
+                 <FormField
+                   control={form.control}
+                   name="developer_name"
+                   render={({ field }) => (
+                     <FormItem>
+                       <FormLabel>Developer Name</FormLabel>
+                       <FormControl>
+                         <Input {...field} placeholder="Conservation International" autoComplete="organization" />
+                       </FormControl>
+                       <FormMessage />
+                     </FormItem>
+                   )}
+                 />
+
+                 <FormField
+                   control={form.control}
+                   name="methodology"
+                   render={({ field }) => (
+                     <FormItem>
+                       <FormLabel>Methodology (Optional)</FormLabel>
+                       <FormControl>
+                         <Input {...field} placeholder="VM0007" autoComplete="off" />
+                       </FormControl>
+                       <FormMessage />
+                     </FormItem>
+                   )}
+                 />
+               </div>
+             </fieldset>
+
+             <fieldset className="space-y-4">
+               <legend className="text-lg font-semibold text-foreground">Financial Information</legend>
+               <div className="grid grid-cols-2 gap-4">
+                 <FormField
+                   control={form.control}
+                   name="price_per_credit"
+                   render={({ field }) => (
+                     <FormItem>
+                       <FormLabel>Price per Credit ($)</FormLabel>
+                       <FormControl>
+                         <Input
+                           type="number"
+                           step="0.01"
+                           {...field}
+                           onChange={e => field.onChange(parseFloat(e.target.value))}
+                           autoComplete="off"
+                         />
+                       </FormControl>
+                       <FormMessage />
+                     </FormItem>
+                   )}
+                 />
+
+                 <FormField
+                   control={form.control}
+                   name="total_credits"
+                   render={({ field }) => (
+                     <FormItem>
+                       <FormLabel>Total Credits</FormLabel>
+                       <FormControl>
+                         <Input
+                           type="number"
+                           {...field}
+                           onChange={e => field.onChange(parseInt(e.target.value))}
+                           autoComplete="off"
+                         />
+                       </FormControl>
+                       <FormMessage />
+                     </FormItem>
+                   )}
+                 />
+
+                 <FormField
+                   control={form.control}
+                   name="available_credits"
+                   render={({ field }) => (
+                     <FormItem>
+                       <FormLabel>Available Credits</FormLabel>
+                       <FormControl>
+                         <Input
+                           type="number"
+                           {...field}
+                           onChange={e => field.onChange(parseInt(e.target.value))}
+                           autoComplete="off"
+                         />
+                       </FormControl>
+                       <FormMessage />
+                     </FormItem>
+                   )}
+                 />
+
+                 <FormField
+                   control={form.control}
+                   name="co2_offset_per_credit"
+                   render={({ field }) => (
+                     <FormItem>
+                       <FormLabel>CO2 Offset per Credit (tons)</FormLabel>
+                       <FormControl>
+                         <Input
+                           type="number"
+                           step="0.01"
+                           {...field}
+                           onChange={e => field.onChange(parseFloat(e.target.value))}
+                           autoComplete="off"
+                         />
+                       </FormControl>
+                       <FormMessage />
+                     </FormItem>
+                   )}
+                 />
+               </div>
+             </fieldset>
+
+             <fieldset className="space-y-4">
+               <legend className="text-lg font-semibold text-foreground">Media</legend>
+               <div className="grid grid-cols-2 gap-4">
+                 <FormField
+                   control={form.control}
+                   name="image_url"
+                   render={({ field }) => (
+                     <FormItem className="col-span-2">
+                       <FormLabel>Image URL (Optional)</FormLabel>
+                       <FormControl>
+                         <Input {...field} placeholder="https://example.com/image.jpg" autoComplete="url" />
+                       </FormControl>
+                       <FormMessage />
+                     </FormItem>
+                   )}
+                 />
+               </div>
+             </fieldset>
             
             <div className="flex justify-end gap-3 pt-4">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

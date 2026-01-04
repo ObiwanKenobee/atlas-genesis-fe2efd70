@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { verifyAccessToken, checkPermission, checkTenantAccess, User } from '../utils/auth';
+import { verifySecureAccessToken, checkPermission, checkTenantAccess, User, getCurrentTokenVersion, generateDeviceFingerprint } from '../utils/auth';
 import { query } from '../db';
 import { logSecurityEvent } from '../utils/logger';
 
@@ -23,7 +23,8 @@ export const authenticate = async (req: AuthenticatedRequest, res: Response, nex
     }
 
     const token = authHeader.substring(7);
-    const payload = verifyAccessToken(token);
+    const deviceFingerprint = generateDeviceFingerprint(req);
+    const payload = verifySecureAccessToken(token, deviceFingerprint);
 
     // Fetch user from database to ensure they still exist and get latest data
     const result = await query(
@@ -43,6 +44,21 @@ export const authenticate = async (req: AuthenticatedRequest, res: Response, nex
     }
 
     const user = result.rows[0];
+
+    // Check token version for forced logout capability
+    const currentVersion = await getCurrentTokenVersion(user.id);
+    if (payload.version && payload.version < currentVersion) {
+      logSecurityEvent('authentication_failed', user.id, {
+        reason: 'token_version_mismatch',
+        tokenVersion: payload.version,
+        currentVersion,
+        path: req.path,
+        method: req.method,
+        ip: req.ip,
+        userAgent: req.get('User-Agent')
+      }, 'medium');
+      return res.status(401).json({ code: 'token_expired', message: 'Token has been invalidated' });
+    }
 
     // Check if account is locked
     if (user.account_locked) {
@@ -155,20 +171,37 @@ export const requireEmailVerification = (req: AuthenticatedRequest, res: Respons
   next();
 };
 
-// MFA verification middleware (placeholder for future implementation)
+// MFA verification middleware
 export const requireMFA = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   if (!req.user) {
     return res.status(401).json({ code: 'unauthorized', message: 'Authentication required' });
   }
 
-  // TODO: Implement MFA verification logic
-  // For now, just check if MFA is enabled
   if (req.user.mfaEnabled) {
-    return res.status(403).json({
-      code: 'mfa_required',
-      message: 'Multi-factor authentication required',
-      requiresMFA: true
-    });
+    const mfaToken = req.headers['x-mfa-token'] as string;
+    if (!mfaToken) {
+      return res.status(403).json({
+        code: 'mfa_required',
+        message: 'Multi-factor authentication required',
+        requiresMFA: true
+      });
+    }
+
+    // Verify MFA token
+    const { verifyMFAForLogin } = require('../utils/auth');
+    const isValidMFA = verifyMFAForLogin(req.user.id, mfaToken);
+    if (!isValidMFA) {
+      logSecurityEvent('mfa_verification_failed', req.user.id, {
+        path: req.path,
+        method: req.method,
+        ip: req.ip,
+        userAgent: req.get('User-Agent')
+      }, 'medium');
+      return res.status(403).json({
+        code: 'mfa_invalid',
+        message: 'Invalid MFA token'
+      });
+    }
   }
 
   next();

@@ -4,8 +4,8 @@ import { query } from '../db';
 import {
   hashPassword,
   verifyPassword,
-  generateAccessToken,
-  generateRefreshToken,
+  generateSecureAccessToken,
+  generateSecureRefreshToken,
   createRefreshToken,
   revokeRefreshToken,
   findRefreshToken,
@@ -14,17 +14,31 @@ import {
   createPasswordResetToken,
   verifyPasswordResetToken,
   createUserSession,
-  verifyRefreshToken
+  verifySecureRefreshToken,
+  enforceConcurrentSessionLimit,
+  invalidateAllUserSessions,
+  setupMFA,
+  enableMFA,
+  disableMFA,
+  verifyMFAForLogin,
+  generateBackupCodes,
+  hashBackupCodes,
+  generateDeviceFingerprint,
+  getCurrentTokenVersion,
+  detectSuspiciousLogin,
+  LoginContext,
+  getSecurityDashboardData
 } from '../utils/auth';
 import { emailService } from '../services/email';
-import { authenticate, requireEmailVerification, checkLoginAttempts, resetLoginAttempts, AuthenticatedRequest } from '../middleware/auth';
-import { validateUserRegistration, validateUserLogin, validateWithJoi, userProfileSchema } from '../middleware/validation';
+import { authenticate, authorize, requireMFA, requireEmailVerification, checkLoginAttempts, resetLoginAttempts, AuthenticatedRequest } from '../middleware/auth';
+import { validateWithZod } from '../middleware/validation';
+import { userCreateSchema, loginSchema, userUpdateSchema } from '../validation/schemas';
 import { logSecurityEvent } from '../utils/logger';
 
 const router = express.Router();
 
 // Sign Up
-router.post('/signup', validateUserRegistration, async (req: Request, res: Response) => {
+router.post('/signup', validateWithZod(userCreateSchema), async (req: Request, res: Response) => {
   const { email, password, displayName, role = 'individual' } = req.body;
 
   try {
@@ -90,7 +104,7 @@ router.post('/signup', validateUserRegistration, async (req: Request, res: Respo
 });
 
 // Login
-router.post('/login', validateUserLogin, async (req: Request, res: Response) => {
+router.post('/login', validateWithZod(loginSchema), async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   // Check login attempts
@@ -170,25 +184,59 @@ router.post('/login', validateUserLogin, async (req: Request, res: Response) => 
     resetLoginAttempts(email.toLowerCase());
     await query('UPDATE users SET login_attempts = 0, locked_until = NULL, last_login = NOW() WHERE id = $1', [user.id]);
 
+    // Check for suspicious login activity
+    const loginDeviceFingerprint = generateDeviceFingerprint(req);
+    const loginContext: LoginContext = {
+      ip: req.ip,
+      userAgent: req.get('User-Agent') || '',
+      deviceFingerprint: loginDeviceFingerprint,
+      timestamp: new Date()
+    };
+
+    const suspiciousCheck = await detectSuspiciousLogin(user.id, loginContext);
+
+    if (suspiciousCheck.isSuspicious) {
+      logSecurityEvent('suspicious_login', user.id, {
+        reasons: suspiciousCheck.reasons,
+        riskLevel: suspiciousCheck.riskLevel,
+        ip: req.ip,
+        userAgent: req.get('User-Agent'),
+        deviceFingerprint: loginDeviceFingerprint
+      }, suspiciousCheck.riskLevel);
+
+      // For high risk, you could require additional verification or send alerts
+      // For now, just log it
+    }
+
+    // Enforce concurrent session limits
+    await enforceConcurrentSessionLimit(user.id);
+
+    // Get current token version and device fingerprint
+    const currentVersion = await getCurrentTokenVersion(user.id);
+    const deviceFingerprint = generateDeviceFingerprint(req);
+
     // Create tokens
-    const accessToken = generateAccessToken({
+    const accessToken = generateSecureAccessToken({
       userId: user.id,
       email: user.email,
       role: user.role,
-      tenantId: user.tenant_id
-    });
+      tenantId: user.tenant_id,
+      version: currentVersion
+    }, deviceFingerprint);
 
     const refreshTokenData = await createRefreshToken(user.id, {
       ip: req.ip,
-      userAgent: req.get('User-Agent')
+      userAgent: req.get('User-Agent'),
+      deviceFingerprint
     });
 
-    const refreshToken = generateRefreshToken({
+    const refreshToken = generateSecureRefreshToken({
       userId: user.id,
       email: user.email,
       role: user.role,
-      tenantId: user.tenant_id
-    });
+      tenantId: user.tenant_id,
+      version: currentVersion
+    }, deviceFingerprint);
 
     // Create user session
     await createUserSession(
@@ -254,7 +302,8 @@ router.post('/refresh', async (req: Request, res: Response) => {
   }
 
   try {
-    const payload = verifyRefreshToken(refreshToken);
+    const deviceFingerprint = generateDeviceFingerprint(req);
+    const payload = verifySecureRefreshToken(refreshToken, deviceFingerprint);
     const refreshTokenData = await findRefreshToken(payload.userId);
 
     if (!refreshTokenData || refreshTokenData.revoked) {
@@ -262,25 +311,28 @@ router.post('/refresh', async (req: Request, res: Response) => {
     }
 
     // Generate new tokens
-    const newAccessToken = generateAccessToken({
+    const newAccessToken = generateSecureAccessToken({
       userId: payload.userId,
       email: payload.email,
       role: payload.role,
-      tenantId: payload.tenantId
-    });
+      tenantId: payload.tenantId,
+      version: payload.version
+    }, deviceFingerprint);
 
-    const newRefreshToken = generateRefreshToken({
+    const newRefreshToken = generateSecureRefreshToken({
       userId: payload.userId,
       email: payload.email,
       role: payload.role,
-      tenantId: payload.tenantId
-    });
+      tenantId: payload.tenantId,
+      version: payload.version
+    }, deviceFingerprint);
 
     // Revoke old refresh token and create new one
     await revokeRefreshToken(refreshTokenData.token);
     const newRefreshTokenData = await createRefreshToken(payload.userId, {
       ip: req.ip,
-      userAgent: req.get('User-Agent')
+      userAgent: req.get('User-Agent'),
+      deviceFingerprint
     });
 
     res.json({
@@ -298,13 +350,16 @@ router.post('/refresh', async (req: Request, res: Response) => {
 // Logout
 router.post('/logout', authenticate, async (req: AuthenticatedRequest, res: Response) => {
   const { refreshToken } = req.body;
+  const userId = req.user!.id;
 
   try {
     if (refreshToken) {
       await revokeRefreshToken(refreshToken);
     }
 
-    // Could also revoke all user sessions here if needed
+    // Invalidate all user sessions for security
+    await invalidateAllUserSessions(userId);
+
     res.json({ message: 'Logged out successfully' });
   } catch (err) {
     res.status(500).json({ code: 'server_error', message: 'Logout failed' });
@@ -327,7 +382,7 @@ router.get('/me', authenticate, async (req: AuthenticatedRequest, res: Response)
 });
 
 // Update Profile
-router.put('/profile', authenticate, validateWithJoi(userProfileSchema), async (req: AuthenticatedRequest, res: Response) => {
+router.put('/profile', authenticate, validateWithZod(userUpdateSchema), async (req: AuthenticatedRequest, res: Response) => {
   const { displayName, bio, avatar, preferences } = req.body;
   const userId = req.user!.id;
 
@@ -524,6 +579,66 @@ router.post('/reset-password', async (req: Request, res: Response) => {
   }
 });
 
+// Change Password
+router.put('/change-password', authenticate, async (req: AuthenticatedRequest, res: Response) => {
+  const { currentPassword, newPassword } = req.body;
+  const userId = req.user!.id;
+
+  if (!currentPassword || !newPassword) {
+    return res.status(422).json({ code: 'invalid', message: 'Current password and new password required' });
+  }
+
+  if (newPassword.length < 8) {
+    return res.status(422).json({ code: 'invalid', message: 'New password must be at least 8 characters long' });
+  }
+
+  try {
+    // Get current user
+    const userResult = await query('SELECT password_hash FROM users WHERE id = $1', [userId]);
+    if (userResult.rowCount === 0) {
+      return res.status(404).json({ code: 'not_found', message: 'User not found' });
+    }
+
+    const user = userResult.rows[0];
+
+    // Verify current password
+    const isValidPassword = await verifyPassword(currentPassword, user.password_hash);
+    if (!isValidPassword) {
+      logSecurityEvent('password_change_failed', userId, {
+        reason: 'invalid_current_password',
+        ip: req.ip,
+        userAgent: req.get('User-Agent')
+      }, 'medium');
+      return res.status(401).json({ code: 'invalid_credentials', message: 'Current password is incorrect' });
+    }
+
+    // Hash new password
+    const hashedNewPassword = await hashPassword(newPassword);
+
+    // Update password
+    await query('UPDATE users SET password_hash = $1, updated_at = NOW() WHERE id = $2', [hashedNewPassword, userId]);
+
+    // Revoke all refresh tokens for security
+    await query('UPDATE refresh_tokens SET revoked = true WHERE user_id = $1', [userId]);
+
+    // Log successful password change
+    logSecurityEvent('password_changed', userId, {
+      ip: req.ip,
+      userAgent: req.get('User-Agent')
+    }, 'low');
+
+    res.json({ message: 'Password changed successfully' });
+  } catch (err: any) {
+    console.error('Password change error:', err);
+    logSecurityEvent('password_change_failed', userId, {
+      error: err.message,
+      ip: req.ip,
+      userAgent: req.get('User-Agent')
+    }, 'medium');
+    res.status(500).json({ code: 'server_error', message: 'Failed to change password' });
+  }
+});
+
 // OAuth routes
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
@@ -532,26 +647,33 @@ router.get('/google/callback',
   async (req: Request, res: Response) => {
     const user = (req as any).user;
 
+    // Get current token version and device fingerprint
+    const currentVersion = await getCurrentTokenVersion(user.id);
+    const deviceFingerprint = generateDeviceFingerprint(req);
+
     // Generate tokens for OAuth user
-    const accessToken = generateAccessToken({
+    const accessToken = generateSecureAccessToken({
       userId: user.id,
       email: user.email,
       role: user.role,
-      tenantId: user.tenant_id
-    });
+      tenantId: user.tenant_id,
+      version: currentVersion
+    }, deviceFingerprint);
 
     const refreshTokenData = await createRefreshToken(user.id, {
       ip: req.ip,
       userAgent: req.get('User-Agent'),
-      provider: 'google'
+      provider: 'google',
+      deviceFingerprint
     });
 
-    const refreshToken = generateRefreshToken({
+    const refreshToken = generateSecureRefreshToken({
       userId: user.id,
       email: user.email,
       role: user.role,
-      tenantId: user.tenant_id
-    });
+      tenantId: user.tenant_id,
+      version: currentVersion
+    }, deviceFingerprint);
 
     // Redirect to frontend with tokens
     const redirectUrl = new URL(`${process.env.FRONTEND_URL}/auth/callback`);
@@ -569,25 +691,31 @@ router.get('/github/callback',
   async (req: Request, res: Response) => {
     const user = (req as any).user;
 
-    const accessToken = generateAccessToken({
+    const currentVersion = await getCurrentTokenVersion(user.id);
+    const deviceFingerprint = generateDeviceFingerprint(req);
+
+    const accessToken = generateSecureAccessToken({
       userId: user.id,
       email: user.email,
       role: user.role,
-      tenantId: user.tenant_id
-    });
+      tenantId: user.tenant_id,
+      version: currentVersion
+    }, deviceFingerprint);
 
     const refreshTokenData = await createRefreshToken(user.id, {
       ip: req.ip,
       userAgent: req.get('User-Agent'),
-      provider: 'github'
+      provider: 'github',
+      deviceFingerprint
     });
 
-    const refreshToken = generateRefreshToken({
+    const refreshToken = generateSecureRefreshToken({
       userId: user.id,
       email: user.email,
       role: user.role,
-      tenantId: user.tenant_id
-    });
+      tenantId: user.tenant_id,
+      version: currentVersion
+    }, deviceFingerprint);
 
     const redirectUrl = new URL(`${process.env.FRONTEND_URL}/auth/callback`);
     redirectUrl.searchParams.set('accessToken', accessToken);
@@ -604,25 +732,31 @@ router.get('/microsoft/callback',
   async (req: Request, res: Response) => {
     const user = (req as any).user;
 
-    const accessToken = generateAccessToken({
+    const currentVersion = await getCurrentTokenVersion(user.id);
+    const deviceFingerprint = generateDeviceFingerprint(req);
+
+    const accessToken = generateSecureAccessToken({
       userId: user.id,
       email: user.email,
       role: user.role,
-      tenantId: user.tenant_id
-    });
+      tenantId: user.tenant_id,
+      version: currentVersion
+    }, deviceFingerprint);
 
     const refreshTokenData = await createRefreshToken(user.id, {
       ip: req.ip,
       userAgent: req.get('User-Agent'),
-      provider: 'microsoft'
+      provider: 'microsoft',
+      deviceFingerprint
     });
 
-    const refreshToken = generateRefreshToken({
+    const refreshToken = generateSecureRefreshToken({
       userId: user.id,
       email: user.email,
       role: user.role,
-      tenantId: user.tenant_id
-    });
+      tenantId: user.tenant_id,
+      version: currentVersion
+    }, deviceFingerprint);
 
     const redirectUrl = new URL(`${process.env.FRONTEND_URL}/auth/callback`);
     redirectUrl.searchParams.set('accessToken', accessToken);
@@ -631,5 +765,205 @@ router.get('/microsoft/callback',
     res.redirect(redirectUrl.toString());
   }
 );
+
+// MFA Setup
+router.post('/mfa/setup', authenticate, async (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.user!.id;
+
+  try {
+    const result = await query('SELECT mfa_enabled FROM users WHERE id = $1', [userId]);
+    if (result.rowCount === 0) {
+      return res.status(404).json({ code: 'not_found', message: 'User not found' });
+    }
+
+    if (result.rows[0].mfa_enabled) {
+      return res.status(400).json({ code: 'mfa_already_enabled', message: 'MFA is already enabled' });
+    }
+
+    const { secret, otpauthUrl, backupCodes } = await setupMFA(userId);
+
+    logSecurityEvent('mfa_setup_initiated', userId, {
+      ip: req.ip,
+      userAgent: req.get('User-Agent')
+    }, 'low');
+
+    res.json({
+      secret,
+      otpauthUrl,
+      backupCodes,
+      message: 'MFA setup initiated. Use the QR code to configure your authenticator app.'
+    });
+  } catch (err) {
+    console.error('MFA setup error:', err);
+    res.status(500).json({ code: 'server_error', message: 'Failed to setup MFA' });
+  }
+});
+
+// MFA Enable
+router.post('/mfa/enable', authenticate, async (req: AuthenticatedRequest, res: Response) => {
+  const { token } = req.body;
+  const userId = req.user!.id;
+
+  if (!token) {
+    return res.status(422).json({ code: 'invalid', message: 'MFA token required' });
+  }
+
+  try {
+    const isValid = await enableMFA(userId, token);
+
+    if (!isValid) {
+      logSecurityEvent('mfa_enable_failed', userId, {
+        reason: 'invalid_token',
+        ip: req.ip,
+        userAgent: req.get('User-Agent')
+      }, 'medium');
+      return res.status(400).json({ code: 'invalid_token', message: 'Invalid MFA token' });
+    }
+
+    logSecurityEvent('mfa_enabled', userId, {
+      ip: req.ip,
+      userAgent: req.get('User-Agent')
+    }, 'low');
+
+    res.json({ message: 'MFA enabled successfully' });
+  } catch (err) {
+    console.error('MFA enable error:', err);
+    res.status(500).json({ code: 'server_error', message: 'Failed to enable MFA' });
+  }
+});
+
+// MFA Disable
+router.post('/mfa/disable', authenticate, requireMFA, async (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.user!.id;
+
+  try {
+    await disableMFA(userId);
+
+    logSecurityEvent('mfa_disabled', userId, {
+      ip: req.ip,
+      userAgent: req.get('User-Agent')
+    }, 'medium');
+
+    res.json({ message: 'MFA disabled successfully' });
+  } catch (err) {
+    console.error('MFA disable error:', err);
+    res.status(500).json({ code: 'server_error', message: 'Failed to disable MFA' });
+  }
+});
+
+// MFA Status
+router.get('/mfa/status', authenticate, async (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.user!.id;
+
+  try {
+    const result = await query('SELECT mfa_enabled FROM users WHERE id = $1', [userId]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ code: 'not_found', message: 'User not found' });
+    }
+
+    res.json({
+      mfaEnabled: result.rows[0].mfa_enabled || false
+    });
+  } catch (err) {
+    console.error('MFA status error:', err);
+    res.status(500).json({ code: 'server_error', message: 'Failed to get MFA status' });
+  }
+});
+
+// Regenerate Backup Codes
+router.post('/mfa/backup-codes', authenticate, requireMFA, async (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.user!.id;
+
+  try {
+    const backupCodes = generateBackupCodes();
+    const hashedBackupCodes = await hashBackupCodes(backupCodes);
+
+    await query('UPDATE users SET mfa_backup_codes = $1 WHERE id = $2', [hashedBackupCodes, userId]);
+
+    logSecurityEvent('backup_codes_regenerated', userId, {
+      ip: req.ip,
+      userAgent: req.get('User-Agent')
+    }, 'medium');
+
+    res.json({
+      backupCodes,
+      message: 'Backup codes regenerated. Save these codes securely.'
+    });
+  } catch (err) {
+    console.error('Backup codes regeneration error:', err);
+    res.status(500).json({ code: 'server_error', message: 'Failed to regenerate backup codes' });
+  }
+});
+
+// Security Dashboard (Admin only)
+router.get('/security-dashboard', authenticate, authorize('admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const dashboardData = await getSecurityDashboardData();
+    res.json(dashboardData);
+  } catch (err) {
+    console.error('Security dashboard error:', err);
+    res.status(500).json({ code: 'server_error', message: 'Failed to fetch security dashboard data' });
+  }
+});
+
+// Force logout all sessions for a user (Admin only)
+router.post('/force-logout/:userId', authenticate, authorize('admin'), async (req: AuthenticatedRequest, res: Response) => {
+  const { userId } = req.params;
+
+  try {
+    // Increment token version to invalidate all existing tokens
+    await query('UPDATE users SET token_version = COALESCE(token_version, 1) + 1 WHERE id = $1', [userId]);
+
+    logSecurityEvent('force_logout', req.user!.id, {
+      targetUserId: userId,
+      ip: req.ip,
+      userAgent: req.get('User-Agent')
+    }, 'high');
+
+    res.json({ message: 'User has been forcibly logged out from all sessions' });
+  } catch (err) {
+    console.error('Force logout error:', err);
+    res.status(500).json({ code: 'server_error', message: 'Failed to force logout' });
+  }
+});
+
+// Get user sessions (Admin only)
+router.get('/user-sessions/:userId', authenticate, authorize('admin'), async (req: AuthenticatedRequest, res: Response) => {
+  const { userId } = req.params;
+
+  try {
+    const result = await query(`
+      SELECT
+        us.id,
+        us.session_token,
+        us.ip_address,
+        us.user_agent,
+        us.created_at,
+        us.last_activity,
+        us.expires_at,
+        rt.device_info
+      FROM user_sessions us
+      LEFT JOIN refresh_tokens rt ON us.refresh_token_id = rt.id
+      WHERE us.user_id = $1 AND us.expires_at > NOW()
+      ORDER BY us.last_activity DESC
+    `, [userId]);
+
+    res.json({
+      sessions: result.rows.map(session => ({
+        id: session.id,
+        ipAddress: session.ip_address,
+        userAgent: session.user_agent,
+        createdAt: session.created_at,
+        lastActivity: session.last_activity,
+        expiresAt: session.expires_at,
+        deviceInfo: session.device_info
+      }))
+    });
+  } catch (err) {
+    console.error('User sessions fetch error:', err);
+    res.status(500).json({ code: 'server_error', message: 'Failed to fetch user sessions' });
+  }
+});
 
 export default router;
