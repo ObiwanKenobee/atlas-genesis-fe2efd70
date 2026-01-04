@@ -4,6 +4,8 @@ import { Request, Response, NextFunction } from 'express';
 import Tokens from 'csrf';
 import { randomBytes } from 'crypto';
 import { logSecurityEvent } from '../utils/logger';
+import { recordSecurityPerformanceMetric, getSecurityPerformanceMetrics } from '../services/securityPerformance';
+import { performance } from 'perf_hooks';
 
 // Rate limiting configurations with enhanced features
 interface RateLimitConfig {
