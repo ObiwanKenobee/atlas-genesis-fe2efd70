@@ -543,19 +543,19 @@ const RegenerationTracker: React.FC = () => {
             >
               {/* Project Filters */}
               <div className="flex flex-wrap gap-4">
-                <select className="px-4 py-2 border border-border/50 rounded-lg bg-background" aria-label="Filter by project type">
+                <select className="px-4 py-2 border border-border/50 rounded-lg bg-background">
                   <option>All Types</option>
                   <option>Reforestation</option>
                   <option>Soil Restoration</option>
                   <option>Marine Restoration</option>
                 </select>
-                <select className="px-4 py-2 border border-border/50 rounded-lg bg-background" aria-label="Filter by project status">
+                <select className="px-4 py-2 border border-border/50 rounded-lg bg-background">
                   <option>All Status</option>
                   <option>Active</option>
                   <option>Planning</option>
                   <option>Completed</option>
                 </select>
-                <select className="px-4 py-2 border border-border/50 rounded-lg bg-background" aria-label="Filter by region">
+                <select className="px-4 py-2 border border-border/50 rounded-lg bg-background">
                   <option>All Regions</option>
                   <option>Latin America</option>
                   <option>Africa</option>
