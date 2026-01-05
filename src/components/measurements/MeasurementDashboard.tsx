@@ -437,6 +437,7 @@ const MeasurementDashboard: React.FC = () => {
                   value={selectedMetric}
                   onChange={(e) => setSelectedMetric(e.target.value)}
                   className="px-4 py-2 border border-border/50 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                  aria-label="Filter measurements by metric type"
                 >
                   {metricFilters.map(filter => (
                     <option key={filter.value} value={filter.value}>{filter.label}</option>

@@ -19,7 +19,8 @@ import {
   Zap,
   Lock,
   Eye,
-  EyeOff
+  EyeOff,
+  XCircle
 } from 'lucide-react';
 
 interface Proposal {
@@ -514,14 +515,14 @@ const DecentralizedGovernance: React.FC = () => {
             >
               {/* Proposal Filters */}
               <div className="flex flex-wrap gap-4">
-                <select className="px-4 py-2 border border-border/50 rounded-lg bg-background">
+                <select className="px-4 py-2 border border-border/50 rounded-lg bg-background" aria-label="Filter by proposal type">
                   <option>All Types</option>
                   <option>Funding</option>
                   <option>Policy</option>
                   <option>Technical</option>
                   <option>Governance</option>
                 </select>
-                <select className="px-4 py-2 border border-border/50 rounded-lg bg-background">
+                <select className="px-4 py-2 border border-border/50 rounded-lg bg-background" aria-label="Filter by proposal status">
                   <option>All Status</option>
                   <option>Draft</option>
                   <option>Active</option>
@@ -529,8 +530,8 @@ const DecentralizedGovernance: React.FC = () => {
                   <option>Rejected</option>
                 </select>
                 <div className="flex items-center space-x-2">
-                  <input type="checkbox" className="rounded border-border/50" />
-                  <span className="text-sm">My Proposals</span>
+                  <input type="checkbox" className="rounded border-border/50" id="my-proposals" />
+                  <label htmlFor="my-proposals" className="text-sm">My Proposals</label>
                 </div>
               </div>
 

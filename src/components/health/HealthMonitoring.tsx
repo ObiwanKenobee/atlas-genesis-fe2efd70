@@ -457,6 +457,7 @@ const HealthMonitoring: React.FC = () => {
                   className={`p-2 rounded-lg border transition-colors ${
                     autoRefresh ? 'bg-primary text-primary-foreground' : 'border-border hover:bg-muted'
                   }`}
+                  aria-label={autoRefresh ? 'Disable auto-refresh' : 'Enable auto-refresh'}
                 >
                   <RefreshCw className={`w-4 h-4 ${autoRefresh ? '' : 'animate-spin'}`} />
                 </button>
@@ -818,14 +819,14 @@ const HealthMonitoring: React.FC = () => {
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-xl font-semibold text-foreground">Alert Management</h3>
                   <div className="flex space-x-2">
-                    <select className="px-3 py-1 border border-border/50 rounded text-sm">
+                    <select className="px-3 py-1 border border-border/50 rounded text-sm" aria-label="Filter alerts by severity">
                       <option>All Severities</option>
                       <option>Critical</option>
                       <option>High</option>
                       <option>Medium</option>
                       <option>Low</option>
                     </select>
-                    <select className="px-3 py-1 border border-border/50 rounded text-sm">
+                    <select className="px-3 py-1 border border-border/50 rounded text-sm" aria-label="Filter alerts by status">
                       <option>All Status</option>
                       <option>Active</option>
                       <option>Acknowledged</option>
