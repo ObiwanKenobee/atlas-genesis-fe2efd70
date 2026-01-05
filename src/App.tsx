@@ -25,9 +25,9 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
           <Navigation />
-          <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-8 w-8 border-2 border-green-600 border-t-transparent"></div></div>}>
+          <Suspense fallback={<div className="flex items-center justify-center min-h-screen bg-slate-900"><div className="animate-spin rounded-full h-8 w-8 border-2 border-emerald-500 border-t-transparent"></div></div>}>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/measurements" element={<Measurements />} />
