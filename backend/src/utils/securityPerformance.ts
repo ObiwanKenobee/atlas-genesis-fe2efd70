@@ -10,6 +10,10 @@ export interface PerformanceMetrics {
   userId?: string;
   ip?: string;
   metadata?: Record<string, any>;
+  success: boolean;
+  errorType?: string;
+  concurrentOperations?: number;
+  throughput?: number;
 }
 
 export interface SecurityPerformanceThresholds {
@@ -22,6 +26,7 @@ export class SecurityPerformanceMonitor {
   private static instance: SecurityPerformanceMonitor;
   private metrics: PerformanceMetrics[] = [];
   private thresholds: Map<string, SecurityPerformanceThresholds> = new Map();
+  private concurrentOperations: Map<string, number> = new Map();
 
   private constructor() {
     // Set default thresholds
@@ -85,6 +90,7 @@ export class SecurityPerformanceMonitor {
         userId,
         ip,
         metadata,
+        success: true,
       };
 
       this.metrics.push(metrics);
