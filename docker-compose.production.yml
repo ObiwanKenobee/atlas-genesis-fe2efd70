@@ -1,0 +1,282 @@
+# Atlas Genesis - Docker Compose Configuration
+# Complete development and production environment setup
+
+version: '3.8'
+
+services:
+  # ============================================
+  # PostgreSQL Database with PostGIS
+  # ============================================
+  postgres:
+    image: postgis/postgis:15-3.3-alpine
+    container_name: atlas-postgres
+    environment:
+      POSTGRES_DB: atlas_genesis
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./supabase/migrations:/docker-entrypoint-initdb.d
+    networks:
+      - atlas-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d atlas_genesis"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ============================================
+  # Redis (Optional - for caching and sessions)
+  # ============================================
+  redis:
+    image: redis:7-alpine
+    container_name: atlas-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - atlas-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+  # ============================================
+  # Backend API Server
+  # ============================================
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+      target: production
+    container_name: atlas-backend
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/atlas_genesis
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
+      CORS_ORIGIN: http://localhost:8080,http://frontend:80
+      LOG_LEVEL: info
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - atlas-network
+    volumes:
+      - ./logs:/app/logs
+      - ./uploads:/app/uploads
+      - ./backups:/app/backups
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+  # ============================================
+  # Frontend (Nginx serving static files)
+  # ============================================
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+      target: frontend-only
+    container_name: atlas-frontend
+    environment:
+      VITE_API_URL: http://localhost:3001/api
+      VITE_FRONTEND_URL: http://localhost:8080
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    networks:
+      - atlas-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # ============================================
+  # Development Services
+  # ============================================
+  
+  # Development Backend (with hot reload)
+  backend-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+      target: development
+    container_name: atlas-backend-dev
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/atlas_genesis
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: development-secret-key
+      DEBUG: true
+      VERBOSE_LOGGING: true
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - atlas-network
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/backend/node_modules
+      - ./logs:/app/logs
+    command: ["npm", "run", "dev:backend"]
+    profiles:
+      - development
+
+  # Development Frontend (with hot reload)
+  frontend-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+      target: development
+    container_name: atlas-frontend-dev
+    environment:
+      VITE_API_URL: http://localhost:3001/api
+      VITE_FRONTEND_URL: http://localhost:8080
+    ports:
+      - "8080:8080"
+      - "5173:5173"
+    depends_on:
+      - backend-dev
+    networks:
+      - atlas-network
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: ["npm", "run", "dev"]
+    profiles:
+      - development
+
+  # ============================================
+  # Monitoring & Utilities
+  # ============================================
+  
+  # pgAdmin (Database Management)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: atlas-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@atlas-genesis.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - atlas-network
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    profiles:
+      - tools
+
+  # Redis Commander (Redis Management)
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: atlas-redis-commander
+    environment:
+      REDIS_HOSTS: local:redis:6379
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
+    networks:
+      - atlas-network
+    profiles:
+      - tools
+
+  # Nginx Load Balancer (for scaling)
+  nginx-lb:
+    image: nginx:alpine
+    container_name: atlas-nginx-lb
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx-lb.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - atlas-network
+    profiles:
+      - production
+      - loadbalancer
+
+# ============================================
+# Networks
+# ============================================
+networks:
+  atlas-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# ============================================
+# Volumes
+# ============================================
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+# ============================================
+# Usage Examples
+# ============================================
+
+# Development mode:
+# docker-compose --profile development up -d
+
+# Production mode:
+# docker-compose up -d
+
+# With tools (pgAdmin, Redis Commander):
+# docker-compose --profile tools up -d
+
+# With load balancer:
+# docker-compose --profile production --profile loadbalancer up -d
+
+# Scale backend:
+# docker-compose up -d --scale backend=3
+
+# View logs:
+# docker-compose logs -f backend
+# docker-compose logs -f frontend
+
+# Stop all services:
+# docker-compose down
+
+# Stop and remove volumes:
+# docker-compose down -v
+
+# Rebuild and restart:
+# docker-compose up -d --build
