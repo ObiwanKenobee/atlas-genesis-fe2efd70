@@ -241,6 +241,50 @@ export class AtlasSanctumOrchestrator {
         privacyProtocolsImplemented: this.currentPhase >= 2
       },
       phase3: {
+        autonomousBioregions: this.currentPhase >= 3 ? 50 : 0,
+        planetaryIntelligenceActive: this.currentPhase >= 3,
+        multiGenerationalGovernance: this.currentPhase >= 3,
+        technologicalSovereigntyAchieved: this.currentPhase >= 3 ? 80 : 0,
+        civilizationalOSOperational: this.currentPhase >= 3
+      },
+      overallProgress: {
+        regenerativeImpact: await this.calculateRegenerativeImpact(),
+        communityEmpowerment: await this.assessCommunityEmpowerment(),
+        culturalPreservation: this.currentPhase >= 2 ? 85 : 45,
+        ecologicalRestoration: phase1Status.nodesDeployed * 12,
+        technologicalSovereignty: this.currentPhase >= 3 ? 90 : this.currentPhase >= 2 ? 60 : 30,
+        governanceEvolution: this.currentPhase >= 3 ? 95 : this.currentPhase >= 2 ? 70 : 40
+      }
+    };
+  }
+
+  private async calculateRegenerativeImpact(): Promise<number> {
+    const baseImpact = this.currentPhase * 25;
+    const phaseMultiplier = this.currentPhase === 3 ? 1.5 : this.currentPhase === 2 ? 1.2 : 1.0;
+    return Math.round(baseImpact * phaseMultiplier);
+  }
+
+  private async assessCommunityEmpowerment(): Promise<number> {
+    const phase1Status = await this.phase1.getPhase1Status();
+    return Math.min(95, phase1Status.partnershipsEstablished * 8 + this.currentPhase * 15);
+  }
+}
+
+export interface InitializationResult {
+  success: boolean;
+  civilizationalOSActive: boolean;
+  regenerativeImpact: number;
+  communityEmpowerment: number;
+  message: string;
+}
+
+export interface PhaseResult {
+  success: boolean;
+  metrics: any;
+  message: string;
+}ase >= 2
+      },
+      phase3: {
         autonomousBioregions: this.currentPhase >= 3 ? 75 : 0,
         planetaryIntelligenceActive: this.currentPhase >= 3,
         multiGenerationalGovernance: this.currentPhase >= 3,
