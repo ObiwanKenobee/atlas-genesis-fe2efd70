@@ -12,7 +12,7 @@ const Home = () => {
           <div className="inline-block px-4 py-2 bg-emerald-500/20 text-emerald-400 rounded-full text-sm font-medium mb-6 border border-emerald-500/30">
             🌱 Join the regenerative revolution — Explore verified projects
           </div>
-          <h1 className="text-6xl font-bold text-white mb-4">
+          <h1 className="font-display text-4xl md:text-6xl font-bold leading-tight text-white mb-4">
             Regenerating<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-400">Earth's Future</span>
           </h1>
@@ -60,7 +60,7 @@ const Home = () => {
       <section className="py-20 px-4 bg-slate-800/50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-4">Platform Architecture</h2>
+            <h2 className="font-display text-4xl font-bold text-white mb-4">Platform Architecture</h2>
             <p className="text-xl text-slate-300 mb-2">Five Layers of Regeneration</p>
             <p className="text-slate-400">A multi-layered ecosystem designed to preserve humanity and the planet, blending impact finance with ethical technology.</p>
           </div>
@@ -96,7 +96,7 @@ const Home = () => {
                 <div className="flex items-start gap-6">
                   <div className="text-6xl font-bold text-emerald-400/30">{layer.number}</div>
                   <div className="flex-1">
-                    <h3 className="text-2xl font-bold text-white mb-4">{layer.title}</h3>
+                    <h3 className="font-display text-2xl font-bold text-white mb-4">{layer.title}</h3>
                     <p className="text-slate-300 mb-6">{layer.description}</p>
                     <div className="flex flex-wrap gap-2 mb-6">
                       {layer.features.map((feature, i) => (
@@ -121,7 +121,7 @@ const Home = () => {
       <section className="py-20 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-4">Real-Time Impact</h2>
+            <h2 className="font-display text-4xl font-bold text-white mb-4">Real-Time Impact</h2>
             <p className="text-xl text-slate-300 mb-2">Measuring Regeneration</p>
             <p className="text-slate-400">Transparent, verifiable metrics powered by AI oracles and IoT sensors tracking our collective impact across all ecosystems.</p>
           </div>
@@ -153,7 +153,7 @@ const Home = () => {
       {/* CTA Section */}
       <section className="py-20 px-4 bg-gradient-to-r from-emerald-600/20 to-blue-600/20">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-white mb-4">
+          <h2 className="font-display text-4xl font-bold text-white mb-4">
             Join the Regenerative Revolution
           </h2>
           <p className="text-xl text-slate-300 mb-8">
