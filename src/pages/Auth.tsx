@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Leaf, Mail, Lock, User, ArrowRight, Sparkles } from "lucide-react";
+import { Leaf, Mail, Lock, User, ArrowRight, Sparkles, Github, Chrome } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +9,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { loginSchema, registerSchema } from "@/lib/validation";
 import { sanitizeEmail } from "@/lib/utils/sanitization";
+import { errorHandler } from "@/lib/errorHandling";
+import { securityManager } from "@/lib/security";
+import { analytics } from "@/lib/analytics";
+import { usePerformanceOptimization } from "@/hooks/usePerformanceOptimization";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -17,9 +21,17 @@ const Auth = () => {
   const [fullName, setFullName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isOAuthLoading, setIsOAuthLoading] = useState(false);
-  const { signIn, signUp, user, loading, verifyEmail, resendVerification } = useAuth();
+  const { signIn, signUp, user, loading } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  
+  // Initialize performance optimizations
+  usePerformanceOptimization();
+  
+  // Track page view
+  useEffect(() => {
+    analytics.trackPageView('auth');
+  }, []);
 
   // Handle OAuth callback
   useEffect(() => {
@@ -62,8 +74,15 @@ const Auth = () => {
     }
   }, [user, loading, navigate]);
 
-  const handleOAuthLogin = (provider: 'google' | 'github' | 'microsoft') => {
+  const handleOAuthLogin = (provider: 'google' | 'github') => {
+    if (!securityManager.rateLimiter.check('oauth_attempt', 5, 300000)) {
+      toast.error('Too many OAuth attempts. Please wait 5 minutes.');
+      return;
+    }
+    
+    analytics.trackEvent('oauth_attempt', { provider });
     setIsOAuthLoading(true);
+    
     const apiBase = import.meta.env.PROD
       ? 'https://api.atlas-genesis.com'
       : 'http://localhost:4000';
