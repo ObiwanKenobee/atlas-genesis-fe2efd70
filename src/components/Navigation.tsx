@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Leaf, LogIn, ShoppingBag, Briefcase, LayoutDashboard, Crown, Award, Zap, Shield, TrendingUp, Globe, Heart } from "lucide-react";
+import { Menu, X, Leaf, LogIn, ShoppingBag, Briefcase, LayoutDashboard, Crown, Award, Zap, Shield, TrendingUp, Globe, Heart, Network } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
@@ -21,6 +21,7 @@ const Navigation = () => {
     { name: "Outreach", href: "/outreach", icon: Globe },
     { name: "Security", href: "/security", icon: Shield },
     { name: "Adoption", href: "/adoption", icon: Zap },
+    { name: "Architecture", href: "/architecture", icon: Network },
     { name: "Portfolio", href: "/portfolio", icon: Briefcase },
   ];
 

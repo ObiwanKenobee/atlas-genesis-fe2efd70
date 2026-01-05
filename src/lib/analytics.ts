@@ -54,6 +54,11 @@ export const analytics = {
     });
   },
 
+  // Track performance metric (alias for compatibility)
+  trackPerformanceMetric: (metric: string, value: number, unit: string = 'ms') => {
+    analytics.trackPerformance(metric, value, unit);
+  },
+
   // Track errors
   trackError: (error: Error, context?: Record<string, any>) => {
     analytics.trackEvent('platform_error', {
@@ -75,5 +80,25 @@ export const analytics = {
     };
     
     return summary;
+  }
+};
+
+// Export individual functions for direct import
+export const { trackEvent, trackPageView, trackEngagement, trackPerformance, trackPerformanceMetric, trackError, getSummary } = analytics;
+
+// Initialize Google Analytics
+export const initGA = () => {
+  if (typeof window !== 'undefined' && !window.gtag) {
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = 'https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID';
+    document.head.appendChild(script);
+    
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function() {
+      window.dataLayer.push(arguments);
+    };
+    window.gtag('js', new Date());
+    window.gtag('config', 'GA_MEASUREMENT_ID');
   }
 };

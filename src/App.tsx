@@ -34,6 +34,7 @@ const Health = lazy(() => import('./pages/Health'));
 const Outreach = lazy(() => import('./pages/Outreach'));
 const Security = lazy(() => import('./pages/Security'));
 const Adoption = lazy(() => import('./pages/Adoption'));
+const CivilizationalArchitectureDashboard = lazy(() => import('./components/CivilizationalArchitectureDashboard'));
 const Settings = lazy(() => import('./pages/Settings'));
 const Profile = lazy(() => import('./pages/Profile'));
 const HelpCenter = lazy(() => import('./pages/HelpCenter'));
@@ -100,6 +101,7 @@ const App = () => (
                       <Route path="/outreach" element={<Outreach />} />
                       <Route path="/security" element={<Security />} />
                       <Route path="/adoption" element={<Adoption />} />
+                      <Route path="/architecture" element={<CivilizationalArchitectureDashboard />} />
                       <Route path="/settings" element={<Settings />} />
                       <Route path="/profile" element={<Profile />} />
                       <Route path="/help" element={<HelpCenter />} />
