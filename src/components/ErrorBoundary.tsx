@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, RefreshCw } from 'lucide-react';
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -31,23 +31,30 @@ class ErrorBoundary extends React.Component<
       }
 
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <Card className="max-w-md">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50">
+          <Card className="max-w-md mx-4">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-red-600">
-                <AlertTriangle className="h-5 w-5" />
-                System Loading
+              <CardTitle className="flex items-center gap-2 text-green-600">
+                <RefreshCw className="h-5 w-5" />
+                Atlas Genesis Loading
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 mb-4">
-                The innovation systems are initializing. Please refresh the page.
+            <CardContent className="space-y-4">
+              <p className="text-gray-600">
+                The platform is initializing all systems. This may take a moment.
               </p>
+              <div className="flex items-center space-x-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-green-600 border-t-transparent"></div>
+                <span className="text-sm text-gray-500">Loading innovation systems...</span>
+              </div>
               <button
-                onClick={() => window.location.reload()}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                onClick={() => {
+                  this.setState({ hasError: false });
+                  window.location.reload();
+                }}
+                className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
               >
-                Refresh Page
+                Continue to Platform
               </button>
             </CardContent>
           </Card>

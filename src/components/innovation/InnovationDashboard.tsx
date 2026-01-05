@@ -4,9 +4,10 @@ import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Shield, Brain, Users, Globe, Leaf, Zap } from 'lucide-react';
 
-// Fallback implementation for missing RegenerativeInnovationHub
+// Simplified mock implementation that always works
 const mockRegenerativeHub = {
   async initializeRegenerativeSystem() {
+    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate loading
     return {
       quantumSecurity: true,
       aiIntelligence: true,
@@ -17,6 +18,7 @@ const mockRegenerativeHub = {
     };
   },
   async getSystemDashboard() {
+    await new Promise(resolve => setTimeout(resolve, 300)); // Simulate loading
     return {
       activeActions: Math.round(Math.random() * 50 + 25),
       totalCarbonSequestered: Math.round(Math.random() * 10000 + 5000),
@@ -27,12 +29,15 @@ const mockRegenerativeHub = {
     };
   },
   async proposeRegenerativeAction() {
+    await new Promise(resolve => setTimeout(resolve, 800)); // Simulate processing
     return { id: `action_${Date.now()}` };
   },
   async approveRegenerativeAction() {
+    await new Promise(resolve => setTimeout(resolve, 600)); // Simulate approval
     return Math.random() > 0.2;
   },
   async executeRegenerativeAction() {
+    await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate execution
     return {
       success: true,
       carbonSequestered: Math.round(Math.random() * 100 + 50),
@@ -47,33 +52,50 @@ const InnovationDashboard = () => {
   const [systemStatus, setSystemStatus] = useState<any>(null);
   const [dashboard, setDashboard] = useState<any>(null);
   const [activeDemo, setActiveDemo] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     initializeSystems();
   }, []);
 
   const initializeSystems = async () => {
-    const status = await mockRegenerativeHub.initializeRegenerativeSystem();
-    const dashboardData = await mockRegenerativeHub.getSystemDashboard();
-    setSystemStatus(status);
-    setDashboard(dashboardData);
+    try {
+      setIsLoading(true);
+      setError(null);
+      const status = await mockRegenerativeHub.initializeRegenerativeSystem();
+      const dashboardData = await mockRegenerativeHub.getSystemDashboard();
+      setSystemStatus(status);
+      setDashboard(dashboardData);
+    } catch (err) {
+      setError('Failed to initialize systems');
+      console.error('Initialization error:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const runDemo = async (demoType: string) => {
-    setActiveDemo(demoType);
-    
-    if (demoType === 'regenerative_action') {
-      const action = await mockRegenerativeHub.proposeRegenerativeAction();
-      const approved = await mockRegenerativeHub.approveRegenerativeAction();
+    try {
+      setActiveDemo(demoType);
       
-      if (approved) {
-        await mockRegenerativeHub.executeRegenerativeAction();
+      if (demoType === 'regenerative_action') {
+        const action = await mockRegenerativeHub.proposeRegenerativeAction();
+        const approved = await mockRegenerativeHub.approveRegenerativeAction();
+        
+        if (approved) {
+          await mockRegenerativeHub.executeRegenerativeAction();
+        }
       }
+      
+      const newDashboard = await mockRegenerativeHub.getSystemDashboard();
+      setDashboard(newDashboard);
+    } catch (err) {
+      setError('Demo execution failed');
+      console.error('Demo error:', err);
+    } finally {
+      setActiveDemo(null);
     }
-    
-    setActiveDemo(null);
-    const newDashboard = await mockRegenerativeHub.getSystemDashboard();
-    setDashboard(newDashboard);
   };
 
   const innovations = [
@@ -99,6 +121,36 @@ const InnovationDashboard = () => {
       color: "bg-green-100 text-green-600"
     }
   ];
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Card className="p-8">
+          <CardContent className="flex flex-col items-center space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-green-600 border-t-transparent"></div>
+            <p className="text-lg font-medium">Initializing Innovation Systems...</p>
+            <p className="text-sm text-gray-600">Please wait while we load the platform</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Card className="p-8 max-w-md">
+          <CardContent className="text-center space-y-4">
+            <p className="text-red-600 font-medium">System Error</p>
+            <p className="text-gray-600">{error}</p>
+            <Button onClick={initializeSystems} className="w-full">
+              Retry Initialization
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

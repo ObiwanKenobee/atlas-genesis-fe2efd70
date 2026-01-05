@@ -494,7 +494,9 @@ io.use(async (socket: Socket, next) => {
 // Socket.io connection handler
 io.on('connection', (socket: Socket) => {
   const user = (socket as any).user;
-  console.log(`🔌 User ${user.email} connected via WebSocket (ID: ${socket.id})`);
+  const sanitizedEmail = user.email.replace(/[\r\n\t]/g, '');
+  const sanitizedSocketId = socket.id.replace(/[\r\n\t]/g, '');
+  console.log(`🔌 User ${sanitizedEmail} connected via WebSocket (ID: ${sanitizedSocketId})`);
 
   // Join user-specific room for targeted notifications
   socket.join(`user:${user.id}`);
@@ -523,7 +525,7 @@ io.on('connection', (socket: Socket) => {
     channels.forEach(channel => {
       if (['price-updates', 'notifications', 'governance', 'marketplace'].includes(channel)) {
         socket.join(channel);
-        console.log(`📡 User ${user.email} subscribed to ${channel}`);
+        console.log(`📡 User ${sanitizedEmail} subscribed to ${channel}`);
       } else {
         logSecurityEvent('websocket_invalid_channel', user.id, {
           channel,
@@ -549,13 +551,14 @@ io.on('connection', (socket: Socket) => {
 
     channels.forEach(channel => {
       socket.leave(channel);
-      console.log(`📡 User ${user.email} unsubscribed from ${channel}`);
+      console.log(`📡 User ${sanitizedEmail} unsubscribed from ${channel}`);
     });
   });
 
   // Handle disconnection
   socket.on('disconnect', (reason) => {
-    console.log(`🔌 User ${user.email} disconnected (ID: ${socket.id}), reason: ${reason}`);
+    const sanitizedReason = reason.replace(/[\r\n\t]/g, '');
+    console.log(`🔌 User ${sanitizedEmail} disconnected (ID: ${sanitizedSocketId}), reason: ${sanitizedReason}`);
     logSecurityEvent('websocket_disconnect', user.id, {
       socketId: socket.id,
       reason,
