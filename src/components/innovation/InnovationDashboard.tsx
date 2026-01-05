@@ -4,94 +4,63 @@ import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Shield, Brain, Users, Globe, Leaf, Zap } from 'lucide-react';
 
-// Simplified mock implementation that always works
-const mockRegenerativeHub = {
-  async initializeRegenerativeSystem() {
-    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate loading
-    return {
-      quantumSecurity: true,
-      aiIntelligence: true,
-      dataSovereignty: true,
-      planetaryTwin: true,
-      multiSpeciesGov: true,
-      overallHealth: 95
-    };
-  },
-  async getSystemDashboard() {
-    await new Promise(resolve => setTimeout(resolve, 300)); // Simulate loading
-    return {
-      activeActions: Math.round(Math.random() * 50 + 25),
-      totalCarbonSequestered: Math.round(Math.random() * 10000 + 5000),
-      communitiesEmpowered: Math.round(Math.random() * 200 + 100),
-      speciesProtected: Math.round(Math.random() * 500 + 250),
-      quantumRecords: Math.round(Math.random() * 1000 + 500),
-      systemHealth: 95 + Math.round(Math.random() * 5)
-    };
-  },
-  async proposeRegenerativeAction() {
-    await new Promise(resolve => setTimeout(resolve, 800)); // Simulate processing
-    return { id: `action_${Date.now()}` };
-  },
-  async approveRegenerativeAction() {
-    await new Promise(resolve => setTimeout(resolve, 600)); // Simulate approval
-    return Math.random() > 0.2;
-  },
-  async executeRegenerativeAction() {
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate execution
-    return {
-      success: true,
-      carbonSequestered: Math.round(Math.random() * 100 + 50),
-      biodiversityIncrease: Math.round(Math.random() * 30 + 20),
-      communityBenefit: Math.round(Math.random() * 50000 + 25000),
-      quantumVerified: true
-    };
-  }
-};
-
 const InnovationDashboard = () => {
   const [systemStatus, setSystemStatus] = useState<any>(null);
   const [dashboard, setDashboard] = useState<any>(null);
   const [activeDemo, setActiveDemo] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Simple initialization without complex dependencies
+    const initializeSystems = async () => {
+      try {
+        setIsLoading(true);
+        
+        // Simulate system initialization
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        setSystemStatus({
+          quantumSecurity: true,
+          aiIntelligence: true,
+          dataSovereignty: true,
+          planetaryTwin: true,
+          multiSpeciesGov: true,
+          overallHealth: 95
+        });
+        
+        setDashboard({
+          activeActions: 42,
+          totalCarbonSequestered: 8750,
+          communitiesEmpowered: 156,
+          speciesProtected: 387,
+          quantumRecords: 892,
+          systemHealth: 97
+        });
+      } catch (err) {
+        console.error('Initialization error:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
     initializeSystems();
   }, []);
-
-  const initializeSystems = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const status = await mockRegenerativeHub.initializeRegenerativeSystem();
-      const dashboardData = await mockRegenerativeHub.getSystemDashboard();
-      setSystemStatus(status);
-      setDashboard(dashboardData);
-    } catch (err) {
-      setError('Failed to initialize systems');
-      console.error('Initialization error:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const runDemo = async (demoType: string) => {
     try {
       setActiveDemo(demoType);
       
-      if (demoType === 'regenerative_action') {
-        const action = await mockRegenerativeHub.proposeRegenerativeAction();
-        const approved = await mockRegenerativeHub.approveRegenerativeAction();
-        
-        if (approved) {
-          await mockRegenerativeHub.executeRegenerativeAction();
-        }
-      }
+      // Simulate demo execution
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
-      const newDashboard = await mockRegenerativeHub.getSystemDashboard();
-      setDashboard(newDashboard);
+      // Update dashboard with new values
+      setDashboard(prev => ({
+        ...prev,
+        activeActions: prev.activeActions + 1,
+        totalCarbonSequestered: prev.totalCarbonSequestered + Math.round(Math.random() * 100 + 50),
+        systemHealth: Math.min(100, prev.systemHealth + 1)
+      }));
     } catch (err) {
-      setError('Demo execution failed');
       console.error('Demo error:', err);
     } finally {
       setActiveDemo(null);
@@ -130,22 +99,6 @@ const InnovationDashboard = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-4 border-green-600 border-t-transparent"></div>
             <p className="text-lg font-medium">Initializing Innovation Systems...</p>
             <p className="text-sm text-gray-600">Please wait while we load the platform</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="p-8 max-w-md">
-          <CardContent className="text-center space-y-4">
-            <p className="text-red-600 font-medium">System Error</p>
-            <p className="text-gray-600">{error}</p>
-            <Button onClick={initializeSystems} className="w-full">
-              Retry Initialization
-            </Button>
           </CardContent>
         </Card>
       </div>

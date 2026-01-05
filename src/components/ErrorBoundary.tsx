@@ -34,19 +34,15 @@ class ErrorBoundary extends React.Component<
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50">
           <Card className="max-w-md mx-4">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-green-600">
-                <RefreshCw className="h-5 w-5" />
-                Atlas Genesis Loading
+              <CardTitle className="flex items-center gap-2 text-red-600">
+                <AlertTriangle className="h-5 w-5" />
+                System Error
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-gray-600">
-                The platform is initializing all systems. This may take a moment.
+                Something went wrong. Please try refreshing the page.
               </p>
-              <div className="flex items-center space-x-2">
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-green-600 border-t-transparent"></div>
-                <span className="text-sm text-gray-500">Loading innovation systems...</span>
-              </div>
               <button
                 onClick={() => {
                   this.setState({ hasError: false });
@@ -54,7 +50,7 @@ class ErrorBoundary extends React.Component<
                 }}
                 className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
               >
-                Continue to Platform
+                Refresh Page
               </button>
             </CardContent>
           </Card>
