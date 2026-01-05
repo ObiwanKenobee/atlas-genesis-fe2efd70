@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import SEO from "@/components/SEO";
 import { useSEO } from "@/hooks/useSEO";
-import Navigation from "@/components/Navigation";
+import PageLayout from "@/components/PageLayout";
 import { RegenerativeMarketplaceShowcase } from "@/components/marketplace/RegenerativeMarketplaceShowcase";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -105,11 +105,10 @@ const Marketplace = () => {
   return (
     <>
       <SEO {...seoData} />
-      <div className="min-h-screen bg-background">
-        <Navigation />
-      <main className="container mx-auto px-4 sm:px-6 py-8 max-w-7xl">
+      <PageLayout>
+        <div className="container mx-auto px-4 sm:px-6 py-8 max-w-7xl">
         {/* Header */}
-        <div className="mb-8 pt-8">
+        <div className="mb-8">
           <div className="flex items-center gap-4 mb-4">
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Marketplace & Financial Infrastructure</h1>
             <div className="flex items-center gap-2">
@@ -639,8 +638,8 @@ const Marketplace = () => {
             </Card>
           </TabsContent>
         </Tabs>
-      </main>
-    </div>
+        </div>
+      </PageLayout>
     </>
   );
 };
