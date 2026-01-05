@@ -1,6 +1,7 @@
 import SEO from "@/components/SEO";
 import { useSEO } from "@/hooks/useSEO";
 import EnterpriseHeader from "@/components/EnterpriseHeader";
+import ImprovedNavigation from "@/components/ImprovedNavigation";
 import HeroSection from "@/components/HeroSection";
 import PlatformLayers from "@/components/PlatformLayers";
 import ImpactMetrics from "@/components/ImpactMetrics";
@@ -35,7 +36,7 @@ const Index = () => {
     <>
       <SEO {...seoData} />
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        <EnterpriseHeader />
+        <ImprovedNavigation />
       <main className="pt-[104px]">
         <HeroSection />
         <PlatformLayers />
