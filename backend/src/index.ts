@@ -41,6 +41,7 @@ import auditPublicRouter from './routes/audit-public';
 import paymentsRouter from './routes/payments';
 import securityRouter from './routes/security';
 import adminFilesRouter from './routes/admin/files';
+import healthRouter from './routes/health';
 
 // Import session cleanup utility
 import { cleanupExpiredSessions } from './utils/auth';
@@ -294,6 +295,10 @@ app.get('/health', async (req, res) => {
     });
   }
 });
+
+// Health check routes (before other routes for priority)
+app.use('/health', healthRouter);
+app.use('/api/health', healthRouter);
 
 // Original API Routes
 app.use('/api/auth', authRouter);

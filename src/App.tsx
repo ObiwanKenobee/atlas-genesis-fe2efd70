@@ -15,6 +15,7 @@ import Outreach from './pages/Outreach';
 import Security from './pages/Security';
 import Adoption from './pages/Adoption';
 import AtlasSanctumDashboard from './components/sanctum/AtlasSanctumDashboard';
+import ExtendedAtlasSanctumDashboard from './components/sanctum/ExtendedAtlasSanctumDashboard';
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ function App() {
             <Route path="/security" element={<Security />} />
             <Route path="/adoption" element={<Adoption />} />
             <Route path="/sanctum" element={<AtlasSanctumDashboard />} />
+            <Route path="/sanctum/extended" element={<ExtendedAtlasSanctumDashboard />} />
           </Routes>
           <Toaster />
         </div>
