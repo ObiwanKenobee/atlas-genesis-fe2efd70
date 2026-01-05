@@ -1,59 +1,28 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { AlertTriangle } from 'lucide-react';
 
-interface Props {
-  children: ReactNode;
-  fallback?: ReactNode;
-}
-
-interface State {
+interface ErrorBoundaryState {
   hasError: boolean;
-  error: Error | null;
-  errorInfo: ErrorInfo | null;
+  error?: Error;
 }
 
-class ErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode; fallback?: React.ReactNode },
+  ErrorBoundaryState
+> {
+  constructor(props: { children: React.ReactNode; fallback?: React.ReactNode }) {
     super(props);
-    this.state = {
-      hasError: false,
-      error: null,
-      errorInfo: null,
-    };
+    this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(error: Error): State {
-    return {
-      hasError: true,
-      error,
-      errorInfo: null,
-    };
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // Log error to console in development
-    if (import.meta.env.DEV) {
-      console.error('ErrorBoundary caught an error:', error, errorInfo);
-    }
-
-    // In production, you would log to an error tracking service
-    // Example: Sentry.captureException(error, { extra: errorInfo });
-
-    this.setState({
-      error,
-      errorInfo,
-    });
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('Error caught by boundary:', error, errorInfo);
   }
-
-  handleReset = () => {
-    this.setState({
-      hasError: false,
-      error: null,
-      errorInfo: null,
-    });
-  };
 
   render() {
     if (this.state.hasError) {
@@ -62,50 +31,24 @@ class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="min-h-screen bg-background flex items-center justify-center p-4">
-          <Card className="w-full max-w-2xl">
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <Card className="max-w-md">
             <CardHeader>
-              <div className="flex items-center gap-3 mb-2">
-                <AlertTriangle className="w-8 h-8 text-destructive" />
-                <CardTitle className="text-2xl">Something went wrong</CardTitle>
-              </div>
-              <CardDescription>
-                We encountered an unexpected error. Please try refreshing the page or contact support if the problem persists.
-              </CardDescription>
+              <CardTitle className="flex items-center gap-2 text-red-600">
+                <AlertTriangle className="h-5 w-5" />
+                System Loading
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {import.meta.env.DEV && this.state.error && (
-                <div className="p-4 bg-muted rounded-lg border border-border">
-                  <p className="text-sm font-mono text-destructive mb-2">
-                    {this.state.error.toString()}
-                  </p>
-                  {this.state.errorInfo && (
-                    <details className="mt-2">
-                      <summary className="text-sm text-muted-foreground cursor-pointer">
-                        Stack trace
-                      </summary>
-                      <pre className="mt-2 text-xs overflow-auto max-h-64 p-2 bg-background rounded border">
-                        {this.state.errorInfo.componentStack}
-                      </pre>
-                    </details>
-                  )}
-                </div>
-              )}
-
-              <div className="flex gap-3">
-                <Button onClick={this.handleReset} variant="default" className="flex-1">
-                  <RefreshCw className="w-4 h-4 mr-2" />
-                  Try Again
-                </Button>
-                <Button
-                  onClick={() => (window.location.href = '/')}
-                  variant="outline"
-                  className="flex-1"
-                >
-                  <Home className="w-4 h-4 mr-2" />
-                  Go Home
-                </Button>
-              </div>
+            <CardContent>
+              <p className="text-gray-600 mb-4">
+                The innovation systems are initializing. Please refresh the page.
+              </p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Refresh Page
+              </button>
             </CardContent>
           </Card>
         </div>
@@ -117,4 +60,3 @@ class ErrorBoundary extends Component<Props, State> {
 }
 
 export default ErrorBoundary;
-
