@@ -17,6 +17,7 @@ const Outreach = React.lazy(() => import('./pages/Outreach'));
 const Security = React.lazy(() => import('./pages/Security'));
 const Adoption = React.lazy(() => import('./pages/Adoption'));
 const Innovation = React.lazy(() => import('./pages/Innovation'));
+const Profile = React.lazy(() => import('./pages/Profile'));
 
 const queryClient = new QueryClient();
 
@@ -40,6 +41,7 @@ function App() {
               <Route path="/security" element={<Security />} />
               <Route path="/adoption" element={<Adoption />} />
               <Route path="/innovation" element={<Innovation />} />
+              <Route path="/profile" element={<Profile />} />
             </Routes>
           </Suspense>
           <Toaster />
