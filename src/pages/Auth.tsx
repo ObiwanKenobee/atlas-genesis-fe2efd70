@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
-import { loginSchema, registerSchema, sanitizeFormData } from "@/lib/validation";
+import { loginSchema, registerSchema } from "@/lib/validation";
 import { sanitizeEmail } from "@/lib/utils/sanitization";
 
 const Auth = () => {
@@ -64,7 +64,7 @@ const Auth = () => {
 
   const handleOAuthLogin = (provider: 'google' | 'github' | 'microsoft') => {
     setIsOAuthLoading(true);
-    const apiBase = process.env.NODE_ENV === 'production'
+    const apiBase = import.meta.env.PROD
       ? 'https://api.atlas-genesis.com'
       : 'http://localhost:4000';
 
@@ -75,11 +75,11 @@ const Auth = () => {
     e.preventDefault();
 
     // Sanitize inputs
-    const sanitizedData = sanitizeFormData({
+    const sanitizedData = {
       email: email.trim(),
       password,
       ...(isLogin ? {} : { fullName: fullName.trim() })
-    });
+    };
 
     // Validate inputs
     const validationResult = isLogin
