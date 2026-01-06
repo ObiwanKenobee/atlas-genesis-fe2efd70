@@ -327,7 +327,6 @@ const Portfolio = () => {
             </TabsContent>
           </Tabs>
         </div>
-      </div>
     </PageLayout>
   );
 };

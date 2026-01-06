@@ -272,8 +272,10 @@ const BioregionalMap: React.FC = () => {
           checked={layer.visible}
           onChange={() => onToggle(layer.id)}
           className="rounded border-border/50"
+          id={`layer-${layer.id}`}
+          aria-label={`Toggle ${layer.name} layer visibility`}
         />
-        <span className="text-sm font-medium text-foreground">{layer.name}</span>
+        <label htmlFor={`layer-${layer.id}`} className="text-sm font-medium text-foreground cursor-pointer">{layer.name}</label>
       </div>
       {layer.visible && (
         <input
@@ -284,6 +286,8 @@ const BioregionalMap: React.FC = () => {
           value={layer.opacity}
           onChange={(e) => onOpacityChange(layer.id, parseFloat(e.target.value))}
           className="w-16 h-2 bg-muted rounded-lg appearance-none cursor-pointer"
+          title={`Adjust opacity for ${layer.name}`}
+          aria-label={`Opacity slider for ${layer.name} layer`}
         />
       )}
     </div>
@@ -317,10 +321,18 @@ const BioregionalMap: React.FC = () => {
                 <span className="text-sm font-medium">{bioregions.length} Bioregions</span>
               </div>
               <div className="flex space-x-2">
-                <button className="p-2 border border-border rounded-lg hover:bg-muted transition-colors">
+                <button 
+                  className="p-2 border border-border rounded-lg hover:bg-muted transition-colors"
+                  title="Download map data"
+                  aria-label="Download map data"
+                >
                   <Download className="w-4 h-4" />
                 </button>
-                <button className="p-2 border border-border rounded-lg hover:bg-muted transition-colors">
+                <button 
+                  className="p-2 border border-border rounded-lg hover:bg-muted transition-colors"
+                  title="Share map"
+                  aria-label="Share map"
+                >
                   <Share2 className="w-4 h-4" />
                 </button>
               </div>
@@ -385,16 +397,32 @@ const BioregionalMap: React.FC = () => {
                   <div className="bg-card border border-border/50 rounded-lg p-6">
                     <h3 className="text-lg font-semibold text-foreground mb-4">Map Controls</h3>
                     <div className="grid grid-cols-2 gap-2">
-                      <button className="p-3 border border-border rounded-lg hover:bg-muted transition-colors">
+                      <button 
+                        className="p-3 border border-border rounded-lg hover:bg-muted transition-colors"
+                        title="Zoom in"
+                        aria-label="Zoom in"
+                      >
                         <ZoomIn className="w-5 h-5 mx-auto" />
                       </button>
-                      <button className="p-3 border border-border rounded-lg hover:bg-muted transition-colors">
+                      <button 
+                        className="p-3 border border-border rounded-lg hover:bg-muted transition-colors"
+                        title="Zoom out"
+                        aria-label="Zoom out"
+                      >
                         <ZoomOut className="w-5 h-5 mx-auto" />
                       </button>
-                      <button className="p-3 border border-border rounded-lg hover:bg-muted transition-colors">
+                      <button 
+                        className="p-3 border border-border rounded-lg hover:bg-muted transition-colors"
+                        title="Reset view"
+                        aria-label="Reset map view"
+                      >
                         <RotateCcw className="w-5 h-5 mx-auto" />
                       </button>
-                      <button className="p-3 border border-border rounded-lg hover:bg-muted transition-colors">
+                      <button 
+                        className="p-3 border border-border rounded-lg hover:bg-muted transition-colors"
+                        title="Toggle layers"
+                        aria-label="Toggle map layers"
+                      >
                         <Layers className="w-5 h-5 mx-auto" />
                       </button>
                     </div>
