@@ -42,7 +42,8 @@ const ImprovedNavigation = () => {
           submenu: [
             { label: 'Valuation Engine', href: '/valuation', icon: TrendingUp, description: 'Credit pricing and analysis' },
             { label: 'Transactions', href: '/transactions', icon: BarChart3, description: 'Complete transaction history' },
-            { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, description: 'Unified control center' }
+            { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, description: 'Unified control center' },
+            { label: 'Pricing', href: '/pricing', icon: Target, description: 'Transparent pricing plans' }
           ]
         },
         {
@@ -123,8 +124,12 @@ const ImprovedNavigation = () => {
   };
 
   const DropdownMenu: React.FC<{ items: NavigationItem[]; level: number }> = ({ items, level }) => (
-    <div className={`${level === 0 ? 'absolute top-full left-0 mt-2 w-screen max-w-4xl z-50' : ''} bg-card border border-border/50 rounded-lg shadow-xl p-6`}>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div className={`${
+      level === 0 
+        ? 'absolute top-full left-0 mt-2 w-screen max-w-4xl z-50' 
+        : 'w-full'
+    } bg-card border border-border/50 rounded-lg shadow-xl p-4 sm:p-6`}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8">
         {items.map((section, index) => (
           <div key={index}>
             <h3 className="font-semibold text-foreground mb-4">{section.label}</h3>

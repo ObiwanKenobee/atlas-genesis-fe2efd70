@@ -36,6 +36,17 @@ const Security = lazy(() => import('./pages/Security'));
 const Adoption = lazy(() => import('./pages/Adoption'));
 const CivilizationalArchitectureDashboard = lazy(() => import('./components/CivilizationalArchitectureDashboard'));
 const RoleSpecificDashboards = lazy(() => import('./components/RoleSpecificDashboards'));
+
+// Infrastructure Pages
+const CarbonOffsetting = lazy(() => import('./pages/InfrastructurePages').then(m => ({ default: m.CarbonOffsetting })));
+const ImpactInvestment = lazy(() => import('./pages/InfrastructurePages').then(m => ({ default: m.ImpactInvestment })));
+const RegulatoryCompliance = lazy(() => import('./pages/InfrastructurePages').then(m => ({ default: m.RegulatoryCompliance })));
+const EnterpriseSolutions = lazy(() => import('./pages/InfrastructurePages').then(m => ({ default: m.EnterpriseSolutions })));
+const SMBSolutions = lazy(() => import('./pages/InfrastructurePages').then(m => ({ default: m.SMBSolutions })));
+const AgricultureSolutions = lazy(() => import('./pages/InfrastructurePages').then(m => ({ default: m.AgricultureSolutions })));
+const RenewableEnergy = lazy(() => import('./pages/InfrastructurePages').then(m => ({ default: m.RenewableEnergy })));
+const EducationHub = lazy(() => import('./pages/InfrastructurePages').then(m => ({ default: m.EducationHub })));
+const Certifications = lazy(() => import('./pages/InfrastructurePages').then(m => ({ default: m.Certifications })));
 const Settings = lazy(() => import('./pages/Settings'));
 const Profile = lazy(() => import('./pages/Profile'));
 const HelpCenter = lazy(() => import('./pages/HelpCenter'));
@@ -104,6 +115,17 @@ const App = () => (
                       <Route path="/adoption" element={<Adoption />} />
                       <Route path="/architecture" element={<CivilizationalArchitectureDashboard />} />
                       <Route path="/dashboards" element={<RoleSpecificDashboards />} />
+                      
+                      {/* Infrastructure Pages */}
+                      <Route path="/offsetting" element={<CarbonOffsetting />} />
+                      <Route path="/investment" element={<ImpactInvestment />} />
+                      <Route path="/compliance" element={<RegulatoryCompliance />} />
+                      <Route path="/enterprise" element={<EnterpriseSolutions />} />
+                      <Route path="/smb" element={<SMBSolutions />} />
+                      <Route path="/agriculture" element={<AgricultureSolutions />} />
+                      <Route path="/renewable-energy" element={<RenewableEnergy />} />
+                      <Route path="/education" element={<EducationHub />} />
+                      <Route path="/certifications" element={<Certifications />} />
                       <Route path="/settings" element={<Settings />} />
                       <Route path="/profile" element={<Profile />} />
                       <Route path="/help" element={<HelpCenter />} />
