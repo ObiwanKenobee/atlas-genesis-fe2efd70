@@ -6,6 +6,7 @@ import {
   CheckCircle2, ExternalLink, FileText, BarChart3 
 } from 'lucide-react';
 import Navigation from '@/components/Navigation';
+import PageLayout from '@/components/PageLayout';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -45,15 +46,14 @@ const Portfolio = () => {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navigation />
-        <main className="pt-24 pb-16 container mx-auto px-6">
+      <PageLayout>
+        <div className="container mx-auto px-6 py-8">
           <Skeleton className="h-12 w-1/3 mb-8" />
           <div className="grid md:grid-cols-4 gap-4 mb-8">
             {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-32" />)}
           </div>
-        </main>
-      </div>
+        </div>
+      </PageLayout>
     );
   }
 
@@ -64,11 +64,8 @@ const Portfolio = () => {
   const isLoading = holdingsLoading || transactionsLoading;
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-
-      <main className="pt-24 pb-16">
-        <div className="container mx-auto px-6">
+    <PageLayout>
+      <div className="container mx-auto px-6 py-8">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -330,10 +327,7 @@ const Portfolio = () => {
             </TabsContent>
           </Tabs>
         </div>
-      </main>
-
-      <Footer />
-    </div>
+    </PageLayout>
   );
 };
 

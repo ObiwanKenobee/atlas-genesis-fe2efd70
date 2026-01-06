@@ -54,7 +54,6 @@ import projectsRouter from './routes/projects';
 // Regenerative Architecture Routes
 import regenerativeRouter from './routes/regenerative';
 import ecosystemRouter from './routes/ecosystem';
-import coreRouter from './routes/core';
 
 const app = express();
 
@@ -323,7 +322,6 @@ app.use('/api/v2/projects', projectsRouter);
 // Regenerative Architecture API
 app.use('/api/regenerative', regenerativeRouter);
 app.use('/api/ecosystem', ecosystemRouter);
-app.use('/api/core', coreRouter);
 
 // Root endpoint with API documentation
 app.get('/api', (req, res) => {
