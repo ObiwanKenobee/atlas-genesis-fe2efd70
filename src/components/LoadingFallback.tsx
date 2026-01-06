@@ -1,11 +1,13 @@
 import React from 'react';
-import { RefreshCw } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
-const LoadingFallback: React.FC = () => {
+const LoadingFallback = () => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-background">
-      <RefreshCw className="w-8 h-8 animate-spin text-primary mb-4" />
-      <p className="text-muted-foreground">Loading...</p>
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="text-center">
+        <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
+        <p className="text-muted-foreground">Loading Atlas Sanctum...</p>
+      </div>
     </div>
   );
 };
