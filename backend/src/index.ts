@@ -51,6 +51,9 @@ import marketplaceV2Router from './routes/marketplace-v2';
 import measurementsV2Router from './routes/measurements-v2';
 import projectsRouter from './routes/projects';
 
+// Regenerative Architecture Routes
+import regenerativeRouter from './routes/regenerative';
+
 const app = express();
 
 // Security headers (must be first)
@@ -315,6 +318,9 @@ app.use('/api/v2/marketplace', marketplaceV2Router);
 app.use('/api/v2/measurements', measurementsV2Router);
 app.use('/api/v2/projects', projectsRouter);
 
+// Regenerative Architecture API
+app.use('/api/regenerative', regenerativeRouter);
+
 // Root endpoint with API documentation
 app.get('/api', (req, res) => {
   res.json({
@@ -335,6 +341,7 @@ app.get('/api', (req, res) => {
         v2: '/api/v2/measurements'
       },
       projects: '/api/v2/projects',
+      regenerative: '/api/regenerative',
       governance: '/api/governance',
       assets: '/api/assets',
       ethics: '/api/ethics',
