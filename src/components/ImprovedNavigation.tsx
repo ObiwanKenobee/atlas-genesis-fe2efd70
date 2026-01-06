@@ -1,4 +1,3 @@
-import { platformNavigation } from '../config/navigation';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -11,6 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
+import { InteractiveButton } from './Interactions';
 
 interface NavigationItem {
   label: string;
@@ -152,7 +152,7 @@ const ImprovedNavigation = () => {
                     )}
                   </div>
                 </Link>
-              ))}
+              ))}}
             </div>
           </div>
         ))}
@@ -291,23 +291,19 @@ const ImprovedNavigation = () => {
                       ))}
                     </div>
                   </div>
-                ))}
+                ))}}
                 
                 <div className="pt-3 sm:pt-4 border-t border-border">
                   {user ? (
-                    <Button variant="hero" asChild className="w-full">
-                      <Link to="/dashboard">
-                        <LayoutDashboard className="w-4 h-4 mr-2" />
-                        Dashboard
-                      </Link>
-                    </Button>
+                    <InteractiveButton variant="primary" size="md" onClick={() => window.location.href = '/dashboard'}>
+                      <LayoutDashboard className="w-4 h-4 mr-2" />
+                      Dashboard
+                    </InteractiveButton>
                   ) : (
-                    <Button variant="hero" asChild className="w-full">
-                      <Link to="/auth">
-                        <LogIn className="w-4 h-4 mr-2" />
-                        Sign In
-                      </Link>
-                    </Button>
+                    <InteractiveButton variant="primary" size="md" onClick={() => window.location.href = '/auth'}>
+                      <LogIn className="w-4 h-4 mr-2" />
+                      Sign In
+                    </InteractiveButton>
                   )}
                 </div>
               </div>

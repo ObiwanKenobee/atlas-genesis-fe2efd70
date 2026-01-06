@@ -1,286 +1,339 @@
-import { PageLayout } from '../components/PageLayout';
-import { ResponsiveLayout, ResponsiveGrid, ResponsiveStack } from '../components/ResponsiveLayout';
-import { useResponsive } from '../hooks/useResponsive';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Button } from '../components/ui/button';
-import { Badge } from '../components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { useMemo } from 'react';
+import { Link, Navigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { 
   Leaf, TrendingUp, Award, Clock, ArrowRight, 
-  CheckCircle2, ExternalLink, FileText, BarChart3,
-  Menu, X
+  CheckCircle2, ExternalLink, FileText, BarChart3 
 } from 'lucide-react';
-import { useState } from 'react';
+import Navigation from '@/components/Navigation';
+import Footer from '@/components/Footer';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { useAuth } from '@/hooks/useAuth';
+import { useUserHoldings, useUserTransactions, useRetireCredits } from '@/hooks/useMarketplace';
+import { PROJECT_TYPE_ICONS } from '@/types/marketplace';
+import { Skeleton } from '@/components/ui/skeleton';
+import { format } from 'date-fns';
+import PortfolioAnalyticsDashboard from '@/components/PortfolioAnalyticsDashboard';
 
 const Portfolio = () => {
-  const { isMobile, isTablet } = useResponsive();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, loading: authLoading } = useAuth();
+  const { data: holdings, isLoading: holdingsLoading } = useUserHoldings();
+  const { data: transactions, isLoading: transactionsLoading } = useUserTransactions();
+  const retireMutation = useRetireCredits();
 
-  // Mock data
-  const stats = {
-    totalCredits: 1250,
-    totalOffset: 1875.5,
-    totalValue: 31250.75,
-    retiredCredits: 450
-  };
+  const stats = useMemo(() => {
+    if (!holdings) return { totalCredits: 0, totalOffset: 0, totalValue: 0, retiredCredits: 0 };
+    
+    return holdings.reduce((acc, h) => ({
+      totalCredits: acc.totalCredits + h.quantity,
+      totalOffset: acc.totalOffset + (h.quantity * (h.carbon_projects?.co2_offset_per_credit || 1)),
+      totalValue: acc.totalValue + (h.quantity * h.purchase_price),
+      retiredCredits: acc.retiredCredits + (h.retired ? h.quantity : 0),
+    }), { totalCredits: 0, totalOffset: 0, totalValue: 0, retiredCredits: 0 });
+  }, [holdings]);
 
-  const holdings = [
-    {
-      id: '1',
-      title: 'Amazon Rainforest Conservation',
-      project_type: 'reforestation',
-      quantity: 500,
-      purchase_price: 25.50,
-      purchased_at: '2024-01-15',
-      retired: false,
-      co2_offset_per_credit: 1.5
-    },
-    {
-      id: '2', 
-      title: 'Solar Farm Development',
-      project_type: 'renewable_energy',
-      quantity: 750,
-      purchase_price: 22.75,
-      retired: true,
-      co2_offset_per_credit: 1.2,
-      certificate_id: 'CERT_2024_001'
-    }
-  ];
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <main className="pt-24 pb-16 container mx-auto px-6">
+          <Skeleton className="h-12 w-1/3 mb-8" />
+          <div className="grid md:grid-cols-4 gap-4 mb-8">
+            {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-32" />)}
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  const isLoading = holdingsLoading || transactionsLoading;
 
   return (
-    <PageLayout>
-      <ResponsiveLayout maxWidth="xl" padding="md">
-        {/* Mobile Header */}
-        {isMobile && (
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold text-foreground">Portfolio</h1>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </Button>
-          </div>
-        )}
+    <div className="min-h-screen bg-background">
+      <Navigation />
 
-        {/* Desktop Header */}
-        {!isMobile && (
-          <div className="mb-8">
+      <main className="pt-24 pb-16">
+        <div className="container mx-auto px-6">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-8"
+          >
             <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
               Your Carbon Portfolio
             </h1>
             <p className="text-muted-foreground">
               Track your carbon credit investments and environmental impact.
             </p>
-          </div>
-        )}
+          </motion.div>
 
-        {/* Stats Grid - Responsive */}
-        <ResponsiveGrid 
-          cols={{ mobile: 2, tablet: 2, desktop: 4, largeDesktop: 4 }}
-          gap="md"
-          className="mb-8"
-        >
-          {[
-            { icon: Leaf, label: 'Total Credits', value: stats.totalCredits.toLocaleString(), color: 'text-primary' },
-            { icon: TrendingUp, label: 'CO₂ Offset', value: `${stats.totalOffset.toFixed(1)} tonnes`, color: 'text-accent' },
-            { icon: Award, label: 'Portfolio Value', value: `$${stats.totalValue.toFixed(2)}`, color: 'text-primary' },
-            { icon: CheckCircle2, label: 'Retired Credits', value: stats.retiredCredits.toLocaleString(), color: 'text-green-500' },
-          ].map((stat) => (
-            <Card key={stat.label} className="bg-card-gradient border-border/50">
-              <CardContent className={`p-4 ${isMobile ? 'p-3' : 'p-5'}`}>
-                <ResponsiveStack 
-                  direction={{ mobile: 'col', tablet: 'row', desktop: 'row' }}
-                  spacing="sm"
-                  align="center"
-                >
-                  <div className={`p-2 rounded-lg bg-muted ${stat.color} ${isMobile ? 'mb-2' : ''}`}>
-                    <stat.icon className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
+          {/* Stats Grid */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
+          >
+            {[
+              { icon: Leaf, label: 'Total Credits', value: stats.totalCredits.toLocaleString(), color: 'text-primary' },
+              { icon: TrendingUp, label: 'CO₂ Offset', value: `${stats.totalOffset.toFixed(1)} tonnes`, color: 'text-accent' },
+              { icon: Award, label: 'Portfolio Value', value: `$${stats.totalValue.toFixed(2)}`, color: 'text-primary' },
+              { icon: CheckCircle2, label: 'Retired Credits', value: stats.retiredCredits.toLocaleString(), color: 'text-green-500' },
+            ].map((stat, i) => (
+              <Card key={stat.label} className="bg-card-gradient border-border/50">
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2.5 rounded-lg bg-muted ${stat.color}`}>
+                      <stat.icon className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="text-xs text-muted-foreground">{stat.label}</div>
+                      <div className="text-xl font-bold text-foreground">{stat.value}</div>
+                    </div>
                   </div>
-                  <div className={isMobile ? 'text-center' : ''}>
-                    <div className={`text-xs text-muted-foreground ${isMobile ? 'mb-1' : ''}`}>{stat.label}</div>
-                    <div className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold text-foreground`}>{stat.value}</div>
-                  </div>
-                </ResponsiveStack>
-              </CardContent>
-            </Card>
-          ))}
-        </ResponsiveGrid>
+                </CardContent>
+              </Card>
+            ))}
+          </motion.div>
 
-        {/* Main Content Tabs - Responsive */}
-        <Tabs defaultValue="holdings" className="space-y-6">
-          <TabsList className={`bg-muted/50 ${isMobile ? 'w-full grid grid-cols-3' : ''}`}>
-            <TabsTrigger value="holdings" className={`flex items-center ${isMobile ? 'text-xs px-2' : 'space-x-2'}`}>
-              <Leaf className={`${isMobile ? 'w-3 h-3' : 'w-4 h-4'}`} />
-              {!isMobile && <span>Holdings</span>}
-              {isMobile && <span className="ml-1">Holdings</span>}
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className={`flex items-center ${isMobile ? 'text-xs px-2' : 'space-x-2'}`}>
-              <BarChart3 className={`${isMobile ? 'w-3 h-3' : 'w-4 h-4'}`} />
-              {!isMobile && <span>Analytics</span>}
-              {isMobile && <span className="ml-1">Analytics</span>}
-            </TabsTrigger>
-            <TabsTrigger value="transactions" className={`flex items-center ${isMobile ? 'text-xs px-2' : 'space-x-2'}`}>
-              <Clock className={`${isMobile ? 'w-3 h-3' : 'w-4 h-4'}`} />
-              {!isMobile && <span>Transactions</span>}
-              {isMobile && <span className="ml-1">History</span>}
-            </TabsTrigger>
-          </TabsList>
+          {/* Main Content Tabs */}
+          <Tabs defaultValue="holdings" className="space-y-6">
+            <TabsList className="bg-muted/50">
+              <TabsTrigger value="holdings" className="flex items-center gap-2">
+                <Leaf className="w-4 h-4" />
+                Holdings
+              </TabsTrigger>
+              <TabsTrigger value="analytics" className="flex items-center gap-2">
+                <BarChart3 className="w-4 h-4" />
+                Analytics
+              </TabsTrigger>
+              <TabsTrigger value="transactions" className="flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                Transactions
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="holdings">
-            <Card className="bg-card-gradient border-border/50">
-              <CardHeader className={`${isMobile ? 'pb-4' : ''}`}>
-                <ResponsiveStack 
-                  direction={{ mobile: 'col', tablet: 'row', desktop: 'row' }}
-                  justify="between"
-                  align={isMobile ? 'start' : 'center'}
-                  spacing="md"
-                >
-                  <CardTitle className="text-foreground">Your Holdings</CardTitle>
-                  <Button asChild variant="outline" size={isMobile ? "sm" : "default"} className="border-border/50">
-                    <a href="/marketplace">
-                      Browse Projects <ArrowRight className="w-4 h-4 ml-2" />
-                    </a>
-                  </Button>
-                </ResponsiveStack>
-              </CardHeader>
-              <CardContent>
-                {/* Mobile Holdings View */}
-                {isMobile ? (
-                  <div className="space-y-4">
-                    {holdings.map((holding) => (
-                      <Card key={holding.id} className="p-4">
-                        <div className="space-y-3">
-                          <div className="flex items-start justify-between">
-                            <h3 className="font-medium text-foreground text-sm">{holding.title}</h3>
-                            <Badge variant={holding.retired ? "outline" : "default"} className="text-xs">
-                              {holding.retired ? 'Retired' : 'Active'}
-                            </Badge>
-                          </div>
-                          <div className="grid grid-cols-2 gap-2 text-sm">
-                            <div>
-                              <span className="text-muted-foreground">Quantity:</span>
-                              <div className="font-medium">{holding.quantity.toLocaleString()}</div>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Price:</span>
-                              <div className="font-medium">${holding.purchase_price.toFixed(2)}</div>
-                            </div>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs text-muted-foreground">
-                              CO₂: {(holding.quantity * holding.co2_offset_per_credit).toFixed(1)}t
-                            </span>
-                            {holding.retired ? (
-                              <Button variant="ghost" size="sm" className="text-xs">
-                                <FileText className="w-3 h-3 mr-1" />
-                                Certificate
-                              </Button>
-                            ) : (
-                              <Button variant="outline" size="sm" className="text-xs">
-                                Retire
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                      </Card>
-                    ))}
-                  </div>
-                ) : (
-                  /* Desktop Table View */
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b border-border/50">
-                          <th className="text-left py-3 px-4">Project</th>
-                          <th className="text-right py-3 px-4">Quantity</th>
-                          <th className="text-right py-3 px-4">Price</th>
-                          <th className="text-right py-3 px-4">CO₂ Offset</th>
-                          <th className="text-center py-3 px-4">Status</th>
-                          <th className="text-right py-3 px-4">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {holdings.map((holding) => (
-                          <tr key={holding.id} className="border-b border-border/30">
-                            <td className="py-4 px-4">
-                              <div>
-                                <div className="font-medium text-foreground">{holding.title}</div>
-                                <div className="text-sm text-muted-foreground capitalize">{holding.project_type}</div>
-                              </div>
-                            </td>
-                            <td className="text-right py-4 px-4 font-medium">
-                              {holding.quantity.toLocaleString()}
-                            </td>
-                            <td className="text-right py-4 px-4">
-                              ${holding.purchase_price.toFixed(2)}
-                            </td>
-                            <td className="text-right py-4 px-4 text-primary">
-                              {(holding.quantity * holding.co2_offset_per_credit).toFixed(1)} t
-                            </td>
-                            <td className="text-center py-4 px-4">
-                              <Badge variant={holding.retired ? "outline" : "default"}>
-                                {holding.retired ? 'Retired' : 'Active'}
-                              </Badge>
-                            </td>
-                            <td className="text-right py-4 px-4">
-                              {holding.retired ? (
-                                <Button variant="ghost" size="sm">
-                                  <FileText className="w-4 h-4 mr-1" />
-                                  Certificate
-                                </Button>
-                              ) : (
-                                <Button variant="outline" size="sm">
-                                  Retire Credits
-                                </Button>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
+            <TabsContent value="holdings">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <Card className="bg-card-gradient border-border/50">
+                  <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle className="text-foreground">Your Holdings</CardTitle>
+                    <Button asChild variant="outline" size="sm" className="border-border/50">
+                      <Link to="/marketplace">
+                        Browse Projects <ArrowRight className="w-4 h-4 ml-2" />
+                      </Link>
+                    </Button>
+                  </CardHeader>
+                  <CardContent>
+                    {isLoading ? (
+                      <div className="space-y-3">
+                        {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-16 w-full" />)}
+                      </div>
+                    ) : holdings?.length === 0 ? (
+                      <div className="text-center py-12">
+                        <Leaf className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                        <p className="text-muted-foreground mb-4">You don't have any carbon credits yet.</p>
+                        <Button asChild>
+                          <Link to="/marketplace">Explore Marketplace</Link>
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="overflow-x-auto">
+                        <Table>
+                          <TableHeader>
+                            <TableRow className="border-border/50">
+                              <TableHead>Project</TableHead>
+                              <TableHead className="text-right">Quantity</TableHead>
+                              <TableHead className="text-right">Price</TableHead>
+                              <TableHead className="text-right">CO₂ Offset</TableHead>
+                              <TableHead>Status</TableHead>
+                              <TableHead className="text-right">Actions</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {holdings?.map((holding) => (
+                              <TableRow key={holding.id} className="border-border/30">
+                                <TableCell>
+                                  <div className="flex items-center gap-3">
+                                    <span className="text-xl">
+                                      {PROJECT_TYPE_ICONS[holding.carbon_projects?.project_type || 'reforestation']}
+                                    </span>
+                                    <div>
+                                      <Link 
+                                        to={`/marketplace/${holding.project_id}`}
+                                        className="font-medium text-foreground hover:text-primary transition-colors"
+                                      >
+                                        {holding.carbon_projects?.title || 'Unknown Project'}
+                                      </Link>
+                                      <div className="text-xs text-muted-foreground">
+                                        Purchased {format(new Date(holding.purchased_at), 'MMM d, yyyy')}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </TableCell>
+                                <TableCell className="text-right font-medium">
+                                  {holding.quantity.toLocaleString()}
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  ${holding.purchase_price.toFixed(2)}
+                                </TableCell>
+                                <TableCell className="text-right text-primary">
+                                  {(holding.quantity * (holding.carbon_projects?.co2_offset_per_credit || 1)).toFixed(1)} t
+                                </TableCell>
+                                <TableCell>
+                                  {holding.retired ? (
+                                    <Badge variant="outline" className="border-green-500/50 text-green-500">
+                                      <CheckCircle2 className="w-3 h-3 mr-1" />
+                                      Retired
+                                    </Badge>
+                                  ) : (
+                                    <Badge variant="outline" className="border-primary/50 text-primary">
+                                      Active
+                                    </Badge>
+                                  )}
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  {holding.retired ? (
+                                    <Button variant="ghost" size="sm" className="text-muted-foreground">
+                                      <FileText className="w-4 h-4 mr-1" />
+                                      {holding.certificate_id?.slice(0, 12)}...
+                                    </Button>
+                                  ) : (
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => retireMutation.mutate(holding.id)}
+                                      disabled={retireMutation.isPending}
+                                      className="border-primary/50 text-primary hover:bg-primary/10"
+                                    >
+                                      Retire Credits
+                                    </Button>
+                                  )}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </TabsContent>
 
-          <TabsContent value="analytics">
-            <Card className="bg-card-gradient border-border/50">
-              <CardHeader>
-                <CardTitle>Portfolio Analytics</CardTitle>
-                <CardDescription>Performance metrics and insights</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className={`${isMobile ? 'h-64' : 'h-96'} flex items-center justify-center bg-muted/20 rounded-lg`}>
-                  <div className="text-center">
-                    <BarChart3 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">Analytics dashboard coming soon</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+            <TabsContent value="analytics">
+              <PortfolioAnalyticsDashboard />
+            </TabsContent>
 
-          <TabsContent value="transactions">
-            <Card className="bg-card-gradient border-border/50">
-              <CardHeader>
-                <CardTitle>Transaction History</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className={`${isMobile ? 'h-64' : 'h-96'} flex items-center justify-center bg-muted/20 rounded-lg`}>
-                  <div className="text-center">
-                    <Clock className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">Transaction history coming soon</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </ResponsiveLayout>
-    </PageLayout>
+            <TabsContent value="transactions">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <Card className="bg-card-gradient border-border/50">
+                  <CardHeader>
+                    <CardTitle className="text-foreground flex items-center gap-2">
+                      <Clock className="w-5 h-5" />
+                      Transaction History
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {isLoading ? (
+                      <div className="space-y-3">
+                        {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}
+                      </div>
+                    ) : transactions?.length === 0 ? (
+                      <p className="text-center text-muted-foreground py-8">No transactions yet.</p>
+                    ) : (
+                      <div className="overflow-x-auto">
+                        <Table>
+                          <TableHeader>
+                            <TableRow className="border-border/50">
+                              <TableHead>Date</TableHead>
+                              <TableHead>Project</TableHead>
+                              <TableHead>Type</TableHead>
+                              <TableHead className="text-right">Quantity</TableHead>
+                              <TableHead className="text-right">Total</TableHead>
+                              <TableHead>Status</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {transactions?.map((tx) => (
+                              <TableRow key={tx.id} className="border-border/30">
+                                <TableCell className="text-muted-foreground">
+                                  {format(new Date(tx.created_at), 'MMM d, yyyy HH:mm')}
+                                </TableCell>
+                                <TableCell>
+                                  <Link 
+                                    to={`/marketplace/${tx.project_id}`}
+                                    className="text-foreground hover:text-primary transition-colors"
+                                  >
+                                    {tx.carbon_projects?.title || 'Unknown'}
+                                  </Link>
+                                </TableCell>
+                                <TableCell>
+                                  <Badge variant="outline" className="border-border/50 capitalize">
+                                    {tx.transaction_type}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell className="text-right font-medium">
+                                  {tx.quantity.toLocaleString()}
+                                </TableCell>
+                                <TableCell className="text-right font-bold text-gradient-gold">
+                                  ${tx.total_amount.toFixed(2)}
+                                </TableCell>
+                                <TableCell>
+                                  <Badge 
+                                    variant="outline" 
+                                    className={
+                                      tx.status === 'completed' 
+                                        ? 'border-green-500/50 text-green-500' 
+                                        : tx.status === 'failed' 
+                                        ? 'border-destructive/50 text-destructive'
+                                        : 'border-accent/50 text-accent'
+                                    }
+                                  >
+                                    {tx.status}
+                                  </Badge>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </main>
+
+      <Footer />
+    </div>
   );
 };
 

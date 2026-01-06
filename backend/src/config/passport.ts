@@ -14,7 +14,7 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
   }, async (accessToken, refreshToken, profile, done) => {
     try {
       // Check if user already exists
-      let result = await query('SELECT * FROM users WHERE oauth_provider = $1 AND oauth_id = $2', ['google', profile.id]);
+      const result = await query('SELECT * FROM users WHERE oauth_provider = $1 AND oauth_id = $2', ['google', profile.id]);
 
       if (result.rowCount > 0) {
         // Update last login
@@ -67,7 +67,7 @@ if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
   }, async (accessToken, refreshToken, profile, done) => {
     try {
       // Check if user already exists
-      let result = await query('SELECT * FROM users WHERE oauth_provider = $1 AND oauth_id = $2', ['github', profile.id]);
+      const result = await query('SELECT * FROM users WHERE oauth_provider = $1 AND oauth_id = $2', ['github', profile.id]);
 
       if (result.rowCount > 0) {
         await query('UPDATE users SET last_login = NOW() WHERE id = $1', [result.rows[0].id]);
@@ -118,7 +118,7 @@ if (process.env.MICROSOFT_CLIENT_ID && process.env.MICROSOFT_CLIENT_SECRET) {
   }, async (accessToken, refreshToken, profile, done) => {
     try {
       // Check if user already exists
-      let result = await query('SELECT * FROM users WHERE oauth_provider = $1 AND oauth_id = $2', ['microsoft', profile.id]);
+      const result = await query('SELECT * FROM users WHERE oauth_provider = $1 AND oauth_id = $2', ['microsoft', profile.id]);
 
       if (result.rowCount > 0) {
         await query('UPDATE users SET last_login = NOW() WHERE id = $1', [result.rows[0].id]);
@@ -160,7 +160,7 @@ if (process.env.MICROSOFT_CLIENT_ID && process.env.MICROSOFT_CLIENT_SECRET) {
 }
 
 // Serialize user for session
-passport.serializeUser((user: any, done) => {
+passport.serializeUser((user: { id: string }, done) => {
   done(null, user.id);
 });
 

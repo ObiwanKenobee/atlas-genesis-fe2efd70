@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import PageLayout from "@/components/PageLayout";
+import Navigation from "@/components/Navigation";
 import BioregionalMap from "@/components/BioregionalMap";
 import ClimateRiskForecasting from "@/components/ClimateRiskForecasting";
 import { useBioregionalZones } from "@/hooks/useBioregionalZones";
@@ -77,8 +77,9 @@ const Bioregions = () => {
   const highBiodiversityZones = displayZones.filter((z) => (z.biodiversity_index || 0) > 90);
 
   return (
-    <PageLayout>
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <div className="min-h-screen bg-background">
+      <Navigation />
+      <main className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold tracking-tight mb-2">Geographic Intelligence & Bioregional Mapping</h1>
@@ -371,8 +372,8 @@ const Bioregions = () => {
             </Card>
           </TabsContent>
         </Tabs>
-      </div>
-    </PageLayout>
+      </main>
+    </div>
   );
 };
 
