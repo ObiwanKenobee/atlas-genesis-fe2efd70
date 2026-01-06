@@ -37,7 +37,7 @@ const Index = () => {
       <SEO {...seoData} />
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
         <ImprovedNavigation />
-      <main className="pt-[104px]">
+      <main className="pt-24">
         <HeroSection />
         <PlatformLayers />
         <ImpactMetrics />

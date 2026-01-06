@@ -10,7 +10,7 @@ export const PageLayout: React.FC<PageLayoutProps> = ({ children, className = ''
   return (
     <div className="min-h-screen bg-background">
       <ImprovedNavigation />
-      <main className={`pt-20 ${className}`}>
+      <main className={`pt-24 ${className}`}>
         {children}
       </main>
     </div>
