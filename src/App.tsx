@@ -1,66 +1,16 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-
-const Header = () => (
-  <header style={{
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 50,
-    backgroundColor: 'rgba(15, 23, 42, 0.95)',
-    backdropFilter: 'blur(12px)',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
-  }}>
-    <div style={{ padding: '0.5rem 1rem', backgroundColor: '#10b981', textAlign: 'center', fontSize: '0.875rem', color: 'white' }}>
-      🌱 Join the regenerative revolution — Explore verified projects
-    </div>
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '1rem 2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-        <div style={{ width: '2.5rem', height: '2.5rem', borderRadius: '0.5rem', background: 'linear-gradient(135deg, #10b981, #3b82f6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          🌱
-        </div>
-        <div>
-          <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'white' }}>Atlas Sanctum</div>
-          <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>REGENERATIVE PLATFORM</div>
-        </div>
-      </div>
-      
-      <nav style={{ display: 'flex', alignItems: 'center', gap: '2rem', color: '#94a3b8' }}>
-        <span>Platform</span>
-        <span>Solutions</span>
-        <span>Impact</span>
-        <span>Resources</span>
-      </nav>
-      
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        <Link to="/dashboard" style={{ color: '#94a3b8', textDecoration: 'none' }}>Dashboard</Link>
-        <Link to="/auth" style={{ color: '#94a3b8', textDecoration: 'none' }}>Sign In</Link>
-        <button style={{
-          padding: '0.5rem 1rem',
-          backgroundColor: '#10b981',
-          color: 'white',
-          border: 'none',
-          borderRadius: '0.375rem',
-          fontSize: '0.875rem',
-          cursor: 'pointer'
-        }}>
-          Get Started
-        </button>
-      </div>
-    </div>
-  </header>
-);
+import Layout from './components/Layout';
+import { Measurements, Bioregions, RegenerativeAgriculture, Valuation, Governance, Marketplace, Health, Adoption } from './pages';
 
 const HeroSection = () => (
   <section style={{
-    minHeight: '100vh',
+    minHeight: 'calc(100vh - 6rem)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)',
     color: 'white',
-    paddingTop: '8rem',
     textAlign: 'center'
   }}>
     <div style={{ maxWidth: '1200px', padding: '0 2rem' }}>
@@ -334,130 +284,94 @@ const RealTimeImpact = () => (
   </section>
 );
 
-const Footer = () => (
-  <footer style={{ backgroundColor: '#1e293b', color: 'white', padding: '3rem 2rem 1rem' }}>
-    <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>
-        <div>
-          <div style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>Atlas Sanctum</div>
-          <p style={{ color: '#94a3b8', marginBottom: '1rem' }}>
-            The world's first regenerative platform uniting ecosystems for trillion-dollar impact.
-          </p>
-          <div style={{ color: '#94a3b8', fontSize: '0.875rem' }}>
-            <div>hello@atlassanctum.com</div>
-            <div>+1 (234) 567-890</div>
-            <div>San Francisco, CA</div>
-          </div>
-        </div>
-        
-        <div>
-          <h4 style={{ fontWeight: 'bold', marginBottom: '1rem' }}>FEATURES</h4>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.875rem', color: '#94a3b8' }}>
-            <span>Measurements</span>
-            <span>Bioregions</span>
-            <span>Regeneration</span>
-            <span>Valuation</span>
-          </div>
-        </div>
-        
-        <div>
-          <h4 style={{ fontWeight: 'bold', marginBottom: '1rem' }}>PLATFORM</h4>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.875rem', color: '#94a3b8' }}>
-            <span>Marketplace</span>
-            <span>Adoption</span>
-            <span>Dashboard</span>
-            <span>Portfolio</span>
-          </div>
-        </div>
-        
-        <div>
-          <h4 style={{ fontWeight: 'bold', marginBottom: '1rem' }}>RESOURCES</h4>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.875rem', color: '#94a3b8' }}>
-            <span>API Documentation</span>
-            <span>Impact Guides</span>
-            <span>Community Forum</span>
-            <span>Case Studies</span>
-          </div>
-        </div>
-      </div>
-      
-      <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '2rem', textAlign: 'center' }}>
-        <div style={{ fontSize: '0.875rem', color: '#94a3b8', marginBottom: '1rem' }}>
-          © 2025 Atlas Sanctum. All rights reserved.
-        </div>
-        <div style={{ fontSize: '0.875rem', color: '#94a3b8' }}>
-          Regenerating Earth's future through verified, ethical impact.
-        </div>
-      </div>
-    </div>
-  </footer>
-);
+
 
 const Index = () => (
-  <div style={{ fontFamily: 'Inter, sans-serif', backgroundColor: '#0f172a' }}>
-    <Header />
+  <Layout>
     <HeroSection />
     <PlatformArchitecture />
     <RealTimeImpact />
-    <Footer />
-  </div>
+  </Layout>
 );
 
 const Dashboard = () => (
-  <div style={{ minHeight: '100vh', backgroundColor: '#0f172a', color: 'white', padding: '8rem 2rem 2rem' }}>
-    <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-      <h1 style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '2rem' }}>Dashboard</h1>
-      <p style={{ color: '#94a3b8' }}>Welcome to your Atlas Sanctum dashboard.</p>
+  <Layout>
+    <div style={{ padding: '2rem', color: 'white' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        <h1 style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '2rem' }}>Dashboard</h1>
+        <p style={{ color: '#94a3b8', marginBottom: '2rem' }}>Welcome to your Atlas Sanctum dashboard.</p>
+        
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+          <div style={{ padding: '2rem', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '1rem', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem', color: '#10b981' }}>Your Impact</h3>
+            <p style={{ color: '#94a3b8' }}>Track your regenerative contributions and verified impact metrics.</p>
+          </div>
+          
+          <div style={{ padding: '2rem', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '1rem', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem', color: '#10b981' }}>Portfolio</h3>
+            <p style={{ color: '#94a3b8' }}>Manage your RIU holdings and investment performance.</p>
+          </div>
+          
+          <div style={{ padding: '2rem', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '1rem', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem', color: '#10b981' }}>Projects</h3>
+            <p style={{ color: '#94a3b8' }}>Explore and invest in verified regenerative projects worldwide.</p>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
+  </Layout>
 );
 
 const Auth = () => (
-  <div style={{ minHeight: '100vh', backgroundColor: '#0f172a', color: 'white', padding: '8rem 2rem 2rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-    <div style={{ maxWidth: '400px', width: '100%' }}>
-      <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '2rem', textAlign: 'center' }}>Sign In</h1>
-      <div style={{ backgroundColor: 'rgba(255,255,255,0.05)', padding: '2rem', borderRadius: '1rem', border: '1px solid rgba(255,255,255,0.1)' }}>
-        <input
-          type="email"
-          placeholder="Email"
-          style={{
+  <Layout showFooter={false}>
+    <div style={{ minHeight: 'calc(100vh - 6rem)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+      <div style={{ maxWidth: '400px', width: '100%' }}>
+        <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '2rem', textAlign: 'center', color: 'white' }}>Sign In</h1>
+        <div style={{ backgroundColor: 'rgba(255,255,255,0.05)', padding: '2rem', borderRadius: '1rem', border: '1px solid rgba(255,255,255,0.1)' }}>
+          <input
+            type="email"
+            placeholder="Email"
+            style={{
+              width: '100%',
+              padding: '0.75rem',
+              marginBottom: '1rem',
+              backgroundColor: 'rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              borderRadius: '0.5rem',
+              color: 'white',
+              boxSizing: 'border-box'
+            }}
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            style={{
+              width: '100%',
+              padding: '0.75rem',
+              marginBottom: '1.5rem',
+              backgroundColor: 'rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              borderRadius: '0.5rem',
+              color: 'white',
+              boxSizing: 'border-box'
+            }}
+          />
+          <button style={{
             width: '100%',
             padding: '0.75rem',
-            marginBottom: '1rem',
-            backgroundColor: 'rgba(255,255,255,0.1)',
-            border: '1px solid rgba(255,255,255,0.2)',
+            backgroundColor: '#10b981',
+            color: 'white',
+            border: 'none',
             borderRadius: '0.5rem',
-            color: 'white'
-          }}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          style={{
-            width: '100%',
-            padding: '0.75rem',
-            marginBottom: '1.5rem',
-            backgroundColor: 'rgba(255,255,255,0.1)',
-            border: '1px solid rgba(255,255,255,0.2)',
-            borderRadius: '0.5rem',
-            color: 'white'
-          }}
-        />
-        <button style={{
-          width: '100%',
-          padding: '0.75rem',
-          backgroundColor: '#10b981',
-          color: 'white',
-          border: 'none',
-          borderRadius: '0.5rem',
-          fontSize: '1rem',
-          cursor: 'pointer'
-        }}>
-          Sign In
-        </button>
+            fontSize: '1rem',
+            cursor: 'pointer'
+          }}>
+            Sign In
+          </button>
+        </div>
       </div>
     </div>
-  </div>
+  </Layout>
 );
 
 const App = () => (
@@ -466,6 +380,14 @@ const App = () => (
       <Route path="/" element={<Index />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/auth" element={<Auth />} />
+      <Route path="/measurements" element={<Measurements />} />
+      <Route path="/bioregions" element={<Bioregions />} />
+      <Route path="/regenerative-agriculture" element={<RegenerativeAgriculture />} />
+      <Route path="/valuation" element={<Valuation />} />
+      <Route path="/governance" element={<Governance />} />
+      <Route path="/marketplace" element={<Marketplace />} />
+      <Route path="/health" element={<Health />} />
+      <Route path="/adoption" element={<Adoption />} />
       <Route path="*" element={<Index />} />
     </Routes>
   </BrowserRouter>
