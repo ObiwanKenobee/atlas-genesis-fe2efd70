@@ -1,7 +1,103 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import Layout from './components/Layout';
-import { Measurements, Bioregions, RegenerativeAgriculture, Valuation, Governance, Marketplace, Health, Adoption } from './pages';
+
+const TechStack = () => (
+  <section className="py-32 bg-slate-800 relative">
+    <div className="max-w-7xl mx-auto px-8">
+      <div className="text-center mb-20">
+        <h2 className="text-6xl font-black mb-6">TECHNOLOGY STACK</h2>
+        <h3 className="text-3xl text-emerald-500 mb-8">Built for Scale & Trust</h3>
+        <p className="text-xl text-slate-400 max-w-4xl mx-auto">
+          Enterprise-grade infrastructure combining the latest in blockchain, AI, and cloud technology to power global regeneration.
+        </p>
+      </div>
+
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+        {[
+          {
+            title: "Blockchain Layer",
+            description: "Ethereum & Polkadot-based infrastructure for immutable records and decentralized applications.",
+            features: ["Smart Contracts", "Carbon Tokens", "DeFi"],
+            icon: "⛓️"
+          },
+          {
+            title: "AI & Machine Learning",
+            description: "Real-time ecosystem analysis, predictive modeling, and optimization algorithms.",
+            features: ["AI Oracles", "Pattern Recognition", "Forecasting"],
+            icon: "🤖"
+          },
+          {
+            title: "Security & Privacy",
+            description: "Zero-Knowledge Proofs ensuring privacy without compromising transparency.",
+            features: ["ZKPs", "Encryption", "Secure Compute"],
+            icon: "🔒"
+          },
+          {
+            title: "Cloud Infrastructure",
+            description: "Scalable hosting on AWS, Google Cloud, and Azure with decentralized storage.",
+            features: ["Multi-Cloud", "IPFS", "Edge Computing"],
+            icon: "☁️"
+          },
+          {
+            title: "IoT Integration",
+            description: "Global sensor network providing real-time environmental data feeds.",
+            features: ["Satellites", "Sensors", "Real-Time Data"],
+            icon: "📡"
+          },
+          {
+            title: "API Ecosystem",
+            description: "Open-source APIs enabling third-party integrations and ecosystem growth.",
+            features: ["REST", "GraphQL", "Webhooks"],
+            icon: "🔌"
+          }
+        ].map((tech, index) => (
+          <div key={index} className="glass p-8 rounded-2xl hover-lift">
+            <div className="text-4xl mb-4">{tech.icon}</div>
+            <h4 className="text-2xl font-bold mb-4 text-emerald-500">{tech.title}</h4>
+            <p className="text-slate-400 mb-6">{tech.description}</p>
+            <div className="space-y-2">
+              {tech.features.map((feature, i) => (
+                <div key={i} className="bg-emerald-500/10 px-4 py-2 rounded-lg text-sm border border-emerald-500/20">
+                  {feature}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="glass p-12 rounded-3xl text-center">
+        <h4 className="text-3xl font-bold mb-6">Decentralized by Design</h4>
+        <p className="text-xl text-slate-400 mb-8 max-w-4xl mx-auto">
+          Our architecture ensures no single point of failure, with data distributed across global nodes and verified through consensus mechanisms.
+        </p>
+        <div className="flex justify-center items-center gap-8 mb-6">
+          {['N1', 'N2', 'N3', 'N4'].map((node, i) => (
+            <div key={i} className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center text-emerald-400 font-bold">
+              {node}
+            </div>
+          ))}
+        </div>
+        <div className="text-emerald-400 font-semibold">4,000+ global nodes</div>
+      </div>
+    </div>
+  </section>
+);
+
+const SimplePage = ({ title, description }: { title: string; description: string }) => (
+  <Layout>
+    <div className="py-8 px-8">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-5xl font-bold mb-4">{title}</h1>
+        <p className="text-xl text-slate-400 mb-8">{description}</p>
+        <div className="glass p-8 rounded-2xl">
+          <p className="text-slate-400">Feature coming soon...</p>
+        </div>
+      </div>
+    </div>
+  </Layout>
+);
 
 const TechStack = () => (
   <section className="py-32 bg-slate-800 relative">
@@ -566,14 +662,14 @@ const App = () => (
       <Route path="/" element={<Index />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/auth" element={<Auth />} />
-      <Route path="/measurements" element={<Measurements />} />
-      <Route path="/bioregions" element={<Bioregions />} />
-      <Route path="/regenerative-agriculture" element={<RegenerativeAgriculture />} />
-      <Route path="/valuation" element={<Valuation />} />
-      <Route path="/governance" element={<Governance />} />
-      <Route path="/marketplace" element={<Marketplace />} />
-      <Route path="/health" element={<Health />} />
-      <Route path="/adoption" element={<Adoption />} />
+      <Route path="/measurements" element={<SimplePage title="Planetary Measurement & Verification" description="Real-time satellite data integration with multi-metric tracking and 95% confidence intervals." />} />
+      <Route path="/bioregions" element={<SimplePage title="Geographic Intelligence & Bioregional Mapping" description="PostGIS-powered bioregional visualization with climate risk forecasting." />} />
+      <Route path="/regenerative-agriculture" element={<SimplePage title="Regenerative Agriculture & Ecosystem Recovery" description="Comprehensive ecosystem health monitoring with farmer income projections." />} />
+      <Route path="/valuation" element={<SimplePage title="Mathematical Trust & Credit Valuation Engine" description="Multi-variable impact scoring with dynamic pricing model." />} />
+      <Route path="/governance" element={<SimplePage title="Ethical, Cultural & Spiritual Governance" description="Bioregional Ethics Councils with 67% indigenous representation." />} />
+      <Route path="/marketplace" element={<SimplePage title="Marketplace & Financial Infrastructure" description="RIU trading platform with 24.5M RIUs in circulation." />} />
+      <Route path="/health" element={<SimplePage title="Human Health Integration" description="Air quality credits and healthcare savings projections." />} />
+      <Route path="/adoption" element={<SimplePage title="Adoption Pathway for Global Change" description="Six actor entry points with The Flywheel Effect economic model." />} />
       <Route path="*" element={<Index />} />
     </Routes>
   </BrowserRouter>
