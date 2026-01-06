@@ -1,1 +1,91 @@
-import React from 'react';\nimport { motion } from 'framer-motion';\nimport { Helmet } from 'react-helmet-async';\nimport { \n  Shield, Zap, Globe, Users, TrendingUp, Award, Brain, Leaf, \n  Database, Lock, Cpu, Network, Eye, AlertTriangle, CheckCircle,\n  BarChart3, Activity, Layers, Settings, Target, Sparkles, Building\n} from 'lucide-react';\nimport { ResponsiveContainer, ResponsiveGrid, ResponsiveCard, ResponsiveText } from '@/components/ResponsiveSystem';\nimport { CriticalSystemsDashboard } from '@/components/CriticalEcosystemComponents';\nimport { Badge } from '@/components/ui/badge';\nimport { Button } from '@/components/ui/button';\n\nconst CriticalSystems = () => {\n  return (\n    <>\n      <Helmet>\n        <title>Critical Systems - Atlas Sanctum</title>\n        <meta name=\"description\" content=\"Civilizational infrastructure powering the regenerative economy at planetary scale\" />\n      </Helmet>\n      \n      <div className=\"min-h-screen bg-background pt-24\">\n        {/* Hero Section */}\n        <section className=\"py-20 bg-gradient-to-b from-primary/5 to-transparent\">\n          <ResponsiveContainer>\n            <motion.div\n              className=\"text-center max-w-4xl mx-auto\"\n              initial={{ opacity: 0, y: 20 }}\n              animate={{ opacity: 1, y: 0 }}\n              transition={{ duration: 0.8 }}\n            >\n              <div className=\"flex items-center justify-center gap-3 mb-6\">\n                <div className=\"w-16 h-16 rounded-2xl bg-gradient-to-br from-primary via-ocean to-emerald-500 flex items-center justify-center shadow-glow\">\n                  <Building className=\"w-8 h-8 text-white\" />\n                </div>\n                <Badge variant=\"secondary\" className=\"bg-emerald-500/10 text-emerald-600 border-emerald-500/20\">\n                  <Sparkles className=\"w-3 h-3 mr-1\" />\n                  Civilizational OS\n                </Badge>\n              </div>\n              \n              <ResponsiveText size=\"4xl\" weight=\"bold\" className=\"mb-6 text-gradient\">\n                Critical Systems Infrastructure\n              </ResponsiveText>\n              \n              <ResponsiveText size=\"lg\" color=\"muted\" className=\"mb-8 max-w-3xl mx-auto\">\n                The foundational systems powering regenerative impact at planetary scale. \n                Real-time monitoring, quantum verification, and autonomous optimization \n                for the civilizational operating system.\n              </ResponsiveText>\n              \n              <div className=\"flex flex-col sm:flex-row gap-4 justify-center\">\n                <Button variant=\"hero\" size=\"lg\">\n                  <Eye className=\"w-5 h-5 mr-2\" />\n                  System Overview\n                </Button>\n                <Button variant=\"outline\" size=\"lg\">\n                  <Settings className=\"w-5 h-5 mr-2\" />\n                  Configuration\n                </Button>\n              </div>\n            </motion.div>\n          </ResponsiveContainer>\n        </section>\n\n        {/* System Status Bar */}\n        <section className=\"py-8 border-b border-border/50\">\n          <ResponsiveContainer>\n            <div className=\"flex flex-wrap items-center justify-center gap-6\">\n              <div className=\"flex items-center gap-2\">\n                <div className=\"w-3 h-3 bg-emerald-500 rounded-full animate-pulse\" />\n                <span className=\"text-sm font-medium\">All Systems Operational</span>\n              </div>\n              <div className=\"flex items-center gap-2\">\n                <Network className=\"w-4 h-4 text-blue-500\" />\n                <span className=\"text-sm text-muted-foreground\">3,111 Active Nodes</span>\n              </div>\n              <div className=\"flex items-center gap-2\">\n                <Shield className=\"w-4 h-4 text-emerald-500\" />\n                <span className=\"text-sm text-muted-foreground\">99.97% Uptime</span>\n              </div>\n              <div className=\"flex items-center gap-2\">\n                <Zap className=\"w-4 h-4 text-amber-500\" />\n                <span className=\"text-sm text-muted-foreground\">847ms Response</span>\n              </div>\n            </div>\n          </ResponsiveContainer>\n        </section>\n\n        {/* Critical Systems Dashboard */}\n        <section className=\"py-20\">\n          <CriticalSystemsDashboard />\n        </section>\n\n        {/* System Architecture Overview */}\n        <section className=\"py-20 bg-muted/20\">\n          <ResponsiveContainer>\n            <div className=\"text-center mb-12\">\n              <ResponsiveText size=\"3xl\" weight=\"bold\" className=\"mb-4\">\n                Architecture Overview\n              </ResponsiveText>\n              <ResponsiveText size=\"lg\" color=\"muted\" className=\"max-w-3xl mx-auto\">\n                Multi-layered infrastructure designed for resilience, scalability, and regenerative impact\n              </ResponsiveText>\n            </div>\n            \n            <ResponsiveGrid cols={{ default: 1, md: 2, lg: 4 }} gap=\"lg\">\n              <ResponsiveCard variant=\"glass\" className=\"text-center\">\n                <div className=\"w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mx-auto mb-4\">\n                  <Database className=\"w-8 h-8 text-white\" />\n                </div>\n                <ResponsiveText size=\"lg\" weight=\"semibold\" className=\"mb-2\">\n                  Data Layer\n                </ResponsiveText>\n                <ResponsiveText size=\"sm\" color=\"muted\">\n                  Distributed storage with quantum encryption and real-time synchronization\n                </ResponsiveText>\n              </ResponsiveCard>\n              \n              <ResponsiveCard variant=\"glass\" className=\"text-center\">\n                <div className=\"w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-4\">\n                  <Brain className=\"w-8 h-8 text-white\" />\n                </div>\n                <ResponsiveText size=\"lg\" weight=\"semibold\" className=\"mb-2\">\n                  AI Layer\n                </ResponsiveText>\n                <ResponsiveText size=\"sm\" color=\"muted\">\n                  Autonomous decision-making with continuous learning and optimization\n                </ResponsiveText>\n              </ResponsiveCard>\n              \n              <ResponsiveCard variant=\"glass\" className=\"text-center\">\n                <div className=\"w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center mx-auto mb-4\">\n                  <Network className=\"w-8 h-8 text-white\" />\n                </div>\n                <ResponsiveText size=\"lg\" weight=\"semibold\" className=\"mb-2\">\n                  Network Layer\n                </ResponsiveText>\n                <ResponsiveText size=\"sm\" color=\"muted\">\n                  Global mesh network with edge computing and satellite integration\n                </ResponsiveText>\n              </ResponsiveCard>\n              \n              <ResponsiveCard variant=\"glass\" className=\"text-center\">\n                <div className=\"w-16 h-16 rounded-2xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center mx-auto mb-4\">\n                  <Shield className=\"w-8 h-8 text-white\" />\n                </div>\n                <ResponsiveText size=\"lg\" weight=\"semibold\" className=\"mb-2\">\n                  Security Layer\n                </ResponsiveText>\n                <ResponsiveText size=\"sm\" color=\"muted\">\n                  Multi-factor authentication with blockchain verification and threat detection\n                </ResponsiveText>\n              </ResponsiveCard>\n            </ResponsiveGrid>\n          </ResponsiveContainer>\n        </section>\n\n        {/* Performance Metrics */}\n        <section className=\"py-20\">\n          <ResponsiveContainer>\n            <div className=\"text-center mb-12\">\n              <ResponsiveText size=\"3xl\" weight=\"bold\" className=\"mb-4\">\n                Performance Metrics\n              </ResponsiveText>\n              <ResponsiveText size=\"lg\" color=\"muted\">\n                Real-time system performance and health indicators\n              </ResponsiveText>\n            </div>\n            \n            <ResponsiveGrid cols={{ default: 2, md: 4 }} gap=\"lg\">\n              <div className=\"text-center p-8 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-green-600/10 border border-emerald-500/20\">\n                <div className=\"text-4xl font-bold text-emerald-600 mb-2\">99.97%</div>\n                <div className=\"text-sm text-muted-foreground mb-1\">System Uptime</div>\n                <Badge variant=\"secondary\" className=\"bg-emerald-500/10 text-emerald-600\">\n                  <CheckCircle className=\"w-3 h-3 mr-1\" />\n                  Excellent\n                </Badge>\n              </div>\n              \n              <div className=\"text-center p-8 rounded-2xl bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/20\">\n                <div className=\"text-4xl font-bold text-blue-600 mb-2\">847ms</div>\n                <div className=\"text-sm text-muted-foreground mb-1\">Response Time</div>\n                <Badge variant=\"secondary\" className=\"bg-blue-500/10 text-blue-600\">\n                  <Zap className=\"w-3 h-3 mr-1\" />\n                  Fast\n                </Badge>\n              </div>\n              \n              <div className=\"text-center p-8 rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20\">\n                <div className=\"text-4xl font-bold text-purple-600 mb-2\">3,111</div>\n                <div className=\"text-sm text-muted-foreground mb-1\">Active Nodes</div>\n                <Badge variant=\"secondary\" className=\"bg-purple-500/10 text-purple-600\">\n                  <Globe className=\"w-3 h-3 mr-1\" />\n                  Global\n                </Badge>\n              </div>\n              \n              <div className=\"text-center p-8 rounded-2xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20\">\n                <div className=\"text-4xl font-bold text-amber-600 mb-2\">2.8PB</div>\n                <div className=\"text-sm text-muted-foreground mb-1\">Data Processed</div>\n                <Badge variant=\"secondary\" className=\"bg-amber-500/10 text-amber-600\">\n                  <Database className=\"w-3 h-3 mr-1\" />\n                  Massive\n                </Badge>\n              </div>\n            </ResponsiveGrid>\n          </ResponsiveContainer>\n        </section>\n\n        {/* Call to Action */}\n        <section className=\"py-20 bg-gradient-to-r from-primary/10 to-ocean/10\">\n          <ResponsiveContainer>\n            <div className=\"text-center max-w-3xl mx-auto\">\n              <ResponsiveText size=\"3xl\" weight=\"bold\" className=\"mb-4\">\n                Ready to Scale Regenerative Impact?\n              </ResponsiveText>\n              <ResponsiveText size=\"lg\" color=\"muted\" className=\"mb-8\">\n                Join the civilizational operating system powering the regenerative economy. \n                Access enterprise-grade infrastructure with planetary-scale impact.\n              </ResponsiveText>\n              <div className=\"flex flex-col sm:flex-row gap-4 justify-center\">\n                <Button variant=\"hero\" size=\"lg\">\n                  <Building className=\"w-5 h-5 mr-2\" />\n                  Enterprise Access\n                </Button>\n                <Button variant=\"outline\" size=\"lg\">\n                  <Eye className=\"w-5 h-5 mr-2\" />\n                  System Demo\n                </Button>\n              </div>\n            </div>\n          </ResponsiveContainer>\n        </section>\n      </div>\n    </>\n  );\n};\n\nexport default CriticalSystems;
+import React from 'react';
+import { Helmet } from 'react-helmet-async';
+import { Shield, Building, Globe, Zap } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+
+const CriticalSystems = () => {
+  return (
+    <>
+      <Helmet>
+        <title>Critical Systems - Atlas Sanctum</title>
+        <meta name="description" content="Civilizational infrastructure powering the regenerative economy" />
+      </Helmet>
+      
+      <div className="min-h-screen bg-background pt-24">
+        <div className="container mx-auto px-4 py-20">
+          <div className="text-center max-w-4xl mx-auto mb-16">
+            <div className="flex items-center justify-center gap-3 mb-6">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary via-ocean to-emerald-500 flex items-center justify-center">
+                <Building className="w-8 h-8 text-white" />
+              </div>
+              <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-600">
+                Civilizational OS
+              </Badge>
+            </div>
+            
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-gradient">
+              Critical Systems Infrastructure
+            </h1>
+            
+            <p className="text-lg text-muted-foreground mb-8 max-w-3xl mx-auto">
+              The foundational systems powering regenerative impact at planetary scale.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button variant="hero" size="lg">
+                System Overview
+              </Button>
+              <Button variant="outline" size="lg">
+                Configuration
+              </Button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+            <div className="text-center p-6 rounded-xl bg-card border border-border">
+              <Shield className="w-8 h-8 text-emerald-500 mx-auto mb-3" />
+              <div className="text-2xl font-bold text-emerald-600 mb-1">99.97%</div>
+              <div className="text-sm text-muted-foreground">Uptime</div>
+            </div>
+            
+            <div className="text-center p-6 rounded-xl bg-card border border-border">
+              <Globe className="w-8 h-8 text-blue-500 mx-auto mb-3" />
+              <div className="text-2xl font-bold text-blue-600 mb-1">3,111</div>
+              <div className="text-sm text-muted-foreground">Active Nodes</div>
+            </div>
+            
+            <div className="text-center p-6 rounded-xl bg-card border border-border">
+              <Zap className="w-8 h-8 text-amber-500 mx-auto mb-3" />
+              <div className="text-2xl font-bold text-amber-600 mb-1">847ms</div>
+              <div className="text-sm text-muted-foreground">Response Time</div>
+            </div>
+            
+            <div className="text-center p-6 rounded-xl bg-card border border-border">
+              <Building className="w-8 h-8 text-purple-500 mx-auto mb-3" />
+              <div className="text-2xl font-bold text-purple-600 mb-1">2.8PB</div>
+              <div className="text-sm text-muted-foreground">Data Processed</div>
+            </div>
+          </div>
+
+          <div className="text-center bg-gradient-to-r from-primary/10 to-ocean/10 rounded-2xl p-12">
+            <h2 className="text-3xl font-bold mb-4">Ready to Scale Regenerative Impact?</h2>
+            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+              Join the civilizational operating system powering the regenerative economy.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button variant="hero" size="lg">
+                Enterprise Access
+              </Button>
+              <Button variant="outline" size="lg">
+                System Demo
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default CriticalSystems;
