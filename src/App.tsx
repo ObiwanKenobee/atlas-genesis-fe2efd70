@@ -36,6 +36,8 @@ const Health = lazy(() => import('./pages/Health'));
 const Outreach = lazy(() => import('./pages/Outreach'));
 const Security = lazy(() => import('./pages/Security'));
 const Adoption = lazy(() => import('./pages/Adoption'));
+const EndToEndExperience = lazy(() => import('./pages/EndToEndExperience'));
+const BusinessModelPage = lazy(() => import('./pages/BusinessModel'));
 const CriticalSystems = lazy(() => import('./pages/CriticalSystems'));
 const CivilizationalArchitectureDashboard = lazy(() => import('./components/CivilizationalArchitectureDashboard'));
 const RoleSpecificDashboards = lazy(() => import('./components/RoleSpecificDashboards'));
@@ -119,6 +121,8 @@ const App = () => (
                       <Route path="/adoption" element={<Adoption />} />
                       <Route path="/architecture" element={<CivilizationalArchitectureDashboard />} />
                       <Route path="/systems" element={<CriticalSystems />} />
+                      <Route path="/business-model" element={<BusinessModelPage />} />
+                      <Route path="/experience" element={<EndToEndExperience />} />
                       <Route path="/dashboards" element={<RoleSpecificDashboards />} />
                       
                       {/* Infrastructure Pages */}
