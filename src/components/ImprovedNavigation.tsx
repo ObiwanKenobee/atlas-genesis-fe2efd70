@@ -123,7 +123,7 @@ const ImprovedNavigation = () => {
   };
 
   const DropdownMenu: React.FC<{ items: NavigationItem[]; level: number }> = ({ items, level }) => (
-    <div className={`${level === 0 ? 'absolute top-full left-0 mt-2 w-screen max-w-4xl' : ''} bg-card border border-border/50 rounded-lg shadow-xl p-6`}>
+    <div className={`${level === 0 ? 'absolute top-full left-0 mt-2 w-screen max-w-4xl z-50' : ''} bg-card border border-border/50 rounded-lg shadow-xl p-6`}>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {items.map((section, index) => (
           <div key={index}>
@@ -155,7 +155,7 @@ const ImprovedNavigation = () => {
   );
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border/50">
       <div className="container mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo */}
@@ -205,7 +205,7 @@ const ImprovedNavigation = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
-                      className="absolute top-full left-0 mt-2"
+                      className="absolute top-full left-0 mt-2 z-50"
                       onMouseLeave={() => setActiveDropdown(null)}
                     >
                       <DropdownMenu items={item.submenu || []} level={0} />
