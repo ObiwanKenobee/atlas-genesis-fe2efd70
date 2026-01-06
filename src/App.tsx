@@ -35,27 +35,26 @@ const HeroSection = () => (
       </h1>
 
       <p className="text-2xl text-slate-300 max-w-5xl mx-auto mb-16 leading-relaxed">
-        The world's first <span className="text-emerald-400 font-semibold">regenerative platform</span> uniting ecosystems across land, oceans, and human health—scaling to <span className="text-blue-400 font-semibold">trillion-dollar impact</span> with an enduring ethical core.
+        The world's first regenerative platform uniting ecosystems across land, oceans, and human health—scaling to trillion-dollar impact with an enduring ethical core.
       </p>
 
       <div className="flex gap-8 justify-center mb-20 flex-wrap">
         <Link to="/dashboard" className="btn-glow px-12 py-6 rounded-2xl text-white font-bold text-xl hover-lift">
-          🚀 Enter the Sanctum
+          Enter the Sanctum
         </Link>
         <Link to="/marketplace" className="glass px-12 py-6 rounded-2xl text-white font-bold text-xl hover-lift border-2 border-emerald-500/30">
-          🌱 Explore Platform
+          Explore Platform
         </Link>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
         {[
-          { value: "$2.4T", label: "Addressable Market", icon: "🌍" },
-          { value: "150+", label: "Global Partners", icon: "🤝" },
-          { value: "12M", label: "Hectares Protected", icon: "🌱" },
-          { value: "99.9%", label: "Carbon Verified", icon: "✅" }
+          { value: "$2.4T", label: "Addressable Market" },
+          { value: "150+", label: "Global Partners" },
+          { value: "12M", label: "Hectares Protected" },
+          { value: "99.9%", label: "Carbon Verified" }
         ].map((stat, index) => (
           <div key={index} className="glass p-8 rounded-2xl hover-lift text-center group animate-float" style={{animationDelay: `${index * 0.5}s`}}>
-            <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">{stat.icon}</div>
             <div className="text-4xl font-black text-emerald-400 mb-3">{stat.value}</div>
             <div className="text-sm text-slate-400 font-medium uppercase tracking-wider">{stat.label}</div>
           </div>
@@ -84,6 +83,7 @@ const PlatformArchitecture = () => (
             description: "Decentralized AI-driven decision-making grounded in universal ethics, ensuring transparent governance through DAO participation.",
             stat: "12,450+",
             statLabel: "Governance Participants",
+            statDesc: "Active DAO members",
             features: ["Moral AI Protocols", "DAO Governance", "Values Engine", "Ethical Frameworks", "Sacred Land Protection"]
           },
           {
@@ -92,6 +92,7 @@ const PlatformArchitecture = () => (
             description: "Seamless exchange of regenerative assets including carbon credits, ecosystem restoration credits, and cultural preservation funds.",
             stat: "$1.84B",
             statLabel: "Trading Volume",
+            statDesc: "Total value exchanged",
             features: ["Blockchain Records", "AI-Powered Oracles", "Living Smart Contracts", "RIU Trading", "Impact Verification"]
           },
           {
@@ -100,6 +101,7 @@ const PlatformArchitecture = () => (
             description: "Measure real-world regenerative impact across agriculture, oceanic, healthcare, and circular economy sectors.",
             stat: "15,000+",
             statLabel: "Data Points",
+            statDesc: "IoT sensors active",
             features: ["Big Data Analytics", "AI Forecasting", "Ecosystem Mapping", "Satellite Integration", "IoT Sensor Networks"]
           },
           {
@@ -108,6 +110,7 @@ const PlatformArchitecture = () => (
             description: "Build and share a global knowledge ecosystem through impact stories, collaboration, and ethical AI research.",
             stat: "8,500+", 
             statLabel: "Knowledge Assets",
+            statDesc: "Stories & resources",
             features: ["Impact Stories", "Global Hub", "AI Library", "Cultural Preservation", "Knowledge Sharing"]
           },
           {
@@ -116,6 +119,7 @@ const PlatformArchitecture = () => (
             description: "Enable financial flows supporting regenerative businesses through impact investing, DeFi, and microfinance.",
             stat: "$4.2B",
             statLabel: "Value Generated", 
+            statDesc: "Economic impact",
             features: ["Impact Marketplace", "Sustainable Finance", "Microfinance Platform", "DeFi Integration", "Impact Bonds"]
           }
         ].map((layer, index) => (
@@ -124,6 +128,7 @@ const PlatformArchitecture = () => (
               <div className="text-8xl font-black text-emerald-500 mb-4">{layer.number}</div>
               <div className="text-4xl font-bold text-emerald-400 mb-2">{layer.stat}</div>
               <div className="text-lg font-semibold text-white mb-1">{layer.statLabel}</div>
+              <div className="text-sm text-slate-400">{layer.statDesc}</div>
             </div>
             
             <div className="md:col-span-6">
@@ -143,6 +148,10 @@ const PlatformArchitecture = () => (
           </div>
         ))}
       </div>
+      
+      <div className="text-center mt-12 text-xl text-slate-400">
+        Each layer interconnects to create a unified regenerative ecosystem
+      </div>
     </div>
   </section>
 );
@@ -160,15 +169,14 @@ const RealTimeImpact = () => (
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mb-16">
         {[
-          { value: "12.4M", unit: "Hectares", label: "Land Restored", change: "+23%", icon: "🌱" },
-          { value: "847K", unit: "km²", label: "Ocean Protected", change: "+18%", icon: "🌊" },
-          { value: "2.8M", unit: "Lives", label: "Health Improved", change: "+45%", icon: "❤️" },
-          { value: "94%", unit: "Rate", label: "Circular Economy", change: "+12%", icon: "♻️" },
-          { value: "$4.2B", unit: "USD", label: "Value Generated", change: "+67%", icon: "💰" },
-          { value: "156", unit: "Nations", label: "Global Reach", change: "+8%", icon: "🌍" }
+          { value: "12.4M", unit: "Hectares", label: "Land Restored", change: "+23%" },
+          { value: "847K", unit: "km²", label: "Ocean Protected", change: "+18%" },
+          { value: "2.8M", unit: "Lives", label: "Health Improved", change: "+45%" },
+          { value: "94%", unit: "Rate", label: "Circular Economy", change: "+12%" },
+          { value: "$4.2B", unit: "USD", label: "Value Generated", change: "+67%" },
+          { value: "156", unit: "Nations", label: "Global Reach", change: "+8%" }
         ].map((metric, index) => (
           <div key={index} className="glass p-10 rounded-3xl text-center hover-lift group">
-            <div className="text-5xl mb-6 group-hover:animate-bounce">{metric.icon}</div>
             <div className="text-5xl font-black text-emerald-400 mb-3">{metric.value}</div>
             <div className="text-lg text-slate-400 mb-3">{metric.unit}</div>
             <div className="text-2xl font-bold mb-4">{metric.label}</div>
@@ -189,12 +197,275 @@ const RealTimeImpact = () => (
   </section>
 );
 
+const TechStack = () => (
+  <section className="py-32 bg-slate-800 relative">
+    <div className="max-w-7xl mx-auto px-8">
+      <div className="text-center mb-20">
+        <h2 className="text-6xl font-black mb-6">TECHNOLOGY STACK</h2>
+        <h3 className="text-3xl text-emerald-500 mb-8">Built for Scale & Trust</h3>
+        <p className="text-xl text-slate-400 max-w-4xl mx-auto">
+          Enterprise-grade infrastructure combining the latest in blockchain, AI, and cloud technology to power global regeneration.
+        </p>
+      </div>
+
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+        {[
+          {
+            title: "Blockchain Layer",
+            description: "Ethereum & Polkadot-based infrastructure for immutable records and decentralized applications.",
+            features: ["Smart Contracts", "Carbon Tokens", "DeFi"]
+          },
+          {
+            title: "AI & Machine Learning",
+            description: "Real-time ecosystem analysis, predictive modeling, and optimization algorithms.",
+            features: ["AI Oracles", "Pattern Recognition", "Forecasting"]
+          },
+          {
+            title: "Security & Privacy",
+            description: "Zero-Knowledge Proofs ensuring privacy without compromising transparency.",
+            features: ["ZKPs", "Encryption", "Secure Compute"]
+          },
+          {
+            title: "Cloud Infrastructure",
+            description: "Scalable hosting on AWS, Google Cloud, and Azure with decentralized storage.",
+            features: ["Multi-Cloud", "IPFS", "Edge Computing"]
+          },
+          {
+            title: "IoT Integration",
+            description: "Global sensor network providing real-time environmental data feeds.",
+            features: ["Satellites", "Sensors", "Real-Time Data"]
+          },
+          {
+            title: "API Ecosystem",
+            description: "Open-source APIs enabling third-party integrations and ecosystem growth.",
+            features: ["REST", "GraphQL", "Webhooks"]
+          }
+        ].map((tech, index) => (
+          <div key={index} className="glass p-8 rounded-2xl hover-lift">
+            <h4 className="text-2xl font-bold mb-4 text-emerald-500">{tech.title}</h4>
+            <p className="text-slate-400 mb-6">{tech.description}</p>
+            <div className="space-y-2">
+              {tech.features.map((feature, i) => (
+                <div key={i} className="bg-emerald-500/10 px-4 py-2 rounded-lg text-sm border border-emerald-500/20">
+                  {feature}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="glass p-12 rounded-3xl text-center">
+        <h4 className="text-3xl font-bold mb-6">Decentralized by Design</h4>
+        <p className="text-xl text-slate-400 mb-8 max-w-4xl mx-auto">
+          Our architecture ensures no single point of failure, with data distributed across global nodes and verified through consensus mechanisms.
+        </p>
+        <div className="flex justify-center items-center gap-8 mb-6">
+          {['N1', 'N2', 'N3', 'N4'].map((node, i) => (
+            <div key={i} className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center text-emerald-400 font-bold">
+              {node}
+            </div>
+          ))}
+        </div>
+        <div className="text-emerald-400 font-semibold">4,000+ global nodes</div>
+      </div>
+    </div>
+  </section>
+);
+
+const JoinRevolution = () => (
+  <section className="py-32 bg-gradient-to-r from-emerald-900 via-slate-900 to-blue-900 relative">
+    <div className="max-w-5xl mx-auto px-8 text-center">
+      <h2 className="text-7xl font-black mb-8">
+        Join the Regenerative<br />
+        <span className="text-gradient">Revolution</span>
+      </h2>
+      
+      <p className="text-2xl text-slate-300 mb-16">
+        Be part of the world's largest ecosystem for regenerating land, oceans, and human flourishing. Together, we scale to trillions.
+      </p>
+      
+      <div className="flex gap-8 justify-center mb-16">
+        <button className="btn-glow px-12 py-6 rounded-2xl text-white font-bold text-xl">
+          Request Early Access
+        </button>
+        <button className="glass px-12 py-6 rounded-2xl text-white font-bold text-xl border-2 border-emerald-500/50">
+          Contact Team
+        </button>
+      </div>
+
+      <div className="mb-12">
+        <p className="text-slate-400 mb-8">Trusted by leading organizations worldwide</p>
+        <div className="flex justify-center items-center gap-12 flex-wrap">
+          {['UN Climate', 'World Bank', 'WEF', 'WWF', 'IUCN'].map((org, i) => (
+            <div key={i} className="text-slate-500 font-semibold text-lg">{org}</div>
+          ))}
+        </div>
+      </div>
+
+      <div className="glass p-8 rounded-2xl max-w-md mx-auto">
+        <h4 className="text-xl font-bold mb-4">Stay Updated</h4>
+        <p className="text-slate-400 mb-6">Get the latest regenerative impact updates delivered to your inbox.</p>
+        <div className="flex gap-4">
+          <input 
+            type="email" 
+            placeholder="Enter your email"
+            className="flex-1 px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder-slate-400"
+          />
+          <button className="btn-glow px-6 py-3 rounded-lg font-semibold">Subscribe</button>
+        </div>
+        <p className="text-xs text-slate-500 mt-4">We respect your privacy. Unsubscribe at any time.</p>
+      </div>
+    </div>
+  </section>
+);
+
+const EnhancedFooter = () => (
+  <footer className="bg-slate-900 text-white py-16">
+    <div className="max-w-7xl mx-auto px-8">
+      <div className="grid md:grid-cols-5 gap-12 mb-12">
+        <div className="md:col-span-2">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-blue-500 rounded-lg flex items-center justify-center">
+              🌱
+            </div>
+            <div>
+              <div className="text-xl font-bold">Atlas Sanctum</div>
+              <div className="text-xs text-slate-400">REGENERATIVE PLATFORM</div>
+            </div>
+          </div>
+          <p className="text-slate-400 mb-6">
+            The world's first regenerative platform uniting ecosystems for trillion-dollar impact.
+          </p>
+          <div className="space-y-2 text-sm text-slate-400">
+            <div>hello@atlassanctum.com</div>
+            <div>+1 (234) 567-890</div>
+            <div>San Francisco, CA</div>
+            <div>United States</div>
+          </div>
+        </div>
+
+        <div>
+          <h4 className="font-bold mb-4">FEATURES</h4>
+          <div className="space-y-2 text-sm text-slate-400">
+            <Link to="/measurements" className="block hover:text-emerald-400">Measurements</Link>
+            <Link to="/bioregions" className="block hover:text-emerald-400">Bioregions</Link>
+            <Link to="/regenerative-agriculture" className="block hover:text-emerald-400">Regeneration</Link>
+            <Link to="/valuation" className="block hover:text-emerald-400">Valuation</Link>
+          </div>
+          <div className="mt-6">
+            <h5 className="font-semibold mb-3">📱 Download Apps</h5>
+            <div className="space-y-2 text-xs">
+              <div className="glass px-3 py-2 rounded">📱 App Store</div>
+              <div className="glass px-3 py-2 rounded">📦 APK</div>
+              <div className="glass px-3 py-2 rounded">🤖 Google Play</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h4 className="font-bold mb-4">MORE FEATURES</h4>
+          <div className="space-y-2 text-sm text-slate-400">
+            <Link to="/governance" className="block hover:text-emerald-400">Governance</Link>
+            <Link to="/health" className="block hover:text-emerald-400">Health</Link>
+            <div>Outreach</div>
+            <div>Security</div>
+          </div>
+          <div className="mt-6">
+            <h5 className="font-bold mb-4">PLATFORM</h5>
+            <div className="space-y-2 text-sm text-slate-400">
+              <Link to="/marketplace" className="block hover:text-emerald-400">Marketplace</Link>
+              <Link to="/adoption" className="block hover:text-emerald-400">Adoption</Link>
+              <Link to="/dashboard" className="block hover:text-emerald-400">Dashboard</Link>
+              <div>Portfolio</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h4 className="font-bold mb-4">RESOURCES</h4>
+          <div className="space-y-2 text-sm text-slate-400">
+            <div>API Documentation</div>
+            <div>Impact Guides</div>
+            <div>Community Forum</div>
+            <div>Case Studies</div>
+          </div>
+          <div className="mt-6">
+            <h5 className="font-bold mb-4">SUPPORT</h5>
+            <div className="space-y-2 text-sm text-slate-400">
+              <div>Help Center</div>
+              <div>Contact Support</div>
+              <div>Documentation</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-3 gap-8 mb-12">
+        <div>
+          <h5 className="font-bold mb-4">LEGAL</h5>
+          <div className="space-y-2 text-sm text-slate-400">
+            <div>Privacy Policy</div>
+            <div>Terms of Service</div>
+            <div>Cookie Policy</div>
+            <div>Accessibility Statement</div>
+          </div>
+        </div>
+        <div>
+          <h5 className="font-bold mb-4">COMPANY</h5>
+          <div className="space-y-2 text-sm text-slate-400">
+            <div>About Atlas</div>
+            <div>Join Our Team</div>
+            <div>Media Kit</div>
+            <div>Get in Touch</div>
+          </div>
+        </div>
+        <div className="text-right">
+          <div className="space-y-2 text-sm">
+            <div className="flex items-center justify-end gap-2">
+              <span className="w-2 h-2 bg-emerald-500 rounded-full"></span>
+              <span className="text-emerald-400">All Systems Operational</span>
+            </div>
+            <div className="text-slate-400">Global Network</div>
+            <div className="text-slate-400">Enterprise Security</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t border-slate-700 pt-8 flex justify-between items-center">
+        <div className="text-sm text-slate-400">
+          © 2025 Atlas Sanctum. All rights reserved.<br />
+          Regenerating Earth's future through verified, ethical impact.
+        </div>
+        <div className="text-center">
+          <div className="text-lg font-bold mb-2">Ready to join the regeneration?</div>
+          <Link to="/marketplace" className="btn-glow px-6 py-3 rounded-lg font-semibold">
+            Explore Platform
+          </Link>
+        </div>
+      </div>
+
+      <div className="mt-8 text-center">
+        <div className="glass p-6 rounded-xl inline-block">
+          <div className="text-lg font-bold mb-2">STAY UPDATED</div>
+          <div className="text-slate-400">Get weekly insights on regenerative impact</div>
+        </div>
+      </div>
+    </div>
+  </footer>
+);
+
 const Index = () => (
-  <Layout>
-    <HeroSection />
-    <PlatformArchitecture />
-    <RealTimeImpact />
-  </Layout>
+  <div className="font-display bg-slate-900 text-white">
+    <Layout showFooter={false}>
+      <HeroSection />
+      <PlatformArchitecture />
+      <RealTimeImpact />
+      <TechStack />
+      <JoinRevolution />
+    </Layout>
+    <EnhancedFooter />
+  </div>
 );
 
 const Dashboard = () => (
