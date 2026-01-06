@@ -1,5 +1,5 @@
 import SEO from "@/components/SEO";
-import { useSEO } from "@/hooks/usePerformanceMonitoring";
+import { useSEO } from "@/hooks/useSEO";
 import HeroSection from "@/components/HeroSection";
 import PlatformLayers from "@/components/PlatformLayers";
 import ImpactMetrics from "@/components/ImpactMetrics";

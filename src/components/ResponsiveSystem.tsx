@@ -71,7 +71,8 @@ export const ResponsiveGrid: React.FC<ResponsiveGridProps> = ({
   };
 
   const gridCols = cn(
-    'grid grid-cols-1',
+    'grid',
+    cols.default && `grid-cols-${cols.default}`,
     cols.sm && `sm:grid-cols-${cols.sm}`,
     cols.md && `md:grid-cols-${cols.md}`,
     cols.lg && `lg:grid-cols-${cols.lg}`,

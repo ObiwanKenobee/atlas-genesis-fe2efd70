@@ -98,14 +98,14 @@ export const BusinessModelOverview = () => {
         <ResponsiveGrid cols={{ default: 1, md: 2, lg: 4 }} gap="lg">
           {revenueStreams.map((stream, index) => (
             <ResponsiveCard key={index} variant="elevated" className="text-center">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
-                <stream.icon className="w-6 h-6 text-emerald-600" />
+              <div className={`w-12 h-12 rounded-xl bg-${stream.color}-500/10 flex items-center justify-center mx-auto mb-4`}>
+                <stream.icon className={`w-6 h-6 text-${stream.color}-600`} />
               </div>
               <ResponsiveText size="lg" weight="semibold" className="mb-2">
                 {stream.title}
               </ResponsiveText>
               <div className="text-3xl font-bold text-foreground mb-1">{stream.revenue}</div>
-              <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-600 mb-3">
+              <Badge variant="secondary" className={`bg-${stream.color}-500/10 text-${stream.color}-600 mb-3`}>
                 {stream.growth}
               </Badge>
               <ResponsiveText size="sm" color="muted">
