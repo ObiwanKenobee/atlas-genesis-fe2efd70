@@ -1,13 +1,10 @@
 import SEO from "@/components/SEO";
 import { useSEO } from "@/hooks/useSEO";
-import EnterpriseHeader from "@/components/EnterpriseHeader";
-import ImprovedNavigation from "@/components/ImprovedNavigation";
 import HeroSection from "@/components/HeroSection";
 import PlatformLayers from "@/components/PlatformLayers";
 import ImpactMetrics from "@/components/ImpactMetrics";
 import TechnologyStack from "@/components/TechnologyStack";
 import CTASection from "@/components/CTASection";
-import Footer from "@/components/Footer";
 import NewsletterBanner from "@/components/NewsletterBanner";
 
 const Index = () => {
@@ -36,17 +33,15 @@ const Index = () => {
     <>
       <SEO {...seoData} />
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        <ImprovedNavigation />
-      <main className="pt-24">
-        <HeroSection />
-        <PlatformLayers />
-        <ImpactMetrics />
-        <TechnologyStack />
-        <CTASection />
-      </main>
-      <Footer />
-      <NewsletterBanner />
-    </div>
+        <main>
+          <HeroSection />
+          <PlatformLayers />
+          <ImpactMetrics />
+          <TechnologyStack />
+          <CTASection />
+        </main>
+        <NewsletterBanner />
+      </div>
     </>
   );
 };

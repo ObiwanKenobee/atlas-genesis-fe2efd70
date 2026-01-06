@@ -9,6 +9,8 @@ import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/hooks/useAuth";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import LoadingFallback from "@/components/LoadingFallback";
+import CivilizationalHeader from "@/components/CivilizationalHeader";
+import CivilizationalFooter from "@/components/CivilizationalFooter";
 import { initGA } from "@/lib/analytics";
 import { usePerformanceMonitoring } from "@/hooks/usePerformanceMonitoring";
 import * as Sentry from "@sentry/react";
@@ -34,6 +36,7 @@ const Health = lazy(() => import('./pages/Health'));
 const Outreach = lazy(() => import('./pages/Outreach'));
 const Security = lazy(() => import('./pages/Security'));
 const Adoption = lazy(() => import('./pages/Adoption'));
+const CriticalSystems = lazy(() => import('./pages/CriticalSystems'));
 const CivilizationalArchitectureDashboard = lazy(() => import('./components/CivilizationalArchitectureDashboard'));
 const RoleSpecificDashboards = lazy(() => import('./components/RoleSpecificDashboards'));
 
@@ -91,6 +94,7 @@ const App = () => (
               <AuthProvider>
                 <PerformanceWrapper>
                   <ErrorBoundary>
+                    <CivilizationalHeader />
                     <Suspense fallback={<LoadingFallback />}>
                       <Routes>
                       <Route path="/" element={<Index />} />
@@ -114,6 +118,7 @@ const App = () => (
                       <Route path="/security" element={<Security />} />
                       <Route path="/adoption" element={<Adoption />} />
                       <Route path="/architecture" element={<CivilizationalArchitectureDashboard />} />
+                      <Route path="/systems" element={<CriticalSystems />} />
                       <Route path="/dashboards" element={<RoleSpecificDashboards />} />
                       
                       {/* Infrastructure Pages */}
@@ -147,6 +152,7 @@ const App = () => (
                       <Route path="*" element={<NotFound />} />
                     </Routes>
                   </Suspense>
+                  <CivilizationalFooter />
                 </ErrorBoundary>
               </PerformanceWrapper>
             </AuthProvider>
