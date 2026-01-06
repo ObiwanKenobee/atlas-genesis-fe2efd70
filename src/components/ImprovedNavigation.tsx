@@ -10,6 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
+import { InteractiveButton } from './Interactions';
 
 interface NavigationItem {
   label: string;
@@ -126,32 +127,32 @@ const ImprovedNavigation = () => {
   const DropdownMenu: React.FC<{ items: NavigationItem[]; level: number }> = ({ items, level }) => (
     <div className={`${
       level === 0 
-        ? 'absolute top-full left-0 mt-2 w-screen max-w-4xl z-50' 
+        ? 'absolute top-full left-0 mt-2 w-screen max-w-xs sm:max-w-md md:max-w-2xl lg:max-w-4xl z-50' 
         : 'w-full'
-    } bg-card border border-border/50 rounded-lg shadow-xl p-4 sm:p-6`}>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8">
+    } bg-card border border-border/50 rounded-lg shadow-xl p-3 sm:p-4 md:p-6`}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
         {items.map((section, index) => (
-          <div key={index}>
-            <h3 className="font-semibold text-foreground mb-4">{section.label}</h3>
-            <div className="space-y-3">
+          <div key={index} className="min-w-0">
+            <h3 className="font-semibold text-foreground mb-2 sm:mb-3 md:mb-4 text-sm sm:text-base">{section.label}</h3>
+            <div className="space-y-2 sm:space-y-3">
               {section.submenu?.map((item, itemIndex) => (
                 <Link
                   key={itemIndex}
                   to={item.href || '#'}
-                  className="flex items-start space-x-3 p-3 rounded-lg hover:bg-muted/50 transition-colors group"
+                  className="flex items-start space-x-2 sm:space-x-3 p-2 sm:p-3 rounded-lg hover:bg-muted/50 transition-colors group"
                   onClick={() => setActiveDropdown(null)}
                 >
-                  {item.icon && <item.icon className="w-5 h-5 text-primary mt-0.5" />}
-                  <div>
-                    <div className="font-medium text-foreground group-hover:text-primary transition-colors">
+                  {item.icon && <item.icon className="w-4 h-4 sm:w-5 sm:h-5 text-primary mt-0.5 flex-shrink-0" />}
+                  <div className="min-w-0 flex-1">
+                    <div className="font-medium text-foreground group-hover:text-primary transition-colors text-sm sm:text-base truncate">
                       {item.label}
                     </div>
                     {item.description && (
-                      <div className="text-sm text-muted-foreground">{item.description}</div>
+                      <div className="text-xs sm:text-sm text-muted-foreground line-clamp-2">{item.description}</div>
                     )}
                   </div>
                 </Link>
-              ))}
+              ))}}
             </div>
           </div>
         ))}
@@ -264,25 +265,25 @@ const ImprovedNavigation = () => {
             exit={{ opacity: 0, height: 0 }}
             className="lg:hidden bg-card/95 backdrop-blur-xl border-b border-border overflow-hidden"
           >
-            <div className="container mx-auto px-4 sm:px-6 py-6">
-              <div className="space-y-6">
+            <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
+              <div className="space-y-4 sm:space-y-6">
                 {Object.entries(navigationStructure).map(([key, section]) => (
                   <div key={key}>
-                    <h3 className="font-semibold text-foreground mb-3">{section.label}</h3>
-                    <div className="space-y-4 ml-4">
+                    <h3 className="font-semibold text-foreground mb-2 sm:mb-3 text-base sm:text-lg">{section.label}</h3>
+                    <div className="space-y-3 sm:space-y-4 ml-2 sm:ml-4">
                       {section.submenu?.map((category, categoryIndex) => (
                         <div key={categoryIndex}>
-                          <h4 className="text-sm font-medium text-muted-foreground mb-2">{category.label}</h4>
-                          <div className="space-y-2 ml-4">
+                          <h4 className="text-sm font-medium text-muted-foreground mb-1 sm:mb-2">{category.label}</h4>
+                          <div className="space-y-1 sm:space-y-2 ml-2 sm:ml-4">
                             {category.submenu?.map((item, itemIndex) => (
                               <Link
                                 key={itemIndex}
                                 to={item.href || '#'}
-                                className="flex items-center gap-2 text-muted-foreground hover:text-foreground py-2"
+                                className="flex items-center gap-2 sm:gap-3 text-muted-foreground hover:text-foreground py-2 text-sm sm:text-base"
                                 onClick={() => setIsOpen(false)}
                               >
-                                {item.icon && <item.icon className="w-4 h-4" />}
-                                {item.label}
+                                {item.icon && <item.icon className="w-4 h-4 flex-shrink-0" />}
+                                <span className="truncate">{item.label}</span>
                               </Link>
                             ))}
                           </div>
@@ -290,23 +291,19 @@ const ImprovedNavigation = () => {
                       ))}
                     </div>
                   </div>
-                ))}
+                ))}}
                 
-                <div className="pt-4 border-t border-border">
+                <div className="pt-3 sm:pt-4 border-t border-border">
                   {user ? (
-                    <Button variant="hero" asChild className="w-full">
-                      <Link to="/dashboard">
-                        <LayoutDashboard className="w-4 h-4 mr-2" />
-                        Dashboard
-                      </Link>
-                    </Button>
+                    <InteractiveButton variant="primary" size="md" onClick={() => window.location.href = '/dashboard'}>
+                      <LayoutDashboard className="w-4 h-4 mr-2" />
+                      Dashboard
+                    </InteractiveButton>
                   ) : (
-                    <Button variant="hero" asChild className="w-full">
-                      <Link to="/auth">
-                        <LogIn className="w-4 h-4 mr-2" />
-                        Sign In
-                      </Link>
-                    </Button>
+                    <InteractiveButton variant="primary" size="md" onClick={() => window.location.href = '/auth'}>
+                      <LogIn className="w-4 h-4 mr-2" />
+                      Sign In
+                    </InteractiveButton>
                   )}
                 </div>
               </div>

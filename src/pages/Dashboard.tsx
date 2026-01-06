@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { InteractiveDashboard, InteractiveFeatureGrid } from '@/components/EnhancedPlatformComponents';
+import { PageTransition, InteractiveButton } from '@/components/Interactions';
 import {
   Leaf, LogOut, User, BarChart3, ShoppingCart, Briefcase,
   TrendingUp, Activity, Bell, Settings, Globe, TreePine,
@@ -167,7 +169,8 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <PageTransition>
+      <div className="min-h-screen bg-background">
       {/* Onboarding Tour */}
       <OnboardingTour />
 
@@ -272,17 +275,13 @@ const Dashboard = () => {
                       Explore verified carbon credit projects and make your first investment in planetary regeneration.
                     </p>
                     <div className="flex flex-wrap gap-3 justify-center md:justify-start">
-                      <Button asChild className="gap-2">
-                        <Link to="/marketplace">
-                          Browse Projects
-                          <ArrowUpRight className="w-4 h-4" />
-                        </Link>
-                      </Button>
-                      <Button variant="outline" asChild>
-                        <Link to="/bioregions">
-                          Explore Bioregions
-                        </Link>
-                      </Button>
+                      <InteractiveButton variant="primary" onClick={() => navigate('/marketplace')}>
+                        Browse Projects
+                        <ArrowUpRight className="w-4 h-4" />
+                      </InteractiveButton>
+                      <InteractiveButton variant="secondary" onClick={() => navigate('/bioregions')}>
+                        Explore Bioregions
+                      </InteractiveButton>
                     </div>
                   </div>
                 </div>
@@ -353,7 +352,16 @@ const Dashboard = () => {
           ))}
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
+        {/* Interactive Dashboard Metrics */}
+        <InteractiveDashboard />
+
+        {/* Interactive Feature Grid */}
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold text-foreground mb-6">Platform Features</h2>
+          <InteractiveFeatureGrid />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mt-12">
           {/* Recent Activity or Getting Started */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -433,6 +441,7 @@ const Dashboard = () => {
         </div>
       </main>
     </div>
+    </PageTransition>
   );
 };
 
