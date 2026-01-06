@@ -13,34 +13,32 @@ import CivilizationalHeader from "@/components/CivilizationalHeader";
 import CivilizationalFooter from "@/components/CivilizationalFooter";
 import { initGA } from "@/lib/analytics";
 import { usePerformanceMonitoring } from "@/hooks/usePerformanceMonitoring";
-import * as Sentry from "@sentry/react";
-import { BrowserTracing } from "@sentry/tracing";
 
 // Lazy-loaded page components
 const Index = lazy(() => import('./pages/Index'));
 const Auth = lazy(() => import('./pages/Auth'));
-const Onboarding = lazy(() => import('./pages/Onboarding'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
-const Marketplace = lazy(() => import('./pages/Marketplace'));
-const ProjectDetail = lazy(() => import('./pages/ProjectDetail'));
-const Portfolio = lazy(() => import('./pages/Portfolio'));
-const Pricing = lazy(() => import('./pages/Pricing'));
-const NotFound = lazy(() => import('./pages/NotFound'));
-const Transactions = lazy(() => import('./pages/Transactions'));
-const Measurements = lazy(() => import('./pages/Measurements'));
-const Bioregions = lazy(() => import('./pages/Bioregions'));
-const RegenerativeAgriculture = lazy(() => import('./pages/RegenerativeAgriculture'));
-const Valuation = lazy(() => import('./pages/Valuation'));
-const Governance = lazy(() => import('./pages/Governance'));
-const Health = lazy(() => import('./pages/Health'));
-const Outreach = lazy(() => import('./pages/Outreach'));
-const Security = lazy(() => import('./pages/Security'));
-const Adoption = lazy(() => import('./pages/Adoption'));
+const Onboarding = lazy(() => import('./pages/BasicPages').then(m => ({ default: m.Onboarding })));
+const Marketplace = lazy(() => import('./pages/BasicPages').then(m => ({ default: m.Marketplace })));
+const ProjectDetail = lazy(() => import('./pages/BasicPages').then(m => ({ default: m.ProjectDetail })));
+const Portfolio = lazy(() => import('./pages/BasicPages').then(m => ({ default: m.Portfolio })));
+const Pricing = lazy(() => import('./pages/BasicPages').then(m => ({ default: m.Pricing })));
+const NotFound = lazy(() => import('./pages/BasicPages').then(m => ({ default: m.NotFound })));
+const Transactions = lazy(() => import('./pages/FeaturePages').then(m => ({ default: m.Transactions })));
+const Measurements = lazy(() => import('./pages/FeaturePages').then(m => ({ default: m.Measurements })));
+const Bioregions = lazy(() => import('./pages/FeaturePages').then(m => ({ default: m.Bioregions })));
+const RegenerativeAgriculture = lazy(() => import('./pages/FeaturePages').then(m => ({ default: m.RegenerativeAgriculture })));
+const Valuation = lazy(() => import('./pages/FeaturePages').then(m => ({ default: m.Valuation })));
+const Governance = lazy(() => import('./pages/FeaturePages').then(m => ({ default: m.Governance })));
+const Health = lazy(() => import('./pages/FeaturePages').then(m => ({ default: m.Health })));
+const Outreach = lazy(() => import('./pages/FeaturePages').then(m => ({ default: m.Outreach })));
+const Security = lazy(() => import('./pages/FeaturePages').then(m => ({ default: m.Security })));
+const Adoption = lazy(() => import('./pages/FeaturePages').then(m => ({ default: m.Adoption })));
 const EndToEndExperience = lazy(() => import('./pages/EndToEndExperience'));
 const BusinessModelPage = lazy(() => import('./pages/BusinessModel'));
 const CriticalSystems = lazy(() => import('./pages/CriticalSystems'));
-const CivilizationalArchitectureDashboard = lazy(() => import('./components/CivilizationalArchitectureDashboard'));
-const RoleSpecificDashboards = lazy(() => import('./components/RoleSpecificDashboards'));
+const CivilizationalArchitectureDashboard = lazy(() => import('./components/SimpleComponents').then(m => ({ default: m.CivilizationalArchitectureDashboard })));
+const RoleSpecificDashboards = lazy(() => import('./components/SimpleComponents').then(m => ({ default: m.RoleSpecificDashboards })));
 
 // Infrastructure Pages
 const CarbonOffsetting = lazy(() => import('./pages/InfrastructurePages').then(m => ({ default: m.CarbonOffsetting })));
@@ -52,22 +50,22 @@ const AgricultureSolutions = lazy(() => import('./pages/InfrastructurePages').th
 const RenewableEnergy = lazy(() => import('./pages/InfrastructurePages').then(m => ({ default: m.RenewableEnergy })));
 const EducationHub = lazy(() => import('./pages/InfrastructurePages').then(m => ({ default: m.EducationHub })));
 const Certifications = lazy(() => import('./pages/InfrastructurePages').then(m => ({ default: m.Certifications })));
-const Settings = lazy(() => import('./pages/Settings'));
-const Profile = lazy(() => import('./pages/Profile'));
-const HelpCenter = lazy(() => import('./pages/HelpCenter'));
-const Contact = lazy(() => import('./pages/Contact'));
-const ReportsAnalytics = lazy(() => import('./pages/ReportsAnalytics'));
-const DashboardOverview = lazy(() => import('./pages/DashboardOverview'));
-const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
-const TermsOfService = lazy(() => import('./pages/TermsOfService'));
+const Settings = lazy(() => import('./pages/UtilityPages').then(m => ({ default: m.Settings })));
+const Profile = lazy(() => import('./pages/UtilityPages').then(m => ({ default: m.Profile })));
+const HelpCenter = lazy(() => import('./pages/UtilityPages').then(m => ({ default: m.HelpCenter })));
+const Contact = lazy(() => import('./pages/UtilityPages').then(m => ({ default: m.Contact })));
+const ReportsAnalytics = lazy(() => import('./pages/UtilityPages').then(m => ({ default: m.ReportsAnalytics })));
+const DashboardOverview = lazy(() => import('./pages/UtilityPages').then(m => ({ default: m.DashboardOverview })));
+const PrivacyPolicy = lazy(() => import('./pages/UtilityPages').then(m => ({ default: m.PrivacyPolicy })));
+const TermsOfService = lazy(() => import('./pages/UtilityPages').then(m => ({ default: m.TermsOfService })));
 
 // Admin routes grouped for better chunking
-const AdminLayout = lazy(() => import('./pages/admin/AdminLayout'));
-const AdminOverview = lazy(() => import('./pages/admin/AdminOverview'));
-const AdminProjects = lazy(() => import('./pages/admin/AdminProjects'));
-const AdminTransactions = lazy(() => import('./pages/admin/AdminTransactions'));
-const AdminAnalytics = lazy(() => import('./pages/admin/AdminAnalytics'));
-const UserManagement = lazy(() => import('./pages/admin/UserManagement'));
+const AdminLayout = lazy(() => import('./pages/AdminPages').then(m => ({ default: m.AdminLayout })));
+const AdminOverview = lazy(() => import('./pages/AdminPages').then(m => ({ default: m.AdminOverview })));
+const AdminProjects = lazy(() => import('./pages/AdminPages').then(m => ({ default: m.AdminProjects })));
+const AdminTransactions = lazy(() => import('./pages/AdminPages').then(m => ({ default: m.AdminTransactions })));
+const AdminAnalytics = lazy(() => import('./pages/AdminPages').then(m => ({ default: m.AdminAnalytics })));
+const UserManagement = lazy(() => import('./pages/AdminPages').then(m => ({ default: m.UserManagement })));
 
 const queryClient = new QueryClient();
 
