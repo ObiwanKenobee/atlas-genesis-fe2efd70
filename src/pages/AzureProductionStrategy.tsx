@@ -278,7 +278,7 @@ const AzureProductionStrategy = () => (
                 <div className="space-y-3">
                   <div className="bg-emerald-500/10 p-4 rounded-lg border border-emerald-500/20">
                     <div className="font-semibold text-emerald-400 mb-2">AKS Pod Autoscaling</div>
-                    <div className="text-sm text-slate-400">CPU > 70% or Memory > 80% triggers scale-out</div>
+                    <div className="text-sm text-slate-400">CPU over 70% or Memory over 80% triggers scale-out</div>
                   </div>
                   <div className="bg-emerald-500/10 p-4 rounded-lg border border-emerald-500/20">
                     <div className="font-semibold text-emerald-400 mb-2">Cluster Autoscaling</div>
@@ -286,7 +286,7 @@ const AzureProductionStrategy = () => (
                   </div>
                   <div className="bg-emerald-500/10 p-4 rounded-lg border border-emerald-500/20">
                     <div className="font-semibold text-emerald-400 mb-2">Database Read Replicas</div>
-                    <div className="text-sm text-slate-400">Auto-create replicas when read load > 80%</div>
+                    <div className="text-sm text-slate-400">Auto-create replicas when read load over 80%</div>
                   </div>
                 </div>
               </div>
@@ -303,7 +303,7 @@ const AzureProductionStrategy = () => (
                   </div>
                   <div className="bg-blue-500/10 p-4 rounded-lg border border-blue-500/20">
                     <div className="font-semibold text-blue-400 mb-2">Storage Scaling</div>
-                    <div className="text-sm text-slate-400">Auto-expand storage when utilization > 85%</div>
+                    <div className="text-sm text-slate-400">Auto-expand storage when utilization over 85%</div>
                   </div>
                 </div>
               </div>
