@@ -31,7 +31,7 @@ const HeroSection = () => (
   <section className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-slate-900 via-emerald-900/20 to-slate-900">
     <div className="absolute inset-0">
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse animate-delay-2s"></div>
     </div>
     
     <div className="relative z-10 max-w-7xl px-8 text-center">
@@ -65,7 +65,7 @@ const HeroSection = () => (
           { value: "12M", label: "Hectares Protected" },
           { value: "99.9%", label: "Carbon Verified" }
         ].map((stat, index) => (
-          <div key={index} className="glass p-8 rounded-2xl hover-lift text-center group animate-float" style={{animationDelay: `${index * 0.5}s`}}>
+          <div key={index} className="glass p-8 rounded-2xl hover-lift text-center group animate-float" data-delay={index * 0.5}>
             <div className="text-4xl font-black text-emerald-400 mb-3">{stat.value}</div>
             <div className="text-sm text-slate-400 font-medium uppercase tracking-wider">{stat.label}</div>
           </div>
