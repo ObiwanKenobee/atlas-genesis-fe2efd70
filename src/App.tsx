@@ -301,51 +301,6 @@ const JoinRevolution = () => (
       </div>
     </div>
   </section>
-); (
-  <section className="py-32 bg-gradient-to-r from-emerald-900 via-slate-900 to-blue-900 relative">
-    <div className="max-w-5xl mx-auto px-8 text-center">
-      <h2 className="text-7xl font-black mb-8">
-        Join the Regenerative<br />
-        <span className="text-gradient">Revolution</span>
-      </h2>
-      
-      <p className="text-2xl text-slate-300 mb-16">
-        Be part of the world's largest ecosystem for regenerating land, oceans, and human flourishing. Together, we scale to trillions.
-      </p>
-      
-      <div className="flex gap-8 justify-center mb-16">
-        <button className="btn-glow px-12 py-6 rounded-2xl text-white font-bold text-xl">
-          Request Early Access
-        </button>
-        <button className="glass px-12 py-6 rounded-2xl text-white font-bold text-xl border-2 border-emerald-500/50">
-          Contact Team
-        </button>
-      </div>
-
-      <div className="mb-12">
-        <p className="text-slate-400 mb-8">Trusted by leading organizations worldwide</p>
-        <div className="flex justify-center items-center gap-12 flex-wrap">
-          {['UN Climate', 'World Bank', 'WEF', 'WWF', 'IUCN'].map((org, i) => (
-            <div key={i} className="text-slate-500 font-semibold text-lg">{org}</div>
-          ))}
-        </div>
-      </div>
-
-      <div className="glass p-8 rounded-2xl max-w-md mx-auto">
-        <h4 className="text-xl font-bold mb-4">Stay Updated</h4>
-        <p className="text-slate-400 mb-6">Get the latest regenerative impact updates delivered to your inbox.</p>
-        <div className="flex gap-4">
-          <input 
-            type="email" 
-            placeholder="Enter your email"
-            className="flex-1 px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder-slate-400"
-          />
-          <button className="btn-glow px-6 py-3 rounded-lg font-semibold">Subscribe</button>
-        </div>
-        <p className="text-xs text-slate-500 mt-4">We respect your privacy. Unsubscribe at any time.</p>
-      </div>
-    </div>
-  </section>
 );
 
 const EnhancedFooter = () => (
