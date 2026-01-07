@@ -363,17 +363,17 @@ const AzureProductionStrategy = () => (
               <div className="bg-slate-800/50 p-4 rounded-lg">
                 <div className="font-semibold text-white mb-2">Backup Strategy</div>
                 <div className="text-sm text-slate-400">
-                  • Database: Continuous backup with 35-day retention<br/>
-                  • Files: Geo-redundant storage with versioning<br/>
-                  • Configuration: Infrastructure as Code in Git
+                  Database: Continuous backup with 35-day retention<br/>
+                  Files: Geo-redundant storage with versioning<br/>
+                  Configuration: Infrastructure as Code in Git
                 </div>
               </div>
               <div className="bg-slate-800/50 p-4 rounded-lg">
                 <div className="font-semibold text-white mb-2">Testing Schedule</div>
                 <div className="text-sm text-slate-400">
-                  • Monthly: Automated DR testing<br/>
-                  • Quarterly: Full failover simulation<br/>
-                  • Annually: Complete disaster recovery drill
+                  Monthly: Automated DR testing<br/>
+                  Quarterly: Full failover simulation<br/>
+                  Annually: Complete disaster recovery drill
                 </div>
               </div>
             </div>
