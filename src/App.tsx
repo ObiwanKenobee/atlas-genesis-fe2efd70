@@ -1,6 +1,17 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import Layout from './components/Layout';
+import BusinessModel from './pages/BusinessModel';
+import CriticalInnovations from './pages/CriticalInnovations';
+import AzureProductionStrategy from './pages/AzureProductionStrategy';
+import EthicalGovernance from './pages/EthicalGovernance';
+import RegenerativeValueExchange from './pages/RegenerativeValueExchange';
+import DataMetricsEngine from './pages/DataMetricsEngine';
+import CulturalKnowledgeImpact from './pages/CulturalKnowledgeImpact';
+import GlobalImpactEconomy from './pages/GlobalImpactEconomy';
+import EndToEndExperience from './pages/EndToEndExperience';
+import EngineeringArchitecture from './pages/EngineeringArchitecture';
+import RVXInnovations from './pages/RVXInnovations';
 
 const SimplePage = ({ title, description }: { title: string; description: string }) => (
   <Layout>
@@ -274,6 +285,23 @@ const TechStack = () => (
 );
 
 const JoinRevolution = () => (
+  <section className="py-32 bg-slate-900 relative">
+    <div className="max-w-7xl mx-auto px-8 text-center">
+      <h2 className="text-6xl font-black mb-6">JOIN THE REVOLUTION</h2>
+      <p className="text-xl text-slate-400 mb-12 max-w-3xl mx-auto">
+        Be part of the regenerative transformation. Every action counts.
+      </p>
+      <div className="flex justify-center gap-6">
+        <Link to="/auth" className="btn-glow px-8 py-4 rounded-xl font-bold text-lg">
+          Start Regenerating
+        </Link>
+        <Link to="/marketplace" className="glass px-8 py-4 rounded-xl font-bold text-lg hover:bg-slate-700/50">
+          Explore Platform
+        </Link>
+      </div>
+    </div>
+  </section>
+); (
   <section className="py-32 bg-gradient-to-r from-emerald-900 via-slate-900 to-blue-900 relative">
     <div className="max-w-5xl mx-auto px-8 text-center">
       <h2 className="text-7xl font-black mb-8">
@@ -578,11 +606,20 @@ const App = () => (
       <Route path="/marketplace" element={<SimplePage title="Marketplace & Financial Infrastructure" description="RIU trading platform with 24.5M RIUs in circulation." />} />
       <Route path="/health" element={<SimplePage title="Human Health Integration" description="Air quality credits and healthcare savings projections." />} />
       <Route path="/adoption" element={<SimplePage title="Adoption Pathway for Global Change" description="Six actor entry points with The Flywheel Effect economic model." />} />
+      <Route path="/business-model" element={<BusinessModel />} />
+      <Route path="/innovations" element={<CriticalInnovations />} />
+      <Route path="/azure-strategy" element={<AzureProductionStrategy />} />
+      <Route path="/ethical-governance" element={<EthicalGovernance />} />
+      <Route path="/regenerative-value-exchange" element={<RegenerativeValueExchange />} />
+      <Route path="/data-metrics-engine" element={<DataMetricsEngine />} />
+      <Route path="/cultural-knowledge-impact" element={<CulturalKnowledgeImpact />} />
+      <Route path="/global-impact-economy" element={<GlobalImpactEconomy />} />
+      <Route path="/end-to-end-experience" element={<EndToEndExperience />} />
+      <Route path="/engineering-architecture" element={<EngineeringArchitecture />} />
+      <Route path="/rvx-innovations" element={<RVXInnovations />} />
       <Route path="*" element={<Index />} />
     </Routes>
   </BrowserRouter>
 );
-
-export default App;
 
 export default App;
