@@ -28,9 +28,10 @@ const Header = () => (
       
       <nav style={{ display: 'flex', alignItems: 'center', gap: '2rem', color: '#94a3b8' }}>
         <Link to="/measurements" style={{ color: '#94a3b8', textDecoration: 'none' }}>Platform</Link>
-        <Link to="/marketplace" style={{ color: '#94a3b8', textDecoration: 'none' }}>Solutions</Link>
-        <Link to="/governance" style={{ color: '#94a3b8', textDecoration: 'none' }}>Impact</Link>
-        <Link to="/business-model" style={{ color: '#94a3b8', textDecoration: 'none' }}>Resources</Link>
+        <Link to="/marketplace" style={{ color: '#94a3b8', textDecoration: 'none' }}>Marketplace</Link>
+        <Link to="/business-model" style={{ color: '#94a3b8', textDecoration: 'none' }}>Business</Link>
+        <Link to="/innovations" style={{ color: '#94a3b8', textDecoration: 'none' }}>Innovations</Link>
+        <Link to="/engineering-architecture" style={{ color: '#94a3b8', textDecoration: 'none' }}>Engineering</Link>
       </nav>
       
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -89,12 +90,24 @@ const Footer = () => (
         </div>
         
         <div>
+          <h4 style={{ fontWeight: 'bold', marginBottom: '1rem' }}>ARCHITECTURE</h4>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.875rem', color: '#94a3b8' }}>
+            <Link to="/ethical-governance" style={{ color: '#94a3b8', textDecoration: 'none' }}>Ethical Governance</Link>
+            <Link to="/regenerative-value-exchange" style={{ color: '#94a3b8', textDecoration: 'none' }}>Value Exchange</Link>
+            <Link to="/data-metrics-engine" style={{ color: '#94a3b8', textDecoration: 'none' }}>Data Engine</Link>
+            <Link to="/cultural-knowledge-impact" style={{ color: '#94a3b8', textDecoration: 'none' }}>Cultural Impact</Link>
+            <Link to="/global-impact-economy" style={{ color: '#94a3b8', textDecoration: 'none' }}>Impact Economy</Link>
+          </div>
+        </div>
+        
+        <div>
           <h4 style={{ fontWeight: 'bold', marginBottom: '1rem' }}>RESOURCES</h4>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.875rem', color: '#94a3b8' }}>
             <Link to="/business-model" style={{ color: '#94a3b8', textDecoration: 'none' }}>Business Model</Link>
             <Link to="/innovations" style={{ color: '#94a3b8', textDecoration: 'none' }}>Innovations</Link>
             <Link to="/azure-strategy" style={{ color: '#94a3b8', textDecoration: 'none' }}>Azure Strategy</Link>
-            <span>Case Studies</span>
+            <Link to="/rvx-innovations" style={{ color: '#94a3b8', textDecoration: 'none' }}>RVX Innovations</Link>
+            <Link to="/end-to-end-experience" style={{ color: '#94a3b8', textDecoration: 'none' }}>User Experience</Link>
           </div>
         </div>
       </div>

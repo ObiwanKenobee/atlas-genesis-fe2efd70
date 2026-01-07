@@ -335,6 +335,7 @@ const EnhancedFooter = () => (
             <Link to="/bioregions" className="block hover:text-emerald-400">Bioregions</Link>
             <Link to="/regenerative-agriculture" className="block hover:text-emerald-400">Regeneration</Link>
             <Link to="/valuation" className="block hover:text-emerald-400">Valuation</Link>
+            <Link to="/governance" className="block hover:text-emerald-400">Governance</Link>
           </div>
           <div className="mt-6">
             <h5 className="font-semibold mb-3">📱 Download Apps</h5>
@@ -349,18 +350,18 @@ const EnhancedFooter = () => (
         <div>
           <h4 className="font-bold mb-4">MORE FEATURES</h4>
           <div className="space-y-2 text-sm text-slate-400">
-            <Link to="/governance" className="block hover:text-emerald-400">Governance</Link>
             <Link to="/health" className="block hover:text-emerald-400">Health</Link>
-            <div>Outreach</div>
-            <div>Security</div>
+            <Link to="/adoption" className="block hover:text-emerald-400">Adoption</Link>
+            <Link to="/business-model" className="block hover:text-emerald-400">Business Model</Link>
+            <Link to="/innovations" className="block hover:text-emerald-400">Innovations</Link>
           </div>
           <div className="mt-6">
             <h5 className="font-bold mb-4">PLATFORM</h5>
             <div className="space-y-2 text-sm text-slate-400">
               <Link to="/marketplace" className="block hover:text-emerald-400">Marketplace</Link>
-              <Link to="/adoption" className="block hover:text-emerald-400">Adoption</Link>
               <Link to="/dashboard" className="block hover:text-emerald-400">Dashboard</Link>
-              <div>Portfolio</div>
+              <Link to="/engineering-architecture" className="block hover:text-emerald-400">Engineering</Link>
+              <Link to="/rvx-innovations" className="block hover:text-emerald-400">RVX Innovations</Link>
             </div>
           </div>
         </div>
@@ -368,10 +369,10 @@ const EnhancedFooter = () => (
         <div>
           <h4 className="font-bold mb-4">RESOURCES</h4>
           <div className="space-y-2 text-sm text-slate-400">
+            <Link to="/azure-strategy" className="block hover:text-emerald-400">Azure Strategy</Link>
+            <Link to="/end-to-end-experience" className="block hover:text-emerald-400">User Experience</Link>
             <div>API Documentation</div>
             <div>Impact Guides</div>
-            <div>Community Forum</div>
-            <div>Case Studies</div>
           </div>
           <div className="mt-6">
             <h5 className="font-bold mb-4">SUPPORT</h5>
