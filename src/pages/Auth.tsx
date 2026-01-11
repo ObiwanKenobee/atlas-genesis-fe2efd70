@@ -279,19 +279,6 @@ const Auth = () => {
               Continue with GitHub
             </Button>
 
-            <Button
-              type="button"
-              variant="outline"
-              size="lg"
-              className="w-full"
-              onClick={() => handleOAuthLogin('microsoft')}
-              disabled={isOAuthLoading}
-            >
-              <svg className="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M0 0v24h24V0H0zm11.034 18.286h-3.62v-6.571h3.62v6.571zm6.642-7.714h-3.619V6h3.619v4.572zm-6.642-5.143H6.414V6h4.62V5.429zM17.59 18.286h3.619V6H17.59v12.286z"/>
-              </svg>
-              Continue with Microsoft
-            </Button>
           </div>
 
           <div className="relative my-6">

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -31,6 +31,7 @@ import {
   Database,
   LineChart,
   CreditCard,
+  ArrowRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -65,6 +66,15 @@ const EnterpriseHeader = () => {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const navigation: Record<string, NavDropdown> = {
     platform: {
@@ -258,13 +268,13 @@ const EnterpriseHeader = () => {
           items: [
             {
               name: "Help Center",
-              href: "/outreach",
+              href: "/help-center",
               icon: <HelpCircle className="w-5 h-5" />,
               description: "FAQs and troubleshooting",
             },
             {
               name: "Contact Sales",
-              href: "/outreach",
+              href: "/contact",
               icon: <Phone className="w-5 h-5" />,
               description: "Enterprise inquiries",
             },
@@ -284,15 +294,24 @@ const EnterpriseHeader = () => {
   const isActive = (href: string) => location.pathname === href;
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border/50">
+    <header 
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled 
+          ? "bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-lg shadow-black/5" 
+          : "bg-background/60 backdrop-blur-md"
+      }`}
+    >
       {/* Announcement Bar */}
-      <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-ocean/10 border-b border-border/30">
+      <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border-b border-border/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center h-10 text-sm">
-            <span className="text-muted-foreground">
-              🌱 Join the regenerative revolution —{" "}
-              <Link to="/marketplace" className="text-primary hover:underline font-medium">
+          <div className="flex items-center justify-center h-9 text-sm">
+            <span className="text-muted-foreground flex items-center gap-2">
+              <span className="hidden sm:inline">🌱</span>
+              <span>Join the regenerative revolution</span>
+              <span className="hidden sm:inline">—</span>
+              <Link to="/marketplace" className="text-primary hover:text-primary/80 font-medium inline-flex items-center gap-1 group">
                 Explore verified projects
+                <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
               </Link>
             </span>
           </div>
@@ -309,14 +328,15 @@ const EnterpriseHeader = () => {
             className="flex items-center gap-3"
           >
             <Link to="/" className="flex items-center gap-2.5 group">
-              <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-ocean flex items-center justify-center shadow-lg group-hover:shadow-primary/25 transition-shadow">
+              <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg group-hover:shadow-primary/30 transition-all duration-300 group-hover:scale-105">
                 <Leaf className="w-5 h-5 text-primary-foreground" />
+                <div className="absolute inset-0 rounded-xl bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
               <div className="hidden sm:block">
-                <div className="font-display font-bold text-lg text-foreground leading-tight">
-                  Atlas <span className="text-gradient">Sanctum</span>
+                <div className="font-display font-bold text-lg text-foreground leading-tight tracking-tight">
+                  Atlas <span className="text-primary">Sanctum</span>
                 </div>
-                <div className="text-[10px] text-muted-foreground uppercase tracking-widest">
+                <div className="text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
                   Regenerative Platform
                 </div>
               </div>
@@ -333,10 +353,10 @@ const EnterpriseHeader = () => {
                 onMouseLeave={() => setActiveDropdown(null)}
               >
                 <button
-                  className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     activeDropdown === key
-                      ? "text-foreground bg-accent/50"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent/30"
+                      ? "text-foreground bg-accent"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                   }`}
                 >
                   {dropdown.label}
@@ -350,47 +370,47 @@ const EnterpriseHeader = () => {
                 <AnimatePresence>
                   {activeDropdown === key && (
                     <motion.div
-                      initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                      initial={{ opacity: 0, y: 8, scale: 0.98 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 8, scale: 0.96 }}
-                      transition={{ duration: 0.15 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                      transition={{ duration: 0.15, ease: "easeOut" }}
                       className="absolute left-0 top-full pt-2"
                     >
-                      <div className="bg-card border border-border rounded-xl shadow-elevated overflow-hidden min-w-[480px]">
-                        <div className="p-6">
-                          <div className="grid grid-cols-2 gap-8">
+                      <div className="bg-popover border border-border rounded-2xl shadow-2xl shadow-black/20 overflow-hidden min-w-[520px]">
+                        <div className="p-5">
+                          <div className="grid grid-cols-2 gap-6">
                             {dropdown.sections.map((section) => (
                               <div key={section.title}>
-                                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
+                                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-3">
                                   {section.title}
                                 </h4>
-                                <div className="space-y-1">
+                                <div className="space-y-0.5">
                                   {section.items.map((item) => (
                                     <Link
                                       key={item.href + item.name}
                                       to={item.href}
-                                      className={`flex items-start gap-3 p-3 rounded-lg transition-colors group ${
+                                      className={`flex items-start gap-3 p-3 rounded-xl transition-all duration-200 group ${
                                         isActive(item.href)
                                           ? "bg-primary/10"
-                                          : "hover:bg-accent/50"
+                                          : "hover:bg-accent"
                                       }`}
                                     >
                                       <div
-                                        className={`p-2 rounded-lg ${
+                                        className={`p-2 rounded-lg shrink-0 ${
                                           isActive(item.href)
                                             ? "bg-primary text-primary-foreground"
                                             : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
-                                        } transition-colors`}
+                                        } transition-all duration-200`}
                                       >
                                         {item.icon}
                                       </div>
                                       <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2">
-                                          <span className="font-medium text-sm text-foreground">
+                                          <span className="font-medium text-sm text-foreground group-hover:text-primary transition-colors">
                                             {item.name}
                                           </span>
                                           {item.badge && (
-                                            <span className="px-2 py-0.5 text-[10px] font-medium bg-primary/10 text-primary rounded-full">
+                                            <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-primary/15 text-primary rounded-full">
                                               {item.badge}
                                             </span>
                                           )}
@@ -407,12 +427,12 @@ const EnterpriseHeader = () => {
                           </div>
 
                           {dropdown.featured && (
-                            <div className="mt-6 pt-6 border-t border-border">
+                            <div className="mt-5 pt-5 border-t border-border">
                               <Link
                                 to={dropdown.featured.href}
-                                className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-primary/10 to-ocean/10 hover:from-primary/15 hover:to-ocean/15 transition-colors group"
+                                className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 hover:from-primary/10 hover:via-primary/15 hover:to-primary/10 transition-all duration-300 group border border-primary/10"
                               >
-                                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-ocean flex items-center justify-center">
+                                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                                   <Layers className="w-6 h-6 text-primary-foreground" />
                                 </div>
                                 <div className="flex-1">
@@ -423,6 +443,7 @@ const EnterpriseHeader = () => {
                                     {dropdown.featured.description}
                                   </p>
                                 </div>
+                                <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
                               </Link>
                             </div>
                           )}
@@ -436,29 +457,33 @@ const EnterpriseHeader = () => {
 
             <Link
               to="/dashboard"
-              className="px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/30 transition-all"
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                isActive('/dashboard')
+                  ? "text-foreground bg-accent"
+                  : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+              }`}
             >
               Dashboard
             </Link>
           </nav>
 
           {/* Right Section */}
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-2">
             {user ? (
               <>
                 <NotificationCenter />
                 <Link
                   to="/settings"
-                  className="p-2 rounded-lg hover:bg-accent/50 transition-colors"
+                  className="p-2.5 rounded-lg hover:bg-accent transition-colors"
                 >
                   <Settings className="w-5 h-5 text-muted-foreground" />
                 </Link>
                 <div className="w-px h-6 bg-border mx-1" />
                 <Link
                   to="/dashboard"
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-accent/50 transition-colors"
+                  className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-accent transition-colors group"
                 >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-ocean flex items-center justify-center">
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center ring-2 ring-background group-hover:ring-primary/20 transition-all">
                     <User className="w-4 h-4 text-primary-foreground" />
                   </div>
                 </Link>
@@ -471,8 +496,8 @@ const EnterpriseHeader = () => {
                 >
                   Sign In
                 </Link>
-                <Button size="sm" asChild>
-                  <Link to="/auth" className="gap-2">
+                <Button size="sm" className="gap-2 shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-shadow" asChild>
+                  <Link to="/auth">
                     <LogIn className="w-4 h-4" />
                     Get Started
                   </Link>
@@ -483,7 +508,7 @@ const EnterpriseHeader = () => {
 
           {/* Mobile Menu Button */}
           <button
-            className="lg:hidden p-2 rounded-lg hover:bg-accent/50 transition-colors"
+            className="lg:hidden p-2.5 rounded-lg hover:bg-accent transition-colors"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? (
@@ -502,12 +527,13 @@ const EnterpriseHeader = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
             className="lg:hidden border-t border-border bg-background"
           >
-            <div className="max-h-[70vh] overflow-y-auto">
-              <div className="p-4 space-y-4">
+            <div className="max-h-[75vh] overflow-y-auto">
+              <div className="p-4 space-y-6">
                 {Object.entries(navigation).map(([key, dropdown]) => (
-                  <div key={key} className="space-y-2">
+                  <div key={key} className="space-y-3">
                     <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-2">
                       {dropdown.label}
                     </h3>
@@ -518,12 +544,28 @@ const EnterpriseHeader = () => {
                             key={item.href + item.name}
                             to={item.href}
                             onClick={() => setMobileMenuOpen(false)}
-                            className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-accent/50 transition-colors"
+                            className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-colors ${
+                              isActive(item.href) ? "bg-primary/10" : "hover:bg-accent"
+                            }`}
                           >
-                            <div className="text-muted-foreground">{item.icon}</div>
-                            <span className="text-sm font-medium text-foreground">
-                              {item.name}
-                            </span>
+                            <div className={`p-2 rounded-lg ${
+                              isActive(item.href) 
+                                ? "bg-primary text-primary-foreground" 
+                                : "bg-muted text-muted-foreground"
+                            }`}>
+                              {item.icon}
+                            </div>
+                            <div className="flex-1">
+                              <span className="text-sm font-medium text-foreground">
+                                {item.name}
+                              </span>
+                              <p className="text-xs text-muted-foreground">{item.description}</p>
+                            </div>
+                            {item.badge && (
+                              <span className="px-2 py-0.5 text-[10px] font-semibold bg-primary/15 text-primary rounded-full">
+                                {item.badge}
+                              </span>
+                            )}
                           </Link>
                         ))}
                       </div>
@@ -532,27 +574,30 @@ const EnterpriseHeader = () => {
                 ))}
 
                 <div className="pt-4 border-t border-border space-y-2">
+                  <Link
+                    to="/dashboard"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-accent transition-colors"
+                  >
+                    <div className="p-2 rounded-lg bg-muted text-muted-foreground">
+                      <BarChart3 className="w-5 h-5" />
+                    </div>
+                    <span className="text-sm font-medium text-foreground">Dashboard</span>
+                  </Link>
+                  
                   {user ? (
-                    <>
-                      <Link
-                        to="/dashboard"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-accent/50 transition-colors"
-                      >
-                        <BarChart3 className="w-5 h-5 text-muted-foreground" />
-                        <span className="text-sm font-medium text-foreground">Dashboard</span>
-                      </Link>
-                      <Link
-                        to="/settings"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-accent/50 transition-colors"
-                      >
-                        <Settings className="w-5 h-5 text-muted-foreground" />
-                        <span className="text-sm font-medium text-foreground">Settings</span>
-                      </Link>
-                    </>
+                    <Link
+                      to="/settings"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-accent transition-colors"
+                    >
+                      <div className="p-2 rounded-lg bg-muted text-muted-foreground">
+                        <Settings className="w-5 h-5" />
+                      </div>
+                      <span className="text-sm font-medium text-foreground">Settings</span>
+                    </Link>
                   ) : (
-                    <Button asChild className="w-full">
+                    <Button asChild className="w-full mt-4 shadow-lg shadow-primary/20">
                       <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
                         <LogIn className="w-4 h-4 mr-2" />
                         Get Started

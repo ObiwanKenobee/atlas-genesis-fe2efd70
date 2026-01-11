@@ -5,6 +5,7 @@ import {
   Users,
   FileText,
   CheckCircle,
+  XCircle,
   Clock,
   AlertTriangle,
   TrendingUp,

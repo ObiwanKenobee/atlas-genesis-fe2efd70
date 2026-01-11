@@ -34,7 +34,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const API_BASE = process.env.NODE_ENV === 'production'
+const API_BASE = import.meta.env.PROD
   ? 'https://api.atlas-genesis.com'
   : 'http://localhost:4000';
 
