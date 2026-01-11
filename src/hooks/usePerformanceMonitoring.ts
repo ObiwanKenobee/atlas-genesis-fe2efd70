@@ -36,7 +36,7 @@ const reportToGA = (metric: Metric) => {
 
 // Console logging for development
 const logMetric = (metric: Metric) => {
-  if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.DEV) {
     console.log(`[Performance] ${metric.name}: ${metric.value.toFixed(2)} (${metric.rating})`);
   }
 };
@@ -108,7 +108,7 @@ export const usePerformanceMonitoring = () => {
 
   // Method to manually trigger performance report
   const reportPerformance = useCallback(() => {
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       console.log('[Performance] Manual report:', metrics);
     }
 

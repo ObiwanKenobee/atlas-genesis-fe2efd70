@@ -1,4 +1,5 @@
 import { useEffect, useCallback } from 'react';
+import { onCLS, onINP, onFCP, onLCP, onTTFB } from 'web-vitals';
 
 export const usePerformanceOptimization = () => {
   // Preload critical resources
@@ -31,17 +32,13 @@ export const usePerformanceOptimization = () => {
     return () => imageObserver.disconnect();
   }, []);
 
-  // Monitor Core Web Vitals
+  // Monitor Core Web Vitals using the new API
   const monitorWebVitals = useCallback(() => {
-    if ('web-vital' in window) {
-      import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
-        getCLS(console.log);
-        getFID(console.log);
-        getFCP(console.log);
-        getLCP(console.log);
-        getTTFB(console.log);
-      });
-    }
+    onCLS((metric) => console.log('[CLS]', metric.value));
+    onINP((metric) => console.log('[INP]', metric.value));
+    onFCP((metric) => console.log('[FCP]', metric.value));
+    onLCP((metric) => console.log('[LCP]', metric.value));
+    onTTFB((metric) => console.log('[TTFB]', metric.value));
   }, []);
 
   useEffect(() => {

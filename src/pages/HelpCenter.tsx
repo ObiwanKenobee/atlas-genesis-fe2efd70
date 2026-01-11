@@ -15,21 +15,6 @@ import Footer from "@/components/Footer";
 const HelpCenter = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
-  const seoData = useSEO({
-    structuredData: {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": faqs.map(faq => ({
-        "@type": "Question",
-        "name": faq.question,
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": faq.answer
-        }
-      }))
-    }
-  });
-
   const faqs = [
     {
       id: "getting-started",
@@ -89,6 +74,21 @@ const HelpCenter = () => {
       link: "/help/security"
     }
   ];
+
+  const seoData = useSEO({
+    structuredData: {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": faqs.map(faq => ({
+        "@type": "Question",
+        "name": faq.question,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": faq.answer
+        }
+      }))
+    }
+  });
 
   return (
     <>

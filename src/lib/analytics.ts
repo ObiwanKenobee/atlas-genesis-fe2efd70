@@ -1,3 +1,11 @@
+// Extend Window interface for gtag
+declare global {
+  interface Window {
+    gtag?: (...args: any[]) => void;
+    dataLayer?: any[];
+  }
+}
+
 // Enhanced Platform Analytics
 export const analytics = {
   // Track user interactions
@@ -73,9 +81,9 @@ export const analytics = {
     const events = JSON.parse(localStorage.getItem('platform_events') || '[]');
     const summary = {
       totalEvents: events.length,
-      pageViews: events.filter(e => e.event === 'page_view').length,
-      errors: events.filter(e => e.event === 'platform_error').length,
-      engagements: events.filter(e => e.event === 'user_engagement').length,
+      pageViews: events.filter((e: any) => e.event === 'page_view').length,
+      errors: events.filter((e: any) => e.event === 'platform_error').length,
+      engagements: events.filter((e: any) => e.event === 'user_engagement').length,
       lastActivity: events[events.length - 1]?.timestamp
     };
     
@@ -95,8 +103,8 @@ export const initGA = () => {
     document.head.appendChild(script);
     
     window.dataLayer = window.dataLayer || [];
-    window.gtag = function() {
-      window.dataLayer.push(arguments);
+    window.gtag = function(...args: any[]) {
+      window.dataLayer!.push(args);
     };
     window.gtag('js', new Date());
     window.gtag('config', 'GA_MEASUREMENT_ID');
