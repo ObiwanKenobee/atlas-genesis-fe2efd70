@@ -35,18 +35,18 @@ const Index = () => {
   return (
     <>
       <SEO {...seoData} />
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <div className="min-h-screen bg-background">
         <ImprovedNavigation />
-      <main className="pt-24">
-        <HeroSection />
-        <PlatformLayers />
-        <ImpactMetrics />
-        <TechnologyStack />
-        <CTASection />
-      </main>
-      <Footer />
-      <NewsletterBanner />
-    </div>
+        <main className="pt-24">
+          <HeroSection />
+          <PlatformLayers />
+          <ImpactMetrics />
+          <TechnologyStack />
+          <CTASection />
+        </main>
+        <Footer />
+        <NewsletterBanner />
+      </div>
     </>
   );
 };
