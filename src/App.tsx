@@ -14,6 +14,7 @@ import GlobalImpactEconomy from './pages/GlobalImpactEconomy';
 import EndToEndExperience from './pages/EndToEndExperience';
 import EngineeringArchitecture from './pages/EngineeringArchitecture';
 import RVXInnovations from './pages/RVXInnovations';
+import DashboardWithSidebar from './pages/DashboardWithSidebar';
 
 const SimplePage = ({ title, description }: { title: string; description: string }) => (
   <Layout>
@@ -578,7 +579,7 @@ const AnimatedRoutes = () => {
       >
         <Routes location={location}>
           <Route path="/" element={<Index />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard" element={<DashboardWithSidebar />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/measurements" element={<SimplePage title="Planetary Measurement & Verification" description="Real-time satellite data integration with multi-metric tracking and 95% confidence intervals." />} />
           <Route path="/bioregions" element={<SimplePage title="Geographic Intelligence & Bioregional Mapping" description="PostGIS-powered bioregional visualization with climate risk forecasting." />} />
