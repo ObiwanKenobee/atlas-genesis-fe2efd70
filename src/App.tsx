@@ -1,6 +1,8 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import Layout from './components/Layout';
+import BackToTop from './components/BackToTop';
 import BusinessModel from './pages/BusinessModel';
 import CriticalInnovations from './pages/CriticalInnovations';
 import AzureProductionStrategy from './pages/AzureProductionStrategy';
@@ -548,33 +550,66 @@ const Auth = () => (
   </Layout>
 );
 
+// Page transition variants
+const pageVariants = {
+  initial: { opacity: 0, y: 20 },
+  enter: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -10 },
+};
+
+const pageTransition = {
+  duration: 0.4,
+  ease: [0.22, 1, 0.36, 1] as const,
+};
+
+// Animated Route wrapper
+const AnimatedRoutes = () => {
+  const location = useLocation();
+  
+  return (
+    <AnimatePresence mode="wait" initial={false}>
+      <motion.div
+        key={location.pathname}
+        variants={pageVariants}
+        initial="initial"
+        animate="enter"
+        exit="exit"
+        transition={pageTransition}
+      >
+        <Routes location={location}>
+          <Route path="/" element={<Index />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/measurements" element={<SimplePage title="Planetary Measurement & Verification" description="Real-time satellite data integration with multi-metric tracking and 95% confidence intervals." />} />
+          <Route path="/bioregions" element={<SimplePage title="Geographic Intelligence & Bioregional Mapping" description="PostGIS-powered bioregional visualization with climate risk forecasting." />} />
+          <Route path="/regenerative-agriculture" element={<SimplePage title="Regenerative Agriculture & Ecosystem Recovery" description="Comprehensive ecosystem health monitoring with farmer income projections." />} />
+          <Route path="/valuation" element={<SimplePage title="Mathematical Trust & Credit Valuation Engine" description="Multi-variable impact scoring with dynamic pricing model." />} />
+          <Route path="/governance" element={<SimplePage title="Ethical, Cultural & Spiritual Governance" description="Bioregional Ethics Councils with 67% indigenous representation." />} />
+          <Route path="/marketplace" element={<SimplePage title="Marketplace & Financial Infrastructure" description="RIU trading platform with 24.5M RIUs in circulation." />} />
+          <Route path="/health" element={<SimplePage title="Human Health Integration" description="Air quality credits and healthcare savings projections." />} />
+          <Route path="/adoption" element={<SimplePage title="Adoption Pathway for Global Change" description="Six actor entry points with The Flywheel Effect economic model." />} />
+          <Route path="/business-model" element={<BusinessModel />} />
+          <Route path="/innovations" element={<CriticalInnovations />} />
+          <Route path="/azure-strategy" element={<AzureProductionStrategy />} />
+          <Route path="/ethical-governance" element={<EthicalGovernance />} />
+          <Route path="/regenerative-value-exchange" element={<RegenerativeValueExchange />} />
+          <Route path="/data-metrics-engine" element={<DataMetricsEngine />} />
+          <Route path="/cultural-knowledge-impact" element={<CulturalKnowledgeImpact />} />
+          <Route path="/global-impact-economy" element={<GlobalImpactEconomy />} />
+          <Route path="/end-to-end-experience" element={<EndToEndExperience />} />
+          <Route path="/engineering-architecture" element={<EngineeringArchitecture />} />
+          <Route path="/rvx-innovations" element={<RVXInnovations />} />
+          <Route path="*" element={<Index />} />
+        </Routes>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
 const App = () => (
   <BrowserRouter>
-    <Routes>
-      <Route path="/" element={<Index />} />
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/auth" element={<Auth />} />
-      <Route path="/measurements" element={<SimplePage title="Planetary Measurement & Verification" description="Real-time satellite data integration with multi-metric tracking and 95% confidence intervals." />} />
-      <Route path="/bioregions" element={<SimplePage title="Geographic Intelligence & Bioregional Mapping" description="PostGIS-powered bioregional visualization with climate risk forecasting." />} />
-      <Route path="/regenerative-agriculture" element={<SimplePage title="Regenerative Agriculture & Ecosystem Recovery" description="Comprehensive ecosystem health monitoring with farmer income projections." />} />
-      <Route path="/valuation" element={<SimplePage title="Mathematical Trust & Credit Valuation Engine" description="Multi-variable impact scoring with dynamic pricing model." />} />
-      <Route path="/governance" element={<SimplePage title="Ethical, Cultural & Spiritual Governance" description="Bioregional Ethics Councils with 67% indigenous representation." />} />
-      <Route path="/marketplace" element={<SimplePage title="Marketplace & Financial Infrastructure" description="RIU trading platform with 24.5M RIUs in circulation." />} />
-      <Route path="/health" element={<SimplePage title="Human Health Integration" description="Air quality credits and healthcare savings projections." />} />
-      <Route path="/adoption" element={<SimplePage title="Adoption Pathway for Global Change" description="Six actor entry points with The Flywheel Effect economic model." />} />
-      <Route path="/business-model" element={<BusinessModel />} />
-      <Route path="/innovations" element={<CriticalInnovations />} />
-      <Route path="/azure-strategy" element={<AzureProductionStrategy />} />
-      <Route path="/ethical-governance" element={<EthicalGovernance />} />
-      <Route path="/regenerative-value-exchange" element={<RegenerativeValueExchange />} />
-      <Route path="/data-metrics-engine" element={<DataMetricsEngine />} />
-      <Route path="/cultural-knowledge-impact" element={<CulturalKnowledgeImpact />} />
-      <Route path="/global-impact-economy" element={<GlobalImpactEconomy />} />
-      <Route path="/end-to-end-experience" element={<EndToEndExperience />} />
-      <Route path="/engineering-architecture" element={<EngineeringArchitecture />} />
-      <Route path="/rvx-innovations" element={<RVXInnovations />} />
-      <Route path="*" element={<Index />} />
-    </Routes>
+    <AnimatedRoutes />
+    <BackToTop threshold={400} />
   </BrowserRouter>
 );
 
