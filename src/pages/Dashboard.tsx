@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { InteractiveDashboard, InteractiveFeatureGrid } from '@/components/EnhancedPlatformComponents';
@@ -109,14 +109,20 @@ const Dashboard = () => {
   };
 
   if (loading) {
+    // Using lazy import to avoid circular dependencies
+    const DashboardSkeleton = React.lazy(() => import('@/components/skeletons/DashboardSkeleton'));
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full"
-        />
-      </div>
+      <React.Suspense fallback={
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full"
+          />
+        </div>
+      }>
+        <DashboardSkeleton />
+      </React.Suspense>
     );
   }
 

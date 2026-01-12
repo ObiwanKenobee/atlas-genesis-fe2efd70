@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, Suspense } from "react";
 import SEO from "@/components/SEO";
 import { useSEO } from "@/hooks/useSEO";
 import PageLayout from "@/components/PageLayout";
@@ -101,6 +101,16 @@ const Marketplace = () => {
     { tier: "Institutional", min: "$1M+", max: "Unlimited", count: 85, allocation: "Large portfolios, funds", icon: "🏦" },
     { tier: "Government", min: "$10M+", max: "Unlimited", count: 12, allocation: "Climate policy, NDCs", icon: "🏛️" },
   ];
+
+  // Show skeleton while loading
+  if (isLoading) {
+    const MarketplaceSkeleton = React.lazy(() => import('@/components/skeletons/MarketplaceSkeleton'));
+    return (
+      <Suspense fallback={<div className="min-h-screen bg-background" />}>
+        <MarketplaceSkeleton />
+      </Suspense>
+    );
+  }
 
   return (
     <>

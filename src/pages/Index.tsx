@@ -1,6 +1,5 @@
 import SEO from "@/components/SEO";
 import { useSEO } from "@/hooks/useSEO";
-import EnterpriseHeader from "@/components/EnterpriseHeader";
 import ImprovedNavigation from "@/components/ImprovedNavigation";
 import HeroSection from "@/components/HeroSection";
 import PlatformLayers from "@/components/PlatformLayers";
@@ -9,6 +8,7 @@ import TechnologyStack from "@/components/TechnologyStack";
 import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
 import NewsletterBanner from "@/components/NewsletterBanner";
+import BackToTop from "@/components/BackToTop";
 
 const Index = () => {
   const seoData = useSEO({
@@ -46,6 +46,7 @@ const Index = () => {
         </main>
         <Footer />
         <NewsletterBanner />
+        <BackToTop threshold={300} />
       </div>
     </>
   );
