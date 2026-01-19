@@ -15,6 +15,8 @@ import EndToEndExperience from './pages/EndToEndExperience';
 import EngineeringArchitecture from './pages/EngineeringArchitecture';
 import RVXInnovations from './pages/RVXInnovations';
 import DashboardWithSidebar from './pages/DashboardWithSidebar';
+import SupabaseAuth from './pages/SupabaseAuth';
+import Portfolio from './pages/Portfolio';
 
 const SimplePage = ({ title, description }: { title: string; description: string }) => (
   <Layout>
@@ -519,37 +521,7 @@ const Dashboard = () => (
   </Layout>
 );
 
-const Auth = () => (
-  <Layout showFooter={false}>
-    <div className="min-h-[calc(100vh-6rem)] flex items-center justify-center px-8">
-      <div className="max-w-md w-full">
-        <div className="text-center mb-8">
-          <div className="text-6xl mb-4">🌱</div>
-          <h1 className="text-4xl font-bold mb-4">Welcome to Atlas Sanctum</h1>
-          <p className="text-slate-400">Join the regenerative revolution</p>
-        </div>
-        
-        <div className="glass p-8 rounded-2xl">
-          <div className="space-y-6">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            />
-            <input
-              type="password"
-              placeholder="Enter your password"
-              className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            />
-            <button className="w-full btn-glow py-3 rounded-lg text-white font-semibold text-lg">
-              🚀 Start Regenerating
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </Layout>
-);
+// Auth is now imported from SupabaseAuth page
 
 // Page transition variants
 const pageVariants = {
@@ -580,7 +552,8 @@ const AnimatedRoutes = () => {
         <Routes location={location}>
           <Route path="/" element={<Index />} />
           <Route path="/dashboard" element={<DashboardWithSidebar />} />
-          <Route path="/auth" element={<Auth />} />
+          <Route path="/auth" element={<SupabaseAuth />} />
+          <Route path="/portfolio" element={<Portfolio />} />
           <Route path="/measurements" element={<SimplePage title="Planetary Measurement & Verification" description="Real-time satellite data integration with multi-metric tracking and 95% confidence intervals." />} />
           <Route path="/bioregions" element={<SimplePage title="Geographic Intelligence & Bioregional Mapping" description="PostGIS-powered bioregional visualization with climate risk forecasting." />} />
           <Route path="/regenerative-agriculture" element={<SimplePage title="Regenerative Agriculture & Ecosystem Recovery" description="Comprehensive ecosystem health monitoring with farmer income projections." />} />
