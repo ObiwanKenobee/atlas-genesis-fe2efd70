@@ -15,7 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { InteractiveChartsDashboard } from '@/components/InteractiveChartsDashboard';
-import { useAuth } from '@/hooks/useAuth';
+import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Profile {
@@ -31,7 +31,7 @@ interface CreditHolding {
 }
 
 export default function DashboardPage() {
-  const { user } = useAuth();
+  const { user } = useSupabaseAuth();
   const [profile, setProfile] = React.useState<Profile | null>(null);
   const [holdings, setHoldings] = React.useState<CreditHolding[]>([]);
   const [totalCredits, setTotalCredits] = React.useState(0);

@@ -3,11 +3,9 @@ import { Link, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   Leaf, TrendingUp, Award, Clock, ArrowRight, 
-  CheckCircle2, ExternalLink, FileText, BarChart3 
+  CheckCircle2, FileText, BarChart3 
 } from 'lucide-react';
-import Navigation from '@/components/Navigation';
 import PageLayout from '@/components/PageLayout';
-import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -20,15 +18,16 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useAuth } from '@/hooks/useAuth';
+import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { useUserHoldings, useUserTransactions, useRetireCredits } from '@/hooks/useMarketplace';
 import { PROJECT_TYPE_ICONS } from '@/types/marketplace';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import PortfolioAnalyticsDashboard from '@/components/PortfolioAnalyticsDashboard';
+import ExportMenu from '@/components/portfolio/ExportMenu';
 
 const Portfolio = () => {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useSupabaseAuth();
   const { data: holdings, isLoading: holdingsLoading } = useUserHoldings();
   const { data: transactions, isLoading: transactionsLoading } = useUserTransactions();
   const retireMutation = useRetireCredits();
@@ -134,13 +133,21 @@ const Portfolio = () => {
               transition={{ duration: 0.5 }}
             >
               <Card className="bg-card-gradient border-border/50">
-                <CardHeader className="flex flex-row items-center justify-between">
+                <CardHeader className="flex flex-row items-center justify-between flex-wrap gap-4">
                   <CardTitle className="text-foreground">Your Holdings</CardTitle>
-                  <Button asChild variant="outline" size="sm" className="border-border/50">
-                    <Link to="/marketplace">
-                      Browse Projects <ArrowRight className="w-4 h-4 ml-2" />
-                    </Link>
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <ExportMenu 
+                      holdings={holdings || []} 
+                      transactions={transactions || []} 
+                      stats={stats}
+                      userName={user?.email?.split('@')[0]}
+                    />
+                    <Button asChild variant="outline" size="sm" className="border-border/50">
+                      <Link to="/marketplace">
+                        Browse Projects <ArrowRight className="w-4 h-4 ml-2" />
+                      </Link>
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   {isLoading ? (

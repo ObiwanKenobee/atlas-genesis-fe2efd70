@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from './useAuth';
+import { useSupabaseAuth } from './useSupabaseAuth';
 import { useMemo } from 'react';
 
 export interface PortfolioDataPoint {
@@ -30,7 +30,7 @@ export interface PerformanceMetrics {
 }
 
 export function usePortfolioAnalytics() {
-  const { user } = useAuth();
+  const { user } = useSupabaseAuth();
 
   const { data: holdings = [], isLoading: holdingsLoading } = useQuery({
     queryKey: ['portfolio-holdings', user?.id],

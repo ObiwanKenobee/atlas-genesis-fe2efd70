@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { toast as sonnerToast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
+import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 
 export type ToastType = 'success' | 'error' | 'info' | 'transaction' | 'update';
 
@@ -71,7 +71,7 @@ export const showRealtimeToast = (type: ToastType, title: string, message: strin
 };
 
 export function useRealtimeTransactionToasts() {
-  const { user } = useAuth();
+  const { user } = useSupabaseAuth();
 
   useEffect(() => {
     if (!user) return;

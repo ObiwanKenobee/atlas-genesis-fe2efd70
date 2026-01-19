@@ -33,7 +33,7 @@ import {
   BarChart3,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/useAuth";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 interface NavItem {
   name: string;
@@ -49,7 +49,7 @@ interface NavSection {
 }
 
 const Header = () => {
-  const { user, signOut } = useAuth();
+  const { user, signOut } = useSupabaseAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [activeMega, setActiveMega] = useState<string | null>(null);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -285,7 +285,7 @@ const Header = () => {
                   className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-all"
                 >
                   <User className="w-4 h-4" />
-                  {user.displayName || user.email}
+                  {user.user_metadata?.full_name || user.email}
                   <ChevronDown className="w-4 h-4 group-hover:rotate-180 transition-transform" />
                 </button>
 
