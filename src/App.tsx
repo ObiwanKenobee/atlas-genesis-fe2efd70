@@ -17,6 +17,8 @@ import RVXInnovations from './pages/RVXInnovations';
 import DashboardWithSidebar from './pages/DashboardWithSidebar';
 import SupabaseAuth from './pages/SupabaseAuth';
 import Portfolio from './pages/Portfolio';
+import Profile from './pages/Profile';
+import Marketplace from './pages/Marketplace';
 
 const SimplePage = ({ title, description }: { title: string; description: string }) => (
   <Layout>
@@ -554,12 +556,13 @@ const AnimatedRoutes = () => {
           <Route path="/dashboard" element={<DashboardWithSidebar />} />
           <Route path="/auth" element={<SupabaseAuth />} />
           <Route path="/portfolio" element={<Portfolio />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/measurements" element={<SimplePage title="Planetary Measurement & Verification" description="Real-time satellite data integration with multi-metric tracking and 95% confidence intervals." />} />
           <Route path="/bioregions" element={<SimplePage title="Geographic Intelligence & Bioregional Mapping" description="PostGIS-powered bioregional visualization with climate risk forecasting." />} />
           <Route path="/regenerative-agriculture" element={<SimplePage title="Regenerative Agriculture & Ecosystem Recovery" description="Comprehensive ecosystem health monitoring with farmer income projections." />} />
           <Route path="/valuation" element={<SimplePage title="Mathematical Trust & Credit Valuation Engine" description="Multi-variable impact scoring with dynamic pricing model." />} />
           <Route path="/governance" element={<SimplePage title="Ethical, Cultural & Spiritual Governance" description="Bioregional Ethics Councils with 67% indigenous representation." />} />
-          <Route path="/marketplace" element={<SimplePage title="Marketplace & Financial Infrastructure" description="RIU trading platform with 24.5M RIUs in circulation." />} />
           <Route path="/health" element={<SimplePage title="Human Health Integration" description="Air quality credits and healthcare savings projections." />} />
           <Route path="/adoption" element={<SimplePage title="Adoption Pathway for Global Change" description="Six actor entry points with The Flywheel Effect economic model." />} />
           <Route path="/business-model" element={<BusinessModel />} />

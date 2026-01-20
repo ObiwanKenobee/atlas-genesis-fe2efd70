@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { CarbonProject } from '@/types/marketplace';
-import { useAuth } from '@/hooks/useAuth';
+import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { apiService } from '@/lib/api/client';
 import { toast } from 'sonner';
 
@@ -27,7 +27,7 @@ export function PurchaseModal({ project, isOpen, onClose }: PurchaseModalProps) 
   const [quantity, setQuantity] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('paystack');
   const [isProcessing, setIsProcessing] = useState(false);
-  const { user } = useAuth();
+  const { user } = useSupabaseAuth();
 
   const totalPrice = quantity * project.price_per_credit;
   const totalOffset = quantity * project.co2_offset_per_credit;

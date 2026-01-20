@@ -1,62 +1,57 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Leaf, Mail, Lock, User, ArrowRight, Sparkles, Eye, EyeOff } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Leaf, Mail, Lock, User, ArrowRight, Sparkles, Eye, EyeOff, ArrowLeft, KeyRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { toast } from "sonner";
 import { loginSchema, registerSchema } from "@/lib/validation/auth";
+import { z } from "zod";
+
+type AuthMode = 'login' | 'register' | 'forgot' | 'reset';
 
 const SupabaseAuth = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  const [mode, setMode] = useState<AuthMode>('login');
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { signIn, signUp, user, loading } = useSupabaseAuth();
+  const { signIn, signUp, resetPassword, updatePassword, user, loading } = useSupabaseAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  // Handle redirect from email confirmation
+  // Handle redirect from password reset email
   useEffect(() => {
-    const mode = searchParams.get('mode');
-    if (mode === 'reset') {
+    const urlMode = searchParams.get('mode');
+    if (urlMode === 'reset') {
+      setMode('reset');
       toast.info('You can now set a new password');
     }
   }, [searchParams]);
 
   useEffect(() => {
-    if (!loading && user) {
+    if (!loading && user && mode !== 'reset') {
       navigate("/dashboard");
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, mode]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Validate inputs
-    const validationResult = isLogin
-      ? loginSchema.safeParse({ email: email.trim(), password })
-      : registerSchema.safeParse({ 
-          email: email.trim(), 
-          password, 
-          fullName: fullName.trim(),
-          userType: 'individual' 
-        });
-
-    if (!validationResult.success) {
-      const errorMessage = validationResult.error.errors[0]?.message || 'Validation failed';
-      toast.error(errorMessage);
-      return;
-    }
-
     setIsSubmitting(true);
 
     try {
-      if (isLogin) {
+      if (mode === 'login') {
+        const validationResult = loginSchema.safeParse({ email: email.trim(), password });
+        if (!validationResult.success) {
+          toast.error(validationResult.error.errors[0]?.message || 'Validation failed');
+          setIsSubmitting(false);
+          return;
+        }
+
         const { error } = await signIn(email.trim(), password);
         if (error) {
           toast.error(error.message);
@@ -64,20 +59,92 @@ const SupabaseAuth = () => {
           toast.success("Welcome back!");
           navigate("/dashboard");
         }
-      } else {
+      } else if (mode === 'register') {
+        const validationResult = registerSchema.safeParse({ 
+          email: email.trim(), 
+          password, 
+          fullName: fullName.trim(),
+          userType: 'individual' 
+        });
+        if (!validationResult.success) {
+          toast.error(validationResult.error.errors[0]?.message || 'Validation failed');
+          setIsSubmitting(false);
+          return;
+        }
+
         const { error } = await signUp(email.trim(), password, fullName.trim());
         if (error) {
           toast.error(error.message);
         } else {
           toast.success("Account created successfully! You can now sign in.");
-          setIsLogin(true);
+          setMode('login');
           setPassword("");
+        }
+      } else if (mode === 'forgot') {
+        if (!email.trim()) {
+          toast.error('Please enter your email address');
+          setIsSubmitting(false);
+          return;
+        }
+
+        const { error } = await resetPassword(email.trim());
+        if (error) {
+          toast.error(error.message);
+        } else {
+          toast.success("Password reset email sent! Check your inbox.");
+          setMode('login');
+        }
+      } else if (mode === 'reset') {
+        if (password.length < 8) {
+          toast.error('Password must be at least 8 characters');
+          setIsSubmitting(false);
+          return;
+        }
+        if (password !== confirmPassword) {
+          toast.error('Passwords do not match');
+          setIsSubmitting(false);
+          return;
+        }
+
+        const { error } = await updatePassword(password);
+        if (error) {
+          toast.error(error.message);
+        } else {
+          toast.success("Password updated successfully!");
+          navigate("/dashboard");
         }
       }
     } catch (err) {
       toast.error("An unexpected error occurred. Please try again.");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const getTitle = () => {
+    switch (mode) {
+      case 'login': return 'Sign In';
+      case 'register': return 'Create Account';
+      case 'forgot': return 'Reset Password';
+      case 'reset': return 'Set New Password';
+    }
+  };
+
+  const getSubtitle = () => {
+    switch (mode) {
+      case 'login': return 'Enter your credentials to access your dashboard';
+      case 'register': return 'Start your regenerative journey today';
+      case 'forgot': return 'Enter your email to receive a reset link';
+      case 'reset': return 'Choose a strong, secure password';
+    }
+  };
+
+  const getTagline = () => {
+    switch (mode) {
+      case 'login': return 'Welcome back';
+      case 'register': return 'Join the movement';
+      case 'forgot': return 'Recover access';
+      case 'reset': return 'Almost there';
     }
   };
 
@@ -157,129 +224,202 @@ const SupabaseAuth = () => {
           >
             <Sparkles className="w-4 h-4 text-accent" />
             <span className="text-sm text-muted-foreground">
-              {isLogin ? "Welcome back" : "Join the movement"}
+              {getTagline()}
             </span>
           </motion.div>
 
           <h1 className="font-display text-3xl font-bold text-foreground">
-            {isLogin ? "Sign In" : "Create Account"}
+            {getTitle()}
           </h1>
           <p className="text-muted-foreground mt-2">
-            {isLogin 
-              ? "Enter your credentials to access your dashboard" 
-              : "Start your regenerative journey today"}
+            {getSubtitle()}
           </p>
         </div>
 
         {/* Auth Form */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl p-8 shadow-lg"
-        >
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {!isLogin && (
-              <div className="space-y-2">
-                <Label htmlFor="fullName" className="text-foreground">Full Name</Label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                  <Input
-                    id="fullName"
-                    type="text"
-                    placeholder="John Doe"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    className="pl-11 bg-background border-border focus:border-primary"
-                    autoComplete="name"
-                  />
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={mode}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+            className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl p-8 shadow-lg"
+          >
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {mode === 'register' && (
+                <div className="space-y-2">
+                  <Label htmlFor="fullName" className="text-foreground">Full Name</Label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                    <Input
+                      id="fullName"
+                      type="text"
+                      placeholder="John Doe"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className="pl-11 bg-background border-border focus:border-primary"
+                      autoComplete="name"
+                    />
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-foreground">Email</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="pl-11 bg-background border-border focus:border-primary"
-                  required
-                  autoComplete="email"
-                />
-              </div>
-            </div>
+              {(mode === 'login' || mode === 'register' || mode === 'forgot') && (
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-foreground">Email</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="you@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="pl-11 bg-background border-border focus:border-primary"
+                      required
+                      autoComplete="email"
+                    />
+                  </div>
+                </div>
+              )}
 
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-foreground">Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-11 pr-11 bg-background border-border focus:border-primary"
-                  required
-                  autoComplete={isLogin ? "current-password" : "new-password"}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-              {!isLogin && (
-                <p className="text-xs text-muted-foreground">
-                  Must be at least 8 characters with uppercase, lowercase, and number
+              {(mode === 'login' || mode === 'register' || mode === 'reset') && (
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-foreground">
+                    {mode === 'reset' ? 'New Password' : 'Password'}
+                  </Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="pl-11 pr-11 bg-background border-border focus:border-primary"
+                      required
+                      autoComplete={mode === 'login' ? "current-password" : "new-password"}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
+                  {(mode === 'register' || mode === 'reset') && (
+                    <p className="text-xs text-muted-foreground">
+                      Must be at least 8 characters with uppercase, lowercase, and number
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {mode === 'reset' && (
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword" className="text-foreground">Confirm Password</Label>
+                  <div className="relative">
+                    <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                    <Input
+                      id="confirmPassword"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="pl-11 bg-background border-border focus:border-primary"
+                      required
+                      autoComplete="new-password"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {mode === 'login' && (
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setMode('forgot')}
+                    className="text-sm text-primary hover:text-primary/80 transition-colors"
+                  >
+                    Forgot password?
+                  </button>
+                </div>
+              )}
+
+              <Button
+                type="submit"
+                size="lg"
+                className="w-full bg-primary hover:bg-primary/90"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    className="w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full"
+                  />
+                ) : (
+                  <>
+                    {mode === 'login' && 'Sign In'}
+                    {mode === 'register' && 'Create Account'}
+                    {mode === 'forgot' && 'Send Reset Link'}
+                    {mode === 'reset' && 'Update Password'}
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </>
+                )}
+              </Button>
+            </form>
+
+            <div className="mt-6 text-center space-y-2">
+              {mode === 'login' && (
+                <p className="text-muted-foreground">
+                  Don't have an account?{" "}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode('register');
+                      setPassword("");
+                    }}
+                    className="text-primary hover:text-primary/80 transition-colors font-medium"
+                  >
+                    Sign up
+                  </button>
                 </p>
               )}
-            </div>
-
-            <Button
-              type="submit"
-              size="lg"
-              className="w-full bg-primary hover:bg-primary/90"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                  className="w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full"
-                />
-              ) : (
-                <>
-                  {isLogin ? "Sign In" : "Create Account"}
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </>
+              {mode === 'register' && (
+                <p className="text-muted-foreground">
+                  Already have an account?{" "}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode('login');
+                      setPassword("");
+                    }}
+                    className="text-primary hover:text-primary/80 transition-colors font-medium"
+                  >
+                    Sign in
+                  </button>
+                </p>
               )}
-            </Button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-muted-foreground">
-              {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
-              <button
-                type="button"
-                onClick={() => {
-                  setIsLogin(!isLogin);
-                  setPassword("");
-                }}
-                className="text-primary hover:text-primary/80 transition-colors font-medium"
-              >
-                {isLogin ? "Sign up" : "Sign in"}
-              </button>
-            </p>
-          </div>
-        </motion.div>
+              {(mode === 'forgot' || mode === 'reset') && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode('login');
+                    setPassword("");
+                    setConfirmPassword("");
+                  }}
+                  className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Back to sign in
+                </button>
+              )}
+            </div>
+          </motion.div>
+        </AnimatePresence>
 
         {/* Back to Home */}
         <motion.div
