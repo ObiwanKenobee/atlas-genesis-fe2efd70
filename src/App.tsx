@@ -59,12 +59,52 @@ const HeroSection = () => (
       </p>
 
       <div className="flex gap-8 justify-center mb-20 flex-wrap">
-        <Link to="/dashboard" className="btn-glow px-12 py-6 rounded-2xl text-white font-bold text-xl hover-lift">
+        <Link to="/dashboard" className="btn-glow px-12 py-6 rounded-2xl text-white font-bold text-xl hover-lift focus:outline-none focus:ring-2 focus:ring-emerald-500/50" aria-label="Enter the Sanctum dashboard">
           Enter the Sanctum
         </Link>
-        <Link to="/marketplace" className="glass px-12 py-6 rounded-2xl text-white font-bold text-xl hover-lift border-2 border-emerald-500/30">
+        <Link to="/marketplace" className="glass px-12 py-6 rounded-2xl text-white font-bold text-xl hover-lift border-2 border-emerald-500/30 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" aria-label="Explore the marketplace">
           Explore Platform
         </Link>
+      </div>
+
+      {/* Newsletter Signup Section */}
+      <div className="max-w-2xl mx-auto mb-16">
+        <div className="glass p-8 rounded-3xl border border-emerald-500/20">
+          <h3 className="text-2xl font-bold text-white mb-4">Stay Updated on Regenerative Impact</h3>
+          <p className="text-slate-400 mb-6">Get weekly insights on ecosystem restoration, carbon markets, and regenerative innovations.</p>
+          
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            // Handle newsletter signup
+            const email = (e.currentTarget.elements.namedItem('email') as HTMLInputElement).value;
+            console.log('Newsletter signup:', email);
+            alert('Thank you for subscribing to regenerative updates!');
+          }} className="space-y-4">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">Email Address</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                required
+                className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                placeholder="your@email.com"
+                aria-label="Email address for newsletter subscription"
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full btn-glow py-3 rounded-lg font-bold text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              aria-label="Subscribe to newsletter"
+            >
+              Subscribe to Regenerative Insights
+            </button>
+          </form>
+          
+          <p className="text-xs text-slate-500 mt-4">
+            We respect your privacy. No spam, ever. Unsubscribe anytime.
+          </p>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-6xl mx-auto">

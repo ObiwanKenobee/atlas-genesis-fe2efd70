@@ -48,6 +48,11 @@ export interface RegenerativeForecast {
   confidence: number;
   recommendations: string[];
   risks: string[];
+  metadata?: {
+    generatedAt?: string;
+    processingTimeMs?: number;
+    modelsUsed?: string[];
+  };
 }
 
 export interface RegenerativeValue {
@@ -265,19 +270,51 @@ export class PlanetaryDataSystem {
     new AirQualitySensors()
   ];
   private ai = new PlanetaryAI();
+  private cache = new Map<string, any>();
+  private cacheTTL = 3600000; // 1 hour cache
+  private lastCacheUpdate = 0;
 
-  async ingestPlanetaryData(): Promise<any> {
+  async ingestPlanetaryData(forceRefresh: boolean = false): Promise<any> {
+    const cacheKey = 'planetary_data_cache';
+    const now = Date.now();
+
+    // Return cached data if available and not expired
+    if (!forceRefresh && this.cache.has(cacheKey) && (now - this.lastCacheUpdate) < this.cacheTTL) {
+      console.log('Returning cached planetary data');
+      return this.cache.get(cacheKey);
+    }
+
+    // Fetch fresh data
     const [satelliteData, sensorData] = await Promise.all([
       Promise.all(this.satellites.map(s => s.getLatestData())),
       Promise.all(this.sensors.map(s => s.collectData()))
     ]);
 
-    return this.ai.synthesize({ satellite: satelliteData, sensors: sensorData });
+    const result = this.ai.synthesize({ satellite: satelliteData, sensors: sensorData });
+    
+    // Cache the result
+    this.cache.set(cacheKey, result);
+    this.lastCacheUpdate = now;
+    console.log('Cached planetary data updated');
+
+    return result;
   }
 
   async generateVerifiableMetrics(location: GeoLocation): Promise<any> {
     const data = await this.ingestPlanetaryData();
     return this.ai.calculateImpactMetrics(data, location);
+  }
+
+  async clearCache(): Promise<void> {
+    this.cache.clear();
+    console.log('Planetary data cache cleared');
+  }
+
+  getCacheStatus(): { cachedItems: number, lastUpdated: number } {
+    return {
+      cachedItems: this.cache.size,
+      lastUpdated: this.lastCacheUpdate
+    };
   }
 }
 
@@ -292,35 +329,60 @@ export class PlanetaryAI {
     ['biodiversity', new BiodiversityTrendModel()],
     ['climate', new ClimateResilienceModel()]
   ]);
+  private logger: PlanetaryAILogger;
+
+  constructor() {
+    this.logger = new PlanetaryAILogger();
+  }
 
   async generateRegenerativeForecast(
     location: GeoLocation,
     interventions: RegenerativeIntervention[]
   ): Promise<RegenerativeForecast> {
+    this.logger.logForecastRequest(location, interventions);
+    
+    const startTime = Date.now();
     const scenarios = await Promise.all(
-      Array.from(this.models.values()).map(model => 
+      Array.from(this.models.values()).map(model =>
         model.forecast(location, interventions)
       )
     );
+    const duration = Date.now() - startTime;
+
+    this.logger.logForecastCompletion(duration, scenarios.length);
 
     return {
       scenarios,
       confidence: this.calculateConfidence(scenarios),
       recommendations: this.generateRecommendations(scenarios),
-      risks: this.assessRisks(scenarios)
+      risks: this.assessRisks(scenarios),
+      metadata: {
+        generatedAt: new Date().toISOString(),
+        processingTimeMs: duration,
+        modelsUsed: Array.from(this.models.keys())
+      }
     };
   }
 
   async verifyImpactClaims(claims: any[]): Promise<any[]> {
-    return Promise.all(claims.map(claim => this.verifyWithMultipleSources(claim)));
+    this.logger.logVerificationStart(claims.length);
+    const results = await Promise.all(claims.map(claim => this.verifyWithMultipleSources(claim)));
+    this.logger.logVerificationCompletion(results.filter(r => r.verified).length);
+    return results;
   }
 
   async synthesize(data: any): Promise<any> {
+    this.logger.logSynthesisOperation('data_synthesis');
     return data;
   }
 
   async calculateImpactMetrics(data: any, location: GeoLocation): Promise<any> {
-    return { location, metrics: data };
+    this.logger.logMetricsCalculation(location);
+    return {
+      location,
+      metrics: data,
+      calculatedAt: new Date().toISOString()
+    };
   }
 
   private calculateConfidence(scenarios: any[]): number {
@@ -337,6 +399,60 @@ export class PlanetaryAI {
 
   private async verifyWithMultipleSources(claim: any): Promise<any> {
     return { verified: true, claim };
+  }
+
+  getLogs(): string[] {
+    return this.logger.getLogs();
+  }
+
+  getPerformanceMetrics(): { forecasts: number, verifications: number, avgProcessingTime: number } {
+    return this.logger.getPerformanceMetrics();
+  }
+}
+
+class PlanetaryAILogger {
+  private logs: string[] = [];
+  private forecastCount = 0;
+  private verificationCount = 0;
+  private totalProcessingTime = 0;
+
+  logForecastRequest(location: GeoLocation, interventions: RegenerativeIntervention[]): void {
+    this.forecastCount++;
+    this.logs.push(`[${new Date().toISOString()}] Forecast requested for ${location.lat},${location.lng} with ${interventions.length} interventions`);
+  }
+
+  logForecastCompletion(duration: number, scenarioCount: number): void {
+    this.totalProcessingTime += duration;
+    this.logs.push(`[${new Date().toISOString()}] Forecast completed in ${duration}ms with ${scenarioCount} scenarios`);
+  }
+
+  logVerificationStart(claimCount: number): void {
+    this.verificationCount++;
+    this.logs.push(`[${new Date().toISOString()}] Verification started for ${claimCount} claims`);
+  }
+
+  logVerificationCompletion(verifiedCount: number): void {
+    this.logs.push(`[${new Date().toISOString()}] Verification completed: ${verifiedCount} claims verified`);
+  }
+
+  logSynthesisOperation(operationType: string): void {
+    this.logs.push(`[${new Date().toISOString()}] Synthesis operation: ${operationType}`);
+  }
+
+  logMetricsCalculation(location: GeoLocation): void {
+    this.logs.push(`[${new Date().toISOString()}] Metrics calculation for ${location.lat},${location.lng}`);
+  }
+
+  getLogs(): string[] {
+    return [...this.logs];
+  }
+
+  getPerformanceMetrics(): { forecasts: number, verifications: number, avgProcessingTime: number } {
+    return {
+      forecasts: this.forecastCount,
+      verifications: this.verificationCount,
+      avgProcessingTime: this.forecastCount > 0 ? this.totalProcessingTime / this.forecastCount : 0
+    };
   }
 }
 
