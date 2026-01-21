@@ -111,17 +111,19 @@ const Footer = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                aria-label="Email address for newsletter subscription"
                 className="flex-1 px-4 py-3 rounded-lg bg-slate-900/50 border border-border/30 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
               />
               <Button
                 type="submit"
                 disabled={subscribeStatus === "loading"}
-                className="gap-2 whitespace-nowrap"
+                className="gap-2 whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                aria-label="Subscribe to newsletter"
               >
                 {subscribeStatus === "loading" ? (
-                  "Subscribing..."
+                  <span aria-live="polite">Subscribing...</span>
                 ) : subscribeStatus === "success" ? (
-                  "✓ Subscribed!"
+                  <span aria-live="polite">✓ Subscribed!</span>
                 ) : (
                   <>
                     Subscribe <Send className="w-4 h-4" />
@@ -139,7 +141,7 @@ const Footer = () => {
           <div className="lg:col-span-1">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-blue-600 flex items-center justify-center">
-                <Leaf className="w-5 h-5 text-white" />
+                <Leaf className="w-5 h-5 text-white" aria-hidden="true" />
               </div>
               <div>
                 <div className="font-bold text-lg text-foreground">
@@ -153,16 +155,16 @@ const Footer = () => {
 
             {/* Contact Info */}
             <div className="space-y-3 mb-6">
-              <a href="mailto:hello@atlassanctum.com" className="flex items-center gap-3 text-sm text-muted-foreground hover:text-emerald-400 transition-colors">
-                <Mail className="w-4 h-4 flex-shrink-0" />
+              <a href="mailto:hello@atlassanctum.com" className="flex items-center gap-3 text-sm text-muted-foreground hover:text-emerald-400 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                <Mail className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                 <span>hello@atlassanctum.com</span>
               </a>
-              <a href="tel:+1234567890" className="flex items-center gap-3 text-sm text-muted-foreground hover:text-emerald-400 transition-colors">
-                <Phone className="w-4 h-4 flex-shrink-0" />
+              <a href="tel:+1234567890" className="flex items-center gap-3 text-sm text-muted-foreground hover:text-emerald-400 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                <Phone className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                 <span>+1 (234) 567-890</span>
               </a>
               <div className="flex items-start gap-3 text-sm text-muted-foreground">
-                <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" aria-hidden="true" />
                 <span>San Francisco, CA<br />United States</span>
               </div>
             </div>
@@ -179,7 +181,7 @@ const Footer = () => {
                     href={href}
                     aria-label={social.label}
                     {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                    className="p-2 rounded-lg bg-slate-900/50 text-muted-foreground hover:text-emerald-400 hover:bg-slate-900 transition-all"
+                    className="p-2 rounded-lg bg-slate-900/50 text-muted-foreground hover:text-emerald-400 hover:bg-slate-900 transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                   >
                     {social.icon}
                   </a>
@@ -189,27 +191,27 @@ const Footer = () => {
           </div>
 
           {/* Features */}
-<div>
-  <h4 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider">
-    Features
-  </h4>
-  <ul className="space-y-3">
-    {featureLinks.slice(0, 4).map((link) => (
-      <li key={`feature-${link.name}`}>
-        <Link
-          to={link.href}
-          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-emerald-400 transition-colors group"
-        >
-          <span className="text-emerald-600 group-hover:text-emerald-400">
-            {link.icon}
-          </span>
-          {link.name}
-          <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all" />
-        </Link>
-      </li>
-    ))}
-  </ul>
-</div>
+          <div>
+            <h4 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider">
+              Features
+            </h4>
+            <ul className="space-y-3">
+              {featureLinks.slice(0, 4).map((link) => (
+                <li key={`feature-${link.name}`}>
+                  <Link
+                    to={link.href}
+                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-emerald-400 transition-colors duration-200 group focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                  >
+                    <span className="text-emerald-600 group-hover:text-emerald-400 transition-colors duration-200">
+                      {link.icon}
+                    </span>
+                    {link.name}
+                    <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all duration-200" aria-hidden="true" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
 
 
           {/* More Features */}
@@ -220,11 +222,11 @@ const Footer = () => {
                 <li key={`feature-${link.name}`}>
                   <Link
                     to={link.href}
-                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-emerald-400 transition-colors group"
+                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-emerald-400 transition-colors duration-200 group focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                   >
-                    <span className="text-emerald-600 group-hover:text-emerald-400">{link.icon}</span>
+                    <span className="text-emerald-600 group-hover:text-emerald-400 transition-colors duration-200">{link.icon}</span>
                     {link.name}
-                    <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all" />
+                    <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all duration-200" aria-hidden="true" />
                   </Link>
                 </li>
               ))}
@@ -239,10 +241,10 @@ const Footer = () => {
                 <li key={`platform-${link.name}`}>
                   <Link
                     to={link.href}
-                    className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors flex items-center gap-2 group"
+                    className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors duration-200 flex items-center gap-2 group focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                   >
                     {link.name}
-                    <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all" />
+                    <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all duration-200" aria-hidden="true" />
                   </Link>
                 </li>
               ))}
@@ -254,10 +256,10 @@ const Footer = () => {
                  <li key={`resource-${link.name}`}>
                    <Link
                      to={link.href}
-                     className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors flex items-center gap-2 group"
+                     className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors duration-200 flex items-center gap-2 group focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                    >
                      {link.name}
-                     <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all" />
+                     <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all duration-200" aria-hidden="true" />
                    </Link>
                  </li>
                ))}
@@ -269,10 +271,10 @@ const Footer = () => {
                  <li key={`support-${link.name}`}>
                    <Link
                      to={link.href}
-                     className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors flex items-center gap-2 group"
+                     className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors duration-200 flex items-center gap-2 group focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                    >
                      {link.name}
-                     <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all" />
+                     <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all duration-200" aria-hidden="true" />
                    </Link>
                  </li>
                ))}
@@ -287,10 +289,10 @@ const Footer = () => {
                 <li key={`legal-${link.name}`}>
                   <Link
                     to={link.href}
-                    className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors flex items-center gap-2 group"
+                    className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors duration-200 flex items-center gap-2 group focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                   >
                     {link.name}
-                    <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all" />
+                    <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all duration-200" aria-hidden="true" />
                   </Link>
                 </li>
               ))}
@@ -302,10 +304,10 @@ const Footer = () => {
                 <li key={`company-${link.name}`}>
                   <Link
                     to={link.href}
-                    className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors flex items-center gap-2 group"
+                    className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors duration-200 flex items-center gap-2 group focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                   >
                     {link.name}
-                    <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all" />
+                    <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all duration-200" aria-hidden="true" />
                   </Link>
                 </li>
               ))}
@@ -323,19 +325,19 @@ const Footer = () => {
 
           {/* Status Indicators */}
           <div className="flex flex-wrap justify-center gap-6 text-xs text-muted-foreground">
-            <a href="#" className="hover:text-emerald-400 transition-colors flex items-center gap-2">
+            <a href="#" className="hover:text-emerald-400 transition-colors flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
               <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
               All Systems Operational
             </a>
-            <a href="#" className="hover:text-emerald-400 transition-colors flex items-center gap-2">
-              <Globe className="w-3 h-3" />
+            <a href="#" className="hover:text-emerald-400 transition-colors flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+              <Globe className="w-3 h-3" aria-hidden="true" />
               Global Network
             </a>
-            <a href="#" className="hover:text-emerald-400 transition-colors flex items-center gap-2">
-              <Lock className="w-3 h-3" />
+            <a href="#" className="hover:text-emerald-400 transition-colors flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+              <Lock className="w-3 h-3" aria-hidden="true" />
               Enterprise Security
             </a>
-          </div>              
+          </div>
            
 
           {/* Language & Theme */}
@@ -357,9 +359,9 @@ const Footer = () => {
         <div className="py-8 border-t border-border/30 text-center">
           <div className="inline-block">
             <p className="text-sm text-muted-foreground mb-3">Ready to join the regeneration?</p>
-            <Button asChild size="lg" className="gap-2">
-              <Link to="/marketplace">
-                Explore Platform <ArrowRight className="w-4 h-4" />
+            <Button asChild size="lg" className="gap-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+              <Link to="/marketplace" className="focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                Explore Platform <ArrowRight className="w-4 h-4" aria-hidden="true" />
               </Link>
             </Button>
           </div>
