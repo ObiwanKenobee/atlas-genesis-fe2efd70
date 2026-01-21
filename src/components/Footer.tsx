@@ -24,6 +24,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import ApiStatus from "@/components/ApiStatus";
 
 const Footer = () => {
   const [email, setEmail] = useState("");
@@ -94,7 +95,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-slate-950/50 border-t border-border/30 relative">
+    <footer className="bg-regenerative border-t border-border/30 relative glass-panel">
       {/* Gradient Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-emerald-500/5 to-transparent pointer-events-none"></div>
 
@@ -325,15 +326,14 @@ const Footer = () => {
 
           {/* Status Indicators */}
           <div className="flex flex-wrap justify-center gap-6 text-xs text-muted-foreground">
-            <a href="#" className="hover:text-emerald-400 transition-colors flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
-              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-              All Systems Operational
-            </a>
-            <a href="#" className="hover:text-emerald-400 transition-colors flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+            <div className="flex items-center gap-2">
+              <ApiStatus showLabel />
+            </div>
+            <a href="/contact" className="hover:text-emerald-400 transition-colors flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
               <Globe className="w-3 h-3" aria-hidden="true" />
               Global Network
             </a>
-            <a href="#" className="hover:text-emerald-400 transition-colors flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+            <a href="/security" className="hover:text-emerald-400 transition-colors flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
               <Lock className="w-3 h-3" aria-hidden="true" />
               Enterprise Security
             </a>
@@ -359,11 +359,18 @@ const Footer = () => {
         <div className="py-8 border-t border-border/30 text-center">
           <div className="inline-block">
             <p className="text-sm text-muted-foreground mb-3">Ready to join the regeneration?</p>
-            <Button asChild size="lg" className="gap-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
-              <Link to="/marketplace" className="focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
-                Explore Platform <ArrowRight className="w-4 h-4" aria-hidden="true" />
-              </Link>
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button asChild size="lg" className="gap-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                <Link to="/auth" className="focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                  Start Free <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="gap-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                <Link to="/contact" className="focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                  Talk to Sales
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       </div>

@@ -32,10 +32,13 @@ import {
   LineChart,
   CreditCard,
   ArrowRight,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { NotificationCenter } from "@/components/NotificationCenter";
+import ApiStatus from "@/components/ApiStatus";
 
 interface DropdownItem {
   name: string;
@@ -67,6 +70,12 @@ const EnterpriseHeader = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
+  const [theme, setTheme] = useState<"dark" | "light">(() => {
+    if (typeof window === "undefined") return "dark";
+    const saved = localStorage.getItem("theme");
+    if (saved === "light" || saved === "dark") return saved;
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -75,6 +84,20 @@ const EnterpriseHeader = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === "dark") {
+      root.classList.add("dark");
+    } else {
+      root.classList.remove("dark");
+    }
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  };
 
   const navigation: Record<string, NavDropdown> = {
     platform: {
@@ -295,25 +318,27 @@ const EnterpriseHeader = () => {
 
   return (
     <header 
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 glass-panel ${
         scrolled 
-          ? "bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-lg shadow-black/5" 
-          : "bg-background/60 backdrop-blur-md"
+          ? "bg-background/80"
+          : "bg-background/60"
       }`}
     >
       {/* Announcement Bar */}
       <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border-b border-border/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-center h-9 text-sm">
-            <span className="text-muted-foreground flex items-center gap-2">
+            <div className="flex items-center gap-3 text-muted-foreground">
               <span className="hidden sm:inline">🌱</span>
-              <span>Join the regenerative revolution</span>
-              <span className="hidden sm:inline">—</span>
+              <span className="hidden sm:inline">Join the regenerative revolution</span>
               <Link to="/marketplace" className="text-primary hover:text-primary/80 font-medium inline-flex items-center gap-1 group">
                 Explore verified projects
                 <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
               </Link>
-            </span>
+              <div className="hidden sm:inline-flex">
+                <ApiStatus showLabel />
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -496,14 +521,26 @@ const EnterpriseHeader = () => {
                 >
                   Sign In
                 </Link>
+                <Button variant="outline" size="sm" className="gap-2" asChild>
+                  <Link to="/contact">
+                    Book Demo
+                  </Link>
+                </Button>
                 <Button size="sm" className="gap-2 shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-shadow" asChild>
                   <Link to="/auth">
                     <LogIn className="w-4 h-4" />
-                    Get Started
+                    Start Free
                   </Link>
                 </Button>
               </>
             )}
+            <button
+              onClick={toggleTheme}
+              className="p-2.5 rounded-lg hover:bg-accent transition-colors border border-border/50"
+              aria-label="Toggle theme"
+            >
+              {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
           </div>
 
           {/* Mobile Menu Button */}

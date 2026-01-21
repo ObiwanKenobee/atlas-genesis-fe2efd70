@@ -103,7 +103,7 @@ const ImpactMetrics = () => {
               className="group"
             >
               <div
-                className="relative bg-card-gradient border border-border/50 rounded-lg sm:rounded-2xl p-4 sm:p-8 hover:border-primary/30 focus-within:ring-2 focus-within:ring-primary transition-all duration-500 hover:shadow-glow h-full"
+                className="relative bg-card-gradient border border-border/50 rounded-lg sm:rounded-2xl p-4 sm:p-8 hover:border-primary/30 focus-within:ring-2 focus-within:ring-primary transition-all duration-500 hover:shadow-glow h-full glass-panel"
                 role="region"
                 aria-label={`${metric.label}: ${metric.value} ${metric.unit}`}
               >

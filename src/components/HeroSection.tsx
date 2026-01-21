@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import { motion, useScroll, useTransform, useSpring, type Easing } from "framer-motion";
-import { ArrowRight, Sparkles, Globe2 } from "lucide-react";
+import { ArrowRight, Sparkles, Globe2, ShieldCheck, Gauge, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
@@ -43,7 +43,7 @@ const HeroSection = () => {
   return (
     <section 
       ref={containerRef}
-      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background pt-20"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-regenerative pt-20"
     >
       {/* Animated Background Gradient */}
       <motion.div 
@@ -123,17 +123,8 @@ const HeroSection = () => {
         />
       ))}
 
-      {/* Grid Pattern */}
-      <div 
-        className="absolute inset-0 opacity-[0.02]"
-        style={{
-          backgroundImage: `
-            linear-gradient(to right, hsl(var(--foreground)) 1px, transparent 1px),
-            linear-gradient(to bottom, hsl(var(--foreground)) 1px, transparent 1px)
-          `,
-          backgroundSize: '60px 60px'
-        }}
-      />
+      {/* Soft Grid Overlay */}
+      <div className="absolute inset-0 bg-soft-grid opacity-[0.06] pointer-events-none" />
 
       <motion.div 
         className="container mx-auto px-4 sm:px-6 relative z-10"
@@ -202,7 +193,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.8 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
+            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8"
           >
             <motion.div
               whileHover={{ scale: 1.02 }}
@@ -213,8 +204,8 @@ const HeroSection = () => {
                 className="w-full sm:w-auto gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300"
                 asChild
               >
-                <Link to="/marketplace">
-                  Enter the Sanctum
+                <Link to="/auth">
+                  Start Free
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </Button>
@@ -229,12 +220,34 @@ const HeroSection = () => {
                 className="w-full sm:w-auto gap-2 border-border/50 hover:bg-accent/10"
                 asChild
               >
-                <Link to="/dashboard">
+                <Link to="/contact">
                   <Globe2 className="w-4 h-4" />
-                  Explore Platform
+                  Book a Demo
                 </Link>
               </Button>
             </motion.div>
+          </motion.div>
+
+          {/* Conversion bullets */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 1 }}
+            className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 max-w-4xl mx-auto mb-12"
+          >
+            {[
+              { icon: ShieldCheck, text: "Verified impact with DAO-backed governance" },
+              { icon: Gauge, text: "Live analytics & measurement you can trust" },
+              { icon: Users, text: "Onboard teams, investors, and communities fast" },
+            ].map((item, idx) => (
+              <div
+                key={item.text}
+                className="flex items-center gap-3 justify-center bg-card/40 border border-border/50 rounded-xl px-4 py-3 text-sm text-foreground/90"
+              >
+                <item.icon className="w-4 h-4 text-primary" />
+                <span className="leading-snug">{item.text}</span>
+              </div>
+            ))}
           </motion.div>
 
           {/* Stats Row with staggered reveal */}
@@ -260,7 +273,7 @@ const HeroSection = () => {
                   y: -5,
                   transition: { duration: 0.2 }
                 }}
-                className="text-center p-4 md:p-6 rounded-2xl bg-card/50 border border-border/50 backdrop-blur-sm hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 cursor-default"
+                className="text-center p-4 md:p-6 rounded-2xl bg-card/50 border border-border/50 backdrop-blur-sm hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 cursor-default glass-panel"
               >
                 <motion.div 
                   className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2"
@@ -278,6 +291,26 @@ const HeroSection = () => {
                 <div className="text-xs sm:text-sm text-muted-foreground">{stat.label}</div>
               </motion.div>
             ))}
+          </motion.div>
+
+          {/* Social Proof Strip */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 1.3 }}
+            className="mt-12"
+          >
+            <p className="text-xs sm:text-sm text-muted-foreground uppercase tracking-[0.2em] mb-4">Trusted by impact leaders</p>
+            <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8 md:gap-10 text-foreground/70">
+              {["UN Climate Lab", "Global Regen Fund", "WEF Cohort", "IUCN Partners", "EarthBank"].map((org) => (
+                <div
+                  key={org}
+                  className="px-4 py-2 rounded-xl bg-card/40 border border-border/50 text-sm sm:text-base font-semibold tracking-tight"
+                >
+                  {org}
+                </div>
+              ))}
+            </div>
           </motion.div>
         </div>
       </motion.div>

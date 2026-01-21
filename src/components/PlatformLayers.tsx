@@ -139,7 +139,7 @@ const PlatformLayers = () => {
                 className="group"
               >
                 <div 
-                  className="relative bg-card-gradient border border-border/50 rounded-lg sm:rounded-2xl p-4 sm:p-6 md:p-8 hover:border-primary/30 transition-all duration-500 hover:shadow-glow overflow-hidden cursor-pointer"
+                  className="relative bg-card-gradient border border-border/50 rounded-lg sm:rounded-2xl p-4 sm:p-6 md:p-8 hover:border-primary/30 transition-all duration-500 hover:shadow-glow overflow-hidden cursor-pointer glass-panel"
                   onClick={() => setExpandedLayer(isExpanded ? null : index)}
                 >
                   {/* Gradient Line */}

@@ -4,10 +4,9 @@ import { Button } from "@/components/ui/button";
 
 const CTASection = () => {
   return (
-    <section className="py-32 relative overflow-hidden">
-      {/* Background Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-background" />
-      
+    <section className="py-32 relative overflow-hidden bg-regenerative">
+      {/* Soft Grid */}
+      <div className="absolute inset-0 bg-soft-grid opacity-[0.05] pointer-events-none" />
       {/* Animated Orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
@@ -36,7 +35,7 @@ const CTASection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="max-w-4xl mx-auto text-center"
+          className="max-w-4xl mx-auto text-center glass-panel border border-border/40"
         >
           {/* Headline */}
           <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
@@ -52,16 +51,23 @@ const CTASection = () => {
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-            <Button variant="hero" size="xl">
-              Request Early Access
-              <ArrowRight className="w-5 h-5 ml-2" />
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
+            <Button variant="hero" size="xl" asChild>
+              <a href="/auth">
+                Start Free
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </a>
             </Button>
-            <Button variant="heroOutline" size="xl">
-              <Mail className="w-5 h-5 mr-2" />
-              Contact Team
+            <Button variant="heroOutline" size="xl" asChild>
+              <a href="/contact">
+                <Mail className="w-5 h-5 mr-2" />
+                Talk to Sales
+              </a>
             </Button>
           </div>
+          <p className="text-sm text-muted-foreground mb-16">
+            No credit card required • SOC2-minded controls • Guided onboarding
+          </p>
 
           {/* Social Links */}
           <div className="flex items-center justify-center gap-6">

@@ -1,6 +1,8 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
+import ApiStatus from './components/ApiStatus';
+import NewsletterBanner from './components/NewsletterBanner';
 import Layout from './components/Layout';
 import BackToTop from './components/BackToTop';
 import BusinessModel from './pages/BusinessModel';
@@ -21,6 +23,8 @@ import Profile from './pages/Profile';
 import Marketplace from './pages/Marketplace';
 import ProjectDetail from './pages/ProjectDetail';
 import TransactionHistory from './pages/TransactionHistory';
+import Status from './pages/Status';
+import Demo from './pages/Demo';
 
 const SimplePage = ({ title, description }: { title: string; description: string }) => (
   <Layout>
@@ -67,46 +71,6 @@ const HeroSection = () => (
         </Link>
       </div>
 
-      {/* Newsletter Signup Section */}
-      <div className="max-w-2xl mx-auto mb-16">
-        <div className="glass p-8 rounded-3xl border border-emerald-500/20">
-          <h3 className="text-2xl font-bold text-white mb-4">Stay Updated on Regenerative Impact</h3>
-          <p className="text-slate-400 mb-6">Get weekly insights on ecosystem restoration, carbon markets, and regenerative innovations.</p>
-          
-          <form onSubmit={(e) => {
-            e.preventDefault();
-            // Handle newsletter signup
-            const email = (e.currentTarget.elements.namedItem('email') as HTMLInputElement).value;
-            console.log('Newsletter signup:', email);
-            alert('Thank you for subscribing to regenerative updates!');
-          }} className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">Email Address</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                required
-                className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                placeholder="your@email.com"
-                aria-label="Email address for newsletter subscription"
-              />
-            </div>
-            <button
-              type="submit"
-              className="w-full btn-glow py-3 rounded-lg font-bold text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-              aria-label="Subscribe to newsletter"
-            >
-              Subscribe to Regenerative Insights
-            </button>
-          </form>
-          
-          <p className="text-xs text-slate-500 mt-4">
-            We respect your privacy. No spam, ever. Unsubscribe anytime.
-          </p>
-        </div>
-      </div>
-
       <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
         {[
           { value: "$2.4T", label: "Addressable Market" },
@@ -119,6 +83,21 @@ const HeroSection = () => (
             <div className="text-sm text-slate-400 font-medium uppercase tracking-wider">{stat.label}</div>
           </div>
         ))}
+      </div>
+
+      {/* Social Proof Strip */}
+      <div className="mt-12">
+        <p className="text-xs sm:text-sm text-slate-400 uppercase tracking-[0.2em] mb-4">Trusted by impact leaders</p>
+        <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6 text-slate-200/80">
+          {["UN Climate Lab", "Global Regen Fund", "WEF Cohort", "IUCN Partners", "EarthBank"].map((org) => (
+            <div
+              key={org}
+              className="px-4 py-2 rounded-xl glass text-sm sm:text-base font-semibold tracking-tight border border-emerald-500/20"
+            >
+              {org}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   </section>
@@ -456,9 +435,9 @@ const EnhancedFooter = () => (
         <div className="text-right">
           <div className="space-y-2 text-sm">
             <div className="flex items-center justify-end gap-2">
-              <span className="w-2 h-2 bg-emerald-500 rounded-full"></span>
-              <span className="text-emerald-400">All Systems Operational</span>
+              <ApiStatus showLabel />
             </div>
+            <Link to="/status" className="text-emerald-400 hover:text-emerald-300 block">Status Page</Link>
             <div className="text-slate-400">Global Network</div>
             <div className="text-slate-400">Enterprise Security</div>
           </div>
@@ -498,6 +477,7 @@ const Index = () => (
       <JoinRevolution />
     </Layout>
     <EnhancedFooter />
+    <NewsletterBanner />
   </div>
 );
 
@@ -602,6 +582,8 @@ const AnimatedRoutes = () => {
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/marketplace/:id" element={<ProjectDetail />} />
           <Route path="/transactions" element={<TransactionHistory />} />
+          <Route path="/status" element={<Status />} />
+          <Route path="/demo" element={<Demo />} />
           <Route path="/measurements" element={<SimplePage title="Planetary Measurement & Verification" description="Real-time satellite data integration with multi-metric tracking and 95% confidence intervals." />} />
           <Route path="/bioregions" element={<SimplePage title="Geographic Intelligence & Bioregional Mapping" description="PostGIS-powered bioregional visualization with climate risk forecasting." />} />
           <Route path="/regenerative-agriculture" element={<SimplePage title="Regenerative Agriculture & Ecosystem Recovery" description="Comprehensive ecosystem health monitoring with farmer income projections." />} />
@@ -628,10 +610,10 @@ const AnimatedRoutes = () => {
 };
 
 const App = () => (
-  <BrowserRouter>
+        <BrowserRouter>
     <AnimatedRoutes />
     <BackToTop threshold={400} />
-  </BrowserRouter>
+        </BrowserRouter>
 );
 
 export default App;

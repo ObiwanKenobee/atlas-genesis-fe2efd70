@@ -167,7 +167,7 @@ const Auth = () => {
   }
 
   return (
-    <div className="min-h-screen bg-hero flex items-center justify-center relative overflow-hidden">
+    <div className="min-h-screen bg-regenerative flex items-center justify-center relative overflow-hidden">
       {/* Animated Orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
@@ -196,12 +196,12 @@ const Auth = () => {
         }}
       />
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="relative z-10 w-full max-w-md mx-4"
-      >
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="relative z-10 w-full max-w-md mx-4"
+        >
         {/* Logo */}
         <div className="text-center mb-8">
           <motion.div
@@ -238,6 +238,17 @@ const Auth = () => {
               ? "Enter your credentials to access your dashboard" 
               : "Start your regenerative journey today"}
           </p>
+          <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-muted-foreground">
+            {[
+              "Secure by design (MFA-ready)",
+              "Verified impact reporting",
+              "No credit card required",
+            ].map((item) => (
+              <div key={item} className="px-3 py-2 rounded-lg bg-card/60 border border-border/50">
+                {item}
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* OAuth Buttons */}
@@ -245,7 +256,7 @@ const Auth = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl p-8 shadow-elevated mb-4"
+          className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl p-8 shadow-elevated mb-4 glass-panel"
         >
           <div className="space-y-3">
             <Button
@@ -296,7 +307,7 @@ const Auth = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl p-8 shadow-elevated"
+          className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl p-8 shadow-elevated glass-panel"
         >
           <form onSubmit={handleSubmit} className="space-y-5">
             {!isLogin && (
