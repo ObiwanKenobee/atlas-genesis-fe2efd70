@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import EmailVerificationStatus from "@/components/profile/EmailVerificationStatus";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, User, Mail, Shield, Calendar, CheckCircle, AlertCircle, Bell, Building2, Save } from "lucide-react";
@@ -244,6 +245,8 @@ const Profile = () => {
 
             {/* Profile Form */}
             <div className="lg:col-span-2 space-y-6">
+              {/* Email Verification Status */}
+              <EmailVerificationStatus />
               {/* Personal Information */}
               <Card>
                 <CardHeader>
