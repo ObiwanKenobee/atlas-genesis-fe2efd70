@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
@@ -19,18 +19,25 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
-import { useUserHoldings, useUserTransactions, useRetireCredits } from '@/hooks/useMarketplace';
-import { PROJECT_TYPE_ICONS } from '@/types/marketplace';
+import { useUserHoldings, useUserTransactions } from '@/hooks/useMarketplace';
+import { PROJECT_TYPE_ICONS, CreditHolding } from '@/types/marketplace';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import PortfolioAnalyticsDashboard from '@/components/PortfolioAnalyticsDashboard';
 import ExportMenu from '@/components/portfolio/ExportMenu';
+import { RetirementModal } from '@/components/portfolio/RetirementModal';
 
 const Portfolio = () => {
   const { user, loading: authLoading } = useSupabaseAuth();
   const { data: holdings, isLoading: holdingsLoading } = useUserHoldings();
   const { data: transactions, isLoading: transactionsLoading } = useUserTransactions();
-  const retireMutation = useRetireCredits();
+  const [retirementModalOpen, setRetirementModalOpen] = useState(false);
+  const [selectedHolding, setSelectedHolding] = useState<CreditHolding | null>(null);
+
+  const handleRetireClick = (holding: CreditHolding) => {
+    setSelectedHolding(holding);
+    setRetirementModalOpen(true);
+  };
 
   const stats = useMemo(() => {
     if (!holdings) return { totalCredits: 0, totalOffset: 0, totalValue: 0, retiredCredits: 0 };
@@ -227,8 +234,7 @@ const Portfolio = () => {
                                   <Button
                                     variant="outline"
                                     size="sm"
-                                    onClick={() => retireMutation.mutate(holding.id)}
-                                    disabled={retireMutation.isPending}
+                                    onClick={() => handleRetireClick(holding)}
                                     className="border-primary/50 text-primary hover:bg-primary/10"
                                   >
                                     Retire Credits
@@ -333,6 +339,16 @@ const Portfolio = () => {
             </motion.div>
           </TabsContent>
         </Tabs>
+
+        {/* Retirement Modal */}
+        <RetirementModal
+          isOpen={retirementModalOpen}
+          onClose={() => {
+            setRetirementModalOpen(false);
+            setSelectedHolding(null);
+          }}
+          holding={selectedHolding}
+        />
       </div>
     </PageLayout>
   );
