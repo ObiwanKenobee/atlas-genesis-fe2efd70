@@ -14,9 +14,11 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import QuickActions from "@/components/dashboard/QuickActions";
 import { OnboardingTour } from "@/components/OnboardingTour";
-import { useAuth } from "@/hooks/useAuth";
+import { ImpactWidget } from "@/components/dashboard/ImpactWidget";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useIsAdmin } from "@/hooks/useAdmin";
 import { useOnboardingTour } from "@/hooks/useOnboardingTour";
+import { usePriceAlertMonitor } from "@/hooks/usePriceAlertMonitor";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 interface Profile {
@@ -37,9 +39,10 @@ interface CreditHolding {
 }
 
 const Dashboard = () => {
-  const { user, loading, signOut } = useAuth();
+  const { user, loading, signOut } = useSupabaseAuth();
   const { data: isAdmin } = useIsAdmin();
   const { startTour, tourCompleted } = useOnboardingTour();
+  usePriceAlertMonitor(); // Start monitoring price alerts
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [holdings, setHoldings] = useState<CreditHolding[]>([]);
@@ -357,6 +360,18 @@ const Dashboard = () => {
             </Link>
           ))}
         </motion.div>
+
+        {/* Carbon Impact Widget */}
+        {totalCredits > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="mt-8"
+          >
+            <ImpactWidget />
+          </motion.div>
+        )}
 
         {/* Interactive Dashboard Metrics */}
         <InteractiveDashboard />
