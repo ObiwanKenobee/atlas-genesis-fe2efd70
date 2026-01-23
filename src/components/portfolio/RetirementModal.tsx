@@ -8,13 +8,13 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { Award, Leaf, AlertTriangle, Download, CheckCircle2, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { CreditHolding } from '@/types/marketplace';
+import { SocialShareButtons } from '@/components/social/SocialShareButtons';
 
 interface RetirementModalProps {
   isOpen: boolean;
@@ -137,11 +137,18 @@ export function RetirementModal({ isOpen, onClose, holding }: RetirementModalPro
                   <p className="font-mono text-sm text-foreground">{certificateId}</p>
                 </div>
 
-                <div className="flex gap-3 justify-center">
+                <div className="flex gap-3 justify-center flex-wrap">
                   <Button onClick={downloadCertificate} className="gap-2">
                     <Download className="w-4 h-4" />
                     Download Certificate
                   </Button>
+                  <SocialShareButtons
+                    title={`${totalCO2.toFixed(1)} tonnes CO₂ Offset!`}
+                    description={`I just retired ${holding.quantity} carbon credits from ${project?.title || 'a regenerative project'} through Atlas Sanctum.`}
+                    type="certificate"
+                    co2Offset={totalCO2}
+                    certificateId={certificateId || undefined}
+                  />
                   <Button variant="outline" onClick={handleClose}>
                     Close
                   </Button>

@@ -23,6 +23,7 @@ import Profile from './pages/Profile';
 import Marketplace from './pages/Marketplace';
 import ProjectDetail from './pages/ProjectDetail';
 import TransactionHistory from './pages/TransactionHistory';
+import CarbonCalculator from './pages/CarbonCalculator';
 import Status from './pages/Status';
 import Demo from './pages/Demo';
 
@@ -582,6 +583,7 @@ const AnimatedRoutes = () => {
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/marketplace/:id" element={<ProjectDetail />} />
           <Route path="/transactions" element={<TransactionHistory />} />
+          <Route path="/calculator" element={<CarbonCalculator />} />
           <Route path="/status" element={<Status />} />
           <Route path="/demo" element={<Demo />} />
           <Route path="/measurements" element={<SimplePage title="Planetary Measurement & Verification" description="Real-time satellite data integration with multi-metric tracking and 95% confidence intervals." />} />
