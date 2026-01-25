@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, Scale, AlertTriangle, Users, Shield, DollarSign } from "lucide-react";
-import Header from "@/components/Header";
+import Header from "@/components/EnterpriseHeader";
 import Footer from "@/components/Footer";
 
 const TermsOfService = () => {

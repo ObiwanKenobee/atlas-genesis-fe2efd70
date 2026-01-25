@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Search, BookOpen, MessageCircle, FileText, HelpCircle, ChevronRight, ExternalLink } from "lucide-react";
 import SEO from "@/components/SEO";
 import { useSEO } from "@/hooks/useSEO";
-import Header from "@/components/Header";
+import Header from "@/components/EnterpriseHeader";
 import Footer from "@/components/Footer";
 
 const HelpCenter = () => {

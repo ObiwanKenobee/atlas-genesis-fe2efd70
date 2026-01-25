@@ -129,13 +129,12 @@ section {
   background-size: 60px 60px;
 }
 
-.glass {
-  background: rgba(30,30,30,0.4);
+.glass-panel {
+  background-color: rgba(255, 255, 255, 0.25); /* translucent background */
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(100, 255, 127, 0.2);
-  border-radius: var(--radius-lg);
-  padding: 2rem;
-  transition: transform var(--transition-medium), background var(--transition-medium);
+  -webkit-backdrop-filter: blur(12px); /* Safari/iOS support */
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 1rem;
 }
 
 /* ========================================

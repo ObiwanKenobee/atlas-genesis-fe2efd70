@@ -14,7 +14,7 @@ import EmailVerificationStatus from "@/components/profile/EmailVerificationStatu
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, User, Mail, Shield, Calendar, CheckCircle, AlertCircle, Bell, Building2, Save } from "lucide-react";
-import Header from "@/components/Header";
+import Header from "@/components/EnterpriseHeader";
 import Footer from "@/components/Footer";
 import { toast } from "sonner";
 

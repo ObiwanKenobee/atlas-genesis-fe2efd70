@@ -115,7 +115,7 @@ const PlatformArchitecture = () => (
         </p>
       </div>
 
-      <div className="space-y-12">
+      <div className="space-y-12 ">
         {[
           {
             number: "01",
@@ -163,7 +163,7 @@ const PlatformArchitecture = () => (
             features: ["Impact Marketplace", "Sustainable Finance", "Microfinance Platform", "DeFi Integration", "Impact Bonds"]
           }
         ].map((layer, index) => (
-          <div key={index} className="grid md:grid-cols-12 gap-12 glass p-12 rounded-3xl hover-lift">
+          <div key={index} className="grid md:grid-cols-12 gap-12 glass p-12 rounded-3xl hover-lift ">
             <div className="md:col-span-3 text-center">
               <div className="text-8xl font-black text-emerald-500 mb-4">{layer.number}</div>
               <div className="text-4xl font-bold text-emerald-400 mb-2">{layer.stat}</div>
@@ -443,7 +443,7 @@ const EnhancedFooter = () => (
             <div className="text-slate-400">Enterprise Security</div>
           </div>
         </div>
-      </div>
+      </div>  
 
       <div className="border-t border-slate-700 pt-8 flex justify-between items-center">
         <div className="text-sm text-slate-400">

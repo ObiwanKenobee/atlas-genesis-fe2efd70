@@ -1,142 +1,175 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Link } from "react-router-dom";
 
-const Header = () => (
-  <header style={{
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 50,
-    backgroundColor: 'rgba(15, 23, 42, 0.95)',
-    backdropFilter: 'blur(12px)',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
-  }}>
-    <div style={{ padding: '0.5rem 1rem', backgroundColor: '#10b981', textAlign: 'center', fontSize: '0.875rem', color: 'white' }}>
-      🌱 Join the regenerative revolution — Explore verified projects
-    </div>
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '1rem 2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-      <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
-        <div style={{ width: '2.5rem', height: '2.5rem', borderRadius: '0.5rem', background: 'linear-gradient(135deg, #10b981, #3b82f6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          🌱
-        </div>
-        <div>
-          <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'white' }}>Atlas Sanctum</div>
-          <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>REGENERATIVE PLATFORM</div>
-        </div>
-      </Link>
-      
-      <nav style={{ display: 'flex', alignItems: 'center', gap: '2rem', color: '#94a3b8' }}>
-        <Link to="/measurements" style={{ color: '#94a3b8', textDecoration: 'none' }}>Platform</Link>
-        <Link to="/marketplace" style={{ color: '#94a3b8', textDecoration: 'none' }}>Marketplace</Link>
-        <Link to="/business-model" style={{ color: '#94a3b8', textDecoration: 'none' }}>Business</Link>
-        <Link to="/innovations" style={{ color: '#94a3b8', textDecoration: 'none' }}>Innovations</Link>
-        <Link to="/engineering-architecture" style={{ color: '#94a3b8', textDecoration: 'none' }}>Engineering</Link>
-      </nav>
-      
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        <Link to="/dashboard" style={{ color: '#94a3b8', textDecoration: 'none' }}>Dashboard</Link>
-        <Link to="/auth" style={{ color: '#94a3b8', textDecoration: 'none' }}>Sign In</Link>
-        <button style={{
-          padding: '0.5rem 1rem',
-          backgroundColor: '#10b981',
-          color: 'white',
-          border: 'none',
-          borderRadius: '0.375rem',
-          fontSize: '0.875rem',
-          cursor: 'pointer'
-        }}>
-          Get Started
-        </button>
+/* ============================
+   HEADER
+============================ */
+const Header: React.FC = () => {
+  return (
+    <header className="fixed inset-x-0 top-0 z-50 bg-slate-900/90 backdrop-blur-xl border-b border-white/10">
+      {/* Announcement Bar */}
+      <div className="bg-emerald-600 text-white text-sm text-center py-2 px-4">
+        🌱 Join the regenerative revolution — Explore verified global impact projects
       </div>
-    </div>
-  </header>
-);
 
-const Footer = () => (
-  <footer style={{ backgroundColor: '#1e293b', color: 'white', padding: '3rem 2rem 1rem' }}>
-    <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>
-        <div>
-          <div style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>Atlas Sanctum</div>
-          <p style={{ color: '#94a3b8', marginBottom: '1rem' }}>
-            The world's first regenerative platform uniting ecosystems for trillion-dollar impact.
-          </p>
-          <div style={{ color: '#94a3b8', fontSize: '0.875rem' }}>
-            <div>hello@atlassanctum.com</div>
-            <div>+1 (234) 567-890</div>
-            <div>San Francisco, CA</div>
+      {/* Main Header */}
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 h-20 flex items-center justify-between">
+        {/* Brand */}
+        <Link to="/" className="flex items-center gap-3 group">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-blue-600 flex items-center justify-center shadow-lg">
+            🌱
           </div>
-        </div>
-        
-        <div>
-          <h4 style={{ fontWeight: 'bold', marginBottom: '1rem' }}>FEATURES</h4>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.875rem', color: '#94a3b8' }}>
-            <Link to="/measurements" style={{ color: '#94a3b8', textDecoration: 'none' }}>Measurements</Link>
-            <Link to="/bioregions" style={{ color: '#94a3b8', textDecoration: 'none' }}>Bioregions</Link>
-            <Link to="/regenerative-agriculture" style={{ color: '#94a3b8', textDecoration: 'none' }}>Regeneration</Link>
-            <Link to="/valuation" style={{ color: '#94a3b8', textDecoration: 'none' }}>Valuation</Link>
+          <div className="leading-tight">
+            <div className="text-lg font-bold text-white tracking-tight">
+              Atlas <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-500">Sanctum</span>
+            </div>
+            <div className="text-[11px] uppercase tracking-widest text-slate-400">
+              Regenerative Platform
+            </div>
           </div>
-        </div>
-        
-        <div>
-          <h4 style={{ fontWeight: 'bold', marginBottom: '1rem' }}>PLATFORM</h4>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.875rem', color: '#94a3b8' }}>
-            <Link to="/marketplace" style={{ color: '#94a3b8', textDecoration: 'none' }}>Marketplace</Link>
-            <Link to="/adoption" style={{ color: '#94a3b8', textDecoration: 'none' }}>Adoption</Link>
-            <Link to="/dashboard" style={{ color: '#94a3b8', textDecoration: 'none' }}>Dashboard</Link>
-            <Link to="/health" style={{ color: '#94a3b8', textDecoration: 'none' }}>Health</Link>
-          </div>
-        </div>
-        
-        <div>
-          <h4 style={{ fontWeight: 'bold', marginBottom: '1rem' }}>ARCHITECTURE</h4>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.875rem', color: '#94a3b8' }}>
-            <Link to="/ethical-governance" style={{ color: '#94a3b8', textDecoration: 'none' }}>Ethical Governance</Link>
-            <Link to="/regenerative-value-exchange" style={{ color: '#94a3b8', textDecoration: 'none' }}>Value Exchange</Link>
-            <Link to="/data-metrics-engine" style={{ color: '#94a3b8', textDecoration: 'none' }}>Data Engine</Link>
-            <Link to="/cultural-knowledge-impact" style={{ color: '#94a3b8', textDecoration: 'none' }}>Cultural Impact</Link>
-            <Link to="/global-impact-economy" style={{ color: '#94a3b8', textDecoration: 'none' }}>Impact Economy</Link>
-          </div>
-        </div>
-        
-        <div>
-          <h4 style={{ fontWeight: 'bold', marginBottom: '1rem' }}>RESOURCES</h4>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.875rem', color: '#94a3b8' }}>
-            <Link to="/business-model" style={{ color: '#94a3b8', textDecoration: 'none' }}>Business Model</Link>
-            <Link to="/innovations" style={{ color: '#94a3b8', textDecoration: 'none' }}>Innovations</Link>
-            <Link to="/azure-strategy" style={{ color: '#94a3b8', textDecoration: 'none' }}>Azure Strategy</Link>
-            <Link to="/rvx-innovations" style={{ color: '#94a3b8', textDecoration: 'none' }}>RVX Innovations</Link>
-            <Link to="/end-to-end-experience" style={{ color: '#94a3b8', textDecoration: 'none' }}>User Experience</Link>
-          </div>
+        </Link>
+
+        {/* Primary Navigation */}
+        <nav className="hidden lg:flex items-center gap-8 text-sm font-medium text-slate-300">
+          <Link className="hover:text-white transition" to="/measurements">Platform</Link>
+          <Link className="hover:text-white transition" to="/marketplace">Marketplace</Link>
+          <Link className="hover:text-white transition" to="/business-model">Business</Link>
+          <Link className="hover:text-white transition" to="/innovations">Innovations</Link>
+          <Link className="hover:text-white transition" to="/engineering-architecture">Engineering</Link>
+        </nav>
+
+        {/* Actions */}
+        <div className="flex items-center gap-4">
+          <Link
+            to="/auth"
+            className="hidden sm:inline text-sm text-slate-300 hover:text-white transition"
+          >
+            Sign In
+          </Link>
+
+          <Link
+            to="/auth"
+            className="inline-flex items-center justify-center rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-md hover:bg-emerald-400 transition"
+          >
+            Get Started
+          </Link>
         </div>
       </div>
-      
-      <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '2rem', textAlign: 'center' }}>
-        <div style={{ fontSize: '0.875rem', color: '#94a3b8', marginBottom: '1rem' }}>
-          © 2025 Atlas Sanctum. All rights reserved.
+    </header>
+  );
+};
+
+/* ============================
+   FOOTER
+============================ */
+const Footer: React.FC = () => {
+  return (
+    <footer className="bg-slate-900 border-t border-white/10 mt-24">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16">
+        {/* Top Grid */}
+        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-5">
+          {/* Brand */}
+          <div className="lg:col-span-2">
+            <div className="text-xl font-bold text-white mb-4">Atlas Sanctum</div>
+            <p className="text-slate-400 max-w-md mb-6">
+              The world’s first regenerative platform uniting ecosystems, capital,
+              and communities for trillion‑dollar verified impact.
+            </p>
+            <div className="text-sm text-slate-400 space-y-1">
+              <div>hello@atlassanctum.com</div>
+              <div>San Francisco, CA • United States</div>
+            </div>
+          </div>
+
+          {/* Footer Columns */}
+          {[
+            {
+              title: "Platform",
+              links: [
+                ["Marketplace", "/marketplace"],
+                ["Dashboard", "/dashboard"],
+                ["Adoption", "/adoption"],
+                ["Health", "/health"],
+              ],
+            },
+            {
+              title: "Architecture",
+              links: [
+                ["Ethical Governance", "/ethical-governance"],
+                ["Value Exchange", "/regenerative-value-exchange"],
+                ["Data Metrics", "/data-metrics-engine"],
+                ["Impact Economy", "/global-impact-economy"],
+              ],
+            },
+            {
+              title: "Resources",
+              links: [
+                ["Business Model", "/business-model"],
+                ["Innovations", "/innovations"],
+                ["Azure Strategy", "/azure-strategy"],
+                ["User Experience", "/end-to-end-experience"],
+              ],
+            },
+          ].map((section) => (
+            <div key={section.title}>
+              <h4 className="text-sm font-semibold text-white mb-4 tracking-wide uppercase">
+                {section.title}
+              </h4>
+              <ul className="space-y-2 text-sm text-slate-400">
+                {section.links.map(([label, href]) => (
+                  <li key={href}>
+                    <Link to={href} className="hover:text-white transition">
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
-        <div style={{ fontSize: '0.875rem', color: '#94a3b8' }}>
-          Regenerating Earth's future through verified, ethical impact.
+
+        {/* Bottom Bar */}
+        <div className="mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="text-sm text-slate-400">
+            © 2025 Atlas Sanctum. All rights reserved.
+          </div>
+          <div className="text-sm text-slate-400">
+            Regenerating Earth’s future through verified ethical impact.
+          </div>
         </div>
       </div>
-    </div>
-  </footer>
-);
+    </footer>
+  );
+};
 
+/* ============================
+   LAYOUT
+============================ */
 interface LayoutProps {
   children: React.ReactNode;
   showFooter?: boolean;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, showFooter = true }) => (
-  <div style={{ fontFamily: 'Inter, sans-serif', backgroundColor: '#0f172a', minHeight: '100vh' }}>
-    <Header />
-    <main style={{ paddingTop: '6rem' }}>
-      {children}
-    </main>
-    {showFooter && <Footer />}
-  </div>
-);
+const Layout: React.FC<LayoutProps> = ({ children, showFooter = true }) => {
+  return (
+    <div className="min-h-screen bg-slate-900 text-white font-sans">
+      {/* Accessibility */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only fixed top-2 left-2 z-50 bg-emerald-500 text-white px-4 py-2 rounded-md"
+      >
+        Skip to content
+      </a>
+
+      <Header />
+
+      <main id="main-content" className="pt-28">
+        {children}
+      </main>
+
+      {showFooter && <Footer />}
+    </div>
+  );
+};
 
 export default Layout;

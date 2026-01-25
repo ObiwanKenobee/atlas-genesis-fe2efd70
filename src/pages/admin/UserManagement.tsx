@@ -27,7 +27,7 @@ import {
   CheckCircle,
   Loader2
 } from "lucide-react";
-import Header from "@/components/Header";
+import Header from "@/components/EnterpriseHeader";
 import Footer from "@/components/Footer";
 
 const UserManagement = () => {

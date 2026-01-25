@@ -33,7 +33,7 @@ import {
   Clock,
   Settings,
 } from 'lucide-react';
-import Header from '@/components/Header';
+import Header from '@/components/EnterpriseHeader';
 import Footer from '@/components/Footer';
 
 // Register Chart.js components
