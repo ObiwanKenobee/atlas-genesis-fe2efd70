@@ -58,8 +58,11 @@ const NewsletterBanner = () => {
           
           {/* Close button */}
           <button
+            type="button"
             onClick={() => setIsVisible(false)}
             className="absolute top-3 right-3 p-1.5 rounded-full hover:bg-muted/50 transition-colors z-10"
+            aria-label="Close newsletter banner"
+            title="Close newsletter banner"
           >
             <X className="w-4 h-4 text-muted-foreground" />
           </button>

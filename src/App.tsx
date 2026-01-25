@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import ApiStatus from './components/ApiStatus';
@@ -42,16 +42,16 @@ const SimplePage = ({ title, description }: { title: string; description: string
 );
 
 const HeroSection = () => (
-  <section className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-slate-900 via-emerald-900/20 to-slate-900">
-    <div className="absolute inset-0">
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse animate-delay-2s"></div>
+  <section className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-slate-900 via-emerald-900/20 to-slate-900 px-4 sm:px-8 lg:px-16 py-32 ">
+    <div className="absolute inset-0 overflow-hidden pointer-events-none ">
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl animate-pulse "></div>
+      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse animate-delay-2s "></div>
     </div>
     
-    <div className="relative z-10 max-w-7xl px-8 text-center">
+    <div className="relative z-10 max-w-7xl px-8 text-center ">
       <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full glass mb-12 text-emerald-400 animate-float">
-        <span className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></span>
-        <span className="text-lg font-medium">Regenerative Value Exchange • Powered by AI & Blockchain</span>
+        <span className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse "></span>
+        <span className="text-lg font-medium ">Regenerative Value Exchange • Powered by AI & Blockchain</span>
       </div>
 
       <h1 className="text-7xl md:text-9xl font-black leading-tight mb-12">
@@ -87,7 +87,7 @@ const HeroSection = () => (
       </div>
 
       {/* Social Proof Strip */}
-      <div className="mt-12">
+      <div className="mt-12 text-center px-4 py-6 bg-slate-800/50 border border-slate-700 rounded-2xl glass max-w-4xl mx-auto">
         <p className="text-xs sm:text-sm text-slate-400 uppercase tracking-[0.2em] mb-4">Trusted by impact leaders</p>
         <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6 text-slate-200/80">
           {["UN Climate Lab", "Global Regen Fund", "WEF Cohort", "IUCN Partners", "EarthBank"].map((org) => (

@@ -136,19 +136,19 @@ const Header = () => {
   ];
 
   const platformLinks: NavItem[] = [
-    { name: "Dashboard", href: "/dashboard", icon: <Home className="w-4 h-4" /> },
-    { name: "Marketplace", href: "/marketplace", icon: <Leaf className="w-4 h-4" /> },
-    { name: "Portfolio", href: "/portfolio", icon: <TrendingUp className="w-4 h-4" /> },
+    { name: "Dashboard", href: "/dashboard", icon: <Home className="w-4 h-4"/> },
+    { name: "Marketplace", href: "/marketplace", icon: <Leaf className="w-4 h-4"/> },
+    { name: "Portfolio", href: "/portfolio", icon: <TrendingUp className="w-4 h-4"/> },
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border/50">
-      <a href="#main-content" className="sr-only focus:not-sr-only focus:inline-block p-2">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border/50 shadow-sm transition-colors duration-300">
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:inline-block p-2 bg-emerald-500 text-white rounded-md m-4">
         Skip to content
       </a>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 md:py-4">
         {/* Top Navigation Bar */}
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-20 space-x-4 md:space-x-6">
           {/* Logo Section */}
           <motion.div
             className="flex items-center gap-3 flex-shrink-0"
@@ -160,11 +160,11 @@ const Header = () => {
               <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-blue-600 flex items-center justify-center shadow-lg">
                 <Leaf className="w-5 h-5 text-white" />
               </div>
-              <div className="hidden sm:block">
-                <div className="font-bold text-lg text-foreground">
+              <div className="hidden sm:block text-left">
+                <div className="font-bold text-lg text-foreground leading-tight">
                   Atlas <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-blue-600">Sanctum</span>
                 </div>
-                <div className="text-xs text-muted-foreground">Regenerative Platform</div>
+                <div className="text-xs text-muted-foreground ">Regenerative Platform</div>
               </div>
             </Link>
           </motion.div>
