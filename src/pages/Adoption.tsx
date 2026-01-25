@@ -1,5 +1,6 @@
 import React from "react";
 import Navigation from "@/components/Navigation";
+import PageHero from "@/components/PageHero";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -65,13 +66,22 @@ const Adoption = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <main className="container mx-auto px-4 py-8 max-w-7xl">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight mb-2">Adoption Pathway for a New Global Order</h1>
-          <p className="text-lg text-muted-foreground">
-            Role-specific entry points from micro-credits to nation-scale climate policy
-          </p>
-        </div>
+      <PageHero
+        title="Adoption Pathway for a New Global Order"
+        subtitle="Role-specific entry points from micro-credits to nation-scale climate policy"
+        ctaText="Explore Roles"
+        ctaLink="#roles"
+        secondaryCtaText="Learn More"
+        secondaryCtaLink="/about"
+        badgeText="Regenerative Movement"
+        stats={[
+          { value: "24.5M", label: "Individuals" },
+          { value: "180K", label: "Farmers" },
+          { value: "1.2K", label: "Cities" },
+          { value: "450", label: "Corporations" }
+        ]}
+      />
+      <main className="container mx-auto px-4 py-8 max-w-7xl" id="roles">
 
         {/* Overview Card */}
         <Card className="mb-8 border-2 border-emerald-500 bg-gradient-to-r from-emerald-50 to-emerald-100">

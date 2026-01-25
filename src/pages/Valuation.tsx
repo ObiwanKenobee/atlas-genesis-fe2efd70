@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Navigation from "@/components/Navigation";
+import PageHero from "@/components/PageHero";
 import CreditValuationEngine from "@/components/CreditValuationEngine";
 import { useValuationModel } from "@/hooks/useValuationModel";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,14 +16,22 @@ const Valuation = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <main className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight mb-2">Mathematical Trust & Credit Valuation Engine</h1>
-          <p className="text-lg text-muted-foreground">
-            Multi-variable impact scoring, confidence-weighted credits, reversal risk decay, and permanence bonding
-          </p>
-        </div>
+      <PageHero
+        title="Mathematical Trust & Credit Valuation Engine"
+        subtitle="Multi-variable impact scoring, confidence-weighted credits, reversal risk decay, and permanence bonding"
+        ctaText="View Valuation"
+        ctaLink="#valuation"
+        secondaryCtaText="Learn More"
+        secondaryCtaLink="/about"
+        badgeText="Trust & Transparency"
+        stats={[
+          { value: "78.5", label: "Impact Score" },
+          { value: "92%", label: "Confidence" },
+          { value: "$82.10", label: "Price/RIU" },
+          { value: "$1.84B", label: "Market Volume" }
+        ]}
+      />
+      <main className="container mx-auto px-4 py-8 max-w-7xl" id="valuation">
 
         {/* Core Principles Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Navigation from "@/components/Navigation";
 import BioregionalMap from "@/components/BioregionalMap";
 import ClimateRiskForecasting from "@/components/ClimateRiskForecasting";
+import PageHero from "@/components/PageHero";
 import { useBioregionalZones } from "@/hooks/useBioregionalZones";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -79,69 +80,24 @@ const Bioregions = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
+      <PageHero
+        title="Geographic Intelligence & Bioregional Mapping"
+        subtitle="Bioregional credit zones, historical land-use analysis, climate risk forecasting, and indigenous land recognition"
+        ctaText="Explore Zones"
+        ctaLink="#map"
+        secondaryCtaText="Learn More"
+        secondaryCtaLink="/about"
+        badgeText="Regenerative Cartography"
+        stats={[
+          { value: displayZones.length.toString(), label: "Active Zones" },
+          { value: "PostGIS", label: "Real-time Modeling" },
+          { value: highBiodiversityZones.length.toString(), label: "High Biodiversity" },
+          { value: "Equity-focused", label: "Justice-Aware" }
+        ]}
+      />
       <main className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight mb-2">Geographic Intelligence & Bioregional Mapping</h1>
-          <p className="text-lg text-muted-foreground">
-            Bioregional credit zones, historical land-use analysis, climate risk forecasting, and indigenous land recognition
-          </p>
-        </div>
 
-        {/* Key Principles Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <Card className="border-l-4 border-l-emerald-500">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm flex items-center gap-2">
-                <Globe className="h-4 w-4" />
-                Bioregional Zones
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">{displayZones.length}</p>
-              <p className="text-xs text-muted-foreground">Active zones</p>
-            </CardContent>
-          </Card>
 
-          <Card className="border-l-4 border-l-amber-500">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm flex items-center gap-2">
-                <Zap className="h-4 w-4" />
-                Climate Risk
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">PostGIS</p>
-              <p className="text-xs text-muted-foreground">Real-time modeling</p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-l-4 border-l-blue-500">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm flex items-center gap-2">
-                <Heart className="h-4 w-4" />
-                High Biodiversity
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">{highBiodiversityZones.length}</p>
-              <p className="text-xs text-muted-foreground">Protected territories</p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-l-4 border-l-purple-500">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm flex items-center gap-2">
-                <Scale className="h-4 w-4" />
-                Justice-Aware
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">Pricing</p>
-              <p className="text-xs text-muted-foreground">Equity-focused</p>
-            </CardContent>
-          </Card>
-        </div>
 
         {/* Main Tabs */}
         <Tabs defaultValue="map" className="w-full">

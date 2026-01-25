@@ -1,6 +1,6 @@
 import SEO from "@/components/SEO";
 import { useSEO } from "@/hooks/useSEO";
-import ImprovedNavigation from "@/components/ImprovedNavigation";
+import EnterpriseHeader from "@/components/EnterpriseHeader";
 import HeroSection from "@/components/HeroSection";
 import PlatformLayers from "@/components/PlatformLayers";
 import ImpactMetrics from "@/components/ImpactMetrics";
@@ -36,7 +36,7 @@ const Index = () => {
     <>
       <SEO {...seoData} />
       <div className="min-h-screen bg-background">
-        <ImprovedNavigation />
+        <EnterpriseHeader />
         <main className="pt-24">
           <HeroSection />
           <PlatformLayers />

@@ -269,21 +269,27 @@ const BioregionalMap: React.FC = () => {
       <div className="flex items-center space-x-3">
         <input
           type="checkbox"
+          id={`layer-toggle-${layer.id}`}
           checked={layer.visible}
           onChange={() => onToggle(layer.id)}
           className="rounded border-border/50"
+          aria-label={`Toggle ${layer.name} layer visibility`}
         />
-        <span className="text-sm font-medium text-foreground">{layer.name}</span>
+        <label htmlFor={`layer-toggle-${layer.id}`} className="text-sm font-medium text-foreground cursor-pointer">
+          {layer.name}
+        </label>
       </div>
       {layer.visible && (
         <input
           type="range"
+          id={`layer-opacity-${layer.id}`}
           min="0"
           max="1"
           step="0.1"
           value={layer.opacity}
           onChange={(e) => onOpacityChange(layer.id, parseFloat(e.target.value))}
           className="w-16 h-2 bg-muted rounded-lg appearance-none cursor-pointer"
+          aria-label={`Adjust ${layer.name} layer opacity`}
         />
       )}
     </div>
@@ -317,10 +323,10 @@ const BioregionalMap: React.FC = () => {
                 <span className="text-sm font-medium">{bioregions.length} Bioregions</span>
               </div>
               <div className="flex space-x-2">
-                <button className="p-2 border border-border rounded-lg hover:bg-muted transition-colors">
+                <button className="p-2 border border-border rounded-lg hover:bg-muted transition-colors" aria-label="Download map data">
                   <Download className="w-4 h-4" />
                 </button>
-                <button className="p-2 border border-border rounded-lg hover:bg-muted transition-colors">
+                <button className="p-2 border border-border rounded-lg hover:bg-muted transition-colors" aria-label="Share map">
                   <Share2 className="w-4 h-4" />
                 </button>
               </div>
@@ -385,16 +391,16 @@ const BioregionalMap: React.FC = () => {
                   <div className="bg-card border border-border/50 rounded-lg p-6">
                     <h3 className="text-lg font-semibold text-foreground mb-4">Map Controls</h3>
                     <div className="grid grid-cols-2 gap-2">
-                      <button className="p-3 border border-border rounded-lg hover:bg-muted transition-colors">
+                      <button className="p-3 border border-border rounded-lg hover:bg-muted transition-colors" aria-label="Zoom in">
                         <ZoomIn className="w-5 h-5 mx-auto" />
                       </button>
-                      <button className="p-3 border border-border rounded-lg hover:bg-muted transition-colors">
+                      <button className="p-3 border border-border rounded-lg hover:bg-muted transition-colors" aria-label="Zoom out">
                         <ZoomOut className="w-5 h-5 mx-auto" />
                       </button>
-                      <button className="p-3 border border-border rounded-lg hover:bg-muted transition-colors">
+                      <button className="p-3 border border-border rounded-lg hover:bg-muted transition-colors" aria-label="Reset view">
                         <RotateCcw className="w-5 h-5 mx-auto" />
                       </button>
-                      <button className="p-3 border border-border rounded-lg hover:bg-muted transition-colors">
+                      <button className="p-3 border border-border rounded-lg hover:bg-muted transition-colors" aria-label="Toggle layer visibility">
                         <Layers className="w-5 h-5 mx-auto" />
                       </button>
                     </div>
