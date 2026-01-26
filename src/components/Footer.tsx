@@ -214,7 +214,6 @@ const Footer = () => {
             </ul>
           </div>
 
-
           {/* More Features */}
           <div>
             <h4 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider">More Features</h4>
@@ -233,6 +232,56 @@ const Footer = () => {
               ))}
             </ul>
           </div>
+
+             {/* App Store Badges (Hidden in USSD mode) */}
+            {!ussdMode && (
+              <div className="space-y-3">
+                <div className="text-sm font-semibold">📱 Download Apps:</div>
+                <div className="space-y-2">
+                  <a
+                    href="#"
+                    className="block bg-black/20 rounded-lg p-2 hover:bg-black/30 transition-colors"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <span className="text-lg">📱</span>
+                      <div className="text-xs">
+                        <div className="font-semibold">Download on the</div>
+                        <div>App Store</div>
+                      </div>
+                    </div>
+                  </a>
+
+                  <a
+                  href="https://drive.google.com/file/d/1QEykzmJOKIKu6sABbPx2zeGXX1MZBcCr/view"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block bg-black/20 rounded-lg p-2 hover:bg-black/30 transition-colors"
+                  >
+                  <div className="flex items-center space-x-2">
+                 <span className="text-lg">📦</span>
+                <div className="text-xs">
+                <div className="font-semibold">Get it on</div>
+                <div>Google Drive</div>
+                </div>
+                </div>
+                </a>
+
+
+                  <a
+                    href="#"
+                    className="block bg-black/20 rounded-lg p-2 hover:bg-black/30 transition-colors"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <span className="text-lg">🤖</span>
+                      <div className="text-xs">
+                        <div className="font-semibold">Get it on</div>
+                        <div>Google Play</div>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            )}
 
           {/* Platform */}
           <div>
@@ -374,6 +423,7 @@ const Footer = () => {
           </div>
         </div>
       </div>
+      
     </footer>
   );
 };
