@@ -300,17 +300,8 @@ const HeroSection = () => {
             transition={{ duration: 0.6, delay: 1.3 }}
             className="mt-12"
           >
-            <p className="text-xs sm:text-sm text-muted-foreground uppercase tracking-[0.2em] mb-4">Trusted by impact leaders</p>
-            <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8 md:gap-10 text-foreground/70">
-              {["UN Climate Lab", "Global Regen Fund", "WEF Cohort", "IUCN Partners", "EarthBank"].map((org) => (
-                <div
-                  key={org}
-                  className="px-4 py-2 rounded-xl bg-card/40 border border-border/50 text-sm sm:text-base font-semibold tracking-tight"
-                >
-                  {org}
-                </div>
-              ))}
-            </div>
+            
+          
           </motion.div>
         </div>
       </motion.div>
