@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Navigation from "@/components/Navigation";
+import EnterpriseHeader from "@/components/EnterpriseHeader";
 import BioregionalMap from "@/components/BioregionalMap";
 import ClimateRiskForecasting from "@/components/ClimateRiskForecasting";
 import PageHero from "@/components/PageHero";
@@ -79,7 +79,7 @@ const Bioregions = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      <EnterpriseHeader />
       <PageHero
         title="Geographic Intelligence & Bioregional Mapping"
         subtitle="Bioregional credit zones, historical land-use analysis, climate risk forecasting, and indigenous land recognition"

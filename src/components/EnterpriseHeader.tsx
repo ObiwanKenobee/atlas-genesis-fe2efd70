@@ -36,7 +36,7 @@ import {
   Moon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/useAuth";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { NotificationCenter } from "@/components/NotificationCenter";
 import ApiStatus from "@/components/ApiStatus";
 
@@ -65,7 +65,7 @@ interface NavDropdown {
 }
 
 const EnterpriseHeader = () => {
-  const { user } = useAuth();
+  const { user } = useSupabaseAuth();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -324,25 +324,6 @@ const EnterpriseHeader = () => {
           : "bg-background/60"
       }`}
     >
-      {/* Announcement Bar */}
-      <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border-b border-border/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center h-9 text-sm">
-            <div className="flex items-center gap-3 text-muted-foreground">
-              <span className="hidden sm:inline">🌱</span>
-              <span className="hidden sm:inline">Join the regenerative revolution</span>
-              <Link to="/marketplace" className="text-primary hover:text-primary/80 font-medium inline-flex items-center gap-1 group">
-                Explore verified projects
-                <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-              </Link>
-              <div className="hidden sm:inline-flex">
-                <ApiStatus showLabel />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Main Navigation */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
@@ -488,7 +469,7 @@ const EnterpriseHeader = () => {
                   : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
               }`}
             >
-              Dashboard
+              Blog
             </Link>
           </nav>
 

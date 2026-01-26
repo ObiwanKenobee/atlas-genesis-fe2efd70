@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Navigation from "@/components/Navigation";
+import EnterpriseHeader from "@/components/EnterpriseHeader";
 import { useMeasurementData } from "@/hooks/useMeasurementData";
 import { useRegenerativeMetrics } from "@/hooks/useRegenerativeMetrics";
 import { useBioregionalZones } from "@/hooks/useBioregionalZones";
@@ -25,7 +25,7 @@ const Measurements = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      <EnterpriseHeader />
       <PageHero
         title="Planetary Measurement & Verification"
         subtitle="Real-time carbon and ecosystem data from satellite networks, soil sensors, and biodiversity monitors"

@@ -1,16 +1,11 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import ApiStatus from './components/ApiStatus';
 import NewsletterBanner from './components/NewsletterBanner';
 import Layout from './components/Layout';
 import BackToTop from './components/BackToTop';
-import HeroSection from './components/HeroSection';
-import PlatformArchitecture from './components/PlatformArchitecture';
-import RealTimeImpact from './components/RealTimeImpact';
-import TechnologyStack from './components/TechnologyStack';
-import JoinRevolution from './components/JoinRevolution';
-import Footer from './components/Footer';
+import Index from './pages/Index';
 import BusinessModel from './pages/BusinessModel';
 import CriticalInnovations from './pages/CriticalInnovations';
 import AzureProductionStrategy from './pages/AzureProductionStrategy';
@@ -31,6 +26,19 @@ import ProjectDetail from './pages/ProjectDetail';
 import TransactionHistory from './pages/TransactionHistory';
 import Status from './pages/Status';
 import Demo from './pages/Demo';
+import Bioregions from './pages/Bioregions';
+import Measurements from './pages/Measurements';
+import Valuation from './pages/Valuation';
+import Governance from './pages/Governance';
+import RegenerativeAgriculture from './pages/RegenerativeAgriculture';
+import Health from './pages/Health';
+import Security from './pages/Security';
+import Adoption from './pages/Adoption';
+import Outreach from './pages/Outreach';
+import HelpCenter from './pages/HelpCenter';
+import Contact from './pages/Contact';
+import Pricing from './pages/Pricing';
+import NotFound from './pages/NotFound';
 
 const SimplePage = ({ title, description }: { title: string; description: string }) => (
   <Layout>
@@ -44,20 +52,6 @@ const SimplePage = ({ title, description }: { title: string; description: string
       </div>
     </div>
   </Layout>
-);
-
-const Index = () => (
-  <div className="font-display bg-slate-900 text-white">
-    <Layout showFooter={false}>
-      <HeroSection />
-      <PlatformArchitecture />
-      <RealTimeImpact />
-      <TechnologyStack />
-      <JoinRevolution />
-    </Layout>
-    <Footer />
-    <NewsletterBanner />
-  </div>
 );
 
 const Dashboard = () => (
@@ -147,6 +141,18 @@ const App = () => {
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/portfolio" element={<Portfolio />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/bioregions" element={<Bioregions />} />
+          <Route path="/measurements" element={<Measurements />} />
+          <Route path="/valuation" element={<Valuation />} />
+          <Route path="/governance" element={<Governance />} />
+          <Route path="/regenerative-agriculture" element={<RegenerativeAgriculture />} />
+          <Route path="/health" element={<Health />} />
+          <Route path="/security" element={<Security />} />
+          <Route path="/adoption" element={<Adoption />} />
+          <Route path="/outreach" element={<Outreach />} />
+          <Route path="/help-center" element={<HelpCenter />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/pricing" element={<Pricing />} />
           <Route path="/business-model" element={<BusinessModel />} />
           <Route path="/critical-innovations" element={<CriticalInnovations />} />
           <Route path="/azure-strategy" element={<AzureProductionStrategy />} />
@@ -163,6 +169,7 @@ const App = () => {
           <Route path="/demo" element={<Demo />} />
           <Route path="/project/:id" element={<ProjectDetail />} />
           <Route path="/transactions" element={<TransactionHistory />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </AnimatePresence>
       <BackToTop />

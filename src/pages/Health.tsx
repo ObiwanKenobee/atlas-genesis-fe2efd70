@@ -1,5 +1,5 @@
 import React from "react";
-import Navigation from "@/components/Navigation";
+import EnterpriseHeader from "@/components/EnterpriseHeader";
 import PageHero from "@/components/PageHero";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,7 +8,7 @@ import { Heart, Wind, Droplet, Leaf } from "lucide-react";
 const Health = () => {
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      <EnterpriseHeader />
       <PageHero
         title="Human Health Integration"
         subtitle="Air quality credits, water restoration, urban health scores, and health system participation"

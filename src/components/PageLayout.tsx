@@ -1,5 +1,5 @@
 import React from 'react';
-import ImprovedNavigation from './ImprovedNavigation';
+import EnterpriseHeader from './EnterpriseHeader';
 
 interface PageLayoutProps {
   children: React.ReactNode;
@@ -9,7 +9,7 @@ interface PageLayoutProps {
 export const PageLayout: React.FC<PageLayoutProps> = ({ children, className = '' }) => {
   return (
     <div className="min-h-screen bg-background">
-      <ImprovedNavigation />
+      <EnterpriseHeader />
       <main className={`pt-20 ${className}`}>
         {children}
       </main>

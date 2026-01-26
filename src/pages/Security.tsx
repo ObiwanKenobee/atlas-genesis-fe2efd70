@@ -1,5 +1,5 @@
 import React from "react";
-import Navigation from "@/components/Navigation";
+import EnterpriseHeader from "@/components/EnterpriseHeader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Shield, Lock, Eye, AlertTriangle } from "lucide-react";
@@ -7,7 +7,7 @@ import { Shield, Lock, Eye, AlertTriangle } from "lucide-react";
 const Security = () => {
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      <EnterpriseHeader />
       <main className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold tracking-tight mb-2">Security, Transparency & Anti-Fraud</h1>

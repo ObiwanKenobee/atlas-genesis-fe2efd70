@@ -1,5 +1,5 @@
 import React from "react";
-import Navigation from "@/components/Navigation";
+import EnterpriseHeader from "@/components/EnterpriseHeader";
 import PageHero from "@/components/PageHero";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -65,7 +65,7 @@ const Adoption = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      <EnterpriseHeader />
       <PageHero
         title="Adoption Pathway for a New Global Order"
         subtitle="Role-specific entry points from micro-credits to nation-scale climate policy"

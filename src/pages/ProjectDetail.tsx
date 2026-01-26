@@ -62,7 +62,7 @@ const ProjectDetail = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <Navigation />
+        <EnterpriseHeader />
         <main className="pt-24 pb-16 container mx-auto px-6">
           <Skeleton className="h-96 w-full rounded-2xl mb-8" />
           <Skeleton className="h-12 w-1/2 mb-4" />
@@ -79,7 +79,7 @@ const ProjectDetail = () => {
   if (error || !project) {
     return (
       <div className="min-h-screen bg-background">
-        <Navigation />
+        <EnterpriseHeader />
         <main className="pt-24 pb-16 container mx-auto px-6 text-center">
           <h1 className="text-2xl font-bold text-foreground mb-4">Project Not Found</h1>
           <p className="text-muted-foreground mb-6">The project you're looking for doesn't exist or has been removed.</p>
@@ -99,7 +99,7 @@ const ProjectDetail = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      <EnterpriseHeader />
 
       <main className="pt-24 pb-16">
         {/* Hero Image */}

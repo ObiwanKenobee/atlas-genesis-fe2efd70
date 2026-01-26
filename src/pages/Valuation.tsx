@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Navigation from "@/components/Navigation";
+import EnterpriseHeader from "@/components/EnterpriseHeader";
 import PageHero from "@/components/PageHero";
 import CreditValuationEngine from "@/components/CreditValuationEngine";
 import { useValuationModel } from "@/hooks/useValuationModel";
@@ -15,7 +15,7 @@ const Valuation = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      <EnterpriseHeader />
       <PageHero
         title="Mathematical Trust & Credit Valuation Engine"
         subtitle="Multi-variable impact scoring, confidence-weighted credits, reversal risk decay, and permanence bonding"

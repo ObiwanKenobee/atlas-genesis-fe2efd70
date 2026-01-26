@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Navigation from "@/components/Navigation";
+import EnterpriseHeader from "@/components/EnterpriseHeader";
 import EcosystemRecoveryTracker from "@/components/EcosystemRecoveryTracker";
 import PageHero from "@/components/PageHero";
 import { useRegenerativeMetrics } from "@/hooks/useRegenerativeMetrics";
@@ -15,7 +15,7 @@ const RegenerativeAgriculture = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      <EnterpriseHeader />
       <PageHero
         title="Regenerative Agriculture & Ecosystem Recovery"
         subtitle="Soil microbiome health, crop diversity metrics, mangrove/kelp restoration, and pollinator recovery"

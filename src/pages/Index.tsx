@@ -15,7 +15,7 @@ const Index = () => {
     structuredData: {
       "@context": "https://schema.org",
       "@type": "Organization",
-      "name": "Atlas Genesis",
+      "name": "Atlas Sanctum",
       "description": "Leading platform for regenerative agriculture, carbon credits, and sustainable farming solutions",
       "url": "https://atlasgenesis.com",
       "logo": "https://atlasgenesis.com/logo.png",
@@ -25,7 +25,7 @@ const Index = () => {
       ],
       "contactPoint": {
         "@type": "ContactPoint",
-        "telephone": "+1-555-123-4567",
+        "telephone": "+254-759-895-739",
         "contactType": "customer service",
         "availableLanguage": "English"
       }
