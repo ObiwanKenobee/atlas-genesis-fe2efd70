@@ -18,6 +18,7 @@ import EndToEndExperience from './pages/EndToEndExperience';
 import EngineeringArchitecture from './pages/EngineeringArchitecture';
 import RVXInnovations from './pages/RVXInnovations';
 import DashboardWithSidebar from './pages/DashboardWithSidebar';
+import Dashboard from './pages/Dashboard';
 import SupabaseAuth from './pages/SupabaseAuth';
 import Portfolio from './pages/Portfolio';
 import Profile from './pages/Profile';
@@ -38,6 +39,12 @@ import Outreach from './pages/Outreach';
 import HelpCenter from './pages/HelpCenter';
 import Contact from './pages/Contact';
 import Pricing from './pages/Pricing';
+import Payment from './pages/Payment';
+import RegenerativeFinance from './pages/RegenerativeFinance';
+import DeFi from './pages/DeFi';
+import Community from './pages/Community';
+import Education from './pages/Education';
+import AdminDashboard from './pages/admin/AdminDashboard';
 import NotFound from './pages/NotFound';
 
 const SimplePage = ({ title, description }: { title: string; description: string }) => (
@@ -48,82 +55,6 @@ const SimplePage = ({ title, description }: { title: string; description: string
         <p className="text-xl text-slate-400 mb-8">{description}</p>
         <div className="glass p-8 rounded-2xl">
           <p className="text-slate-400">Feature coming soon...</p>
-        </div>
-      </div>
-    </div>
-  </Layout>
-);
-
-const Dashboard = () => (
-  <Layout>
-    <div className="py-8 px-8">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-5xl font-bold mb-4">🌱 Regenerative Dashboard</h1>
-        <p className="text-xl text-slate-400 mb-8">Track your impact, manage investments, and scale regeneration.</p>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div className="glass p-8 rounded-2xl hover-lift">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center text-2xl">🎯</div>
-              <h3 className="text-2xl font-bold text-emerald-500">Your Impact</h3>
-            </div>
-            <div className="space-y-4">
-              <div className="flex justify-between">
-                <span className="text-slate-400">Carbon Offset</span>
-                <span className="text-emerald-500 font-bold">2.4 tons CO₂</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400">Projects Funded</span>
-                <span className="text-emerald-500 font-bold">12</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400">Ecosystem Health</span>
-                <span className="text-emerald-500 font-bold">87%</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="glass p-8 rounded-2xl hover-lift">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center text-2xl">📈</div>
-              <h3 className="text-2xl font-bold text-blue-500">Impact Growth</h3>
-            </div>
-            <div className="space-y-4">
-              <div className="flex justify-between">
-                <span className="text-slate-400">Monthly Impact</span>
-                <span className="text-blue-500 font-bold">+18%</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400">Community Reach</span>
-                <span className="text-blue-500 font-bold">+34%</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400">Funding Raised</span>
-                <span className="text-blue-500 font-bold">$2.1M</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="glass p-8 rounded-2xl hover-lift">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center text-2xl">💎</div>
-              <h3 className="text-2xl font-bold text-purple-500">Regenerative Assets</h3>
-            </div>
-            <div className="space-y-4">
-              <div className="flex justify-between">
-                <span className="text-slate-400">Carbon Credits</span>
-                <span className="text-purple-500 font-bold">1,200 RIU</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400">Ecosystem Tokens</span>
-                <span className="text-purple-500 font-bold">5,800</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400">Market Value</span>
-                <span className="text-purple-500 font-bold">$45,200</span>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -153,6 +84,16 @@ const App = () => {
           <Route path="/help-center" element={<HelpCenter />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/pricing" element={<Pricing />} />
+          <Route path="/payment" element={<Payment />} />
+          <Route path="/payment/:reference" element={<Payment />} />
+          <Route path="/regenerative-finance" element={<RegenerativeFinance />} />
+          <Route path="/regenerative-finance/:id" element={<RegenerativeFinance />} />
+          <Route path="/defi" element={<DeFi />} />
+          <Route path="/defi/:id" element={<DeFi />} />
+          <Route path="/community" element={<Community />} />
+          <Route path="/community/:id" element={<Community />} />
+          <Route path="/education" element={<Education />} />
+          <Route path="/education/:id" element={<Education />} />
           <Route path="/business-model" element={<BusinessModel />} />
           <Route path="/critical-innovations" element={<CriticalInnovations />} />
           <Route path="/azure-strategy" element={<AzureProductionStrategy />} />
@@ -169,6 +110,8 @@ const App = () => {
           <Route path="/demo" element={<Demo />} />
           <Route path="/project/:id" element={<ProjectDetail />} />
           <Route path="/transactions" element={<TransactionHistory />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/*" element={<AdminDashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </AnimatePresence>

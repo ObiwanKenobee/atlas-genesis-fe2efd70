@@ -144,12 +144,12 @@ export const logSecurityEvent = (
     userAgent: details.userAgent,
   };
 
-  securityLogger.audit(eventType, actorId, auditData);
+  securityLogger.audit(eventType, actorId || undefined, auditData);
 
   // Log to database if available
-  if (global.dbQuery) {
+  if ((global as any).dbQuery) {
     try {
-      global.dbQuery(
+      (global as any).dbQuery(
         'INSERT INTO security_audit_logs (event_type, actor_id, details, severity, ip_address, user_agent) VALUES ($1, $2, $3, $4, $5, $6)',
         [eventType, actorId, JSON.stringify(details), severity, details.ip, details.userAgent]
       ).catch((err: any) => {

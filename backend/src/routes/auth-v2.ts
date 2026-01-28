@@ -32,22 +32,55 @@ import {
 import { emailService } from '../services/email';
 import { authenticate, authorize, requireMFA, requireEmailVerification, checkLoginAttempts, resetLoginAttempts, AuthenticatedRequest } from '../middleware/auth';
 import { validateWithZod } from '../middleware/validation';
-import { userCreateSchema, loginSchema, userUpdateSchema } from '../validation/schemas';
+import { 
+  userCreateSchema, 
+  loginSchema, 
+  userUpdateSchema, 
+  producerOnboardingSchema, 
+  investorOnboardingSchema, 
+  institutionOnboardingSchema, 
+  researcherOnboardingSchema 
+} from '../validation/schemas';
 import { logSecurityEvent } from '../utils/logger';
 
 const router = express.Router();
 
 // Sign Up
 router.post('/signup', validateWithZod(userCreateSchema), async (req: Request, res: Response) => {
-  const { email, password, displayName, role = 'individual' } = req.body;
+  const { email, phoneNumber, password, displayName, role = 'producer' } = req.body;
 
   try {
-    const hashedPassword = await hashPassword(password);
+    // Validate that either email or phone number is provided
+    if (!email && !phoneNumber) {
+      return res.status(400).json({ message: 'Either email or phone number is required' });
+    }
+
+    // Check if user with this email or phone already exists
+    if (email) {
+      const existingEmailUser = await query('SELECT id FROM users WHERE email = $1', [email.toLowerCase()]);
+      if (existingEmailUser.rows.length > 0) {
+        return res.status(400).json({ message: 'Email already in use' });
+      }
+    }
+
+    if (phoneNumber) {
+      const existingPhoneUser = await query('SELECT id FROM users WHERE phone_number = $1', [phoneNumber]);
+      if (existingPhoneUser.rows.length > 0) {
+        return res.status(400).json({ message: 'Phone number already in use' });
+      }
+    }
+
+    // Hash password if provided
+    let hashedPassword = null;
+    if (password) {
+      hashedPassword = await hashPassword(password);
+    }
+
     const result = await query(
-      `INSERT INTO users (email, display_name, password_hash, role, email_verified)
-       VALUES ($1, $2, $3, $4, false)
-       RETURNING id, email, display_name, role, email_verified`,
-      [email.toLowerCase(), displayName || email.split('@')[0], hashedPassword, role]
+      `INSERT INTO users (email, phone_number, display_name, password_hash, role, email_verified, phone_verified)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       RETURNING id, email, phone_number, display_name, role, email_verified, phone_verified`,
+      [email?.toLowerCase(), phoneNumber, displayName || (email?.split('@')[0] || 'User'), hashedPassword, role, !!email, !!phoneNumber]
     );
 
     const user = result.rows[0];
@@ -63,19 +96,23 @@ router.post('/signup', validateWithZod(userCreateSchema), async (req: Request, r
     // Create email verification token
     const verificationToken = await createEmailVerificationToken(user.id);
 
-    // Send welcome and verification email
-    try {
-      await emailService.sendWelcomeEmail(user.email, user.display_name || user.email);
-      await emailService.sendEmailVerification(user.email, user.display_name || user.email, verificationToken);
-    } catch (emailError) {
-      console.error('Failed to send welcome/verification email:', emailError);
-      // Don't fail registration if email fails
+    // Send welcome and verification email if email is provided
+    if (user.email) {
+      try {
+        const safeDisplayName = user.display_name || 'User';
+        await emailService.sendWelcomeEmail(user.email, safeDisplayName);
+        await emailService.sendEmailVerification(user.email, safeDisplayName, verificationToken);
+      } catch (emailError) {
+        console.error('Failed to send welcome/verification email:', emailError);
+        // Don't fail registration if email fails
+      }
     }
 
     res.status(201).json({
       user: {
         id: user.id,
         email: user.email,
+        phoneNumber: user.phone_number,
         displayName: user.display_name,
         role: user.role,
         emailVerified: user.email_verified
@@ -86,7 +123,7 @@ router.post('/signup', validateWithZod(userCreateSchema), async (req: Request, r
     if (err.code === '23505') { // Unique violation
       logSecurityEvent('registration_failed', null, {
         reason: 'email_exists',
-        email: email.toLowerCase(),
+        email: email?.toLowerCase(),
         ip: req.ip,
         userAgent: req.get('User-Agent')
       }, 'low');
@@ -187,7 +224,7 @@ router.post('/login', validateWithZod(loginSchema), async (req: Request, res: Re
     // Check for suspicious login activity
     const loginDeviceFingerprint = generateDeviceFingerprint(req);
     const loginContext: LoginContext = {
-      ip: req.ip,
+      ip: req.ip || '',
       userAgent: req.get('User-Agent') || '',
       deviceFingerprint: loginDeviceFingerprint,
       timestamp: new Date()
@@ -516,8 +553,13 @@ router.post('/resend-verification', authenticate, async (req: AuthenticatedReque
   }
 
   try {
+    if (!user.email) {
+      return res.status(400).json({ code: 'email_required', message: 'Email is required for verification' });
+    }
+    
     const verificationToken = await createEmailVerificationToken(user.id);
-    await emailService.sendEmailVerification(user.email, user.displayName || user.email, verificationToken);
+    const safeDisplayName = user.displayName || 'User';
+    await emailService.sendEmailVerification(user.email, safeDisplayName, verificationToken);
 
     res.json({ message: 'Verification email sent' });
   } catch (err) {
@@ -963,6 +1005,244 @@ router.get('/user-sessions/:userId', authenticate, authorize('admin'), async (re
   } catch (err) {
     console.error('User sessions fetch error:', err);
     res.status(500).json({ code: 'server_error', message: 'Failed to fetch user sessions' });
+  }
+});
+
+// Role-based onboarding routes
+router.post('/onboarding/producer', authenticate, validateWithZod(producerOnboardingSchema), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { locationType, location, verificationPhoto } = req.body;
+    const userId = req.user!.id;
+
+    // Update user profile with producer-specific information
+    await query(
+      `UPDATE users 
+       SET profile_data = COALESCE(profile_data, '{}'::jsonb) || $1::jsonb 
+       WHERE id = $2`,
+      [
+        JSON.stringify({
+          producer: {
+            locationType,
+            location,
+            verificationPhoto,
+            onboardingCompleted: true
+          }
+        }),
+        userId
+      ]
+    );
+
+    logSecurityEvent('onboarding_completed', userId, {
+      role: 'producer',
+      locationType,
+      ip: req.ip,
+      userAgent: req.get('User-Agent')
+    }, 'low');
+
+    res.json({ 
+      message: 'Producer onboarding completed successfully',
+      user: {
+        id: userId,
+        role: 'producer',
+        onboardingCompleted: true
+      }
+    });
+  } catch (err: any) {
+    console.error('Producer onboarding error:', err);
+    logSecurityEvent('onboarding_failed', req.user!.id, {
+      role: 'producer',
+      error: err.message,
+      ip: req.ip,
+      userAgent: req.get('User-Agent')
+    }, 'medium');
+    res.status(500).json({ code: 'server_error', message: 'Failed to complete onboarding' });
+  }
+});
+
+router.post('/onboarding/investor', authenticate, validateWithZod(investorOnboardingSchema), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { investmentIntent, riskProfile, investmentAmount } = req.body;
+    const userId = req.user!.id;
+
+    // Update user profile with investor-specific information
+    await query(
+      `UPDATE users 
+       SET profile_data = COALESCE(profile_data, '{}'::jsonb) || $1::jsonb 
+       WHERE id = $2`,
+      [
+        JSON.stringify({
+          investor: {
+            investmentIntent,
+            riskProfile,
+            investmentAmount,
+            onboardingCompleted: true
+          }
+        }),
+        userId
+      ]
+    );
+
+    logSecurityEvent('onboarding_completed', userId, {
+      role: 'investor',
+      investmentIntent,
+      ip: req.ip,
+      userAgent: req.get('User-Agent')
+    }, 'low');
+
+    res.json({ 
+      message: 'Investor onboarding completed successfully',
+      user: {
+        id: userId,
+        role: 'investor',
+        onboardingCompleted: true
+      }
+    });
+  } catch (err: any) {
+    console.error('Investor onboarding error:', err);
+    logSecurityEvent('onboarding_failed', req.user!.id, {
+      role: 'investor',
+      error: err.message,
+      ip: req.ip,
+      userAgent: req.get('User-Agent')
+    }, 'medium');
+    res.status(500).json({ code: 'server_error', message: 'Failed to complete onboarding' });
+  }
+});
+
+router.post('/onboarding/institution', authenticate, validateWithZod(institutionOnboardingSchema), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { institutionType, jurisdiction, governanceMode, officialEmail } = req.body;
+    const userId = req.user!.id;
+
+    // Update user profile with institution-specific information
+    await query(
+      `UPDATE users 
+       SET profile_data = COALESCE(profile_data, '{}'::jsonb) || $1::jsonb 
+       WHERE id = $2`,
+      [
+        JSON.stringify({
+          institution: {
+            institutionType,
+            jurisdiction,
+            governanceMode,
+            officialEmail,
+            onboardingCompleted: true
+          }
+        }),
+        userId
+      ]
+    );
+
+    logSecurityEvent('onboarding_completed', userId, {
+      role: 'institution',
+      institutionType,
+      ip: req.ip,
+      userAgent: req.get('User-Agent')
+    }, 'low');
+
+    res.json({ 
+      message: 'Institution onboarding completed successfully',
+      user: {
+        id: userId,
+        role: 'institution',
+        onboardingCompleted: true
+      }
+    });
+  } catch (err: any) {
+    console.error('Institution onboarding error:', err);
+    logSecurityEvent('onboarding_failed', req.user!.id, {
+      role: 'institution',
+      error: err.message,
+      ip: req.ip,
+      userAgent: req.get('User-Agent')
+    }, 'medium');
+    res.status(500).json({ code: 'server_error', message: 'Failed to complete onboarding' });
+  }
+});
+
+router.post('/onboarding/researcher', authenticate, validateWithZod(researcherOnboardingSchema), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { researchPurpose, accessLevel, fieldOfStudy, institution } = req.body;
+    const userId = req.user!.id;
+
+    // Update user profile with researcher-specific information
+    await query(
+      `UPDATE users 
+       SET profile_data = COALESCE(profile_data, '{}'::jsonb) || $1::jsonb 
+       WHERE id = $2`,
+      [
+        JSON.stringify({
+          researcher: {
+            researchPurpose,
+            accessLevel,
+            fieldOfStudy,
+            institution,
+            onboardingCompleted: true
+          }
+        }),
+        userId
+      ]
+    );
+
+    logSecurityEvent('onboarding_completed', userId, {
+      role: 'researcher',
+      researchPurpose,
+      ip: req.ip,
+      userAgent: req.get('User-Agent')
+    }, 'low');
+
+    res.json({ 
+      message: 'Researcher onboarding completed successfully',
+      user: {
+        id: userId,
+        role: 'researcher',
+        onboardingCompleted: true
+      }
+    });
+  } catch (err: any) {
+    console.error('Researcher onboarding error:', err);
+    logSecurityEvent('onboarding_failed', req.user!.id, {
+      role: 'researcher',
+      error: err.message,
+      ip: req.ip,
+      userAgent: req.get('User-Agent')
+    }, 'medium');
+    res.status(500).json({ code: 'server_error', message: 'Failed to complete onboarding' });
+  }
+});
+
+// Get onboarding status
+router.get('/onboarding/status', authenticate, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user!.id;
+
+    const result = await query(
+      'SELECT profile_data, role FROM users WHERE id = $1',
+      [userId]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ code: 'user_not_found', message: 'User not found' });
+    }
+
+    const user = result.rows[0];
+    const profileData = user.profile_data || {};
+
+    // Check if onboarding is completed for the specific role
+    let onboardingCompleted = false;
+    if (user.role in profileData && profileData[user.role]?.onboardingCompleted) {
+      onboardingCompleted = true;
+    }
+
+    res.json({
+      role: user.role,
+      onboardingCompleted,
+      profileData: profileData[user.role] || {},
+      requiresOnboarding: !onboardingCompleted
+    });
+  } catch (err: any) {
+    console.error('Get onboarding status error:', err);
+    res.status(500).json({ code: 'server_error', message: 'Failed to get onboarding status' });
   }
 });
 

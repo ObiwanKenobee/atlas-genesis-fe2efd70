@@ -194,6 +194,73 @@ export class SecurityPerformanceMonitor {
   clearMetrics(): void {
     this.metrics = [];
   }
+
+  // Get statistics (for dashboard)
+  getStats(operation?: string): any {
+    const metrics = operation ? this.metrics.filter(m => m.operation === operation) : this.metrics;
+    
+    return metrics.reduce((acc, metric) => {
+      if (!acc[metric.operation]) {
+        acc[metric.operation] = {
+          count: 0,
+          avgDuration: 0,
+          maxDuration: 0,
+          errors: 0
+        };
+      }
+      
+      const opStats = acc[metric.operation];
+      opStats.count++;
+      opStats.avgDuration = ((opStats.avgDuration * (opStats.count - 1)) + metric.duration) / opStats.count;
+      opStats.maxDuration = Math.max(opStats.maxDuration, metric.duration);
+      if (!metric.success) {
+        opStats.errors++;
+      }
+      
+      return acc;
+    }, {} as Record<string, any>);
+  }
+
+  // Get health score (0-100)
+  getHealthScore(): number {
+    const allMetrics = this.getAggregatedMetrics();
+    const totalOperations = allMetrics.length;
+    let healthScore = 100;
+    
+    allMetrics.forEach(metric => {
+      // Deduct points based on duration and errors
+      if (metric.avgDuration > 500) {
+        healthScore -= 10;
+      }
+      if (metric.avgDuration > 1000) {
+        healthScore -= 20;
+      }
+      if (metric.count > 0 && (metric.count - metric.count) / metric.count > 0.1) {
+        healthScore -= 15;
+      }
+    });
+    
+    return Math.max(0, Math.min(100, healthScore));
+  }
+
+  // Get recent metrics
+  getRecentMetrics(operation?: string, limit: number = 100): PerformanceMetrics[] {
+    return this.getMetrics(operation, limit);
+  }
+
+  // Get benchmark (placeholder)
+  getBenchmark(operation: string): any {
+    return {
+      avgDuration: 200,
+      maxDuration: 500,
+      errorRate: 0.05
+    };
+  }
+
+  // Update benchmark (placeholder)
+  updateBenchmark(operation: string, updates: any): void {
+    console.warn('updateBenchmark is a placeholder method');
+  }
 }
 
 export const securityPerformanceMonitor = SecurityPerformanceMonitor.getInstance();

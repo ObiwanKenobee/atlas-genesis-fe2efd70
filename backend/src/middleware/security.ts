@@ -419,8 +419,8 @@ export const securityHeaders = (req: Request, res: Response, next: NextFunction)
 
   // Remove null values
   Object.keys(cspDirectives).forEach(key => {
-    if (cspDirectives[key] === null) {
-      delete cspDirectives[key];
+    if ((cspDirectives as any)[key] === null) {
+      delete (cspDirectives as any)[key];
     }
   });
 

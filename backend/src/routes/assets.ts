@@ -1,4 +1,5 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
+import { AuthenticatedRequest } from '../middleware/auth';
 import fs from 'fs/promises';
 import path from 'path';
 import { query } from '../db';
@@ -12,7 +13,7 @@ import { fileUploadQuerySchema } from '../validation/schemas';
 const router = express.Router();
 
 // File upload endpoint with comprehensive security
-router.post('/upload', secureFileUpload('default'), async (req, res) => {
+router.post('/upload', secureFileUpload('default'), async (req: any, res: Response) => {
   try {
     if (!req.file || !req.fileValidation) {
       return res.status(400).json({
@@ -140,7 +141,7 @@ router.post('/upload', secureFileUpload('default'), async (req, res) => {
 });
 
 // Get assets with filtering
-router.get('/', authenticate, validateWithZod(fileUploadQuerySchema, { logSecurityEvents: true }), async (req, res) => {
+router.get('/', authenticate, validateWithZod(fileUploadQuerySchema, { logSecurityEvents: true }), async (req: any, res: Response) => {
   try {
     const {
       type,
@@ -231,7 +232,7 @@ router.get('/', authenticate, validateWithZod(fileUploadQuerySchema, { logSecuri
 });
 
 // Get specific asset
-router.get('/:id', authenticate, async (req, res) => {
+router.get('/:id', authenticate, async (req: any, res: Response) => {
   try {
     const { id } = req.params;
     const userId = (req as any).user?.id;
@@ -252,9 +253,12 @@ router.get('/:id', authenticate, async (req, res) => {
 
     const asset = result.rows[0];
 
+    const ip = (req.ip || '') as string;
+    const userAgent = (req.get('User-Agent') || '') as string;
+
     // Check access permissions
     if (!asset.is_owner && !asset.metadata?.isPublic) {
-      await logFileAccess(id, userId, 'access', req.ip, req.get('User-Agent'), false, 'Access denied');
+      await logFileAccess(id, userId, 'access', ip, userAgent, false, 'Access denied');
       return res.status(403).json({
         code: 'access_denied',
         message: 'Access denied to this asset',
@@ -263,7 +267,7 @@ router.get('/:id', authenticate, async (req, res) => {
     }
 
     // Log access
-    await logFileAccess(id, userId, 'access', req.ip, req.get('User-Agent'), true);
+    await logFileAccess(id, userId, 'access', ip, userAgent, true);
 
     res.json(asset);
   } catch (err: any) {
@@ -277,7 +281,7 @@ router.get('/:id', authenticate, async (req, res) => {
 });
 
 // Download asset with security headers
-router.get('/:id/download', authenticate, async (req, res) => {
+router.get('/:id/download', authenticate, async (req: any, res: Response) => {
   try {
     const { id } = req.params;
     const userId = (req as any).user?.id;
@@ -356,7 +360,7 @@ router.get('/:id/download', authenticate, async (req, res) => {
 });
 
 // Delete asset (soft delete with cleanup)
-router.delete('/:id', authenticate, async (req, res) => {
+router.delete('/:id', authenticate, async (req: any, res: Response) => {
   try {
     const { id } = req.params;
     const userId = (req as any).user?.id;
@@ -422,7 +426,7 @@ router.delete('/:id', authenticate, async (req, res) => {
 });
 
 // Manual scan endpoint (admin only)
-router.post('/:id/scan', authenticate, authorize('admin'), async (req, res) => {
+router.post('/:id/scan', authenticate, authorize('admin'), async (req: any, res: Response) => {
   try {
     const { id } = req.params;
     const userId = (req as any).user?.id;

@@ -41,6 +41,10 @@ import auditPublicRouter from './routes/audit-public';
 import paymentsRouter from './routes/payments';
 import securityRouter from './routes/security';
 import adminFilesRouter from './routes/admin/files';
+import regenerativeFinanceRouter from './routes/regenerative-finance';
+import defiRouter from './routes/defi';
+import communityRouter from './routes/community';
+import educationRouter from './routes/education';
 
 // Import session cleanup utility
 import { cleanupExpiredSessions } from './utils/auth';
@@ -308,6 +312,10 @@ app.use('/api/audit-public', auditPublicRouter);
 app.use('/api/payments', paymentsRouter);
 app.use('/api/security', securityRouter);
 app.use('/api/admin/files', adminFilesRouter);
+app.use('/api/regenerative-finance', regenerativeFinanceRouter);
+app.use('/api/defi', defiRouter);
+app.use('/api/community', communityRouter);
+app.use('/api/education', educationRouter);
 
 // V2 API Routes with enhanced functionality
 app.use('/api/v2/auth', authV2Router);
@@ -338,7 +346,11 @@ app.get('/api', (req, res) => {
       governance: '/api/governance',
       assets: '/api/assets',
       ethics: '/api/ethics',
-      payments: '/api/payments'
+      payments: '/api/payments',
+      'regenerative-finance': '/api/regenerative-finance',
+      'defi': '/api/defi',
+      'community': '/api/community',
+      'education': '/api/education'
     },
     documentation: 'https://docs.atlas-genesis.com'
   });
