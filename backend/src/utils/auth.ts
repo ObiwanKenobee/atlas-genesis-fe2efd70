@@ -446,7 +446,6 @@ export const generateSecureAccessToken = (
     ...payload,
     type: 'access',
     iss: JWT_ISSUER,
-    aud: JWT_AUDIENCE,
     deviceFingerprint
   };
   return jwt.sign(tokenPayload, JWT_ACCESS_SECRET as string, {
@@ -465,7 +464,6 @@ export const generateSecureRefreshToken = (
     ...payload,
     type: 'refresh',
     iss: JWT_ISSUER,
-    aud: JWT_AUDIENCE,
     familyId,
     deviceFingerprint
   };
