@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Leaf, LogIn, ShoppingBag, Briefcase, LayoutDashboard, Crown, Award, Zap, Shield, TrendingUp, Globe, Heart, Network, Grid3X3 } from "lucide-react";
+import { Menu, X, Leaf, LogIn, ShoppingBag, Briefcase, LayoutDashboard, Crown, Award, Zap, Shield, TrendingUp, Globe, Heart, Network, Grid3X3, Calculator } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
@@ -12,6 +12,7 @@ const Navigation = () => {
 
   const navLinks = [
     { name: "Marketplace", href: "/marketplace", icon: ShoppingBag },
+    { name: "Calculator", href: "/calculator", icon: Calculator },
     { name: "Measurements", href: "/measurements", icon: LayoutDashboard },
     { name: "Bioregions", href: "/bioregions", icon: Briefcase },
     { name: "Regeneration", href: "/regenerative-agriculture", icon: Award },
