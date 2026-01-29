@@ -109,10 +109,10 @@ router.get('/performance-dashboard', authenticate, authorize('admin'), async (re
 // Get detailed performance metrics for a specific operation
 router.get('/performance/:operation', authenticate, authorize('admin'), async (req, res) => {
   try {
-    const { operation } = req.params;
-    const { hours = 24 } = req.query;
+    const operation = req.params.operation as string;
+    const hours = parseInt(req.query.hours as string || '24');
 
-    const startTime = new Date(Date.now() - parseInt(hours as string) * 60 * 60 * 1000);
+    const startTime = new Date(Date.now() - hours * 60 * 60 * 1000);
 
     // Get operation statistics
     const stats = securityPerformanceMonitor.getStats(operation);
@@ -151,7 +151,7 @@ router.get('/performance/:operation', authenticate, authorize('admin'), async (r
 // Update performance benchmark
 router.put('/benchmarks/:operation', authenticate, authorize('admin'), async (req, res) => {
   try {
-    const { operation } = req.params;
+    const operation = req.params.operation as string;
     const updates = req.body;
 
     securityPerformanceMonitor.updateBenchmark(operation, updates);

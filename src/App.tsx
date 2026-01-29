@@ -19,7 +19,7 @@ import EngineeringArchitecture from './pages/EngineeringArchitecture';
 import RVXInnovations from './pages/RVXInnovations';
 import DashboardWithSidebar from './pages/DashboardWithSidebar';
 import Dashboard from './pages/Dashboard';
-import SupabaseAuth from './pages/SupabaseAuth';
+import Auth from './pages/Auth';
 import Portfolio from './pages/Portfolio';
 import Profile from './pages/Profile';
 import Marketplace from './pages/Marketplace';
@@ -68,7 +68,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/auth" element={<SupabaseAuth />} />
+          <Route path="/auth" element={<Auth />} />
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/portfolio" element={<Portfolio />} />
           <Route path="/profile" element={<Profile />} />

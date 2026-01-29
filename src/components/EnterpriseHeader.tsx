@@ -36,7 +36,7 @@ import {
   Moon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import { useAuth } from "@/hooks/useAuth";
 import { NotificationCenter } from "@/components/NotificationCenter";
 import ApiStatus from "@/components/ApiStatus";
 
@@ -65,7 +65,7 @@ interface NavDropdown {
 }
 
 const EnterpriseHeader = () => {
-  const { user } = useSupabaseAuth();
+  const { user } = useAuth();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);

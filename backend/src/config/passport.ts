@@ -10,7 +10,7 @@ declare global {
   namespace Express {
     interface User {
       id: string;
-      email: string;
+      email?: string;
       displayName?: string;
       role: string;
       tenantId?: string;
@@ -26,8 +26,9 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
   passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: `${process.env.FRONTEND_URL}/api/auth/google/callback`
-  }, async (accessToken: string, refreshToken: string, profile: GoogleProfile, done: (err: any, user?: User | false) => void) => {
+    callbackURL: `${process.env.FRONTEND_URL}/api/auth/google/callback`,
+    passReqToCallback: false
+  }, async (accessToken: string, refreshToken: string, profile: GoogleProfile, done: (err: any, user?: Express.User | false) => void) => {
     try {
       // Check if user already exists
       const result = await query('SELECT * FROM users WHERE oauth_provider = $1 AND oauth_id = $2', ['google', profile.id]);
@@ -176,12 +177,12 @@ if (process.env.MICROSOFT_CLIENT_ID && process.env.MICROSOFT_CLIENT_SECRET) {
 }
 
 // Serialize user for session
-passport.serializeUser((user: User, done) => {
+passport.serializeUser((user: Express.User, done) => {
   done(null, user.id);
 });
 
 // Deserialize user from session
-passport.deserializeUser(async (id: string, done: (err: any, user?: User | false) => void) => {
+passport.deserializeUser(async (id: string, done: (err: any, user?: Express.User | false) => void) => {
   try {
     const result = await query('SELECT * FROM users WHERE id = $1', [id]);
     if (result.rowCount > 0) {

@@ -1,7 +1,7 @@
 import Paystack from 'paystack-node';
 import { query } from '../db';
 
-const paystack = new Paystack(process.env.PAYSTACK_SECRET_KEY || '');
+const paystack = new Paystack({ apiKey: process.env.PAYSTACK_SECRET_KEY || '' });
 
 export type PaymentMethod = 'paystack' | 'stripe' | 'coinbase' | 'wallet';
 

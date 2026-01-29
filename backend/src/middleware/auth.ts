@@ -4,7 +4,7 @@ import { query } from '../db';
 import { logSecurityEvent } from '../utils/logger';
 
 export interface AuthenticatedRequest extends Request {
-  user?: User;
+  user?: Express.User;
 }
 
 // Authentication middleware

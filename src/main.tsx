@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from 'next-themes';
 import { Toaster } from 'sonner';
 import { HelmetProvider } from 'react-helmet-async';
-import { SupabaseAuthProvider } from './hooks/useSupabaseAuth';
+import { AuthProvider } from './hooks/useAuth';
 import App from './App.tsx';
 import './index.css';
 
@@ -22,7 +22,7 @@ createRoot(document.getElementById("root")!).render(
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <SupabaseAuthProvider>
+            <AuthProvider>
             <App />
             <Toaster 
               position="bottom-right" 
@@ -31,7 +31,7 @@ createRoot(document.getElementById("root")!).render(
               closeButton
               theme="system"
             />
-          </SupabaseAuthProvider>
+          </AuthProvider>
         </ThemeProvider>
       </QueryClientProvider>
     </HelmetProvider>

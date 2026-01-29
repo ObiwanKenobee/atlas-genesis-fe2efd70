@@ -108,17 +108,17 @@ class ApiService {
 
   // Auth API
   auth = {
-    signup: (email: string, password: string, displayName?: string) =>
-      this.request<APIResponse<{ user: any; token: string }>>(
+    signup: (email: string, password: string, displayName?: string, role?: string) =>
+      this.request<APIResponse<{ user: any; message: string }>>(
         `${API_V2_BASE_URL}/auth/signup`,
         {
           method: 'POST',
-          body: JSON.stringify({ email, password, displayName }),
+          body: JSON.stringify({ email, password, displayName, role }),
         }
       ),
 
     login: (email: string, password: string) =>
-      this.request<APIResponse<{ user: any; token: string }>>(
+      this.request<APIResponse<{ user: any; tokens: { accessToken: string; refreshToken: string; expiresIn: number } }>>(
         `${API_V2_BASE_URL}/auth/login`,
         {
           method: 'POST',
@@ -129,12 +129,56 @@ class ApiService {
     getCurrentUser: () =>
       this.request<any>(`${API_V2_BASE_URL}/auth/me`),
 
-    updateProfile: (userId: string, updates: any) =>
+    updateProfile: (updates: any) =>
       this.request<any>(
         `${API_V2_BASE_URL}/auth/profile`,
         {
           method: 'PUT',
-          body: JSON.stringify({ userId, ...updates }),
+          body: JSON.stringify(updates),
+        }
+      ),
+
+    refreshToken: (refreshToken: string) =>
+      this.request<APIResponse<{ tokens: { accessToken: string; refreshToken: string; expiresIn: number } }>>(
+        `${API_V2_BASE_URL}/auth/refresh`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ refreshToken }),
+        }
+      ),
+
+    verifyEmail: (token: string) =>
+      this.request<APIResponse<{ message: string }>>(
+        `${API_V2_BASE_URL}/auth/verify-email`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ token }),
+        }
+      ),
+
+    resendVerification: () =>
+      this.request<APIResponse<{ message: string }>>(
+        `${API_V2_BASE_URL}/auth/resend-verification`,
+        {
+          method: 'POST',
+        }
+      ),
+
+    forgotPassword: (email: string) =>
+      this.request<APIResponse<{ message: string }>>(
+        `${API_V2_BASE_URL}/auth/forgot-password`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ email }),
+        }
+      ),
+
+    resetPassword: (token: string, newPassword: string) =>
+      this.request<APIResponse<{ message: string }>>(
+        `${API_V2_BASE_URL}/auth/reset-password`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ token, newPassword }),
         }
       ),
   };
