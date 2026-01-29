@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Filter, X, Zap, ShoppingCart, TrendingUp, Users, DollarSign } from "lucide-react";
+import { Search, Filter, X, Zap, ShoppingCart, TrendingUp, Users, DollarSign, GitCompareArrows, Check } from "lucide-react";
 import { useProjects } from "@/hooks/useMarketplace";
 import { useSocket, useRealtimeMarketplace } from "@/hooks/useSocket";
 import { MarketplaceOverviewTab } from "@/components/marketplace/MarketplaceOverviewTab";
@@ -20,12 +20,32 @@ import { MarketplaceBondsTab } from "@/components/marketplace/MarketplaceBondsTa
 import { MarketplaceApisTab } from "@/components/marketplace/MarketplaceApisTab";
 import { filterAndSortProjects, formatFilterName, SortBy, FilterType } from "@/utils/marketplaceUtils";
 import { CarbonProject } from "@/types/marketplace";
+import { ProjectComparisonModal } from "@/components/marketplace/ProjectComparisonModal";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Marketplace = () => {
   const [selectedFilter, setSelectedFilter] = useState<FilterType>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [sortBy, setSortBy] = useState<SortBy>("trending");
   const { data: projects = [], isLoading } = useProjects();
+  
+  // Compare projects state
+  const [isCompareMode, setIsCompareMode] = useState(false);
+  const [selectedForCompare, setSelectedForCompare] = useState<CarbonProject[]>([]);
+  const [showCompareModal, setShowCompareModal] = useState(false);
+  
+  const toggleCompareProject = (project: CarbonProject) => {
+    if (selectedForCompare.find(p => p.id === project.id)) {
+      setSelectedForCompare(selectedForCompare.filter(p => p.id !== project.id));
+    } else if (selectedForCompare.length < 3) {
+      setSelectedForCompare([...selectedForCompare, project]);
+    }
+  };
+  
+  const resetCompare = () => {
+    setIsCompareMode(false);
+    setSelectedForCompare([]);
+  };
 
   // Real-time hooks
   const { isConnected } = useSocket({ channels: ['marketplace'] });
@@ -161,7 +181,74 @@ const Marketplace = () => {
                     {option.label}
                   </Button>
                 ))}
+                
+                {/* Compare Projects Button */}
+                <div className="ml-auto">
+                  {!isCompareMode ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsCompareMode(true)}
+                      className="gap-2 border-border/50 hover:border-primary/50"
+                    >
+                      <GitCompareArrows className="w-4 h-4" />
+                      Compare Projects
+                    </Button>
+                  ) : (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="flex items-center gap-3 p-2 bg-card border border-primary/30 rounded-lg"
+                    >
+                      <Badge variant="outline" className="bg-primary/10 text-primary">
+                        {selectedForCompare.length}/3 selected
+                      </Badge>
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => setShowCompareModal(true)}
+                        disabled={selectedForCompare.length < 2}
+                        className="gap-2"
+                      >
+                        <Check className="w-4 h-4" />
+                        Compare
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={resetCompare}
+                        className="gap-1 text-muted-foreground hover:text-destructive"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </motion.div>
+                  )}
+                </div>
               </div>
+              
+              {/* Selected Projects Preview */}
+              <AnimatePresence>
+                {isCompareMode && selectedForCompare.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="flex flex-wrap gap-2"
+                  >
+                    {selectedForCompare.map((project) => (
+                      <Badge
+                        key={project.id}
+                        variant="secondary"
+                        className="gap-1 cursor-pointer hover:bg-destructive/20"
+                        onClick={() => toggleCompareProject(project)}
+                      >
+                        {project.title}
+                        <X className="w-3 h-3 ml-1" />
+                      </Badge>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {/* Results Count */}
               {searchQuery || selectedFilter !== "all" ? (
@@ -172,10 +259,23 @@ const Marketplace = () => {
             </div>
           </CardContent>
         </Card>
+        
+        {/* Project Comparison Modal */}
+        <ProjectComparisonModal
+          projects={selectedForCompare}
+          isOpen={showCompareModal}
+          onClose={() => {
+            setShowCompareModal(false);
+            resetCompare();
+          }}
+        />
 
         {/* Regenerative Marketplace Showcase - Categorical Display */}
         <div className="mb-16">
-          <RegenerativeMarketplaceShowcase projects={filteredProjects} isLoading={isLoading} />
+          <RegenerativeMarketplaceShowcase 
+            projects={filteredProjects} 
+            isLoading={isLoading}
+          />
         </div>
 
         {/* Real-time Activity Feed */}

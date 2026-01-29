@@ -6,7 +6,8 @@ import { PageTransition, InteractiveButton } from '@/components/Interactions';
 import {
   Leaf, LogOut, User, BarChart3, ShoppingCart, Briefcase,
   TrendingUp, Activity, Bell, Settings, Globe, TreePine,
-  ChevronRight, Shield, Wallet, ArrowUpRight, Plus, HelpCircle
+  ChevronRight, Shield, Wallet, ArrowUpRight, Plus, HelpCircle,
+  Calculator, Trophy
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -172,8 +173,10 @@ const Dashboard = () => {
 
   const quickLinks = [
     { label: "Browse Marketplace", icon: ShoppingCart, href: "/marketplace", color: "bg-primary/10 text-primary" },
+    { label: "Carbon Calculator", icon: Calculator, href: "/calculator", color: "bg-accent/10 text-accent" },
     { label: "View Portfolio", icon: Briefcase, href: "/portfolio", color: "bg-ocean/10 text-ocean" },
-    { label: "Explore Bioregions", icon: Globe, href: "/bioregions", color: "bg-accent/10 text-accent" },
+    { label: "Explore Bioregions", icon: Globe, href: "/bioregions", color: "bg-emerald-500/10 text-emerald-600" },
+    { label: "Achievements", icon: Trophy, href: "/profile#achievements", color: "bg-amber-500/10 text-amber-600" },
     { label: "Settings", icon: Settings, href: "/settings", color: "bg-muted text-muted-foreground" },
   ];
 
@@ -339,7 +342,7 @@ const Dashboard = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 sm:mb-8"
+          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6 sm:mb-8"
           data-tour="quick-links"
         >
           {quickLinks.map((link, index) => (
