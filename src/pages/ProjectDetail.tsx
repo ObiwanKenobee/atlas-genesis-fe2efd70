@@ -6,7 +6,7 @@ import {
   ArrowLeft, MapPin, Calendar, Award, Leaf, Users, 
   TrendingUp, ShieldCheck, Building2, Activity, BarChart3
 } from 'lucide-react';
-import Navigation from '@/components/Navigation';
+import EnterpriseHeader from '@/components/EnterpriseHeader';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';

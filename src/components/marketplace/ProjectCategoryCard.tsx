@@ -86,11 +86,6 @@ export function ProjectCategoryCard({
     e.preventDefault();
     e.stopPropagation();
     
-    if (!user) {
-      toast.error('Please sign in to purchase carbon credits');
-      return;
-    }
-    
     setSelectedProject(project);
     setShowPurchaseModal(true);
   };
@@ -173,7 +168,7 @@ export function ProjectCategoryCard({
                       <Button
                         size="sm"
                         variant="outline"
-                        className="h-8 px-2 opacity-0 group-hover:opacity-100 transition-opacity border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                        className="h-8 px-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
                         onClick={(e) => handleBuyNow(project, e)}
                         aria-label={`Buy credits from ${project.title}`}
                       >

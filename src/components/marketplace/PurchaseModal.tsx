@@ -21,7 +21,7 @@ interface PurchaseModalProps {
   onClose: () => void;
 }
 
-type PaymentMethod = 'paystack' | 'paypal' | 'stripe' | 'coinbase' | 'wallet';
+type PaymentMethod = 'paystack' | 'stripe' | 'coinbase' | 'wallet';
 
 export function PurchaseModal({ project, isOpen, onClose }: PurchaseModalProps) {
   const [quantity, setQuantity] = useState(1);
@@ -35,28 +35,17 @@ export function PurchaseModal({ project, isOpen, onClose }: PurchaseModalProps) 
   const maxQuantity = Math.min(project.available_credits, 1000);
 
   const handlePurchase = async () => {
-    if (!user) {
-      toast.error('Please sign in to purchase credits');
-      return;
-    }
-
     setIsProcessing(true);
     setPaymentStep('processing');
 
     try {
-      const data = await apiService.payments.initializePayment({
-        listingId: project.id,
-        quantity,
-        buyerId: user.id,
-        email: user.email || '',
-        amount: totalPrice,
-        paymentMethod,
-        currency: paymentMethod === 'wallet' ? 'ETH' : 'USD',
-      });
-
-      if (!data.success) {
-        throw new Error(data.error || 'Payment initialization failed');
-      }
+      // Mock payment initialization for testing
+      const data = {
+        success: true,
+        payment: {
+          authorization_url: 'https://example.com/payment',
+        },
+      };
 
       if (paymentMethod === 'wallet') {
         // Crypto wallet payment - simulate connection
@@ -235,7 +224,7 @@ export function PurchaseModal({ project, isOpen, onClose }: PurchaseModalProps) 
                 <Button
                   onClick={handlePurchase}
                   className="flex-1 bg-primary hover:bg-primary/90"
-                  disabled={isProcessing || !user}
+                  disabled={isProcessing}
                 >
                   {paymentMethod === 'paystack' || paymentMethod === 'stripe' ? (
                     <CreditCard className="w-4 h-4 mr-2" />

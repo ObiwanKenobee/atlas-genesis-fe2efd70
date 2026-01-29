@@ -173,7 +173,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
                 </Button>
               )}
               <Button asChild size="sm" className="bg-primary hover:bg-primary/90">
-                <Link to={`/marketplace/${project.id}`} aria-label={`View details for ${project.title}`}>View Details</Link>
+                <Link to={`/project/${project.id}`} aria-label={`View details for ${project.title}`}>View Details</Link>
               </Button>
             </div>
           </div>

@@ -5,6 +5,7 @@ import { ThemeProvider } from 'next-themes';
 import { Toaster } from 'sonner';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from './hooks/useAuth';
+import { SupabaseAuthProvider } from './hooks/useSupabaseAuth';
 import App from './App.tsx';
 import './index.css';
 
@@ -23,15 +24,17 @@ createRoot(document.getElementById("root")!).render(
       <QueryClientProvider client={queryClient}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <AuthProvider>
-            <App />
-            <Toaster 
-              position="bottom-right" 
-              expand={false}
-              richColors
-              closeButton
-              theme="system"
-            />
-          </AuthProvider>
+              <SupabaseAuthProvider>
+                <App />
+                <Toaster 
+                  position="bottom-right" 
+                  expand={false}
+                  richColors
+                  closeButton
+                  theme="system"
+                />
+              </SupabaseAuthProvider>
+            </AuthProvider>
         </ThemeProvider>
       </QueryClientProvider>
     </HelmetProvider>

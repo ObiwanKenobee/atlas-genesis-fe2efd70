@@ -317,9 +317,9 @@ class ApiService {
       ),
   };
 
-  // Payments API
+   // Payments API
   payments = {
-    initializePayment: (data: { listingId: string; quantity: number; buyerId: string; email: string; amount: number }) =>
+    initializePayment: (data: { listingId: string; quantity: number; buyerId: string; email: string; amount: number; paymentMethod?: string; currency?: string }) =>
       this.request<any>(
         `${API_BASE_URL}/payments/initialize`,
         {
@@ -328,8 +328,8 @@ class ApiService {
         }
       ),
 
-    verifyPayment: (reference: string) =>
-      this.request<any>(`${API_BASE_URL}/payments/verify/${reference}`),
+    verifyPayment: (reference: string, paymentMethod?: string) =>
+      this.request<any>(`${API_BASE_URL}/payments/verify/${reference}${paymentMethod ? `?paymentMethod=${paymentMethod}` : ''}`),
 
     getPaymentStatus: (orderId: string) =>
       this.request<any>(`${API_BASE_URL}/payments/status/${orderId}`),
