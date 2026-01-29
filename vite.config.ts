@@ -25,6 +25,7 @@ export default defineConfig(({ mode }) => ({
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024, // 3 MB
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         runtimeCaching: [
           {
