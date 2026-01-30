@@ -315,6 +315,36 @@ npm run build
 # Deploy the `dist` folder to Vercel or Netlify
 ```
 
+### Backend Deployment (Render.com)
+Create a `render.yaml` file in the project root:
+```yaml
+services:
+  - type: web
+    name: atlas-genesis-backend
+    runtime: node
+    region: oregon
+    buildCommand: cd backend && npm ci && npm run build
+    startCommand: cd backend && npm start
+    plan: free
+    autoDeploy: false
+
+  - type: web
+    name: atlas-genesis-frontend
+    runtime: static
+    region: oregon
+    buildCommand: npm ci && npm run build
+    plan: free
+    autoDeploy: false
+
+databases:
+  - name: atlas-genesis-db
+    plan: free
+    databaseName: atlas_genesis
+    user: atlas
+```
+
+Then deploy via Render.com dashboard.
+
 ### Backend Deployment (AWS/Heroku)
 ```bash
 cd scaffold-mvp/backend

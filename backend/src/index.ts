@@ -324,12 +324,47 @@ app.use('/api/v2/measurements', measurementsV2Router);
 app.use('/api/v2/projects', projectsRouter);
 
 // Root endpoint with API documentation
+app.get('/', (req, res) => {
+  res.json({
+    name: 'Atlas Genesis - Regenerative Carbon Credit Platform API',
+    version: '2.0.0',
+    endpoints: {
+      health: '/health',
+      api: '/api',
+      auth: {
+        v1: '/api/auth',
+        v2: '/api/v2/auth'
+      },
+      marketplace: {
+        v1: '/api/marketplace',
+        v2: '/api/v2/marketplace'
+      },
+      measurements: {
+        v1: '/api/measurements',
+        v2: '/api/v2/measurements'
+      },
+      projects: '/api/v2/projects',
+      governance: '/api/governance',
+      assets: '/api/assets',
+      ethics: '/api/ethics',
+      payments: '/api/payments',
+      'regenerative-finance': '/api/regenerative-finance',
+      'defi': '/api/defi',
+      'community': '/api/community',
+      'education': '/api/education'
+    },
+    documentation: 'https://docs.atlas-genesis.com'
+  });
+});
+
+// API root endpoint (deprecated but kept for compatibility)
 app.get('/api', (req, res) => {
   res.json({
     name: 'Atlas Genesis - Regenerative Carbon Credit Platform API',
     version: '2.0.0',
     endpoints: {
       health: '/health',
+      api: '/api',
       auth: {
         v1: '/api/auth',
         v2: '/api/v2/auth'
