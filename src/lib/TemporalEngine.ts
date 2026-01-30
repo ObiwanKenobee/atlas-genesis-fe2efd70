@@ -61,7 +61,14 @@ export class TemporalRegenerationEngine {
   }
 
   async projectFutureScenarios(targetYear: number) {
-    const scenarios = [];
+    interface ScenarioItem {
+      timelineId: string;
+      targetYear: number;
+      projection: any;
+      probability: number;
+    }
+    
+    const scenarios: ScenarioItem[] = [];
 
     for (const [timelineId, timeline] of this.timelines) {
       const projection = await this.projectTimeline(timeline, targetYear);

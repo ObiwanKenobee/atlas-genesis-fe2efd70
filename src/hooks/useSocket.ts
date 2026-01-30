@@ -80,33 +80,33 @@ export function useSocket(options: UseSocketOptions = {}): UseSocketReturn {
     socketService.unsubscribe(channelsToUnsubscribe);
   }, []);
 
-  // Event listener helpers
+  // Event listener helpers with proper type casting
   const onNotification = useCallback((callback: (data: NotificationData) => void) => {
-    const unsubscribe = socketService.on('notification', callback);
+    const unsubscribe = socketService.on('notification', (data) => callback(data as NotificationData));
     unsubscribeFunctionsRef.current.push(unsubscribe);
     return unsubscribe;
   }, []);
 
   const onPriceUpdate = useCallback((callback: (data: PriceUpdateData) => void) => {
-    const unsubscribe = socketService.on('price-update', callback);
+    const unsubscribe = socketService.on('price-update', (data) => callback(data as PriceUpdateData));
     unsubscribeFunctionsRef.current.push(unsubscribe);
     return unsubscribe;
   }, []);
 
   const onGovernanceUpdate = useCallback((callback: (data: GovernanceUpdateData) => void) => {
-    const unsubscribe = socketService.on('governance-update', callback);
+    const unsubscribe = socketService.on('governance-update', (data) => callback(data as GovernanceUpdateData));
     unsubscribeFunctionsRef.current.push(unsubscribe);
     return unsubscribe;
   }, []);
 
   const onMarketplaceActivity = useCallback((callback: (data: MarketplaceActivityData) => void) => {
-    const unsubscribe = socketService.on('marketplace-activity', callback);
+    const unsubscribe = socketService.on('marketplace-activity', (data) => callback(data as MarketplaceActivityData));
     unsubscribeFunctionsRef.current.push(unsubscribe);
     return unsubscribe;
   }, []);
 
   const onDashboardUpdate = useCallback((callback: (data: DashboardUpdateData) => void) => {
-    const unsubscribe = socketService.on('dashboard-update', callback);
+    const unsubscribe = socketService.on('dashboard-update', (data) => callback(data as DashboardUpdateData));
     unsubscribeFunctionsRef.current.push(unsubscribe);
     return unsubscribe;
   }, []);

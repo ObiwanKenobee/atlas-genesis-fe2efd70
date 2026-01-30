@@ -64,7 +64,7 @@ const ImpactChart: React.FC<ImpactChartProps> = ({
       .call(d3.axisBottom(xScale)
         .ticks(5)
         .tickSize(-(height - margin.top - margin.bottom))
-        .tickFormat('')
+        .tickFormat(() => '')
       )
       .style('stroke', '#e0e0e0')
       .style('stroke-dasharray', '3,3');
@@ -142,9 +142,10 @@ const ImpactChart: React.FC<ImpactChartProps> = ({
       .attr('r', 3)
       .style('fill', '#1976d2')
       .style('cursor', 'pointer')
-      .on('mouseover', function(event, d) {
+      .on('mouseover', function(this: SVGCircleElement, event: MouseEvent, d: ImpactDataPoint) {
         // Show tooltip
-        const tooltip = d3.select(this.parentNode as Element)
+        const parentNode = this.parentNode as Element;
+        const tooltip = d3.select(parentNode)
           .append('g')
           .attr('class', 'tooltip');
 
@@ -171,8 +172,9 @@ const ImpactChart: React.FC<ImpactChartProps> = ({
           .text(`Credits: ${d.credits.toFixed(0)}`)
           .style('font-size', '12px');
       })
-      .on('mouseout', function() {
-        d3.select(this.parentNode as Element).select('.tooltip').remove();
+      .on('mouseout', function(this: SVGCircleElement) {
+        const parentNode = this.parentNode as Element;
+        d3.select(parentNode).select('.tooltip').remove();
       });
 
     // Add data points for sequestration
@@ -186,9 +188,10 @@ const ImpactChart: React.FC<ImpactChartProps> = ({
       .attr('r', 3)
       .style('fill', '#4caf50')
       .style('cursor', 'pointer')
-      .on('mouseover', function(event, d) {
+      .on('mouseover', function(this: SVGCircleElement, event: MouseEvent, d: ImpactDataPoint) {
         // Show tooltip
-        const tooltip = d3.select(this.parentNode as Element)
+        const parentNode = this.parentNode as Element;
+        const tooltip = d3.select(parentNode)
           .append('g')
           .attr('class', 'tooltip');
 
@@ -215,8 +218,9 @@ const ImpactChart: React.FC<ImpactChartProps> = ({
           .text(`Sequestration: ${d.sequestration.toFixed(1)}`)
           .style('font-size', '12px');
       })
-      .on('mouseout', function() {
-        d3.select(this.parentNode as Element).select('.tooltip').remove();
+      .on('mouseout', function(this: SVGCircleElement) {
+        const parentNode = this.parentNode as Element;
+        d3.select(parentNode).select('.tooltip').remove();
       });
 
     // Add legend

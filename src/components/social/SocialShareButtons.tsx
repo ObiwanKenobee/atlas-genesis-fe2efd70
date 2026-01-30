@@ -15,33 +15,40 @@ import {
 
 interface SocialShareButtonsProps {
   title: string;
-  description: string;
+  description?: string;
+  text?: string;
   url?: string;
   image?: string;
-  type: 'certificate' | 'achievement' | 'project';
+  type?: 'certificate' | 'achievement' | 'project' | 'leaderboard';
   co2Offset?: number;
   certificateId?: string;
 }
 
 export function SocialShareButtons({
   title,
-  description,
+  description = '',
+  text,
   url = window.location.href,
   image,
-  type,
+  type = 'project',
   co2Offset,
   certificateId,
 }: SocialShareButtonsProps) {
   const [copied, setCopied] = useState(false);
 
+  const shareDescription = text || description;
+  
   const getShareText = () => {
     if (type === 'certificate') {
-      return `🌍 I just retired ${co2Offset?.toFixed(1) || ''} tonnes of CO₂ through Atlas Sanctum! Certificate: ${certificateId}\n\n${description}\n\n#CarbonNeutral #ClimateAction #Sustainability`;
+      return `🌍 I just retired ${co2Offset?.toFixed(1) || ''} tonnes of CO₂ through Atlas Sanctum! Certificate: ${certificateId}\n\n${shareDescription}\n\n#CarbonNeutral #ClimateAction #Sustainability`;
     }
     if (type === 'achievement') {
-      return `🏆 ${title}\n\n${description}\n\n#AtlasSanctum #ClimateAction #Sustainability`;
+      return `🏆 ${title}\n\n${shareDescription}\n\n#AtlasSanctum #ClimateAction #Sustainability`;
     }
-    return `🌱 ${title}\n\n${description}\n\n#CarbonCredits #Sustainability`;
+    if (type === 'leaderboard') {
+      return `🏆 ${title}\n\n${shareDescription}\n\n#AtlasSanctum #ClimateAction #Sustainability`;
+    }
+    return `🌱 ${title}\n\n${shareDescription}\n\n#CarbonCredits #Sustainability`;
   };
 
   const shareText = getShareText();

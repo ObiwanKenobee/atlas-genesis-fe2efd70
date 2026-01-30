@@ -241,7 +241,7 @@ class SentinelHubClient {
     startDate: Date,
     endDate: Date
   ): SentinelResponse['data'] {
-    const data = [];
+    const data: SentinelResponse['data'] = [];
     const daysDiff = Math.floor((endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
 
     // Generate 3-5 mock acquisitions

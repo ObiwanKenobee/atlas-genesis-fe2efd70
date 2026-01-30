@@ -129,7 +129,7 @@ export const CreditValuationEngine: React.FC<CreditValuationEngineProps> = ({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-blue-600">{(displayValuation.confidence_score * 100).toFixed(0)}%</p>
+            <p className="text-2xl font-bold text-blue-600">{((displayValuation.confidence_score ?? 0) * 100).toFixed(0)}%</p>
             <p className="text-xs text-muted-foreground">95% CI</p>
           </CardContent>
         </Card>
@@ -274,12 +274,12 @@ export const CreditValuationEngine: React.FC<CreditValuationEngineProps> = ({
                   <div>
                     <div className="flex justify-between mb-2">
                       <span className="font-semibold">Confidence Level</span>
-                      <span className="font-bold text-blue-600">{(displayValuation.confidence_score * 100).toFixed(0)}%</span>
+                      <span className="font-bold text-blue-600">{((displayValuation.confidence_score ?? 0) * 100).toFixed(0)}%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-3">
                       <div
                         className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full"
-                        style={{ width: `${displayValuation.confidence_score * 100}%` }}
+                        style={{ width: `${(displayValuation.confidence_score ?? 0) * 100}%` }}
                       />
                     </div>
                     <p className="text-xs text-muted-foreground mt-2">
@@ -441,7 +441,7 @@ export const CreditValuationEngine: React.FC<CreditValuationEngineProps> = ({
                 <div className="p-4 border rounded-lg bg-blue-50">
                   <div className="flex justify-between items-center">
                     <span className="font-semibold text-blue-900">Base Credit Price</span>
-                    <span className="text-2xl font-bold text-blue-600">${displayValuation.base_credit_price.toFixed(2)}</span>
+                    <span className="text-2xl font-bold text-blue-600">${(displayValuation.base_credit_price ?? 0).toFixed(2)}</span>
                   </div>
                   <p className="text-xs text-blue-700 mt-2">Market standard for verified carbon credits</p>
                 </div>
@@ -482,10 +482,10 @@ export const CreditValuationEngine: React.FC<CreditValuationEngineProps> = ({
                   <div className="border-t pt-3">
                     <div className="flex justify-between mb-2">
                       <span className="text-sm">Confidence Adjustment</span>
-                      <span className="font-bold">{(displayValuation.confidence_score).toFixed(3)}x</span>
+                      <span className="font-bold">{(displayValuation.confidence_score ?? 0).toFixed(3)}x</span>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      {(displayValuation.confidence_score * 100).toFixed(0)}% confidence = {(displayValuation.confidence_score).toFixed(3)}x multiplier
+                      {((displayValuation.confidence_score ?? 0) * 100).toFixed(0)}% confidence = {(displayValuation.confidence_score ?? 0).toFixed(3)}x multiplier
                     </p>
                   </div>
 
@@ -508,7 +508,7 @@ export const CreditValuationEngine: React.FC<CreditValuationEngineProps> = ({
                   <LineChart
                     data={decayData.map((d) => ({
                       year: d.year,
-                      price: (displayValuation.final_credit_price * (parseFloat(d.price_retention) / 100)).toFixed(2),
+                      price: ((displayValuation.final_credit_price ?? 0) * (parseFloat(d.price_retention) / 100)).toFixed(2),
                     }))}
                   >
                     <CartesianGrid strokeDasharray="3 3" />
