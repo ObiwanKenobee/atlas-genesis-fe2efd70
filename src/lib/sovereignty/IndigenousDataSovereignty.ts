@@ -101,7 +101,7 @@ export class IndigenousDataSovereignty {
     const protocol = Array.from(this.culturalProtocols.values())
       .find(p => p.guardianCommunity === communityId);
 
-    const restrictions = [];
+    const restrictions: string[] = [];
     let benefitSharing = 70; // Default 70% to community
 
     if (protocol) {

@@ -293,7 +293,12 @@ export function forecastCO2Trend(measurements: MeasurementData[], daysAhead: num
   const intercept = (sumY - slope * sumX) / n;
 
   // Generate forecast
-  const forecast = [];
+  interface ForecastItem {
+    date: string;
+    co2: number;
+  }
+  
+  const forecast: ForecastItem[] = [];
   const lastDate = new Date(measurements[measurements.length - 1].measurement_date);
   for (let i = 1; i <= daysAhead; i++) {
     const predictedValue = intercept + slope * (n + i);

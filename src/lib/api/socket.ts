@@ -129,7 +129,7 @@ class SocketService {
     ];
 
     events.forEach(event => {
-      this.socket.on(event, (data: SocketEventData) => {
+      this.socket?.on(event, (data: SocketEventData) => {
         this.notifyListeners(event, data);
       });
     });

@@ -45,6 +45,7 @@ import DeFi from './pages/DeFi';
 import Community from './pages/Community';
 import Education from './pages/Education';
 import CarbonCalculator from './pages/CarbonCalculator';
+import Leaderboard from './pages/Leaderboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import NotFound from './pages/NotFound';
 
@@ -112,6 +113,7 @@ const App = () => {
           <Route path="/project/:id" element={<ProjectDetail />} />
           <Route path="/transactions" element={<TransactionHistory />} />
           <Route path="/calculator" element={<CarbonCalculator />} />
+          <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/architecture" element={<EngineeringArchitecture />} />
           <Route path="/dashboards" element={<Dashboard />} />
           <Route path="/admin" element={<AdminDashboard />} />

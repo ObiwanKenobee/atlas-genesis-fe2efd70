@@ -31,6 +31,7 @@ const ProjectDetail = () => {
   const { data: measurements } = useQuery({
     queryKey: ["project-measurements", id],
     queryFn: async () => {
+      if (!id) return [];
       const { data, error } = await supabase
         .from("measurement_data")
         .select("*")
@@ -48,6 +49,7 @@ const ProjectDetail = () => {
   const { data: metrics } = useQuery({
     queryKey: ["project-metrics", id],
     queryFn: async () => {
+      if (!id) return [];
       const { data, error } = await supabase
         .from("regenerative_metrics")
         .select("*")

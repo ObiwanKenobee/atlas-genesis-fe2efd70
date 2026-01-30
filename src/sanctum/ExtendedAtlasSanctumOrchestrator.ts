@@ -77,14 +77,14 @@ export class ExtendedAtlasSanctumOrchestrator {
     console.log('🌌 Initializing Complete Atlas Sanctum Civilizational Evolution...');
     
     // Execute all phases sequentially
-    const results = [];
+    const results: PhaseResult[] = [];
     
     // Phases 1-3: Foundation (already implemented)
     for (let phase = 1; phase <= 3; phase++) {
       const result = await this.executeFoundationalPhase(phase);
       results.push(result);
       if (result.success) {
-        this.currentPhase = (phase + 1) as any;
+        this.currentPhase = (phase + 1) as 1 | 2 | 3 | 4 | 5 | 6;
         console.log(`✅ Phase ${phase} Complete`);
       } else {
         return this.createFailureResult(phase, result.message);
