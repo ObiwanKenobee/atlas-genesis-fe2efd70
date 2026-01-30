@@ -44,6 +44,11 @@ class ApiService {
 
     for (let attempt = 0; attempt <= retries; attempt++) {
       try {
+        // Validate URL format
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+          throw new Error('Invalid URL: must start with http:// or https://');
+        }
+
         const response = await fetch(url, {
           ...options,
           headers,

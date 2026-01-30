@@ -266,23 +266,39 @@ app.get('/health', async (req, res) => {
       replayAttackPreventionActive: true
     };
 
-    res.json({
-      status: 'ok',
-      timestamp: new Date().toISOString(),
-      version: '2.0.0',
-      environment: process.env.NODE_ENV || 'development',
-      uptime: Math.floor(uptime),
+    // Service health checks
+    const services = {
+      database: 'connected',
+      websocket: io ? 'active' : 'inactive',
+      api: 'active'
+    };
+
+    // Performance metrics
+    const performanceMetrics = {
       responseTime: `${responseTime}ms`,
       memory: {
         used: `${Math.round(memoryUsage.heapUsed / 1024 / 1024)}MB`,
         total: `${Math.round(memoryUsage.heapTotal / 1024 / 1024)}MB`,
         external: `${Math.round(memoryUsage.external / 1024 / 1024)}MB`
       },
+      uptime: Math.floor(uptime),
+      cpuUsage: process.cpuUsage ? `${process.cpuUsage().user / 1000000}s` : 'N/A'
+    };
+
+    // Determine overall health status based on checks
+    const isHealthy = Object.values(services).every(status => status === 'active' || status === 'connected');
+
+    res.status(isHealthy ? 200 : 503).json({
+      status: isHealthy ? 'ok' : 'degraded',
+      timestamp: new Date().toISOString(),
+      version: '2.0.0',
+      environment: process.env.NODE_ENV || 'development',
+      uptime: performanceMetrics.uptime,
+      responseTime: performanceMetrics.responseTime,
+      memory: performanceMetrics.memory,
+      cpuUsage: performanceMetrics.cpuUsage,
       security: securityStatus,
-      services: {
-        database: 'connected',
-        websocket: io ? 'active' : 'inactive'
-      }
+      services: services
     });
   } catch (error) {
     logSecurityEvent('health_check_failed', null, {

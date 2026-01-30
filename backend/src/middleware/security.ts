@@ -450,14 +450,32 @@ export const securityHeaders = (req: Request, res: Response, next: NextFunction)
 
 // Input sanitization middleware
 export const sanitizeInput = (req: Request, res: Response, next: NextFunction) => {
-  // Basic input sanitization - remove potential script tags and SQL injection attempts
+  // Enhanced input sanitization with comprehensive string manipulation
   const sanitizeString = (str: string): string => {
     if (typeof str !== 'string') return str;
+    
     return str
+      // Remove script tags
       .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      // Remove JavaScript URLs
       .replace(/javascript:/gi, '')
+      // Remove event handlers
       .replace(/on\w+\s*=/gi, '')
+      // Remove iframe tags
       .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+      // Remove style tags
+      .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+      // Remove comment tags
+      .replace(/<!--[\s\S]*?-->/gi, '')
+      // Escape HTML characters
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;')
+      // Remove SQL injection patterns
+      .replace(/\b(SELECT|INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|TRUNCATE|EXEC|UNION|OR|AND|NOT|XOR|LIKE|IN|BETWEEN|IS|NULL|FROM|WHERE|GROUP|HAVING|ORDER|LIMIT|OFFSET|JOIN|LEFT|RIGHT|INNER|OUTER|FETCH|TOP)\b/gi, '')
+      // Trim whitespace
       .trim();
   };
 
