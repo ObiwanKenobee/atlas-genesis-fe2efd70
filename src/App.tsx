@@ -44,6 +44,7 @@ import RegenerativeFinance from './pages/RegenerativeFinance';
 import DeFi from './pages/DeFi';
 import Community from './pages/Community';
 import Education from './pages/Education';
+import CarbonCalculator from './pages/CarbonCalculator';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import NotFound from './pages/NotFound';
 
@@ -110,6 +111,9 @@ const App = () => {
           <Route path="/demo" element={<Demo />} />
           <Route path="/project/:id" element={<ProjectDetail />} />
           <Route path="/transactions" element={<TransactionHistory />} />
+          <Route path="/calculator" element={<CarbonCalculator />} />
+          <Route path="/architecture" element={<EngineeringArchitecture />} />
+          <Route path="/dashboards" element={<Dashboard />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/*" element={<AdminDashboard />} />
           <Route path="*" element={<NotFound />} />

@@ -7,7 +7,101 @@ let users: any[] = [];
 let transactions: any[] = [];
 let tokens: any[] = [];
 let rius: any[] = [];
-let carbonProjects: any[] = [];
+let carbonProjects: any[] = [
+  {
+    id: '1',
+    title: 'Amazon Rainforest Protection',
+    description: 'Protecting and restoring the Amazon rainforest to sequester carbon and preserve biodiversity',
+    location: 'Amazonas Region',
+    country: 'Brazil',
+    project_type: 'reforestation',
+    status: 'active',
+    price_per_credit: 24.50,
+    total_credits: 100000,
+    available_credits: 88000,
+    vintage_year: 2024,
+    certification: 'Verra',
+    methodology: 'VM0004',
+    co2_offset_per_credit: 1,
+    image_url: 'https://images.unsplash.com/photo-1542601906990-61b07816b324?w=800',
+    developer_name: 'Amazon Conservation Association',
+    start_date: '2024-01-01',
+    end_date: '2030-12-31',
+    measurement_data_id: '1',
+    bioregional_zone_id: '1',
+    regenerative_metrics_id: '1',
+    valuation_model_id: '1',
+    geometry: null,
+    verified_by_system_at: new Date().toISOString(),
+    last_measurement_at: new Date().toISOString(),
+    impact_score: 95,
+    confidence_level: 0.98,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: '2',
+    title: 'Kenyan Wind Farm',
+    description: 'Building wind turbines in Turkana County to provide clean renewable energy',
+    location: 'Turkana County',
+    country: 'Kenya',
+    project_type: 'renewable_energy',
+    status: 'active',
+    price_per_credit: 18.75,
+    total_credits: 50000,
+    available_credits: 41500,
+    vintage_year: 2024,
+    certification: 'Gold Standard',
+    methodology: 'GS0001',
+    co2_offset_per_credit: 1,
+    image_url: 'https://images.unsplash.com/photo-1509395062183-67c5ad6ee6fe?w=800',
+    developer_name: 'Kenyan Wind Energy Ltd',
+    start_date: '2024-03-15',
+    end_date: '2035-03-14',
+    measurement_data_id: '2',
+    bioregional_zone_id: '2',
+    regenerative_metrics_id: '2',
+    valuation_model_id: '2',
+    geometry: null,
+    verified_by_system_at: new Date().toISOString(),
+    last_measurement_at: new Date().toISOString(),
+    impact_score: 88,
+    confidence_level: 0.95,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: '3',
+    title: 'Plastic-to-Value Micro-Factories',
+    description: 'Converting plastic waste to fuel and building materials in informal settlements',
+    location: 'Mathare',
+    country: 'Kenya',
+    project_type: 'methane_capture',
+    status: 'active',
+    price_per_credit: 20.00,
+    total_credits: 30000,
+    available_credits: 30000,
+    vintage_year: 2024,
+    certification: 'Climate Action Reserve',
+    methodology: 'CAR0001',
+    co2_offset_per_credit: 1,
+    image_url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800',
+    developer_name: 'Plastic Bank',
+    start_date: '2024-02-01',
+    end_date: '2029-01-31',
+    measurement_data_id: '3',
+    bioregional_zone_id: '3',
+    regenerative_metrics_id: '3',
+    valuation_model_id: '3',
+    geometry: null,
+    verified_by_system_at: new Date().toISOString(),
+    last_measurement_at: new Date().toISOString(),
+    impact_score: 92,
+    confidence_level: 0.96,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  }
+];
 let measurementData: any[] = [];
 
 // Mock query function
@@ -125,11 +219,47 @@ export async function query(text: string, params: any[] = []) {
     };
   }
   
-  // Mock default response
-  return {
-    rows: [],
-    rowCount: 0
-  };
+   // Mock carbon projects queries
+   if (text.includes('SELECT') && text.includes('FROM carbon_projects')) {
+     // Handle different select scenarios
+     if (text.includes('WHERE id =')) {
+       const id = params[0];
+       const project = carbonProjects.find(p => p.id === id);
+       return {
+         rows: project ? [project] : [],
+         rowCount: project ? 1 : 0
+       };
+     }
+     
+     if (text.includes('WHERE status =')) {
+       const status = params[0];
+       const projects = carbonProjects.filter(p => p.status === status);
+       return {
+         rows: projects,
+         rowCount: projects.length
+       };
+     }
+     
+     if (text.includes('WHERE project_type =')) {
+       const type = params[0];
+       const projects = carbonProjects.filter(p => p.project_type === type);
+       return {
+         rows: projects,
+         rowCount: projects.length
+       };
+     }
+     
+     return {
+       rows: carbonProjects,
+       rowCount: carbonProjects.length
+     };
+   }
+
+   // Mock default response
+   return {
+     rows: [],
+     rowCount: 0
+   };
 }
 
 // Mock pool

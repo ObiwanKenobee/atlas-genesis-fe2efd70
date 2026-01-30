@@ -151,9 +151,12 @@ export function ProjectCategoryCard({
                     className="flex items-center justify-between p-2.5 rounded-lg bg-background/60 border border-background/80 hover:bg-background transition-colors group"
                   >
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">
+                      <Link 
+                        to={`/project/${project.id}`}
+                        className="text-sm font-medium text-foreground truncate hover:text-primary transition-colors"
+                      >
                         {project.title}
-                      </p>
+                      </Link>
                       <p className="text-xs text-muted-foreground">
                         {project.location}, {project.country}
                       </p>

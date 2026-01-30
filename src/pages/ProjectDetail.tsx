@@ -386,24 +386,14 @@ const ProjectDetail = () => {
                     </div>
                   </div>
 
-                  {user ? (
-                    <Button 
-                      onClick={() => setIsPurchaseOpen(true)}
-                      className="w-full bg-primary hover:bg-primary/90 text-lg py-6"
-                      disabled={project.available_credits === 0}
-                    >
-                      {project.available_credits === 0 ? 'Sold Out' : 'Purchase Credits'}
-                    </Button>
-                  ) : (
-                    <div className="space-y-3">
-                      <Button asChild className="w-full bg-primary hover:bg-primary/90 text-lg py-6">
-                        <Link to="/auth">Sign In to Purchase</Link>
-                      </Button>
-                      <p className="text-xs text-center text-muted-foreground">
-                        Create an account to start offsetting your carbon footprint
-                      </p>
-                    </div>
-                  )}
+                  {/* Always show purchase button for testing */}
+                  <Button 
+                    onClick={() => setIsPurchaseOpen(true)}
+                    className="w-full bg-primary hover:bg-primary/90 text-lg py-6"
+                    disabled={project.available_credits === 0}
+                  >
+                    {project.available_credits === 0 ? 'Sold Out' : 'Purchase Credits'}
+                  </Button>
 
                   <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground pt-2 border-t border-border/30">
                     <ShieldCheck className="w-4 h-4 text-primary" />

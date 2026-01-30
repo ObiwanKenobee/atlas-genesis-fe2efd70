@@ -28,7 +28,8 @@ export function PurchaseModal({ project, isOpen, onClose }: PurchaseModalProps) 
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('paystack');
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentStep, setPaymentStep] = useState<'select' | 'processing' | 'success'>('select');
-  const { user } = useSupabaseAuth();
+  // Remove user check for testing purposes
+  // const { user } = useSupabaseAuth();
 
   const totalPrice = quantity * project.price_per_credit;
   const totalOffset = quantity * project.co2_offset_per_credit;
