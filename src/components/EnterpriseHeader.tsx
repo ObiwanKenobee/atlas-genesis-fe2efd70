@@ -34,6 +34,8 @@ import {
   ArrowRight,
   Sun,
   Moon,
+  Trophy,
+  Calculator,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -147,6 +149,19 @@ const EnterpriseHeader = () => {
               href: "/transactions",
               icon: <Database className="w-5 h-5" />,
               description: "Complete transaction history",
+            },
+            {
+              name: "Leaderboard",
+              href: "/leaderboard",
+              icon: <Trophy className="w-5 h-5" />,
+              description: "Top offsetters rankings",
+              badge: "New",
+            },
+            {
+              name: "Carbon Calculator",
+              href: "/calculator",
+              icon: <Calculator className="w-5 h-5" />,
+              description: "Calculate your footprint",
             },
           ],
         },

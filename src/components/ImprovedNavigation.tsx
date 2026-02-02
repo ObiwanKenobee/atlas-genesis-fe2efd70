@@ -7,6 +7,7 @@ import {
   Zap, Shield, Heart, Users, BookOpen, HelpCircle,
   Building, Sprout, Target, Award, Phone, Search,
   ArrowRight, Settings, User, CreditCard, Database, Map,
+  Trophy, Calculator,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -83,6 +84,8 @@ const ImprovedNavigation = () => {
           items: [
             { name: "Valuation Engine", href: "/valuation", icon: <TrendingUp className="w-5 h-5" />, description: "Credit pricing and analysis" },
             { name: "Transactions", href: "/transactions", icon: <Database className="w-5 h-5" />, description: "Complete transaction history" },
+            { name: "Leaderboard", href: "/leaderboard", icon: <Trophy className="w-5 h-5" />, description: "Top offsetters rankings", badge: "New" },
+            { name: "Carbon Calculator", href: "/calculator", icon: <Calculator className="w-5 h-5" />, description: "Calculate your footprint" },
           ],
         },
       ],

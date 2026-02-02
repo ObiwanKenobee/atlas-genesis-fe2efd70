@@ -14,7 +14,7 @@ const Navigation = () => {
   const location = useLocation();
 
   // Check if user has completed onboarding
-  const hasCompletedOnboarding = user?.onboardingCompleted || false;
+  const hasCompletedOnboarding = (user as any)?.onboardingCompleted || false;
 
   const navLinks = [
     { name: "Marketplace", href: "/marketplace", icon: ShoppingBag },
