@@ -2,8 +2,28 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
-import { Lock, AlertTriangle } from 'lucide-react';
+import { Shield, Lock, AlertTriangle, ExternalLink } from 'lucide-react';
 import AdminApp from './AdminFigma/app/App';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
+
+const AdminDashboard = () => {
+  const { isAdmin, loading, user } = useAdminAuth();
+  const navigate = useNavigate();
+
+  const handleDemoLogin = () => {
+    navigate('/demo-login');
+  };
+
+  const handleQuickDemoAccess = () => {
+    navigate('/demo-login');
+  };
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/auth');
+    }
+  }, [loading, user, navigate]);
 
 const AdminDashboard = () => {
   const { isAdmin, loading, user } = useAdminAuth();
@@ -41,12 +61,21 @@ const AdminDashboard = () => {
           <Lock className="w-20 h-20 text-amber-500 mx-auto mb-6" />
           <h1 className="text-3xl font-bold text-white mb-4">Authentication Required</h1>
           <p className="text-slate-400 mb-6">Please log in to access the admin dashboard.</p>
-          <button
-            onClick={() => navigate('/auth')}
-            className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors"
-          >
-            Go to Login
-          </button>
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={() => navigate('/auth')}
+              className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors"
+            >
+              Go to Login
+            </button>
+            <button
+              onClick={handleDemoLogin}
+              className="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+            >
+              <ExternalLink className="w-4 h-4" />
+              Quick Demo Access
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -60,12 +89,21 @@ const AdminDashboard = () => {
           <h1 className="text-3xl font-bold text-white mb-4">Access Denied</h1>
           <p className="text-slate-400 mb-2">You don't have permission to access this area.</p>
           <p className="text-slate-500 text-sm mb-6">Admin privileges are required to view this page.</p>
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-medium transition-colors"
-          >
-            Return to Dashboard
-          </button>
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-medium transition-colors"
+            >
+              Return to Dashboard
+            </button>
+            <button
+              onClick={handleDemoLogin}
+              className="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+            >
+              <ExternalLink className="w-4 h-4" />
+              Quick Demo Access
+            </button>
+          </div>
         </div>
       </div>
     );
