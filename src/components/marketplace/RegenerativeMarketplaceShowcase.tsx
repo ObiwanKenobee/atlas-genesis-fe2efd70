@@ -9,6 +9,9 @@ import { Globe, Zap, BarChart3, Award, Leaf } from 'lucide-react';
 interface RegenerativeMarketplaceShowcaseProps {
   projects: CarbonProject[];
   isLoading?: boolean;
+  isCompareMode?: boolean;
+  selectedForCompare?: CarbonProject[];
+  onToggleCompare?: (project: CarbonProject) => void;
 }
 
 const projectTypeCategories: ProjectType[] = [
@@ -20,7 +23,13 @@ const projectTypeCategories: ProjectType[] = [
   'direct_air_capture',
 ];
 
-export function RegenerativeMarketplaceShowcase({ projects, isLoading }: RegenerativeMarketplaceShowcaseProps) {
+export function RegenerativeMarketplaceShowcase({ 
+  projects, 
+  isLoading,
+  isCompareMode = false,
+  selectedForCompare = [],
+  onToggleCompare,
+}: RegenerativeMarketplaceShowcaseProps) {
   const categorizedProjects = useMemo(() => {
     const categories: Record<ProjectType, CarbonProject[]> = {
       reforestation: [],
@@ -193,6 +202,9 @@ export function RegenerativeMarketplaceShowcase({ projects, isLoading }: Regener
               totalMarketValue={categoryStats[type].marketValue}
               participantCount={categoryStats[type].participants}
               index={index}
+              isCompareMode={isCompareMode}
+              selectedForCompare={selectedForCompare}
+              onToggleCompare={onToggleCompare}
             />
           ))}
         </div>

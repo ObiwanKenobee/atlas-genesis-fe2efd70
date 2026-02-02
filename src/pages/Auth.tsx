@@ -100,9 +100,9 @@ const Auth = () => {
 
   // Expose for testing
   useEffect(() => {
-    window.testDemoLogin = testDemoLogin;
+    (window as any).testDemoLogin = testDemoLogin;
     return () => {
-      delete window.testDemoLogin;
+      delete (window as any).testDemoLogin;
     };
   }, []);
 
