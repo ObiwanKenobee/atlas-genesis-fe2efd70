@@ -21,7 +21,7 @@ const Auth = () => {
   const [fullName, setFullName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isOAuthLoading, setIsOAuthLoading] = useState(false);
-  const { signIn, signUp, user, loading } = useAuth();
+  const { signIn, signUp, demoSignIn, user, loading } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   
@@ -70,9 +70,41 @@ const Auth = () => {
 
   useEffect(() => {
     if (!loading && user) {
-      navigate("/dashboard");
+      // Check if user has completed onboarding
+      const savedUser = JSON.parse(localStorage.getItem('auth_user') || '{}');
+      if (savedUser.onboardingCompleted) {
+        navigate("/dashboard");
+      } else {
+        navigate("/segment-selection");
+      }
     }
   }, [user, loading, navigate]);
+
+  // Test function to directly call demo login
+  const testDemoLogin = async () => {
+    console.log('testDemoLogin called');
+    try {
+      const result = await demoSignIn('user');
+      console.log('Demo login result:', result);
+      if (!result.error) {
+        toast.success('Demo user login successful!');
+        navigate('/dashboard');
+      } else {
+        toast.error('Demo login failed');
+      }
+    } catch (error) {
+      console.error('Demo login error:', error);
+      toast.error('Demo login failed');
+    }
+  };
+
+  // Expose for testing
+  useEffect(() => {
+    window.testDemoLogin = testDemoLogin;
+    return () => {
+      delete window.testDemoLogin;
+    };
+  }, []);
 
   const handleOAuthLogin = (provider: 'google' | 'github') => {
     if (!securityManager.rateLimiter.check('oauth_attempt', 5, 300000)) {
@@ -202,6 +234,66 @@ const Auth = () => {
           transition={{ duration: 0.6 }}
           className="relative z-10 w-full max-w-md mx-4"
         >
+        {/* Demo Login Buttons */}
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold mb-4 text-center">Quick Demo Access</h3>
+          <div className="space-y-3">
+            <Button
+              id="demo-user-login"
+              type="button"
+              variant="secondary"
+              size="lg"
+              className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white border-none py-4 text-lg"
+              onClick={async () => {
+                console.log('Demo User Login button clicked');
+                setIsOAuthLoading(true);
+                try {
+                  const result = await demoSignIn('user');
+                  console.log('Demo login result:', result);
+                  setIsOAuthLoading(false);
+                  if (!result.error) {
+                    toast.success('Demo user login successful!');
+                    navigate('/dashboard');
+                  } else {
+                    toast.error('Demo login failed');
+                  }
+                } catch (error) {
+                  console.error('Demo login error:', error);
+                  setIsOAuthLoading(false);
+                  toast.error('Demo login failed');
+                }
+              }}
+              disabled={isOAuthLoading}
+            >
+              <User className="w-5 h-5 mr-3" />
+              Demo User Login
+            </Button>
+
+            <Button
+              id="demo-admin-login"
+              type="button"
+              variant="secondary"
+              size="lg"
+              className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white border-none py-4 text-lg"
+              onClick={async () => {
+                setIsOAuthLoading(true);
+                const result = await demoSignIn('admin');
+                setIsOAuthLoading(false);
+                if (!result.error) {
+                  toast.success('Demo admin login successful!');
+                  navigate('/dashboard');
+                } else {
+                  toast.error('Demo login failed');
+                }
+              }}
+              disabled={isOAuthLoading}
+            >
+              <Sparkles className="w-5 h-5 mr-3" />
+              Demo Admin Login
+            </Button>
+          </div>
+        </div>
+
         {/* Logo */}
         <div className="text-center mb-8">
           <motion.div
@@ -259,6 +351,70 @@ const Auth = () => {
           className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl p-8 shadow-elevated mb-4 glass-panel"
         >
           <div className="space-y-3">
+            {/* Demo Login Buttons */}
+            <Button
+              id="demo-user-login"
+              type="button"
+              variant="secondary"
+              size="lg"
+              className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white border-none py-4 text-lg"
+              onClick={async () => {
+                console.log('Demo User Login button clicked');
+                setIsOAuthLoading(true);
+                try {
+                  const result = await demoSignIn('user');
+                  console.log('Demo login result:', result);
+                  setIsOAuthLoading(false);
+                  if (!result.error) {
+                    toast.success('Demo user login successful!');
+                    navigate('/dashboard');
+                  } else {
+                    toast.error('Demo login failed');
+                  }
+                } catch (error) {
+                  console.error('Demo login error:', error);
+                  setIsOAuthLoading(false);
+                  toast.error('Demo login failed');
+                }
+              }}
+              disabled={isOAuthLoading}
+            >
+              <User className="w-5 h-5 mr-3" />
+              Demo User Login
+            </Button>
+
+            <Button
+              id="demo-admin-login"
+              type="button"
+              variant="secondary"
+              size="lg"
+              className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white border-none"
+              onClick={async () => {
+                setIsOAuthLoading(true);
+                const result = await demoSignIn('admin');
+                setIsOAuthLoading(false);
+                if (!result.error) {
+                  toast.success('Demo admin login successful!');
+                  navigate('/dashboard');
+                } else {
+                  toast.error('Demo login failed');
+                }
+              }}
+              disabled={isOAuthLoading}
+            >
+              <Sparkles className="w-5 h-5 mr-3" />
+              Demo Admin Login
+            </Button>
+
+            <div className="relative my-4">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-border" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+              </div>
+            </div>
+
             <Button
               type="button"
               variant="outline"
@@ -289,7 +445,6 @@ const Auth = () => {
               </svg>
               Continue with GitHub
             </Button>
-
           </div>
 
           <div className="relative my-6">

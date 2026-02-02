@@ -1,8 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import sortCreditListings from './creditSorters';
 
-// Define the shape of a credit listing for testing
-interface TestCreditListing {
+interface CreditListing {
   id: string;
   price: number;
   quality: number;
@@ -15,10 +14,9 @@ interface TestCreditListing {
 }
 
 describe('Credit Sorters', () => {
-  let sampleListings: TestCreditListing[];
+  let sampleListings: CreditListing[];
 
   beforeEach(() => {
-    // Sample data for testing
     sampleListings = [
       {
         id: '1',
@@ -145,8 +143,7 @@ describe('Credit Sorters', () => {
 
   describe('Performance', () => {
     it('should handle large datasets efficiently', () => {
-      // Create a large dataset
-      const largeDataset: TestCreditListing[] = [];
+      const largeDataset: CreditListing[] = [];
       const regions = ['North America', 'Europe', 'Asia', 'South America', 'Africa', 'Oceania'];
       const certifications = ['Basic', 'Standard', 'Verified', 'Premium'];
       
@@ -169,9 +166,8 @@ describe('Credit Sorters', () => {
       const endTime = performance.now();
 
       expect(sorted.length).toBe(largeDataset.length);
-      expect(endTime - startTime).toBeLessThan(1000); // Should be fast for 1000 items
+      expect(endTime - startTime).toBeLessThan(1000);
 
-      // Verify sorting is correct
       const prices = sorted.map(listing => listing.price);
       for (let i = 1; i < prices.length; i++) {
         expect(prices[i]).toBeGreaterThanOrEqual(prices[i - 1]);

@@ -46,8 +46,47 @@ import Community from './pages/Community';
 import Education from './pages/Education';
 import CarbonCalculator from './pages/CarbonCalculator';
 import Leaderboard from './pages/Leaderboard';
-import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminCommandCenter from './pages/admin/AdminCommandCenter';
+import FeatureFlagsAdmin from './pages/admin/FeatureFlags';
+import Careers from './pages/Careers';
 import NotFound from './pages/NotFound';
+import SegmentSelection from './pages/SegmentSelection';
+import Onboarding from './pages/Onboarding';
+import DashboardOverview from './pages/DashboardOverview';
+import ReportsAnalytics from './pages/ReportsAnalytics';
+import Settings from './pages/Settings';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
+import Transactions from './pages/Transactions';
+import About from './pages/About';
+import CookiePolicy from './pages/CookiePolicy';
+import Accessibility from './pages/Accessibility';
+import MediaKit from './pages/MediaKit';
+import APIDocumentation from './pages/APIDocumentation';
+import DonorDashboard from './pages/DonorDashboard';
+import FieldAgentDashboard from './pages/FieldAgentDashboard';
+import AdministratorDashboard from './pages/AdministratorDashboard';
+import CommunityDashboard from './pages/CommunityDashboard';
+import EnterpriseDashboard from './pages/EnterpriseDashboard';
+import GovernmentDashboard from './pages/GovernmentDashboard';
+import DeFiDashboard from './pages/DeFiDashboard';
+import NGODashboard from './pages/NGODashboard';
+import BillingDashboard from './pages/enterprise/BillingDashboard';
+import InvoicesManagement from './pages/enterprise/InvoicesManagement';
+import PaymentMethods from './pages/enterprise/PaymentMethods';
+import DemoLogin from './pages/DemoLogin';
+import {
+  CarbonOffsetting,
+  ImpactInvestment,
+  RegulatoryCompliance,
+  EnterpriseSolutions,
+  SMBSolutions,
+  AgricultureSolutions,
+  RenewableEnergy,
+  EducationHub,
+  Certifications
+} from './pages/InfrastructurePages';
+import { OnboardingProvider } from './hooks/useOnboarding';
 
 const SimplePage = ({ title, description }: { title: string; description: string }) => (
   <Layout>
@@ -65,8 +104,9 @@ const SimplePage = ({ title, description }: { title: string; description: string
 
 const App = () => {
   return (
-    <BrowserRouter>
-      <AnimatePresence mode="wait">
+    <OnboardingProvider>
+      <BrowserRouter>
+        <AnimatePresence mode="wait">
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/dashboard" element={<Dashboard />} />
@@ -116,13 +156,50 @@ const App = () => {
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/architecture" element={<EngineeringArchitecture />} />
           <Route path="/dashboards" element={<Dashboard />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/*" element={<AdminDashboard />} />
+          <Route path="/careers" element={<Careers />} />
+          <Route path="/admin" element={<AdminCommandCenter />} />
+          <Route path="/admin/flags" element={<FeatureFlagsAdmin />} />
+          <Route path="/segment-selection" element={<SegmentSelection />} />
+          <Route path="/onboarding" element={<Onboarding />} />
+          <Route path="/dashboard-overview" element={<DashboardOverview />} />
+          <Route path="/reports-analytics" element={<ReportsAnalytics />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-of-service" element={<TermsOfService />} />
+          <Route path="/my-transactions" element={<Transactions />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/cookie-policy" element={<CookiePolicy />} />
+          <Route path="/accessibility" element={<Accessibility />} />
+          <Route path="/media-kit" element={<MediaKit />} />
+          <Route path="/help" element={<HelpCenter />} />
+          <Route path="/help/documentation" element={<APIDocumentation />} />
+          <Route path="/dashboard/donor" element={<DonorDashboard />} />
+          <Route path="/dashboard/field-agent" element={<FieldAgentDashboard />} />
+          <Route path="/dashboard/administrator" element={<AdministratorDashboard />} />
+          <Route path="/dashboard/community" element={<CommunityDashboard />} />
+          <Route path="/dashboard/enterprise" element={<EnterpriseDashboard />} />
+          <Route path="/dashboard/government" element={<GovernmentDashboard />} />
+          <Route path="/dashboard/defi" element={<DeFiDashboard />} />
+          <Route path="/dashboard/ngo" element={<NGODashboard />} />
+          <Route path="/billing" element={<BillingDashboard />} />
+          <Route path="/invoices" element={<InvoicesManagement />} />
+          <Route path="/payment-methods" element={<PaymentMethods />} />
+          <Route path="/carbon-offsetting" element={<CarbonOffsetting />} />
+          <Route path="/impact-investment" element={<ImpactInvestment />} />
+          <Route path="/regulatory-compliance" element={<RegulatoryCompliance />} />
+          <Route path="/enterprise-solutions" element={<EnterpriseSolutions />} />
+          <Route path="/smb-solutions" element={<SMBSolutions />} />
+          <Route path="/agriculture-solutions" element={<AgricultureSolutions />} />
+          <Route path="/renewable-energy" element={<RenewableEnergy />} />
+          <Route path="/education-hub" element={<EducationHub />} />
+          <Route path="/certifications" element={<Certifications />} />
+          <Route path="/demo-login" element={<DemoLogin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </AnimatePresence>
       <BackToTop />
     </BrowserRouter>
+    </OnboardingProvider>
   );
 };
 

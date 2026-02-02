@@ -11,6 +11,7 @@ export interface User {
   displayName?: string;
   role: string;
   tenantId?: string;
+  organizationId?: string;
   emailVerified?: boolean;
   phoneVerified?: boolean;
   mfaEnabled: boolean;

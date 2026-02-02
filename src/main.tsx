@@ -8,6 +8,7 @@ import { AuthProvider } from './hooks/useAuth';
 import { SupabaseAuthProvider } from './hooks/useSupabaseAuth';
 import App from './App.tsx';
 import './index.css';
+import featureFlags from './lib/featureFlags';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -18,25 +19,40 @@ const queryClient = new QueryClient({
   },
 });
 
-createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <HelmetProvider>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <AuthProvider>
-              <SupabaseAuthProvider>
-                <App />
-                <Toaster 
-                  position="bottom-right" 
-                  expand={false}
-                  richColors
-                  closeButton
-                  theme="system"
-                />
-              </SupabaseAuthProvider>
-            </AuthProvider>
-        </ThemeProvider>
-      </QueryClientProvider>
-    </HelmetProvider>
-  </React.StrictMode>
-);
+// Bootstrap feature flags from backend at runtime before rendering
+async function bootstrap() {
+  try {
+    const res = await fetch('/api/flags');
+    if (res.ok) {
+      const flags = await res.json();
+      featureFlags.initFeatureFlags(flags);
+    }
+  } catch (e) {
+    // ignore failure; app will use defaults
+  }
+
+  createRoot(document.getElementById('root')!).render(
+    <React.StrictMode>
+      <HelmetProvider>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+              <AuthProvider>
+                <SupabaseAuthProvider>
+                  <App />
+                  <Toaster 
+                    position="bottom-right" 
+                    expand={false}
+                    richColors
+                    closeButton
+                    theme="system"
+                  />
+                </SupabaseAuthProvider>
+              </AuthProvider>
+          </ThemeProvider>
+        </QueryClientProvider>
+      </HelmetProvider>
+    </React.StrictMode>
+  );
+}
+
+bootstrap();

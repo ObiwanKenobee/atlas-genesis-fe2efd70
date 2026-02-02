@@ -26,10 +26,15 @@
 
     <!-- Content Security Policy -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net http://localhost:4000 https://iwremcrvzoprfrytvoze.supabase.co; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;" />
+    <style>
+      .skip-to-content{position:absolute;left:-999px;top:auto;background:#000;color:#fff;padding:8px;z-index:9999}
+      .skip-to-content:focus{left:10px;top:10px}
+    </style>
   </head>
   
 
   <body>
+    <a href="#root" class="skip-to-content">Skip to main content</a>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

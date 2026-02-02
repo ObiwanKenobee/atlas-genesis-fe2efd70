@@ -1,4 +1,14 @@
+import './tracing';
+import './secrets';
+import { runStartupChecks } from './startupChecks';
+import { checkReadiness } from './readiness';
+import metrics from './metrics';
+import featureFlags from './featureFlags';
+import adminFlagsRouter from './routes/adminFlags';
 import express, { Request, Response, NextFunction } from 'express';
+import session from 'express-session';
+import connectRedis from 'connect-redis';
+import redisClient from './redisClient';
 import http from 'http';
 import { Server as SocketIOServer, Socket } from 'socket.io';
 import cors from 'cors';
@@ -56,6 +66,29 @@ import measurementsV2Router from './routes/measurements-v2';
 import projectsRouter from './routes/projects';
 
 const app = express();
+
+// Redis-backed sessions when REDIS_URL is configured
+try {
+  const RedisStore = connectRedis(session as any);
+  if (process.env.REDIS_URL) {
+    app.use(
+      session({
+        store: new RedisStore({ client: redisClient as any }),
+        secret: process.env.SESSION_SECRET || 'change-me',
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+          secure: process.env.NODE_ENV === 'production',
+          httpOnly: true,
+          sameSite: 'lax',
+          maxAge: 1000 * 60 * 60 * 24
+        }
+      })
+    );
+  }
+} catch (err) {
+  console.warn('Redis session store not configured', err);
+}
 
 // Security headers (must be first)
 app.use(securityHeaders);
@@ -215,6 +248,13 @@ app.use(securityLogger);
 // Request logging
 app.use(requestLogger);
 
+// Prometheus metrics middleware (captures durations and counts)
+app.use(metrics.metricsMiddleware);
+
+// Attach feature flags to each request
+app.use(featureFlags.attachFlagsMiddleware);
+
+
 // API versioning middleware
 app.use('/api', (req: Request, res: Response, next: NextFunction) => {
   // Extract API version from header, query param, or URL
@@ -314,6 +354,17 @@ app.get('/health', async (req, res) => {
     });
   }
 });
+
+// Expose Prometheus metrics
+app.get('/metrics', metrics.metricsEndpoint);
+
+// Expose feature flags for frontend/runtime (read-only)
+app.get('/api/flags', (req: Request, res: Response) => {
+  res.json(featureFlags.getAllFlags());
+});
+
+// Admin routes for toggling runtime flags
+app.use('/api/admin/flags', adminFlagsRouter);
 
 // Original API Routes
 app.use('/api/auth', authRouter);
@@ -691,11 +742,32 @@ setInterval(async () => {
   }
 }, 60 * 60 * 1000); // Run every hour
 
-const PORT = process.env.PORT || 4000;
-server.listen(PORT, () => {
-  console.log(`🚀 Atlas Genesis API running on http://localhost:${PORT}`);
-  console.log(`📚 API Documentation: http://localhost:${PORT}/api`);
-  console.log(`❤️  Health Check: http://localhost:${PORT}/health`);
-  console.log(`🌍 CORS enabled for: ${allowedOrigins.join(', ')}`);
-  console.log(`🔌 WebSocket server ready for real-time connections`);
+// Start server after performing startup checks (fail-fast in prod if secrets missing)
+(async () => {
+  try {
+    await runStartupChecks();
+  } catch (err) {
+    console.error('Startup checks failed', err);
+    process.exit(1);
+  }
+
+  const PORT = process.env.PORT || 4000;
+  server.listen(PORT, () => {
+    console.log(`🚀 Atlas Genesis API running on http://localhost:${PORT}`);
+    console.log(`📚 API Documentation: http://localhost:${PORT}/api`);
+    console.log(`❤️  Health Check: http://localhost:${PORT}/health`);
+    console.log(`🌍 CORS enabled for: ${allowedOrigins.join(', ')}`);
+    console.log(`🔌 WebSocket server ready for real-time connections`);
+  });
+})();
+
+// Readiness endpoint for orchestration
+app.get('/ready', async (req: any, res: any) => {
+  try {
+    const { ok, details } = await checkReadiness();
+    if (ok) return res.status(200).json({ status: 'ready', details });
+    return res.status(503).json({ status: 'not_ready', details });
+  } catch (err: any) {
+    return res.status(500).json({ status: 'error', message: err.message || String(err) });
+  }
 });

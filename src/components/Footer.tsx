@@ -61,9 +61,9 @@ const Footer = () => {
 
   const resourceLinks = [
     { name: "API Documentation", href: "/help/documentation" },
-    { name: "Impact Guides", href: "#" },
-    { name: "Community Forum", href: "#" },
-    { name: "Case Studies", href: "#" },
+    { name: "Impact Guides", href: "/outreach" },
+    { name: "Community Forum", href: "/community" },
+    { name: "Case Studies", href: "/education" },
   ];
 
   const supportLinks = [
@@ -75,15 +75,15 @@ const Footer = () => {
   const legalLinks = [
     { name: "Privacy Policy", href: "/privacy-policy" },
     { name: "Terms of Service", href: "/terms-of-service" },
-    { name: "Cookie Policy", href: "#" },
-    { name: "Accessibility Statement", href: "#" },
+    { name: "Cookie Policy", href: "/cookie-policy" },
+    { name: "Accessibility Statement", href: "/accessibility" },
   ];
 
   const companyLinks = [
-    { name: "About Atlas", href: "#" },
-    { name: "Join Our Team", href: "#" },
-    { name: "Media Kit", href: "#" },
-    { name: "Get in Touch", href: "#" },
+    { name: "About Atlas", href: "/about" },
+    { name: "Join Our Team", href: "/careers" },
+    { name: "Media Kit", href: "/media-kit" },
+    { name: "Get in Touch", href: "/contact" },
   ];
 
   const socialLinks = [
@@ -137,9 +137,9 @@ const Footer = () => {
         </div>
 
         {/* Main Footer Content */}
-        <div className="py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+        <div className="py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-6">
           {/* Brand & Contact */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 sm:col-span-2">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-blue-600 flex items-center justify-center">
                 <Leaf className="w-5 h-5 text-white" aria-hidden="true" />
@@ -156,11 +156,11 @@ const Footer = () => {
 
             {/* Contact Info */}
             <div className="space-y-3 mb-6">
-              <a href="mailto:hello@atlassanctum.com" className="flex items-center gap-3 text-sm text-muted-foreground hover:text-emerald-400 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+              <a href="mailto:hello@atlassanctum.com" className="flex items-center gap-3 text-sm text-muted-foreground hover:text-emerald-400 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/50 rounded">
                 <Mail className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                 <span>hello@atlassanctum.com</span>
               </a>
-              <a href="tel:+1234567890" className="flex items-center gap-3 text-sm text-muted-foreground hover:text-emerald-400 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+              <a href="tel:+1234567890" className="flex items-center gap-3 text-sm text-muted-foreground hover:text-emerald-400 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/50 rounded">
                 <Phone className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                 <span>+1 (234) 567-890</span>
               </a>
@@ -171,7 +171,7 @@ const Footer = () => {
             </div>
 
             {/* Social Links */}
-            <div className="flex gap-3">
+            <div className="flex gap-3 flex-wrap">
               {socialLinks.map((social, index) => {
                 const href = social.href || "#";
                 const isExternal = href && href.startsWith("http");
@@ -201,7 +201,7 @@ const Footer = () => {
                 <li key={`feature-${link.name}`}>
                   <Link
                     to={link.href}
-                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-emerald-400 transition-colors duration-200 group focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-emerald-400 transition-colors duration-200 group focus:outline-none focus:ring-2 focus:ring-emerald-500/50 rounded"
                   >
                     <span className="text-emerald-600 group-hover:text-emerald-400 transition-colors duration-200">
                       {link.icon}
@@ -222,7 +222,7 @@ const Footer = () => {
                 <li key={`feature-${link.name}`}>
                   <Link
                     to={link.href}
-                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-emerald-400 transition-colors duration-200 group focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-emerald-400 transition-colors duration-200 group focus:outline-none focus:ring-2 focus:ring-emerald-500/50 rounded"
                   >
                     <span className="text-emerald-600 group-hover:text-emerald-400 transition-colors duration-200">{link.icon}</span>
                     {link.name}
@@ -291,7 +291,7 @@ const Footer = () => {
                 <li key={`platform-${link.name}`}>
                   <Link
                     to={link.href}
-                    className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors duration-200 flex items-center gap-2 group focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors duration-200 flex items-center gap-2 group focus:outline-none focus:ring-2 focus:ring-emerald-500/50 rounded"
                   >
                     {link.name}
                     <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all duration-200" aria-hidden="true" />
@@ -306,7 +306,7 @@ const Footer = () => {
                  <li key={`resource-${link.name}`}>
                    <Link
                      to={link.href}
-                     className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors duration-200 flex items-center gap-2 group focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                     className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors duration-200 flex items-center gap-2 group focus:outline-none focus:ring-2 focus:ring-emerald-500/50 rounded"
                    >
                      {link.name}
                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all duration-200" aria-hidden="true" />
@@ -321,7 +321,7 @@ const Footer = () => {
                  <li key={`support-${link.name}`}>
                    <Link
                      to={link.href}
-                     className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors duration-200 flex items-center gap-2 group focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                     className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors duration-200 flex items-center gap-2 group focus:outline-none focus:ring-2 focus:ring-emerald-500/50 rounded"
                    >
                      {link.name}
                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all duration-200" aria-hidden="true" />
@@ -339,7 +339,7 @@ const Footer = () => {
                 <li key={`legal-${link.name}`}>
                   <Link
                     to={link.href}
-                    className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors duration-200 flex items-center gap-2 group focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors duration-200 flex items-center gap-2 group focus:outline-none focus:ring-2 focus:ring-emerald-500/50 rounded"
                   >
                     {link.name}
                     <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all duration-200" aria-hidden="true" />
@@ -354,7 +354,7 @@ const Footer = () => {
                 <li key={`company-${link.name}`}>
                   <Link
                     to={link.href}
-                    className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors duration-200 flex items-center gap-2 group focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors duration-200 flex items-center gap-2 group focus:outline-none focus:ring-2 focus:ring-emerald-500/50 rounded"
                   >
                     {link.name}
                     <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all duration-200" aria-hidden="true" />

@@ -103,6 +103,7 @@ let carbonProjects: any[] = [
   }
 ];
 let measurementData: any[] = [];
+let featureFlagsStorage: any[] = [];
 
 // Mock query function
 export async function query(text: string, params: any[] = []) {
@@ -254,6 +255,27 @@ export async function query(text: string, params: any[] = []) {
        rowCount: carbonProjects.length
      };
    }
+
+  // Mock feature_flags queries
+  if (text.includes('FROM feature_flags')) {
+    return {
+      rows: featureFlagsStorage.map((f) => ({ key: f.key, value: f.value })),
+      rowCount: featureFlagsStorage.length
+    };
+  }
+
+  if (text.includes('INSERT INTO feature_flags')) {
+    const key = params[0];
+    const value = params[1];
+    const existing = featureFlagsStorage.find((f) => f.key === key);
+    if (existing) {
+      existing.value = value;
+      existing.updated_at = new Date();
+    } else {
+      featureFlagsStorage.push({ key, value, created_at: new Date(), updated_at: new Date() });
+    }
+    return { rows: [{ key, value }], rowCount: 1 };
+  }
 
    // Mock default response
    return {

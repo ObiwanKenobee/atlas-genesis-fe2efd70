@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
     "dev:full": "concurrently \"npm run dev\" \"npm run dev:backend\"",
     "dev:backend": "cd scaffold-mvp/backend && npm run dev",
     "build": "vite build",
@@ -17,8 +19,16 @@
     "lighthouse": "lhci autorun",
     "lighthouse:local": "lhci autorun --config=.lighthouserc.json",
     "lighthouse:ci": "lhci autorun --upload.target=temporary-public-storage",
-    "test": "vitest run",
+    "test": "vitest run src/lib/sorting/creditSorters.test.ts",
     "test:watch": "vitest"
+  },
+  "prepare": "husky install",
+  "lint-staged": {
+    "src/**/*.{js,jsx,ts,tsx,json,css,md}": [
+      "prettier --write",
+      "eslint --fix",
+      "git add"
+    ]
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
@@ -122,7 +132,11 @@
     "typescript-eslint": "^8.38.0",
     "vite": "^5.4.19",
     "vite-plugin-pwa": "^1.2.0",
-    "vitest": "^4.0.16"
+    "vitest": "^4.0.16",
+    "prettier": "^2.8.8",
+    "husky": "^8.0.3",
+    "lint-staged": "^14.0.0",
+    "cypress": "^12.0.0"
   },
   "peerDependencies": {
     "react": "18.3.1",

@@ -16,7 +16,7 @@ import { Progress } from "@/components/ui/progress";
 import QuickActions from "@/components/dashboard/QuickActions";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { ImpactWidget } from "@/components/dashboard/ImpactWidget";
-import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useAdmin";
 import { useOnboardingTour } from "@/hooks/useOnboardingTour";
 import { usePriceAlertMonitor } from "@/hooks/usePriceAlertMonitor";
@@ -40,7 +40,7 @@ interface CreditHolding {
 }
 
 const Dashboard = () => {
-  const { user, loading, signOut } = useSupabaseAuth();
+  const { user, loading, signOut } = useAuth();
   const { data: isAdmin } = useIsAdmin();
   const { startTour, tourCompleted } = useOnboardingTour();
   usePriceAlertMonitor(); // Start monitoring price alerts
@@ -60,8 +60,16 @@ const Dashboard = () => {
       // Check if onboarding is complete
       const completed = localStorage.getItem(`onboarding_completed_${user.id}`);
       if (!completed) {
-        navigate("/onboarding");
-        return;
+        // For demo users, skip onboarding
+        if (user.email?.includes('demo')) {
+          localStorage.setItem(`onboarding_completed_${user.id}`, 'true');
+        } else {
+          // For real users, redirect to onboarding if not completed
+          // navigate("/onboarding");
+          // return;
+          // Temporarily skip onboarding for all users
+          localStorage.setItem(`onboarding_completed_${user.id}`, 'true');
+        }
       }
     }
   }, [user, loading, navigate]);
@@ -69,36 +77,124 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (user) {
-        // Fetch profile
-        const { data: profileData } = await supabase
-          .from("profiles")
-          .select("full_name, organization, avatar_url")
-          .eq("user_id", user.id)
-          .maybeSingle();
+        // For demo users, create mock data
+        if (user.email?.includes('demo')) {
+          // Different data for admin and regular users
+          if (user.email?.includes('admin')) {
+            setProfile({
+              full_name: 'Admin User',
+              organization: 'Atlas Sanctum Admin',
+              avatar_url: null
+            });
+            
+            // Create admin-specific mock holdings
+            const mockHoldings: CreditHolding[] = [
+              {
+                id: '1',
+                quantity: 500,
+                purchase_price: 15.50,
+                project_id: 'proj-1',
+                carbon_projects: {
+                  title: 'Amazon Rainforest Protection',
+                  project_type: 'Forest Conservation'
+                }
+              },
+              {
+                id: '2',
+                quantity: 250,
+                purchase_price: 22.00,
+                project_id: 'proj-2',
+                carbon_projects: {
+                  title: 'Solar Farm Initiative',
+                  project_type: 'Renewable Energy'
+                }
+              },
+              {
+                id: '3',
+                quantity: 300,
+                purchase_price: 18.75,
+                project_id: 'proj-3',
+                carbon_projects: {
+                  title: 'Ocean Conservation Project',
+                  project_type: 'Marine Protection'
+                }
+              }
+            ];
+            
+            setHoldings(mockHoldings);
+            const credits = mockHoldings.reduce((sum, h) => sum + h.quantity, 0);
+            const value = mockHoldings.reduce((sum, h) => sum + h.quantity * h.purchase_price, 0);
+            setTotalCredits(credits);
+            setPortfolioValue(value);
+          } else {
+            setProfile({
+              full_name: 'Demo User',
+              organization: 'Demo Organization',
+              avatar_url: null
+            });
+            
+            // Create regular user mock holdings
+            const mockHoldings: CreditHolding[] = [
+              {
+                id: '1',
+                quantity: 100,
+                purchase_price: 15.50,
+                project_id: 'proj-1',
+                carbon_projects: {
+                  title: 'Amazon Rainforest Protection',
+                  project_type: 'Forest Conservation'
+                }
+              },
+              {
+                id: '2',
+                quantity: 50,
+                purchase_price: 22.00,
+                project_id: 'proj-2',
+                carbon_projects: {
+                  title: 'Solar Farm Initiative',
+                  project_type: 'Renewable Energy'
+                }
+              }
+            ];
+            
+            setHoldings(mockHoldings);
+            const credits = mockHoldings.reduce((sum, h) => sum + h.quantity, 0);
+            const value = mockHoldings.reduce((sum, h) => sum + h.quantity * h.purchase_price, 0);
+            setTotalCredits(credits);
+            setPortfolioValue(value);
+          }
+        } else {
+          // For real users, fetch from Supabase
+          const { data: profileData } = await supabase
+            .from("profiles")
+            .select("full_name, organization, avatar_url")
+            .eq("user_id", user.id)
+            .maybeSingle();
 
-        if (profileData) setProfile(profileData);
+          if (profileData) setProfile(profileData);
 
-        // Fetch holdings
-        const { data: holdingsData } = await supabase
-          .from("credit_holdings")
-          .select(`
-            id,
-            quantity,
-            purchase_price,
-            project_id,
-            carbon_projects (
-              title,
-              project_type
-            )
-          `)
-          .eq("user_id", user.id);
+          // Fetch holdings
+          const { data: holdingsData } = await supabase
+            .from("credit_holdings")
+            .select(`
+              id,
+              quantity,
+              purchase_price,
+              project_id,
+              carbon_projects (
+                title,
+                project_type
+              )
+            `)
+            .eq("user_id", user.id);
 
-        if (holdingsData) {
-          setHoldings(holdingsData as CreditHolding[]);
-          const credits = holdingsData.reduce((sum, h) => sum + h.quantity, 0);
-          const value = holdingsData.reduce((sum, h) => sum + h.quantity * h.purchase_price, 0);
-          setTotalCredits(credits);
-          setPortfolioValue(value);
+          if (holdingsData) {
+            setHoldings(holdingsData as CreditHolding[]);
+            const credits = holdingsData.reduce((sum, h) => sum + h.quantity, 0);
+            const value = holdingsData.reduce((sum, h) => sum + h.quantity * h.purchase_price, 0);
+            setTotalCredits(credits);
+            setPortfolioValue(value);
+          }
         }
       }
     };

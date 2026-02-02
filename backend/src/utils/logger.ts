@@ -80,6 +80,21 @@ export const logger = winston.createLogger({
     securityRotateTransport,
   ],
 });
+ 
+ // In production prefer structured JSON on stdout for log shipping
+ if (process.env.NODE_ENV === 'production' || process.env.LOG_JSON === 'true') {
+   logger.clear();
+   logger.add(new winston.transports.Console({
+     format: winston.format.combine(
+       winston.format.timestamp(),
+       winston.format.json(),
+       winston.format((info) => {
+         info.service = process.env.SERVICE_NAME || 'atlas-backend';
+         return info;
+       })()
+     )
+   }));
+ }
 
 // Security-specific logger
 export const securityLogger = {

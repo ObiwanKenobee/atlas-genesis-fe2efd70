@@ -10,6 +10,8 @@ interface User {
   emailVerified: boolean;
   mfaEnabled: boolean;
   lastLogin?: string;
+  segment?: string;
+  onboardingCompleted?: boolean;
 }
 
 interface Tokens {
@@ -21,10 +23,11 @@ interface Tokens {
 interface AuthContextType {
   user: User | null;
   tokens: Tokens | null;
-  session: any;
+  session: Record<string, unknown> | null;
   loading: boolean;
   signUp: (email: string, password: string, displayName?: string, role?: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  demoSignIn: (role: 'user' | 'admin') => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   refreshToken: () => Promise<{ error: Error | null }>;
   verifyEmail: (token: string) => Promise<{ error: Error | null }>;
@@ -77,6 +80,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signIn = async (email: string, password: string): Promise<{ error: Error | null }> => {
     try {
+      // Check if this is a demo login
+      if (email.toLowerCase().includes('demo') && password === 'demo123') {
+        const demoUser = {
+          id: `demo-${Date.now()}`,
+          email: email,
+          displayName: email.split('@')[0],
+          role: email.includes('admin') ? 'admin' : 'user',
+          tenantId: 'demo-tenant',
+          emailVerified: true,
+          mfaEnabled: false,
+          lastLogin: new Date().toISOString()
+        };
+        
+        const demoTokens = {
+          accessToken: `demo-access-token-${Date.now()}`,
+          refreshToken: `demo-refresh-token-${Date.now()}`,
+          expiresIn: 3600 // 1 hour
+        };
+        
+        setUser(demoUser);
+        setTokens(demoTokens);
+        localStorage.setItem('auth_user', JSON.stringify(demoUser));
+        localStorage.setItem('auth_tokens', JSON.stringify(demoTokens));
+        apiService.setToken(demoTokens.accessToken);
+        
+        return { error: null };
+      }
+
+      // Regular login
       const response = await apiService.auth.login(email, password);
       
       if (response.error) {
@@ -96,6 +128,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       return { error: error instanceof Error ? error : new Error('Sign in failed') };
     }
+  };
+
+  const demoSignIn = async (role: 'user' | 'admin'): Promise<{ error: Error | null }> => {
+    const demoEmail = role === 'admin' ? 'admin@demo.com' : 'user@demo.com';
+    return signIn(demoEmail, 'demo123');
   };
 
   const signOut = async (): Promise<void> => {
@@ -222,6 +259,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loading,
     signUp,
     signIn,
+    demoSignIn,
     signOut,
     refreshToken,
     verifyEmail,

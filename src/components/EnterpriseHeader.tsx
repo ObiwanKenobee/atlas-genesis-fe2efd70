@@ -165,19 +165,19 @@ const EnterpriseHeader = () => {
           items: [
             {
               name: "Carbon Offsetting",
-              href: "/marketplace",
+              href: "/carbon-offsetting",
               icon: <Target className="w-5 h-5" />,
               description: "Neutralize your carbon footprint",
             },
             {
               name: "Impact Investment",
-              href: "/portfolio",
+              href: "/impact-investment",
               icon: <TrendingUp className="w-5 h-5" />,
               description: "Generate returns while doing good",
             },
             {
               name: "Regulatory Compliance",
-              href: "/governance",
+              href: "/regulatory-compliance",
               icon: <Shield className="w-5 h-5" />,
               description: "Meet sustainability requirements",
             },
@@ -188,20 +188,20 @@ const EnterpriseHeader = () => {
           items: [
             {
               name: "Enterprise",
-              href: "/marketplace",
+              href: "/enterprise-solutions",
               icon: <Building2 className="w-5 h-5" />,
               description: "Large-scale carbon programs",
               badge: "Enterprise",
             },
             {
               name: "SMB",
-              href: "/marketplace",
+              href: "/smb-solutions",
               icon: <Users className="w-5 h-5" />,
               description: "Accessible sustainability solutions",
             },
             {
               name: "Agriculture",
-              href: "/regenerative-agriculture",
+              href: "/agriculture-solutions",
               icon: <Sprout className="w-5 h-5" />,
               description: "Regenerative farming credits",
             },
@@ -223,7 +223,7 @@ const EnterpriseHeader = () => {
             },
             {
               name: "Renewable Energy",
-              href: "/marketplace",
+              href: "/renewable-energy",
               icon: <Zap className="w-5 h-5" />,
               description: "Clean energy transition projects",
             },
@@ -268,19 +268,19 @@ const EnterpriseHeader = () => {
           items: [
             {
               name: "Documentation",
-              href: "/outreach",
+              href: "/help/documentation",
               icon: <FileText className="w-5 h-5" />,
               description: "Guides and API reference",
             },
             {
               name: "Education Hub",
-              href: "/outreach",
+              href: "/education-hub",
               icon: <BookOpen className="w-5 h-5" />,
               description: "Carbon market education",
             },
             {
               name: "Certifications",
-              href: "/marketplace",
+              href: "/certifications",
               icon: <Award className="w-5 h-5" />,
               description: "Standards and methodologies",
             },
@@ -469,7 +469,7 @@ const EnterpriseHeader = () => {
                   : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
               }`}
             >
-              Blog
+              Dashboard
             </Link>
           </nav>
 
