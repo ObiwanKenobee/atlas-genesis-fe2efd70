@@ -275,6 +275,9 @@ const Marketplace = () => {
           <RegenerativeMarketplaceShowcase 
             projects={filteredProjects} 
             isLoading={isLoading}
+            isCompareMode={isCompareMode}
+            selectedForCompare={selectedForCompare}
+            onToggleCompare={toggleCompareProject}
           />
         </div>
 

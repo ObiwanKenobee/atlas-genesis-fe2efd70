@@ -16,6 +16,9 @@ interface ProjectCategoryCategoryCardProps {
   totalMarketValue: number;
   participantCount: number;
   index: number;
+  isCompareMode?: boolean;
+  selectedForCompare?: CarbonProject[];
+  onToggleCompare?: (project: CarbonProject) => void;
 }
 
 const categoryDescriptions: Record<ProjectType, string> = {
@@ -72,6 +75,9 @@ export function ProjectCategoryCard({
   totalMarketValue,
   participantCount,
   index,
+  isCompareMode = false,
+  selectedForCompare = [],
+  onToggleCompare,
 }: ProjectCategoryCategoryCardProps) {
   const colors = categoryColors[type];
   const topProjects = projects.slice(0, 3);

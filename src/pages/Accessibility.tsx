@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Accessibility, Eye, Keyboard, Volume2, CheckCircle, AlertCircle } from "lucide-react";
+import { Accessibility as AccessibilityIcon, Eye, Keyboard, Volume2, CheckCircle, AlertCircle } from "lucide-react";
 import Header from "@/components/EnterpriseHeader";
 import Footer from "@/components/Footer";
 
-const Accessibility = () => {
+const AccessibilityPage = () => {
   useEffect(() => {
     // Log page access for audit
     const logAccess = async () => {
@@ -31,7 +31,7 @@ const Accessibility = () => {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 text-emerald-400 text-sm font-medium mb-4">
-              <Accessibility className="w-4 h-4" />
+              <AccessibilityIcon className="w-4 h-4" />
               Accessibility Statement
             </div>
             <h1 className="text-4xl font-bold text-foreground mb-4">
@@ -46,7 +46,7 @@ const Accessibility = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Accessibility className="w-5 h-5 text-emerald-500" />
+                  <AccessibilityIcon className="w-5 h-5 text-emerald-500" />
                   Our Commitment
                 </CardTitle>
               </CardHeader>
@@ -99,7 +99,7 @@ const Accessibility = () => {
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <Accessibility className="w-5 h-5 text-emerald-500 mt-0.5" />
+                    <AccessibilityIcon className="w-5 h-5 text-emerald-500 mt-0.5" />
                     <div>
                       <h4 className="font-semibold">Cognitive Accessibility</h4>
                       <p className="text-sm text-muted-foreground">Clear language, consistent navigation, and error prevention</p>
@@ -227,7 +227,7 @@ const Accessibility = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Accessibility className="w-5 h-5 text-emerald-500" />
+                  <AccessibilityIcon className="w-5 h-5 text-emerald-500" />
                   Ongoing Efforts
                 </CardTitle>
               </CardHeader>
@@ -282,4 +282,4 @@ const Accessibility = () => {
   );
 };
 
-export default Accessibility;
+export default AccessibilityPage;
