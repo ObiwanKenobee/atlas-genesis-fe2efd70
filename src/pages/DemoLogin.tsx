@@ -32,7 +32,7 @@ interface UserDashboard {
   id: string;
   name: string;
   description: string;
-  icon: React.ElementType;
+  icon: React.ReactNode;
   route: string;
   color: string;
 }

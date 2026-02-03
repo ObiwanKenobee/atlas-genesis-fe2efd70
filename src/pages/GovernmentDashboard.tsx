@@ -18,6 +18,9 @@ import {
   Shield,
   Activity,
   Database,
+  Clock,
+  XCircle,
+  Lock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -138,19 +141,19 @@ const GovernmentDashboard = () => {
     {
       key: 'funding',
       title: 'Funding',
-      render: (value) => `$${(value / 1000000).toFixed(1)}M`,
+      render: (value) => `$${(Number(value) / 1000000).toFixed(1)}M`,
     },
     {
       key: 'impact',
       title: 'Impact',
-      render: (value) => `${(value / 1000).toFixed(0)}K tons`,
+      render: (value) => `${(Number(value) / 1000).toFixed(0)}K tons`,
     },
     {
       key: 'progress',
       title: 'Progress',
       render: (value) => (
         <div className="w-24">
-          <Progress value={value} className="h-2" />
+          <Progress value={value as number} className="h-2" />
           <span className="text-xs text-muted-foreground mt-1">{value}%</span>
         </div>
       ),

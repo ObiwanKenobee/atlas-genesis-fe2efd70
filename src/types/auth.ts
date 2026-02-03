@@ -15,7 +15,68 @@ export type UserRole =
   | 'government'
   | 'defi'
   | 'ngo'
-  | 'super_admin';
+  | 'super_admin'
+  | 'producer'
+  | 'investor'
+  | 'institution'
+  | 'knowledge_builder';
+
+// Consent Option for ethical consent screen
+export interface ConsentOption {
+  id: string;
+  title: string;
+  description: string;
+  isRequired: boolean;
+  checked?: boolean;
+}
+
+// Consent State for tracking user consents
+export interface ConsentState {
+  [key: string]: boolean | undefined;
+}
+
+// Authentication Data for storing auth method info
+export interface AuthenticationData {
+  method?: string;
+  email?: string;
+  phone?: string;
+  provider?: string;
+  [key: string]: unknown;
+}
+
+// Authentication Method configuration
+export interface AuthenticationMethod {
+  id: string;
+  name: string;
+  icon: string;
+  description: string;
+  isDefault?: boolean;
+}
+
+// Role-specific onboarding step
+export interface OnboardingStep {
+  id: string;
+  title: string;
+  description: string;
+  type: 'form' | 'info' | 'action';
+}
+
+// First Day Experience configuration
+export interface FirstDayExperienceConfig {
+  metric: string;
+  action: string;
+  story: string;
+}
+
+// Role-specific data configuration
+export interface RoleSpecificData {
+  role: UserRole;
+  title: string;
+  description: string;
+  icon: string;
+  steps: OnboardingStep[];
+  firstDayExperience: FirstDayExperienceConfig;
+}
 
 // Dashboard Types
 export type DashboardType = 
@@ -56,6 +117,8 @@ export interface User {
   organization?: string;
   permissions?: Permission[];
   dashboardAccess?: DashboardType[];
+  createdAt?: string;
+  lastLoginAt?: string;
 }
 
 // Tokens Interface
@@ -259,6 +322,10 @@ export const ROLE_TO_DASHBOARD: Record<UserRole, DashboardType> = {
   defi: 'defi',
   ngo: 'ngo',
   super_admin: 'administrator',
+  producer: 'main',
+  investor: 'donor',
+  institution: 'government',
+  knowledge_builder: 'main',
 };
 
 // Dashboard Configurations
