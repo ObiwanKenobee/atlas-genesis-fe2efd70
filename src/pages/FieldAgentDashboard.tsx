@@ -24,8 +24,9 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { DashboardMetricCard, DashboardChart, DashboardTable, type TableColumn } from '@/components/dashboard/shared';
 import Header from '@/components/EnterpriseHeader';
-import Footer from '@/components/Footer';
+import WorkspaceLayout from '@/components/WorkspaceLayout';
 import { useAuth } from '@/hooks/useAuth';
+import { useEnhancedAuth } from '@/hooks/useEnhancedAuth';
 
 interface Project {
   id: string;
@@ -48,7 +49,12 @@ interface DataCollection {
 
 const FieldAgentDashboard = () => {
   const { user, loading } = useAuth();
+  const { user: enhancedUser, loading: enhancedLoading } = useEnhancedAuth();
   const navigate = useNavigate();
+  
+  // Use enhanced auth for demo mode, fallback to regular auth
+  const currentUser = enhancedUser || user;
+  const isLoading = enhancedLoading || loading;
   const [projects, setProjects] = useState<Project[]>([]);
   const [dataCollections, setDataCollections] = useState<DataCollection[]>([]);
   const [activeProjects, setActiveProjects] = useState(0);
@@ -57,7 +63,7 @@ const FieldAgentDashboard = () => {
   const [totalArea, setTotalArea] = useState(0);
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!isLoading && !currentUser) {
       navigate('/auth');
       return;
     }
@@ -267,28 +273,14 @@ const FieldAgentDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="pt-20 pb-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <div className="mb-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <h1 className="text-4xl font-bold text-foreground mb-2">
-                Field Agent Dashboard
-              </h1>
-              <p className="text-xl text-muted-foreground">
-                Manage projects and collect regenerative impact data
-              </p>
-            </motion.div>
-          </div>
-
-          {/* Key Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <WorkspaceLayout
+      title="Field Agent Dashboard"
+      subtitle="Manage projects and collect regenerative impact data"
+      userType="field-agent"
+    >
+      <div className="space-y-8">
+        {/* Key Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <DashboardMetricCard
               title="Active Projects"
               value={activeProjects}
@@ -553,10 +545,8 @@ const FieldAgentDashboard = () => {
             </div>
           </div>
         </div>
-      </main>
-      <Footer />
-    </div>
-  );
-};
+      </WorkspaceLayout>
+    );
+  };
 
-export default FieldAgentDashboard;
+  export default FieldAgentDashboard;

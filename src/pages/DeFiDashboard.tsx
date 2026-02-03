@@ -26,8 +26,9 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { DashboardMetricCard, DashboardChart, DashboardTable, type TableColumn } from '@/components/dashboard/shared';
 import Header from '@/components/EnterpriseHeader';
-import Footer from '@/components/Footer';
+import WorkspaceLayout from '@/components/WorkspaceLayout';
 import { useAuth } from '@/hooks/useAuth';
+import { useEnhancedAuth } from '@/hooks/useEnhancedAuth';
 
 interface TokenAsset {
   id: string;
@@ -49,7 +50,12 @@ interface SmartContract {
 
 const DeFiDashboard = () => {
   const { user, loading } = useAuth();
+  const { user: enhancedUser, loading: enhancedLoading } = useEnhancedAuth();
   const navigate = useNavigate();
+  
+  // Use enhanced auth for demo mode, fallback to regular auth
+  const currentUser = enhancedUser || user;
+  const isLoading = enhancedLoading || loading;
   const [tokenAssets, setTokenAssets] = useState<TokenAsset[]>([]);
   const [smartContracts, setSmartContracts] = useState<SmartContract[]>([]);
   const [totalValue, setTotalValue] = useState(0);
@@ -57,7 +63,7 @@ const DeFiDashboard = () => {
   const [gasPrice, setGasPrice] = useState(0);
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!isLoading && !currentUser) {
       navigate('/auth');
       return;
     }
@@ -230,27 +236,13 @@ const DeFiDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="pt-20 pb-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <div className="mb-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <h1 className="text-4xl font-bold text-foreground mb-2">
-                DeFi Dashboard
-              </h1>
-              <p className="text-xl text-muted-foreground">
-                Tokenized assets and smart contract management
-              </p>
-            </motion.div>
-          </div>
-
-          {/* Wallet Connection */}
+    <WorkspaceLayout
+      title="DeFi Dashboard"
+      subtitle="Tokenized assets and smart contract management"
+      userType="defi"
+    >
+      <div className="space-y-8">
+        {/* Wallet Connection */}
           <div className="mb-8">
             <Card className="hover:shadow-lg transition-shadow">
               <CardHeader>
@@ -448,10 +440,8 @@ const DeFiDashboard = () => {
             </div>
           </div>
         </div>
-      </main>
-      <Footer />
-    </div>
-  );
-};
+      </WorkspaceLayout>
+    );
+  };
 
-export default DeFiDashboard;
+  export default DeFiDashboard;

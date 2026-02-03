@@ -1,13 +1,11 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { CreditCard, Network, Shield, Check, X, ArrowLeft } from "lucide-react";
+import { CreditCard, Network, Shield, Check, X, ArrowLeft, Wallet, Leaf } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useAuth } from "@/hooks/useAuth";
-import PaymentProcessAnimation from "@/components/PaymentProcessAnimation";
-import AuthenticationBuildup from "@/components/AuthenticationBuildup";
+import { useEnhancedAuth } from "@/hooks/useEnhancedAuth";
 
 type PaymentMethod = 'paystack' | 'stripe' | 'coinbase' | 'wallet';
 
@@ -19,18 +17,14 @@ interface PaymentData {
   };
   payment: {
     reference: string;
-    authorization_url?: string;
     payment_method: string;
-    network?: string;
-    contract_address?: string;
   };
   paymentMethod: string;
 }
 
 export default function Payment() {
-  const { user, tokens } = useAuth();
+  const { isDemoMode } = useEnhancedAuth();
   const navigate = useNavigate();
-  const { reference } = useParams();
   const [searchParams] = useSearchParams();
   const [paymentData, setPaymentData] = useState<PaymentData | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('paystack');
@@ -38,134 +32,84 @@ export default function Payment() {
   const [isVerified, setIsVerified] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Get payment parameters from URL
+  const projectId = searchParams.get('projectId');
+  const projectTitle = searchParams.get('projectTitle') || 'Carbon Credits';
+  const quantity = parseInt(searchParams.get('quantity') || '1');
+  const amount = parseFloat(searchParams.get('amount') || '0');
+
   useEffect(() => {
-    if (!user) {
-      navigate("/auth");
-      return;
-    }
-
-    // Check if we're in callback mode with payment verification
-    if (reference) {
-      verifyPayment(reference);
-    }
-  }, [user, navigate, reference]);
-
-  const verifyPayment = async (paymentReference: string) => {
-    setIsProcessing(true);
-    setError(null);
-    
-    try {
-      const response = await fetch(`/api/payments/verify/${paymentReference}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        setPaymentData(result);
-        setIsVerified(result.payment.status === 'success');
-      } else {
-        setError(result.error || 'Payment verification failed');
-      }
-    } catch (error) {
-      setError('Failed to verify payment');
-      console.error('Verification error:', error);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const initializePayment = async () => {
-    setIsProcessing(true);
-    setError(null);
-    
-    try {
-      // Get payment parameters from URL or context
-      const listingId = searchParams.get('listingId');
-      const quantity = parseInt(searchParams.get('quantity') || '1');
-      const amount = parseFloat(searchParams.get('amount') || '0');
-
-      if (!listingId || !amount) {
-        throw new Error('Missing payment parameters');
-      }
-
-      const response = await fetch('/api/payments/initialize', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${tokens?.accessToken}`,
-        },
-        body: JSON.stringify({
-          listingId,
-          quantity,
-          buyerId: user?.id,
-          email: user?.email,
+    // Initialize payment data from URL params for demo mode
+    if (projectId && amount > 0) {
+      setPaymentData({
+        order: {
+          id: `ORD-${Date.now()}`,
           amount,
-          paymentMethod,
-          currency: paymentMethod === 'wallet' ? 'ETH' : 'USD',
-        }),
+          quantity,
+        },
+        payment: {
+          reference: `PAY-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
+          payment_method: paymentMethod,
+        },
+        paymentMethod: 'Demo Payment',
       });
-
-      const result = await response.json();
-
-      if (result.success) {
-        setPaymentData(result);
-        
-        // Redirect to payment provider if needed
-        if (result.payment.authorization_url) {
-          window.location.href = result.payment.authorization_url;
-        }
-      } else {
-        setError(result.error || 'Payment initialization failed');
-      }
-    } catch (error) {
-      setError('Failed to initialize payment');
-      console.error('Initialization error:', error);
-    } finally {
-      setIsProcessing(false);
     }
-  };
+  }, [projectId, amount, quantity, paymentMethod]);
 
-  const handleCryptoPayment = async () => {
+  const handleProcessPayment = async () => {
     setIsProcessing(true);
     setError(null);
-    
+
     try {
-      // This would normally interact with MetaMask or other wallet
+      // Simulate payment processing
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
+
       setIsVerified(true);
-    } catch (error) {
-      setError('Failed to connect wallet or process payment');
-      console.error('Crypto payment error:', error);
+    } catch (error: any) {
+      setError('Failed to process payment');
+      console.error('Payment error:', error);
     } finally {
       setIsProcessing(false);
     }
   };
 
   const handleRetry = () => {
-    if (reference) {
-      verifyPayment(reference);
-    } else {
-      initializePayment();
-    }
+    setIsVerified(false);
+    setError(null);
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800">
+      {/* Header */}
+      <header className="border-b border-slate-700 bg-slate-900/50 backdrop-blur-sm">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center">
+                <Leaf className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-white">Atlas Sanctum</h1>
+                <p className="text-sm text-slate-400">Secure Payment</p>
+              </div>
+            </div>
+            <Badge variant="outline" className="border-slate-600 text-slate-300">
+              {isDemoMode ? 'Demo Mode' : 'Production'}
+            </Badge>
+          </div>
+        </div>
+      </header>
+
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
-          <h1 className="text-3xl font-semibold text-foreground mb-4">
+          <h1 className="text-3xl font-semibold text-white mb-4">
             Payment Processing
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-slate-400">
             {isVerified ? 'Your payment has been processed successfully!' : 
              isProcessing ? 'Processing your payment...' : 
              'Complete your payment to support regenerative projects'}
@@ -175,59 +119,63 @@ export default function Payment() {
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Payment Details */}
           <div className="space-y-6">
-            <Card className="bg-card/50 border-border/50">
+            <Card className="bg-slate-800/50 border-slate-700">
               <CardHeader>
-                <CardTitle className="text-lg">Payment Summary</CardTitle>
+                <CardTitle className="text-lg text-white">Payment Summary</CardTitle>
               </CardHeader>
               <CardContent>
                 {paymentData ? (
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground">Reference</span>
-                      <span className="font-mono text-sm">{paymentData.payment.reference}</span>
+                      <span className="text-slate-400">Project</span>
+                      <span className="text-white font-medium">{projectTitle}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground">Amount</span>
-                      <span className="font-medium">
+                      <span className="text-slate-400">Reference</span>
+                      <span className="font-mono text-sm text-emerald-400">{paymentData.payment.reference}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-400">Amount</span>
+                      <span className="font-medium text-white">
                         ${paymentData.order.amount.toFixed(2)}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground">Quantity</span>
-                      <span>{paymentData.order.quantity}</span>
+                      <span className="text-slate-400">Quantity</span>
+                      <span className="text-white">{paymentData.order.quantity} credits</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground">Payment Method</span>
-                      <Badge variant="secondary">
-                        {paymentData.paymentMethod}
+                      <span className="text-slate-400">Payment Method</span>
+                      <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
+                        {paymentMethod}
                       </Badge>
                     </div>
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-muted-foreground">
-                    Payment details will be displayed here
+                  <div className="text-center py-8 text-slate-400">
+                    No payment details found
                   </div>
                 )}
               </CardContent>
             </Card>
 
             {/* Security Info */}
-            <Card className="bg-card/50 border-border/50">
+            <Card className="bg-slate-800/50 border-slate-700">
               <CardHeader>
-                <CardTitle className="text-lg">Security Information</CardTitle>
+                <CardTitle className="text-lg text-white">Security Information</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2 text-sm text-muted-foreground">
+                <div className="space-y-2 text-sm text-slate-400">
                   <div className="flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-primary" />
+                    <Shield className="w-4 h-4 text-emerald-400" />
                     <span>All payments are encrypted and secure</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-primary" />
+                    <Shield className="w-4 h-4 text-emerald-400" />
                     <span>Your payment information is never stored</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-primary" />
+                    <Shield className="w-4 h-4 text-emerald-400" />
                     <span>Transactions are processed by secure payment gateways</span>
                   </div>
                 </div>
@@ -241,18 +189,18 @@ export default function Payment() {
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-red-50 border border-red-200 rounded-lg p-4"
+                className="bg-red-500/10 border border-red-500/30 rounded-lg p-4"
               >
                 <div className="flex items-center gap-2 mb-2">
-                  <X className="w-4 h-4 text-red-500" />
-                  <h3 className="font-medium text-red-800">Payment Failed</h3>
+                  <X className="w-4 h-4 text-red-400" />
+                  <h3 className="font-medium text-red-400">Payment Failed</h3>
                 </div>
-                <p className="text-sm text-red-700">{error}</p>
+                <p className="text-sm text-red-300">{error}</p>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={handleRetry}
-                  className="mt-3"
+                  className="mt-3 border-slate-600 text-slate-300 hover:bg-slate-800"
                 >
                   Try Again
                 </Button>
@@ -263,72 +211,72 @@ export default function Payment() {
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-green-50 border border-green-200 rounded-lg p-6 text-center"
+                className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-6 text-center"
               >
-                <Check className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-green-800 mb-2">
+                <Check className="w-16 h-16 text-emerald-400 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-white mb-2">
                   Payment Successful!
                 </h3>
-                <p className="text-green-700 mb-4">
+                <p className="text-slate-300 mb-4">
                   Your transaction has been processed successfully.
                 </p>
                 <div className="space-y-2">
-                  <p className="text-sm text-green-600">
-                    Reference: <span className="font-mono">{paymentData?.payment.reference}</span>
+                  <p className="text-sm text-slate-400">
+                    Reference: <span className="font-mono text-emerald-400">{paymentData?.payment.reference}</span>
                   </p>
-                  <p className="text-sm text-green-600">
+                  <p className="text-sm text-slate-400">
                     Amount: ${paymentData?.order.amount.toFixed(2)}
                   </p>
                 </div>
                 <Button
-                  className="mt-6"
+                  className="mt-6 bg-emerald-500 hover:bg-emerald-600"
                   onClick={() => navigate('/marketplace')}
                 >
                   Continue Shopping
                 </Button>
               </motion.div>
             ) : isProcessing ? (
-              <Card className="bg-card/50 border-border/50">
+              <Card className="bg-slate-800/50 border-slate-700">
                 <CardContent className="p-8 text-center">
-                  <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
-                  <h3 className="text-lg font-medium text-foreground mb-2">
+                  <div className="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin mx-auto mb-4"></div>
+                  <h3 className="text-lg font-medium text-white mb-2">
                     Processing Payment...
                   </h3>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-slate-400 text-sm">
                     Please wait while we process your transaction
                   </p>
                 </CardContent>
               </Card>
             ) : (
-              <Card className="bg-card/50 border-border/50">
+              <Card className="bg-slate-800/50 border-slate-700">
                 <CardHeader>
-                  <CardTitle className="text-lg">Select Payment Method</CardTitle>
+                  <CardTitle className="text-lg text-white">Select Payment Method</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {/* Fiat Payment Methods */}
                   <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+                    <h4 className="text-sm font-medium text-slate-400 uppercase tracking-wider">
                       Fiat Payments
                     </h4>
                     <Button
                       variant={paymentMethod === 'paystack' ? 'default' : 'outline'}
-                      className="w-full justify-start"
+                      className={`w-full justify-start ${paymentMethod === 'paystack' ? 'bg-emerald-500 hover:bg-emerald-600' : 'border-slate-600 text-white hover:bg-slate-800'}`}
                       onClick={() => setPaymentMethod('paystack')}
                     >
                       <CreditCard className="w-5 h-5 mr-3" />
                       Paystack
-                      <span className="ml-auto text-sm text-muted-foreground">
-                        Best for African payments
+                      <span className="ml-auto text-sm text-slate-400">
+                        Cards, Bank Transfer
                       </span>
                     </Button>
                     <Button
                       variant={paymentMethod === 'stripe' ? 'default' : 'outline'}
-                      className="w-full justify-start"
+                      className={`w-full justify-start ${paymentMethod === 'stripe' ? 'bg-emerald-500 hover:bg-emerald-600' : 'border-slate-600 text-white hover:bg-slate-800'}`}
                       onClick={() => setPaymentMethod('stripe')}
                     >
                       <CreditCard className="w-5 h-5 mr-3" />
                       Stripe
-                      <span className="ml-auto text-sm text-muted-foreground">
+                      <span className="ml-auto text-sm text-slate-400">
                         Credit & debit cards
                       </span>
                     </Button>
@@ -336,39 +284,39 @@ export default function Payment() {
 
                   {/* Crypto Payment Methods */}
                   <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+                    <h4 className="text-sm font-medium text-slate-400 uppercase tracking-wider">
                       Crypto Payments
                     </h4>
                     <Button
                       variant={paymentMethod === 'coinbase' ? 'default' : 'outline'}
-                      className="w-full justify-start"
+                      className={`w-full justify-start ${paymentMethod === 'coinbase' ? 'bg-emerald-500 hover:bg-emerald-600' : 'border-slate-600 text-white hover:bg-slate-800'}`}
                       onClick={() => setPaymentMethod('coinbase')}
                     >
                       <Network className="w-5 h-5 mr-3" />
                       Coinbase
-                      <span className="ml-auto text-sm text-muted-foreground">
+                      <span className="ml-auto text-sm text-slate-400">
                         Multiple cryptocurrencies
                       </span>
                     </Button>
                     <Button
                       variant={paymentMethod === 'wallet' ? 'default' : 'outline'}
-                      className="w-full justify-start"
+                      className={`w-full justify-start ${paymentMethod === 'wallet' ? 'bg-emerald-500 hover:bg-emerald-600' : 'border-slate-600 text-white hover:bg-slate-800'}`}
                       onClick={() => setPaymentMethod('wallet')}
                     >
-                      <Network className="w-5 h-5 mr-3" />
+                      <Wallet className="w-5 h-5 mr-3" />
                       MetaMask
-                      <span className="ml-auto text-sm text-muted-foreground">
+                      <span className="ml-auto text-sm text-slate-400">
                         Web3 wallet
                       </span>
                     </Button>
                   </div>
 
                   <Button
-                    className="w-full mt-6"
-                    onClick={paymentMethod === 'wallet' ? handleCryptoPayment : initializePayment}
+                    className="w-full mt-6 bg-emerald-500 hover:bg-emerald-600"
+                    onClick={handleProcessPayment}
                     disabled={isProcessing}
                   >
-                    {isProcessing ? 'Processing...' : 'Complete Payment'}
+                    {isProcessing ? 'Processing...' : `Pay $${amount.toFixed(2)}`}
                   </Button>
                 </CardContent>
               </Card>
@@ -381,7 +329,7 @@ export default function Payment() {
           <Button
             variant="outline"
             onClick={() => navigate('/marketplace')}
-            className="flex items-center gap-2 mx-auto"
+            className="flex items-center gap-2 mx-auto border-slate-600 text-white hover:bg-slate-800"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Marketplace

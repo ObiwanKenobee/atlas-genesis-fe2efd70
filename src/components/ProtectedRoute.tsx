@@ -30,6 +30,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     if (loading) return;
 
     // Redirect to auth if not authenticated
+    // Allow demo mode users to access protected routes
     if (!user && !isDemoMode) {
       navigate('/auth');
       return;
@@ -37,10 +38,13 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
     // Check role requirements
     if (requiredRole && user?.role !== requiredRole) {
-      // If user is admin, they can access everything
-      if (user?.role !== 'administrator' && user?.role !== 'super_admin') {
-        navigate('/auth');
-        return;
+      // Demo mode users should be allowed through
+      if (!isDemoMode) {
+        // If user is admin, they can access everything
+        if (user?.role !== 'administrator' && user?.role !== 'super_admin') {
+          navigate('/auth');
+          return;
+        }
       }
     }
 

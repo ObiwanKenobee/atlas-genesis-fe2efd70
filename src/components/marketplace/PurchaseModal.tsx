@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Minus, Plus, Leaf, ShieldCheck, CreditCard, Wallet, Network } from 'lucide-react';
 import {
@@ -24,6 +25,7 @@ interface PurchaseModalProps {
 type PaymentMethod = 'paystack' | 'stripe' | 'coinbase' | 'wallet';
 
 export function PurchaseModal({ project, isOpen, onClose }: PurchaseModalProps) {
+  const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('paystack');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -40,14 +42,6 @@ export function PurchaseModal({ project, isOpen, onClose }: PurchaseModalProps) 
     setPaymentStep('processing');
 
     try {
-      // Mock payment initialization for testing
-      const data = {
-        success: true,
-        payment: {
-          authorization_url: 'https://example.com/payment',
-        },
-      };
-
       if (paymentMethod === 'wallet') {
         // Crypto wallet payment - simulate connection
         await new Promise(resolve => setTimeout(resolve, 2000));
@@ -56,11 +50,16 @@ export function PurchaseModal({ project, isOpen, onClose }: PurchaseModalProps) 
           toast.success('Payment successful!');
           onClose();
         }, 1500);
-      } else if (data.payment.authorization_url) {
-        // Redirect to payment provider
-        window.location.href = data.payment.authorization_url;
       } else {
-        throw new Error('No payment URL received');
+        // Redirect to local payment page with project details
+        const params = new URLSearchParams({
+          projectId: project.id,
+          projectTitle: project.title,
+          quantity: quantity.toString(),
+          amount: totalPrice.toString(),
+          paymentMethod,
+        });
+        navigate(`/payment?${params.toString()}`);
       }
     } catch (error: any) {
       console.error('Payment error:', error);

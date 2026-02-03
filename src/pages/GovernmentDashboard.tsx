@@ -2,214 +2,80 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  Building2,
+  Building,
   TrendingUp,
   Target,
+  BarChart3,
   Users,
   CheckCircle,
   AlertTriangle,
   Globe,
+  Zap,
   FileText,
   ArrowUpRight,
-  MapPin,
-  Calendar,
-  Plus,
-  BarChart3,
+  Settings,
   Shield,
   Activity,
+  Calendar,
+  Plus,
   Database,
-  Clock,
-  XCircle,
-  Lock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { DashboardMetricCard, DashboardChart, DashboardTable, type TableColumn } from '@/components/dashboard/shared';
-import Header from '@/components/EnterpriseHeader';
-import Footer from '@/components/Footer';
+import { DashboardMetricCard, DashboardChart, type TableColumn } from '@/components/dashboard/shared';
+import WorkspaceLayout from '@/components/WorkspaceLayout';
 import { useAuth } from '@/hooks/useAuth';
+import { useEnhancedAuth } from '@/hooks/useEnhancedAuth';
 
-interface RegionalMetric {
-  region: string;
-  projects: number;
-  funding: number;
-  impact: number;
-  progress: number;
-}
-
-interface FundingRequest {
-  id: string;
-  project: string;
-  region: string;
-  amount: number;
-  status: 'pending' | 'approved' | 'rejected' | 'disbursed';
-  submittedDate: string;
+interface MetricData {
+  label: string;
+  value: number;
+  change: number;
+  trend: 'up' | 'down' | 'stable';
+  target: number;
 }
 
 const GovernmentDashboard = () => {
   const { user, loading } = useAuth();
+  const { user: enhancedUser, loading: enhancedLoading } = useEnhancedAuth();
   const navigate = useNavigate();
-  const [regionalMetrics, setRegionalMetrics] = useState<RegionalMetric[]>([]);
-  const [fundingRequests, setFundingRequests] = useState<FundingRequest[]>([]);
-  const [totalFunding, setTotalFunding] = useState(0);
-  const [approvedFunding, setApprovedFunding] = useState(0);
-  const [activeRegions, setActiveRegions] = useState(0);
+  
+  const currentUser = enhancedUser || user;
+  const isLoading = enhancedLoading || loading;
+  const [metrics, setMetrics] = useState<MetricData[]>([]);
+  const [complianceScore, setComplianceScore] = useState(0);
+  const [partnershipsActive, setPartnershipsActive] = useState(0);
+  const [reportsGenerated, setReportsGenerated] = useState(0);
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!isLoading && !currentUser) {
       navigate('/auth');
       return;
     }
 
-    // Mock data for demo
-    const mockRegionalMetrics: RegionalMetric[] = [
-      { region: 'North America', projects: 245, funding: 45000000, impact: 125000, progress: 78 },
-      { region: 'Europe', projects: 189, funding: 32000000, impact: 98000, progress: 85 },
-      { region: 'Asia Pacific', projects: 312, funding: 58000000, impact: 156000, progress: 72 },
-      { region: 'Africa', projects: 156, funding: 24000000, impact: 78000, progress: 65 },
-      { region: 'South America', projects: 98, funding: 18000000, impact: 54000, progress: 82 },
-    ];
-
-    const mockFundingRequests: FundingRequest[] = [
-      {
-        id: '1',
-        project: 'Amazon Rainforest Protection Phase 2',
-        region: 'South America',
-        amount: 15000000,
-        status: 'approved',
-        submittedDate: '2025-01-28',
-      },
-      {
-        id: '2',
-        project: 'Sahel Green Belt Initiative',
-        region: 'Africa',
-        amount: 8500000,
-        status: 'disbursed',
-        submittedDate: '2025-01-25',
-      },
-      {
-        id: '3',
-        project: 'Southeast Asia Reforestation',
-        region: 'Asia Pacific',
-        amount: 12000000,
-        status: 'pending',
-        submittedDate: '2025-01-30',
-      },
-      {
-        id: '4',
-        project: 'European Wetland Restoration',
-        region: 'Europe',
-        amount: 9500000,
-        status: 'approved',
-        submittedDate: '2025-01-20',
-      },
-      {
-        id: '5',
-        project: 'North American Urban Forestry',
-        region: 'North America',
-        amount: 5000000,
-        status: 'rejected',
-        submittedDate: '2025-01-15',
-      },
-    ];
-
-    setRegionalMetrics(mockRegionalMetrics);
-    setFundingRequests(mockFundingRequests);
-    setTotalFunding(178000000);
-    setApprovedFunding(24500000);
-    setActiveRegions(5);
+    setComplianceScore(95);
+    setPartnershipsActive(8);
+    setReportsGenerated(24);
+    setMetrics([
+      { label: 'Total Budget Allocated', value: 4500000, change: 12.5, trend: 'up', target: 5000000 },
+      { label: 'Projects Completed', value: 156, change: 8.3, trend: 'up', target: 200 },
+      { label: 'Lives Impacted', value: 125000, change: 15.2, trend: 'up', target: 150000 },
+      { label: 'Hectares Restored', value: 45000, change: 22.1, trend: 'up', target: 60000 },
+    ]);
   }, [user, loading, navigate]);
 
-  const regionalColumns: TableColumn<RegionalMetric>[] = [
-    {
-      key: 'region',
-      title: 'Region',
-      render: (value) => (
-        <div className="flex items-center gap-2">
-          <MapPin className="w-4 h-4 text-muted-foreground" />
-          <span>{value}</span>
-        </div>
-      ),
-    },
-    {
-      key: 'projects',
-      title: 'Projects',
-      render: (value) => `${value} active`,
-    },
-    {
-      key: 'funding',
-      title: 'Funding',
-      render: (value) => `$${(Number(value) / 1000000).toFixed(1)}M`,
-    },
-    {
-      key: 'impact',
-      title: 'Impact',
-      render: (value) => `${(Number(value) / 1000).toFixed(0)}K tons`,
-    },
-    {
-      key: 'progress',
-      title: 'Progress',
-      render: (value) => (
-        <div className="w-24">
-          <Progress value={value as number} className="h-2" />
-          <span className="text-xs text-muted-foreground mt-1">{value}%</span>
-        </div>
-      ),
-    },
-  ];
-
-  const fundingColumns: TableColumn<FundingRequest>[] = [
-    {
-      key: 'project',
-      title: 'Project',
-    },
-    {
-      key: 'region',
-      title: 'Region',
-    },
-    {
-      key: 'amount',
-      title: 'Amount',
-      render: (value) => `$${value.toLocaleString()}`,
-    },
-    {
-      key: 'status',
-      title: 'Status',
-      render: (value) => {
-        const statusConfig = {
-          pending: { color: 'bg-amber-500/10 text-amber-500', icon: Clock },
-          approved: { color: 'bg-emerald-500/10 text-emerald-500', icon: CheckCircle },
-          disbursed: { color: 'bg-blue-500/10 text-blue-500', icon: CheckCircle },
-          rejected: { color: 'bg-red-500/10 text-red-500', icon: XCircle },
-        };
-        const config = statusConfig[value as keyof typeof statusConfig];
-        const Icon = config.icon;
-        return (
-          <Badge className={config.color}>
-            <Icon className="w-3 h-3 mr-1" />
-            {value}
-          </Badge>
-        );
-      },
-    },
-    {
-      key: 'submittedDate',
-      title: 'Submitted',
-      render: (value) => new Date(value).toLocaleDateString(),
-    },
-  ];
+  const budgetProgress = (4500000 / 5000000) * 100;
+  const projectProgress = (156 / 200) * 100;
+  const impactProgress = (125000 / 150000) * 100;
+  const restorationProgress = (45000 / 60000) * 100;
 
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-            className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full mx-auto mb-4"
-          />
+          <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }} className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full mx-auto mb-4" />
           <p className="text-muted-foreground">Loading dashboard...</p>
         </div>
       </div>
@@ -217,223 +83,193 @@ const GovernmentDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="pt-20 pb-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <div className="mb-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <h1 className="text-4xl font-bold text-foreground mb-2">
-                Government Dashboard
-              </h1>
-              <p className="text-xl text-muted-foreground">
-                National/regional oversight and outcome-based funding
-              </p>
-            </motion.div>
-          </div>
+    <WorkspaceLayout title="Government Dashboard" subtitle="Oversee partnerships, compliance, and policy initiatives" userType="government">
+      <div className="space-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <DashboardMetricCard title="Compliance Score" value={`${complianceScore}%`} change={5.2} icon={Shield} iconColor="text-emerald-500" trend="up" description="Regulatory compliance rate" />
+          <DashboardMetricCard title="Active Partnerships" value={partnershipsActive} change={-2.1} icon={Building} iconColor="text-blue-500" trend="down" description="Government partnerships" />
+          <DashboardMetricCard title="Reports Generated" value={reportsGenerated} change={18.5} icon={FileText} iconColor="text-purple-500" trend="up" description="Monthly reports" />
+          <DashboardMetricCard title="Budget Utilized" value="$4.5M" change={8.7} icon={Activity} iconColor="text-amber-500" trend="up" description="Of $5M allocated" />
+        </div>
 
-          {/* Key Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <DashboardMetricCard
-              title="Total Funding"
-              value={`$${(totalFunding / 1000000).toFixed(1)}M`}
-              change={12.5}
-              icon={Target}
-              iconColor="text-emerald-500"
-              trend="up"
-              description="Allocated across all regions"
-            />
-            <DashboardMetricCard
-              title="Approved Funding"
-              value={`$${(approvedFunding / 1000000).toFixed(1)}M`}
-              change={8.3}
-              icon={CheckCircle}
-              iconColor="text-blue-500"
-              trend="up"
-              description="Funding approved for disbursement"
-            />
-            <DashboardMetricCard
-              title="Active Regions"
-              value={activeRegions}
-              change={5.2}
-              icon={Globe}
-              iconColor="text-purple-500"
-              trend="up"
-              description="Regions with active projects"
-            />
-            <DashboardMetricCard
-              title="Total Impact"
-              value="506K"
-              change={15.7}
-              icon={TrendingUp}
-              iconColor="text-green-500"
-              trend="up"
-              description="Tons CO2 offset this year"
-            />
-          </div>
-
-          {/* Regional Overview */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <DashboardTable
-              title="Regional Performance"
-              icon={Globe}
-              iconColor="text-emerald-500"
-              columns={regionalColumns}
-              data={regionalMetrics}
-              onRowClick={(region) => console.log('View region:', region.region)}
-              emptyMessage="No regional data available."
-            />
-
-            <DashboardTable
-              title="Funding Requests"
-              icon={Target}
-              iconColor="text-blue-500"
-              columns={fundingColumns}
-              data={fundingRequests}
-              onRowClick={(request) => console.log('View request:', request.id)}
-              emptyMessage="No funding requests found."
-            />
-          </div>
-
-          {/* Quick Actions */}
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-foreground mb-4">Quick Actions</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Button
-                asChild
-                size="lg"
-                className="gap-2 h-auto py-6 flex-col"
-              >
-                <a href="#" className="flex items-center gap-2">
-                  <Plus className="w-6 h-6" />
-                  <span>New Funding Request</span>
-                </a>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="gap-2 h-auto py-6 flex-col"
-              >
-                <a href="#" className="flex items-center gap-2">
-                  <FileText className="w-6 h-6" />
-                  <span>View Reports</span>
-                </a>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="gap-2 h-auto py-6 flex-col"
-              >
-                <a href="#" className="flex items-center gap-2">
-                  <Shield className="w-6 h-6" />
-                  <span>Policy Simulation</span>
-                </a>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="gap-2 h-auto py-6 flex-col"
-              >
-                <a href="#" className="flex items-center gap-2">
-                  <Activity className="w-6 h-6" />
-                  <span>Audit Trail</span>
-                </a>
-              </Button>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <DashboardChart title="Budget Allocation vs Spending" icon={TrendingUp} iconColor="text-emerald-500">
+            <div className="space-y-4">
+              <div>
+                <div className="flex justify-between text-sm mb-1"><span className="text-white">Budget Allocation</span><span className="text-slate-400">$5.0M</span></div>
+                <Progress value={100} className="h-3" />
+              </div>
+              <div>
+                <div className="flex justify-between text-sm mb-1"><span className="text-white">Spending</span><span className="text-slate-400">$4.5M</span></div>
+                <Progress value={budgetProgress} className="h-3 bg-slate-700" />
+              </div>
+              <div>
+                <div className="flex justify-between text-sm mb-1"><span className="text-white">Remaining</span><span className="text-slate-400">$0.5M</span></div>
+                <Progress value={10} className="h-3" />
+              </div>
             </div>
-          </div>
+          </DashboardChart>
 
-          {/* Funding Overview */}
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-foreground mb-4">Funding Distribution</h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <DashboardChart
-                title="Funding by Region"
-                icon={Globe}
-                iconColor="text-emerald-500"
-                description="Regional funding allocation breakdown"
-              >
-                <div className="space-y-4">
-                  {regionalMetrics.map((metric, index) => (
-                    <div key={index} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">{metric.region}</span>
-                        <span className="text-sm text-muted-foreground">
-                          ${(metric.funding / 1000000).toFixed(1)}M
-                        </span>
-                      </div>
-                      <Progress value={metric.progress} className="h-2" />
-                      <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <span>{metric.projects} projects</span>
-                        <span>{(metric.impact / 1000).toFixed(0)}K tons impact</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </DashboardChart>
-
-              <DashboardChart
-                title="Funding Status"
-                icon={Target}
-                iconColor="text-blue-500"
-                description="Current funding request status breakdown"
-              >
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-emerald-500/10 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <CheckCircle className="w-8 h-8 text-emerald-500" />
-                      <div>
-                        <p className="font-semibold">Approved</p>
-                        <p className="text-sm text-muted-foreground">Funding approved for disbursement</p>
-                      </div>
-                    </div>
-                    <span className="text-2xl font-bold text-emerald-500">2</span>
-                  </div>
-                  <div className="flex items-center justify-between p-4 bg-amber-500/10 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <Clock className="w-8 h-8 text-amber-500" />
-                      <div>
-                        <p className="font-semibold">Pending</p>
-                        <p className="text-sm text-muted-foreground">Awaiting review</p>
-                      </div>
-                    </div>
-                    <span className="text-2xl font-bold text-amber-500">1</span>
-                  </div>
-                  <div className="flex items-center justify-between p-4 bg-blue-500/10 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <CheckCircle className="w-8 h-8 text-blue-500" />
-                      <div>
-                        <p className="font-semibold">Disbursed</p>
-                        <p className="text-sm text-muted-foreground">Funds transferred</p>
-                      </div>
-                    </div>
-                    <span className="text-2xl font-bold text-blue-500">1</span>
-                  </div>
-                  <div className="flex items-center justify-between p-4 bg-red-500/10 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <XCircle className="w-8 h-8 text-red-500" />
-                      <div>
-                        <p className="font-semibold">Rejected</p>
-                        <p className="text-sm text-muted-foreground">Request denied</p>
-                      </div>
-                    </div>
-                    <span className="text-2xl font-bold text-red-500">1</span>
-                  </div>
-                </div>
-              </DashboardChart>
+          <DashboardChart title="Program Performance" icon={Target} iconColor="text-blue-500">
+            <div className="space-y-4">
+              <div>
+                <div className="flex justify-between text-sm mb-1"><span className="text-white">Projects Completed</span><span className="text-slate-400">156/200</span></div>
+                <Progress value={projectProgress} className="h-3 bg-slate-700" />
+              </div>
+              <div>
+                <div className="flex justify-between text-sm mb-1"><span className="text-white">Lives Impacted</span><span className="text-slate-400">125K/150K</span></div>
+                <Progress value={impactProgress} className="h-3 bg-slate-700" />
+              </div>
+              <div>
+                <div className="flex justify-between text-sm mb-1"><span className="text-white">Hectares Restored</span><span className="text-slate-400">45K/60K</span></div>
+                <Progress value={restorationProgress} className="h-3 bg-slate-700" />
+              </div>
             </div>
+          </DashboardChart>
+        </div>
+
+        <div>
+          <h2 className="text-2xl font-bold text-white mb-4">Initiative Overview</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 rounded-lg bg-emerald-500/10 flex items-center justify-center"><TrendingUp className="w-6 h-6 text-emerald-500" /></div>
+                  <div><h3 className="font-semibold text-white">Carbon Reduction</h3><p className="text-sm text-slate-400">On track for 2030 goals</p></div>
+                </div>
+                <p className="text-sm text-slate-400 mb-4">Reducing emissions through regenerative agriculture and renewable energy adoption.</p>
+                <Progress value={78} className="h-2 mb-2" />
+                <div className="flex items-center justify-between">
+                  <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30">78% Complete</Badge>
+                  <Button variant="ghost" size="sm" className="gap-1">View Details <ArrowUpRight className="w-4 h-4" /></Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center"><Globe className="w-6 h-6 text-blue-500" /></div>
+                  <div><h3 className="font-semibold text-white">Biodiversity Protection</h3><p className="text-sm text-slate-400">Endangered species recovery</p></div>
+                </div>
+                <p className="text-sm text-slate-400 mb-4">Protecting critical habitats and supporting wildlife corridor development.</p>
+                <Progress value={62} className="h-2 mb-2" />
+                <div className="flex items-center justify-between">
+                  <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/30">62% Complete</Badge>
+                  <Button variant="ghost" size="sm" className="gap-1">View Details <ArrowUpRight className="w-4 h-4" /></Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 rounded-lg bg-purple-500/10 flex items-center justify-center"><Database className="w-6 h-6 text-purple-500" /></div>
+                  <div><h3 className="font-semibold text-white">Data Transparency</h3><p className="text-sm text-slate-400">Public reporting system</p></div>
+                </div>
+                <p className="text-sm text-slate-400 mb-4">Real-time tracking and public disclosure of environmental initiatives.</p>
+                <Progress value={89} className="h-2 mb-2" />
+                <div className="flex items-center justify-between">
+                  <Badge className="bg-purple-500/10 text-purple-400 border-purple-500/30">89% Complete</Badge>
+                  <Button variant="ghost" size="sm" className="gap-1">View Details <ArrowUpRight className="w-4 h-4" /></Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
-      </main>
-      <Footer />
-    </div>
+
+        <div>
+          <h2 className="text-2xl font-bold text-white mb-4">Policy Impact</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center"><CheckCircle className="w-5 h-5 text-emerald-500" /></div>
+                    <h3 className="font-semibold text-white">Regenerative Agriculture Policy</h3>
+                  </div>
+                  <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30">Active</Badge>
+                </div>
+                <p className="text-sm text-slate-400 mb-4">Supporting farmers in transitioning to regenerative practices with subsidies and technical assistance.</p>
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div><p className="text-2xl font-bold text-white">2,450</p><p className="text-xs text-slate-400">Farmers Enrolled</p></div>
+                  <div><p className="text-2xl font-bold text-white">15K</p><p className="text-xs text-slate-400">Hectares Converted</p></div>
+                  <div><p className="text-2xl font-bold text-white">$4.2M</p><p className="text-xs text-slate-400">Investment</p></div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center"><Zap className="w-5 h-5 text-blue-500" /></div>
+                    <h3 className="font-semibold text-white">Renewable Energy Initiative</h3>
+                  </div>
+                  <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/30">In Progress</Badge>
+                </div>
+                <p className="text-sm text-slate-400 mb-4">Accelerating the transition to renewable energy in rural communities.</p>
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div><p className="text-2xl font-bold text-white">85</p><p className="text-xs text-slate-400">Communities</p></div>
+                  <div><p className="text-2xl font-bold text-white">12MW</p><p className="text-xs text-slate-400">Capacity Added</p></div>
+                  <div><p className="text-2xl font-bold text-white">$8.5M</p><p className="text-xs text-slate-400">Investment</p></div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        <div>
+          <h2 className="text-2xl font-bold text-white mb-4">Alerts & Notifications</h2>
+          <div className="space-y-3">
+            <Card className="hover:shadow-lg transition-shadow border-l-4 border-l-emerald-500">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="w-5 h-5 text-emerald-500" />
+                    <div>
+                      <p className="font-medium text-white">Q4 Compliance Report Approved</p>
+                      <p className="text-sm text-slate-400">All regulatory requirements met for the fourth quarter</p>
+                    </div>
+                  </div>
+                  <span className="text-xs text-slate-500">2 hours ago</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow border-l-4 border-l-amber-500">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <AlertTriangle className="w-5 h-5 text-amber-500" />
+                    <div>
+                      <p className="font-medium text-white">Budget Review Required</p>
+                      <p className="text-sm text-slate-400">Quarterly budget review pending approval</p>
+                    </div>
+                  </div>
+                  <span className="text-xs text-slate-500">1 day ago</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow border-l-4 border-l-blue-500">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Calendar className="w-5 h-5 text-blue-500" />
+                    <div>
+                      <p className="font-medium text-white">New Partnership Opportunity</p>
+                      <p className="text-sm text-slate-400">International environmental organization requests meeting</p>
+                    </div>
+                  </div>
+                  <span className="text-xs text-slate-500">3 days ago</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </WorkspaceLayout>
   );
 };
 

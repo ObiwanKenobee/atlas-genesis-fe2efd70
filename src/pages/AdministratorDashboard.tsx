@@ -28,8 +28,9 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { DashboardMetricCard, DashboardChart, DashboardTable, type TableColumn } from '@/components/dashboard/shared';
 import Header from '@/components/EnterpriseHeader';
-import Footer from '@/components/Footer';
+import WorkspaceLayout from '@/components/WorkspaceLayout';
 import { useAuth } from '@/hooks/useAuth';
+import { useEnhancedAuth } from '@/hooks/useEnhancedAuth';
 import { useIsAdmin } from '@/hooks/useAdmin';
 
 interface SystemMetric {
@@ -59,8 +60,13 @@ interface SystemAlert {
 
 const AdministratorDashboard = () => {
   const { user, loading } = useAuth();
+  const { user: enhancedUser, loading: enhancedLoading } = useEnhancedAuth();
   const { data: isAdmin } = useIsAdmin();
   const navigate = useNavigate();
+  
+  // Use enhanced auth for demo mode, fallback to regular auth
+  const currentUser = enhancedUser || user;
+  const isLoading = enhancedLoading || loading;
   const [systemMetrics, setSystemMetrics] = useState<SystemMetric[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [alerts, setAlerts] = useState<SystemAlert[]>([]);
@@ -70,12 +76,12 @@ const AdministratorDashboard = () => {
   const [apiRequests, setApiRequests] = useState(0);
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!isLoading && !currentUser) {
       navigate('/auth');
       return;
     }
 
-    if (!isAdmin) {
+    if (!isAdmin && currentUser?.role !== 'administrator' && currentUser?.role !== 'super_admin') {
       navigate('/dashboard');
       return;
     }
@@ -310,28 +316,14 @@ const AdministratorDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="pt-20 pb-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <div className="mb-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <h1 className="text-4xl font-bold text-foreground mb-2">
-                Administrator Dashboard
-              </h1>
-              <p className="text-xl text-muted-foreground">
-                System oversight and user management
-              </p>
-            </motion.div>
-          </div>
-
-          {/* Key Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <WorkspaceLayout
+      title="Administrator Dashboard"
+      subtitle="System oversight and user management"
+      userType="administrator"
+    >
+      <div className="space-y-8">
+        {/* Key Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <DashboardMetricCard
               title="Total Users"
               value={totalUsers}
@@ -600,10 +592,8 @@ const AdministratorDashboard = () => {
             </div>
           </div>
         </div>
-      </main>
-      <Footer />
-    </div>
-  );
-};
+      </WorkspaceLayout>
+    );
+  };
 
-export default AdministratorDashboard;
+  export default AdministratorDashboard;

@@ -23,8 +23,9 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { DashboardMetricCard, DashboardChart, DashboardTable, type TableColumn } from '@/components/dashboard/shared';
 import Header from '@/components/EnterpriseHeader';
-import Footer from '@/components/Footer';
+import WorkspaceLayout from '@/components/WorkspaceLayout';
 import { useAuth } from '@/hooks/useAuth';
+import { useEnhancedAuth } from '@/hooks/useEnhancedAuth';
 
 interface ResearchProject {
   id: string;
@@ -46,7 +47,12 @@ interface Publication {
 
 const NGODashboard = () => {
   const { user, loading } = useAuth();
+  const { user: enhancedUser, loading: enhancedLoading } = useEnhancedAuth();
   const navigate = useNavigate();
+  
+  // Use enhanced auth for demo mode, fallback to regular auth
+  const currentUser = enhancedUser || user;
+  const isLoading = enhancedLoading || loading;
   const [researchProjects, setResearchProjects] = useState<ResearchProject[]>([]);
   const [publications, setPublications] = useState<Publication[]>([]);
   const [activeProjects, setActiveProjects] = useState(0);
@@ -54,7 +60,7 @@ const NGODashboard = () => {
   const [completedProjects, setCompletedProjects] = useState(0);
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!isLoading && !currentUser) {
       navigate('/auth');
       return;
     }
@@ -243,9 +249,12 @@ const NGODashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="pt-20 pb-16">
+    <WorkspaceLayout
+      title="NGO Dashboard"
+      subtitle="Grant management, impact reporting, and donor relations"
+      userType="ngo"
+    >
+      <div className="space-y-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="mb-8">
@@ -539,10 +548,9 @@ const NGODashboard = () => {
             </div>
           </div>
         </div>
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </WorkspaceLayout>
   );
-};
+}
 
 export default NGODashboard;
