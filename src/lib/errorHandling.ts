@@ -27,11 +27,18 @@ export const errorHandler = {
 
     // Send to monitoring service in production
     if (import.meta.env.PROD) {
-      // Integration point for error monitoring
-      window.gtag?.('event', 'exception', {
-        description: error.message,
-        fatal: error instanceof PlatformError && error.severity === 'critical'
-      });
+      try {
+        // Integration point for error monitoring
+        if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+          window.gtag('event', 'exception', {
+            description: error.message,
+            fatal: error instanceof PlatformError && error.severity === 'critical'
+          });
+        }
+      } catch (gtagError) {
+        // Silently fail if gtag is not available
+        console.debug('Failed to send error to gtag:', gtagError);
+      }
     }
 
     return errorData;
