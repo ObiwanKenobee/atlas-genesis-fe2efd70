@@ -1,27 +1,27 @@
 <!doctype html>
 <html lang="en">
-  <head><!-- Google tag (gtag.js) - Simplified to avoid race conditions -->
-<script>
-  // Initialize dataLayer before GA script loads
-  window.dataLayer = window.dataLayer || [];
-
-  // Create a safe gtag stub that won't conflict with GA's gtag
-  if (typeof window.gtag === 'undefined') {
-    window.gtag = function() {};
-  }
-</script>
+  <head><!-- Google tag (gtag.js) -->
+<!-- Load GA asynchronously; let it manage its own gtag function -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-KSE7DJK5WR"></script>
 <script>
-  // Initialize GA only after the async script may have loaded
-  // GA script will define its own gtag, but we provide a stub just in case
-  window.addEventListener('DOMContentLoaded', function() {
-    if (typeof window.gtag === 'function') {
+  // Wrap gtag calls in try-catch to handle errors gracefully
+  // This creates a safe wrapper that won't break the app if GA fails
+  window.dataLayer = window.dataLayer || [];
+
+  var gtagStub = function(){};
+
+  // Create a proxy that safely calls the real gtag when available
+  var originalGtag = window.gtag;
+  window.gtag = new Proxy(gtagStub, {
+    apply: function(target, thisArg, args) {
       try {
-        window.gtag('js', new Date());
-        window.gtag('config', 'G-KSE7DJK5WR');
+        if (typeof window.gtag === 'function' && window.gtag !== this) {
+          return originalGtag.apply(thisArg, args);
+        }
       } catch(e) {
-        // Silently fail if gtag initialization fails
+        // Silently fail
       }
+      return undefined;
     }
   });
 </script>
