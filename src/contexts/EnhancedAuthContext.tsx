@@ -399,8 +399,8 @@ export const EnhancedAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setIsDemoMode(false);
     setCurrentDemoUser(undefined);
     setStatus('unauthenticated');
-//     navigate('/auth');
-  }, [navigate]);
+    // Navigation handled by component
+  }, []);
 
   // Verify Email
   const verifyEmail = useCallback(async (token: string): Promise<{ error: AuthError | null }> => {

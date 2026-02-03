@@ -15,6 +15,16 @@ export const RoleSpecificOnboarding: React.FC<RoleSpecificOnboardingProps> = ({ 
   const roleData = getRoleSpecificData(role);
   const [currentStep, setCurrentStep] = useState<number>(0);
 
+  if (!roleData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50">
+        <div className="container mx-auto px-4 py-8 text-center">
+          <p className="text-slate-600">Loading onboarding...</p>
+        </div>
+      </div>
+    );
+  }
+
   const handleNext = () => {
     if (currentStep < roleData.steps.length - 1) {
       setCurrentStep(currentStep + 1);

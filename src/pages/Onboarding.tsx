@@ -47,6 +47,10 @@ export default function Onboarding() {
     }
   };
 
+  const handlePrevious = () => {
+    previousStep();
+  };
+
   const handleSkip = () => {
     skipStep(currentStepConfig.id);
     if (onboardingState.currentStep < segmentConfig.onboardingSteps.length - 1) {

@@ -128,19 +128,19 @@ const EnterpriseDashboard = () => {
     {
       key: 'current',
       title: 'Current',
-      render: (value) => `${value.toLocaleString()}`,
+      render: (value) => `${Number(value).toLocaleString()}`,
     },
     {
       key: 'target',
       title: 'Target',
-      render: (value) => `${value.toLocaleString()}`,
+      render: (value) => `${Number(value).toLocaleString()}`,
     },
     {
       key: 'progress',
       title: 'Progress',
       render: (value) => (
         <div className="w-24">
-          <Progress value={value} className="h-2" />
+          <Progress value={value as number} className="h-2" />
           <span className="text-xs text-muted-foreground mt-1">{value}%</span>
         </div>
       ),
@@ -202,7 +202,7 @@ const EnterpriseDashboard = () => {
       title: 'ESG Score',
       render: (value) => (
         <div className="flex items-center gap-2">
-          <Progress value={value} className="h-2 w-16" />
+          <Progress value={value as number} className="h-2 w-16" />
           <span className="text-sm font-semibold">{value}/100</span>
         </div>
       ),
@@ -210,7 +210,7 @@ const EnterpriseDashboard = () => {
     {
       key: 'lastAudit',
       title: 'Last Audit',
-      render: (value) => new Date(value).toLocaleDateString(),
+      render: (value) => new Date(String(value)).toLocaleDateString(),
     },
   ];
 

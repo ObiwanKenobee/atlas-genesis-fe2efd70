@@ -157,21 +157,24 @@ const DeFiDashboard = () => {
     {
       key: 'balance',
       title: 'Balance',
-      render: (value) => `${value.toLocaleString()} tokens`,
+      render: (value) => `${Number(value).toLocaleString()} tokens`,
     },
     {
       key: 'value',
       title: 'Value',
-      render: (value) => `$${value.toFixed(2)}`,
+      render: (value) => `$${Number(value).toFixed(2)}`,
     },
     {
       key: 'change24h',
       title: '24h Change',
-      render: (value) => (
-        <span className={value > 0 ? 'text-emerald-500' : 'text-red-500'}>
-          {value > 0 ? '+' : ''}{value}%
-        </span>
-      ),
+      render: (value) => {
+        const numValue = Number(value);
+        return (
+          <span className={numValue > 0 ? 'text-emerald-500' : 'text-red-500'}>
+            {numValue > 0 ? '+' : ''}{numValue}%
+          </span>
+        );
+      },
     },
   ];
 

@@ -197,6 +197,10 @@ export const getRoleDisplayName = (role: UserRole): string => {
     defi: 'DeFi User',
     ngo: 'NGO Manager',
     super_admin: 'Super Administrator',
+    producer: 'Regenerative Producer',
+    investor: 'Impact Investor',
+    institution: 'Public Institution',
+    knowledge_builder: 'Knowledge Builder',
   };
 
   return roleNames[role] || role;
@@ -216,6 +220,10 @@ export const getRoleDescription = (role: UserRole): string => {
     defi: 'DeFi users and token holders',
     ngo: 'Non-profit organizations',
     super_admin: 'Super administrators with full system access',
+    producer: 'Regenerative land and ocean stewards',
+    investor: 'Impact investors seeking verified projects',
+    institution: 'Public institutions and government agencies',
+    knowledge_builder: 'Researchers, builders, and educators',
   };
 
   return descriptions[role] || '';

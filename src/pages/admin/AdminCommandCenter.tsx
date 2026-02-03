@@ -47,7 +47,7 @@ interface ActiveSession {
 }
 
 const AdminCommandCenter: React.FC = () => {
-  const { isAuthenticated, isLoading } = useAdminAuth();
+  const { isAdmin: isAuthenticated, loading: isLoading } = useAdminAuth();
   const [commandLogs, setCommandLogs] = useState<CommandLog[]>([]);
   const [systemMetrics, setSystemMetrics] = useState<SystemMetric[]>([]);
   const [activeSessions, setActiveSessions] = useState<ActiveSession[]>([]);

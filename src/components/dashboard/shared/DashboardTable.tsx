@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 export interface TableColumn<T> {
   key: keyof T;
   title: string;
-  render?: (value: unknown, row: T) => React.ReactNode;
+  render?: (value: T[keyof T], row: T) => React.ReactNode;
   sortable?: boolean;
 }
 
@@ -22,7 +22,7 @@ interface DashboardTableProps<T> {
   loading?: boolean;
 }
 
-export function DashboardTable<T extends Record<string, unknown>>({
+export function DashboardTable<T extends object>({
   title,
   icon: Icon,
   iconColor = 'text-emerald-500',

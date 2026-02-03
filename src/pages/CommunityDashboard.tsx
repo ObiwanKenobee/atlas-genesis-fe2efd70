@@ -190,7 +190,7 @@ const CommunityDashboard = () => {
       title: 'Progress',
       render: (value) => (
         <div className="w-24">
-          <Progress value={value} className="h-2" />
+          <Progress value={value as number} className="h-2" />
           <span className="text-xs text-muted-foreground mt-1">{value}%</span>
         </div>
       ),
@@ -198,7 +198,7 @@ const CommunityDashboard = () => {
     {
       key: 'startDate',
       title: 'Start Date',
-      render: (value) => new Date(value).toLocaleDateString(),
+      render: (value) => new Date(String(value)).toLocaleDateString(),
     },
   ];
 
@@ -219,12 +219,12 @@ const CommunityDashboard = () => {
     {
       key: 'downloads',
       title: 'Downloads',
-      render: (value) => `${value.toLocaleString()}`,
+      render: (value) => `${Number(value).toLocaleString()}`,
     },
     {
       key: 'lastUpdated',
       title: 'Last Updated',
-      render: (value) => new Date(value).toLocaleDateString(),
+      render: (value) => new Date(String(value)).toLocaleDateString(),
     },
   ];
 
