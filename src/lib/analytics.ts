@@ -96,17 +96,12 @@ export const { trackEvent, trackPageView, trackEngagement, trackPerformance, tra
 
 // Initialize Google Analytics
 export const initGA = () => {
-  if (typeof window !== 'undefined' && !window.gtag) {
-    const script = document.createElement('script');
-    script.async = true;
-    script.src = 'https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID';
-    document.head.appendChild(script);
-    
-    window.dataLayer = window.dataLayer || [];
-    window.gtag = function(...args: any[]) {
-      window.dataLayer!.push(args);
-    };
-    window.gtag('js', new Date());
-    window.gtag('config', 'GA_MEASUREMENT_ID');
+  if (typeof window !== 'undefined') {
+    // gtag is already defined in index.html, so we don't need to redefine it
+    // The gtag function from HTML is sufficient for event tracking
+    if (typeof window.gtag === 'function') {
+      // gtag is already available, no need to initialize
+      return;
+    }
   }
 };
