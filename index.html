@@ -3,16 +3,41 @@
   <head><!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-KSE7DJK5WR"></script>
 <script>
-  window.dataLayer = window.dataLayer || [];
-  window.gtag = function(){
-    try {
-      if (window.dataLayer && typeof window.dataLayer.push === 'function') {
-        window.dataLayer.push(Array.prototype.slice.call(arguments));
+  (function() {
+    // Initialize dataLayer as an array
+    if (typeof window !== 'undefined') {
+      window.dataLayer = window.dataLayer || [];
+
+      // Define gtag function with comprehensive error handling
+      window.gtag = function(){
+        try {
+          // Ensure dataLayer is still an array
+          if (!Array.isArray(window.dataLayer)) {
+            window.dataLayer = [];
+          }
+
+          // Safely convert arguments to array
+          var args = [];
+          for (var i = 0; i < arguments.length; i++) {
+            args.push(arguments[i]);
+          }
+
+          // Push to dataLayer
+          window.dataLayer.push(args);
+        } catch(e) {
+          // Fail silently to prevent breaking the app
+          if (typeof console !== 'undefined' && console.debug) {
+            console.debug('gtag error:', e);
+          }
+        }
+      };
+
+      // Ensure gtag is callable even if GA script fails
+      if (typeof window.gtag !== 'function') {
+        window.gtag = function() {};
       }
-    } catch(e) {
-      // Silently fail to prevent breaking the app
     }
-  };
+  })();
 </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
