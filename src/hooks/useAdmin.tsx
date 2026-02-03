@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { CarbonProject, Transaction } from "@/types/marketplace";
 
 export const useIsAdmin = () => {
-  const { user } = useAuth();
+  const { user } = useSupabaseAuth();
   
   return useQuery({
     queryKey: ['isAdmin', user?.id],

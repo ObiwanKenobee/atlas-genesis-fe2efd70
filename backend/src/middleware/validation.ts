@@ -203,7 +203,7 @@ export const validateRequestWithZod = (schemas: {
   sanitize?: boolean;
 }) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    const middlewares = [];
+    const middlewares: Array<(req: Request, res: Response, next: NextFunction) => void> = [];
 
     if (schemas.params) {
       middlewares.push(validateParamsWithZod(schemas.params, options));

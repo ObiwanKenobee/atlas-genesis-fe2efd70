@@ -14,69 +14,237 @@ import {
   Sparkles,
   CreditCard,
   Star,
+  Users as UsersIcon,
+  Briefcase,
+  GraduationCap,
+  TreePine,
+  Factory,
+  TrendingUp,
+  Network,
+  Heart,
+  Database,
+  DollarSign,
+  FileText,
+  BookOpen,
+  Lock,
+  Award,
+  Layout,
+  UsersRound,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-const PLANS = [
+const BUSINESS_MODEL_SEGMENTS = [
   {
-    id: "starter",
-    name: "Starter",
-    description: "Perfect for individuals starting their carbon journey",
-    monthlyPrice: 0,
-    yearlyPrice: 0,
-    features: [
-      "Up to 10 carbon credit purchases/month",
-      "Basic portfolio tracking",
-      "Email transaction receipts",
-      "Standard verification",
-      "Community support",
-    ],
-    cta: "Get Started Free",
-    popular: false,
-    icon: Leaf,
+    id: "infrastructure",
+    name: "Infrastructure-as-a-Utility",
+    primaryCustomers: "Governments, multilaterals, regional blocs",
+    whatIsBeingPriced: "Regenerative data infrastructure, national dashboards, outcome verification",
+    pricingMechanism: "Long-term service contracts (3–10 yrs)",
+    priceRange: "$500K – $10M+ per year",
+    valueJustification: "Critical public infrastructure for trust, compliance, and planning",
+    icon: Database,
+    color: "text-blue-500",
+    gradient: "from-blue-500 to-cyan-600",
   },
   {
-    id: "professional",
-    name: "Professional",
-    description: "For businesses committed to sustainability",
-    monthlyPrice: 49,
-    yearlyPrice: 470,
-    features: [
-      "Unlimited carbon credit purchases",
-      "Advanced portfolio analytics",
-      "Priority email & chat support",
-      "Enhanced verification & certificates",
-      "API access (1,000 calls/month)",
-      "Team member access (up to 5)",
-      "Custom impact reports",
-    ],
-    cta: "Start Professional",
-    popular: true,
-    icon: Zap,
+    id: "multi-sided-market",
+    name: "Multi-Sided Market (RVE)",
+    primaryCustomers: "Corporates, cities, funds",
+    whatIsBeingPriced: "Verified regenerative assets (carbon, nature, health)",
+    pricingMechanism: "Transaction fees",
+    priceRange: "1–3% per settled transaction",
+    valueJustification: "Reduces greenwashing risk and compliance costs",
+    icon: Briefcase,
+    color: "text-green-500",
+    gradient: "from-green-500 to-emerald-600",
   },
   {
-    id: "enterprise",
-    name: "Enterprise",
-    description: "Custom solutions for large organizations",
-    monthlyPrice: 199,
-    yearlyPrice: 1990,
-    features: [
-      "Everything in Professional",
-      "Unlimited API access",
-      "Dedicated account manager",
-      "Custom integrations",
-      "White-label options",
-      "Unlimited team members",
-      "Advanced compliance reporting",
-      "SLA guarantee",
-    ],
-    cta: "Contact Sales",
-    popular: false,
+    id: "outcome-based",
+    name: "Outcome-Based Financing",
+    primaryCustomers: "Donors, DFIs, governments, insurers",
+    whatIsBeingPriced: "Verified real-world outcomes",
+    pricingMechanism: "Pay-for-success / results-based payments",
+    priceRange: "Outcome-dependent (often $/ton, $/hectare, $/life)",
+    valueJustification: "Capital only pays when reality improves",
+    icon: DollarSign,
+    color: "text-purple-500",
+    gradient: "from-purple-500 to-violet-600",
+  },
+  {
+    id: "enterprise-intelligence",
+    name: "Enterprise Intelligence Platform",
+    primaryCustomers: "Multinationals, supply-chain operators",
+    whatIsBeingPriced: "Analytics, forecasting, compliance intelligence",
+    pricingMechanism: "Annual subscriptions",
+    priceRange: "$100K – $1M+ per year",
+    valueJustification: "Replaces consultants, audits, and fragmented ESG tools",
+    icon: BarChart3,
+    color: "text-orange-500",
+    gradient: "from-orange-500 to-amber-600",
+  },
+  {
+    id: "risk-reduction",
+    name: "Risk-Reduction-as-a-Service",
+    primaryCustomers: "Insurers, reinsurers, treasuries",
+    whatIsBeingPriced: "Quantified risk reduction from regeneration",
+    pricingMechanism: "Premium-sharing or service fees",
+    priceRange: "% of avoided loss or fixed contracts",
+    valueJustification: "Prevention cheaper than disaster recovery",
+    icon: Shield,
+    color: "text-red-500",
+    gradient: "from-red-500 to-rose-600",
+  },
+  {
+    id: "capital-markets",
+    name: "Capital Markets & DeFi Layer",
+    primaryCustomers: "Funds, crypto institutions, exchanges",
+    whatIsBeingPriced: "Tokenized assets, oracle data, smart contracts",
+    pricingMechanism: "Protocol, custody & usage fees",
+    priceRange: "Low per unit, high volume",
+    valueJustification: "Enables new financial instruments safely",
+    icon: Network,
+    color: "text-indigo-500",
+    gradient: "from-indigo-500 to-blue-600",
+  },
+  {
+    id: "commons-stewardship",
+    name: "Commons Stewardship (DAO)",
+    primaryCustomers: "Members, stewards, partners",
+    whatIsBeingPriced: "Governance rights, voting, stewardship roles",
+    pricingMechanism: "Mostly non-monetary; stake-based",
+    priceRange: "Minimal / symbolic",
+    valueJustification: "Prevents capture and mission drift",
+    icon: UsersIcon,
+    color: "text-teal-500",
+    gradient: "from-teal-500 to-cyan-600",
+  },
+  {
+    id: "intellectual-infrastructure",
+    name: "Intellectual Infrastructure",
+    primaryCustomers: "Developers, researchers, institutions",
+    whatIsBeingPriced: "Standards, schemas, ethical AI protocols",
+    pricingMechanism: "Open core + paid services",
+    priceRange: "Free core; paid hosting & guarantees",
+    valueJustification: "Standards drive adoption and longevity",
+    icon: FileText,
+    color: "text-pink-500",
+    gradient: "from-pink-500 to-rose-600",
+  },
+  {
+    id: "cultural-institution",
+    name: "Cultural Institution Layer",
+    primaryCustomers: "Foundations, sponsors, educators",
+    whatIsBeingPriced: "Knowledge archives, storytelling, education",
+    pricingMechanism: "Grants, sponsorships, endowments",
+    priceRange: "Grant-dependent",
+    valueJustification: "Builds legitimacy and narrative trust",
+    icon: BookOpen,
+    color: "text-yellow-500",
+    gradient: "from-yellow-500 to-amber-600",
+  },
+];
+
+const CUSTOMER_SEGMENTS = [
+  {
+    id: "producers",
+    name: "Regenerative Producers",
+    description: "Farmers, fishers, land & ocean stewards",
+    whatTheyGet: "Mobile access, onboarding, AI-assisted regeneration guidance, impact verification, access to buyers & finance",
+    pricingModel: "Free / Subsidized",
+    priceRange: "$0",
+    whenWeGetPaid: "Never at entry; platform earns only when credits are sold to buyers",
+    icon: TreePine,
+    color: "text-green-500",
+    gradient: "from-green-500 to-emerald-600",
+  },
+  {
+    id: "communities",
+    name: "Local Communities & Youth Nodes",
+    description: "Schools, labs, cooperatives",
+    whatTheyGet: "Education access, impact storytelling tools, ethical AI library, participation in DAO",
+    pricingModel: "Free / Grant-backed",
+    priceRange: "$0",
+    whenWeGetPaid: "Indirectly via sponsors, institutions, and buyers",
+    icon: GraduationCap,
+    color: "text-blue-500",
+    gradient: "from-blue-500 to-cyan-600",
+  },
+  {
+    id: "buyers",
+    name: "Impact Buyers",
+    description: "Corporates, cities, institutions",
+    whatTheyGet: "Verified carbon, nature, health & restoration credits; audit-ready reporting; reputational protection",
+    pricingModel: "Transaction Fee",
+    priceRange: "1–3% per verified transaction",
+    whenWeGetPaid: "Upon successful verification and settlement of regenerative assets",
+    icon: Briefcase,
+    color: "text-purple-500",
+    gradient: "from-purple-500 to-violet-600",
+  },
+  {
+    id: "enterprises",
+    name: "Enterprises & Multinationals",
+    description: "Large organizations with complex needs",
+    whatTheyGet: "Supply-chain regeneration dashboards, ESG & compliance reporting, forecasting & scenario modeling",
+    pricingModel: "Annual Subscription",
+    priceRange: "$100K – $1M+ / year",
+    whenWeGetPaid: "Recurring, tied to active usage and reporting cycles",
     icon: Building2,
+    color: "text-orange-500",
+    gradient: "from-orange-500 to-amber-600",
+  },
+  {
+    id: "governments",
+    name: "Governments & Public Institutions",
+    description: "National / regional authorities",
+    whatTheyGet: "National / regional regenerative dashboards, outcome-based funding verification, policy simulation",
+    pricingModel: "Multi-Year Contract",
+    priceRange: "$250K – $5M+ per contract",
+    whenWeGetPaid: "Contract milestones and verified outcomes",
+    icon: Building2,
+    color: "text-red-500",
+    gradient: "from-red-500 to-rose-600",
+  },
+  {
+    id: "investors",
+    name: "Impact Investors & Funds",
+    description: "Financial institutions and fund managers",
+    whatTheyGet: "Deal flow, risk-scored regenerative projects, performance-linked instruments",
+    pricingModel: "Origination + Performance Fees",
+    priceRange: "1–2% origination + success-based upside",
+    whenWeGetPaid: "On deal close and verified impact performance",
+    icon: TrendingUp,
+    color: "text-teal-500",
+    gradient: "from-teal-500 to-cyan-600",
+  },
+  {
+    id: "defi",
+    name: "DeFi & Capital Market Participants",
+    description: "Tokenized asset and smart contract users",
+    whatTheyGet: "Tokenized regenerative assets, oracle data, smart contract execution",
+    pricingModel: "Protocol & Usage Fees",
+    priceRange: "Low per-transaction; high volume",
+    whenWeGetPaid: "Per transaction / oracle call",
+    icon: Network,
+    color: "text-indigo-500",
+    gradient: "from-indigo-500 to-blue-600",
+  },
+  {
+    id: "ngos",
+    name: "NGOs & Research Partners",
+    description: "Nonprofits and academic institutions",
+    whatTheyGet: "Data access, co-branded pilots, ethical AI tools",
+    pricingModel: "Strategic / Sponsored",
+    priceRange: "Often $0 or cost-recovery",
+    whenWeGetPaid: "Paid via sponsors, grants, or institutional partners",
+    icon: Heart,
+    color: "text-pink-500",
+    gradient: "from-pink-500 to-rose-600",
   },
 ];
 
@@ -84,7 +252,7 @@ const FEATURES = [
   {
     icon: Shield,
     title: "Verified Projects",
-    description: "All carbon credits are third-party verified and certified",
+    description: "All regenerative assets are third-party verified and certified",
   },
   {
     icon: Globe,
@@ -97,24 +265,38 @@ const FEATURES = [
     description: "Monitor your environmental impact in real-time",
   },
   {
-    icon: Users,
+    icon: UsersIcon,
     title: "Community Driven",
     description: "Join thousands of sustainability-focused organizations",
   },
 ];
 
 export default function Pricing() {
-  const [isYearly, setIsYearly] = useState(true);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [paymentMethod, setPaymentMethod] = useState<'fiat' | 'crypto'>('fiat');
 
-  const handleSelectPlan = (planId: string) => {
+  const handleSelectSegment = (segmentId: string) => {
     if (!user) {
       navigate("/auth");
       return;
     }
-    // Navigate to marketplace for now - in production this would go to checkout
-    navigate("/marketplace");
+    // Navigate to relevant section based on segment
+    if (segmentId === "infrastructure" || segmentId === "governments") {
+      navigate("/outreach");
+    } else if (segmentId === "multi-sided-market" || segmentId === "enterprise-intelligence" || segmentId === "buyers" || segmentId === "enterprises") {
+      navigate("/marketplace");
+    } else if (segmentId === "outcome-based" || segmentId === "risk-reduction" || segmentId === "investors") {
+      navigate("/regenerative-finance");
+    } else if (segmentId === "capital-markets" || segmentId === "defi") {
+      navigate("/defi");
+    } else if (segmentId === "commons-stewardship" || segmentId === "intellectual-infrastructure" || segmentId === "producers" || segmentId === "communities" || segmentId === "ngos") {
+      navigate("/community");
+    } else if (segmentId === "cultural-institution") {
+      navigate("/education");
+    } else {
+      navigate("/marketplace");
+    }
   };
 
   return (
@@ -135,123 +317,184 @@ export default function Pricing() {
           >
             <Badge className="mb-6 bg-primary/10 text-primary border-primary/20">
               <Sparkles className="w-3 h-3 mr-1" />
-              Transparent Pricing
+              Comprehensive Pricing Models
             </Badge>
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground mb-6">
               Invest in Earth's{" "}
               <span className="text-gradient">Regeneration</span>
             </h1>
             <p className="text-lg sm:text-xl text-muted-foreground mb-10">
-              Choose the plan that fits your sustainability goals. All plans include
-              access to verified carbon credits and real-time impact tracking.
+              Choose the pricing model that fits your business needs or customer segment. Our inclusive approach ensures
+              everyone can participate in creating a regenerative future.
             </p>
 
-            {/* Billing Toggle */}
-            <div className="flex items-center justify-center gap-4 mb-12">
-              <span
-                className={`text-sm font-medium ${
-                  !isYearly ? "text-foreground" : "text-muted-foreground"
-                }`}
-              >
-                Monthly
-              </span>
-              <Switch checked={isYearly} onCheckedChange={setIsYearly} />
-              <span
-                className={`text-sm font-medium ${
-                  isYearly ? "text-foreground" : "text-muted-foreground"
-                }`}
-              >
-                Yearly
-              </span>
-              {isYearly && (
-                <Badge variant="secondary" className="bg-primary/10 text-primary">
-                  Save 20%
-                </Badge>
-              )}
-            </div>
+            <Badge variant="secondary" className="bg-primary/10 text-primary">
+              <Globe className="w-3 h-3 mr-1" />
+              Free for producers and communities
+            </Badge>
           </motion.div>
 
-          {/* Pricing Cards */}
-          <div className="grid md:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
-            {PLANS.map((plan, index) => (
-              <motion.div
-                key={plan.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="relative"
-              >
-                {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
-                    <Badge className="bg-primary text-primary-foreground px-4 py-1">
-                      <Star className="w-3 h-3 mr-1 fill-current" />
-                      Most Popular
-                    </Badge>
-                  </div>
-                )}
-                <Card
-                  className={`relative h-full ${
-                    plan.popular
-                      ? "border-primary/50 bg-card shadow-lg shadow-primary/10"
-                      : "bg-card/50 border-border/50"
-                  }`}
-                >
-                  <CardHeader className="pb-4">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div
-                        className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                          plan.popular
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted text-muted-foreground"
-                        }`}
-                      >
-                        <plan.icon className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-lg text-foreground">
-                          {plan.name}
-                        </h3>
-                      </div>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {plan.description}
-                    </p>
-                    <div className="mt-4">
-                      <span className="text-4xl font-bold text-foreground">
-                        ${isYearly ? plan.yearlyPrice : plan.monthlyPrice}
-                      </span>
-                      {plan.monthlyPrice > 0 && (
-                        <span className="text-muted-foreground ml-2">
-                          /{isYearly ? "year" : "month"}
-                        </span>
-                      )}
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <ul className="space-y-3 mb-8">
-                      {plan.features.map((feature, i) => (
-                        <li key={i} className="flex items-start gap-3 text-sm">
-                          <Check className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                          <span className="text-muted-foreground">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <Button
-                      onClick={() => handleSelectPlan(plan.id)}
-                      className={`w-full ${
-                        plan.popular
-                          ? "bg-primary hover:bg-primary/90"
-                          : "bg-muted hover:bg-muted/80 text-foreground"
-                      }`}
+          {/* Pricing Tabs */}
+          <Tabs defaultValue="business-models" className="max-w-7xl mx-auto mt-16">
+            <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
+              <TabsTrigger value="business-models" className="flex items-center gap-2">
+                <Layout className="w-4 h-4" />
+                Business Models
+              </TabsTrigger>
+              <TabsTrigger value="customer-segments" className="flex items-center gap-2">
+                <UsersRound className="w-4 h-4" />
+                Customer Segments
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Business Models Tab */}
+            <TabsContent value="business-models">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-7xl mx-auto">
+                {BUSINESS_MODEL_SEGMENTS.map((segment, index) => (
+                  <motion.div
+                    key={segment.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="relative"
+                  >
+                    <Card
+                      className={`relative h-full bg-card/50 border-border/50 hover:border-primary/30 transition-colors group`}
                     >
-                      {plan.cta}
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
+                      <CardHeader className="pb-4">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div
+                            className={`w-10 h-10 rounded-xl flex items-center justify-center ${segment.color.replace('text-', 'bg-')}/10`}
+                          >
+                            <segment.icon className={`w-5 h-5 ${segment.color}`} />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-lg text-foreground">
+                              {segment.name}
+                            </h3>
+                          </div>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          <span className="font-medium">Primary Customers:</span>
+                          <br />
+                          {segment.primaryCustomers}
+                        </p>
+                        <div className="mt-4">
+                          <span className={`text-2xl font-bold ${segment.color}`}>
+                            {segment.priceRange}
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-2">
+                          {segment.pricingMechanism}
+                        </p>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <div className="mb-4 p-3 bg-muted/30 rounded-lg">
+                          <p className="text-xs text-muted-foreground">
+                            <span className="font-medium">What's Priced:</span>
+                            <br />
+                            {segment.whatIsBeingPriced}
+                          </p>
+                        </div>
+                        <div className="mb-4">
+                          <p className="text-xs text-muted-foreground">
+                            <span className="font-medium">Value Justification:</span>
+                            <br />
+                            {segment.valueJustification}
+                          </p>
+                        </div>
+                        <Button
+                          onClick={() => handleSelectSegment(segment.id)}
+                          className={`w-full ${
+                            segment.priceRange.includes("Free") || segment.priceRange.includes("Minimal")
+                              ? "bg-primary hover:bg-primary/90"
+                              : "bg-muted hover:bg-muted/80 text-foreground"
+                          }`}
+                        >
+                          Learn More
+                          <ArrowRight className="w-4 h-4 ml-2" />
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            </TabsContent>
+
+            {/* Customer Segments Tab */}
+            <TabsContent value="customer-segments">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-7xl mx-auto">
+                {CUSTOMER_SEGMENTS.map((segment, index) => (
+                  <motion.div
+                    key={segment.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="relative"
+                  >
+                    <Card
+                      className={`relative h-full bg-card/50 border-border/50 hover:border-primary/30 transition-colors group`}
+                    >
+                      <CardHeader className="pb-4">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div
+                            className={`w-10 h-10 rounded-xl flex items-center justify-center ${segment.color.replace('text-', 'bg-')}/10`}
+                          >
+                            <segment.icon className={`w-5 h-5 ${segment.color}`} />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-lg text-foreground">
+                              {segment.name}
+                            </h3>
+                          </div>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          <span className="font-medium">Description:</span>
+                          <br />
+                          {segment.description}
+                        </p>
+                        <div className="mt-4">
+                          <span className={`text-2xl font-bold ${segment.color}`}>
+                            {segment.priceRange}
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-2">
+                          {segment.pricingModel}
+                        </p>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <div className="mb-4 p-3 bg-muted/30 rounded-lg">
+                          <p className="text-xs text-muted-foreground">
+                            <span className="font-medium">What They Get:</span>
+                            <br />
+                            {segment.whatTheyGet}
+                          </p>
+                        </div>
+                        <div className="mb-4">
+                          <p className="text-xs text-muted-foreground">
+                            <span className="font-medium">When We Get Paid:</span>
+                            <br />
+                            {segment.whenWeGetPaid}
+                          </p>
+                        </div>
+                        <Button
+                          onClick={() => handleSelectSegment(segment.id)}
+                          className={`w-full ${
+                            segment.priceRange === "$0" || segment.priceRange.includes("Free")
+                              ? "bg-primary hover:bg-primary/90"
+                              : "bg-muted hover:bg-muted/80 text-foreground"
+                          }`}
+                        >
+                          Learn More
+                          <ArrowRight className="w-4 h-4 ml-2" />
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </section>
 
@@ -266,32 +509,95 @@ export default function Pricing() {
               We accept multiple payment methods for your convenience
             </p>
           </div>
+          
+          {/* Payment Method Toggle */}
+          <div className="flex items-center justify-center gap-4 mb-12">
+            <Button
+              variant={paymentMethod === 'fiat' ? 'default' : 'outline'}
+              onClick={() => setPaymentMethod('fiat')}
+              className="flex items-center gap-2"
+            >
+              <CreditCard className="w-4 h-4" />
+              Fiat Payments
+            </Button>
+            <Button
+              variant={paymentMethod === 'crypto' ? 'default' : 'outline'}
+              onClick={() => setPaymentMethod('crypto')}
+              className="flex items-center gap-2"
+            >
+              <Network className="w-4 h-4" />
+              Crypto Payments
+            </Button>
+          </div>
+
+          {/* Payment Methods Grid */}
           <div className="flex flex-wrap items-center justify-center gap-8">
-            <div className="flex items-center gap-3 px-6 py-4 bg-card rounded-xl border border-border/50">
-              <div className="w-10 h-10 rounded-lg bg-[#003087] flex items-center justify-center">
-                <span className="text-white font-bold text-sm">PP</span>
-              </div>
-              <div>
-                <p className="font-medium text-foreground">PayPal</p>
-                <p className="text-xs text-muted-foreground">Fast & secure</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 px-6 py-4 bg-card rounded-xl border border-border/50">
-              <div className="w-10 h-10 rounded-lg bg-[#00C3F7] flex items-center justify-center">
-                <span className="text-white font-bold text-sm">PS</span>
-              </div>
-              <div>
-                <p className="font-medium text-foreground">Paystack</p>
-                <p className="text-xs text-muted-foreground">African payments</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 px-6 py-4 bg-card rounded-xl border border-border/50">
-              <CreditCard className="w-10 h-10 text-muted-foreground" />
-              <div>
-                <p className="font-medium text-foreground">Credit Card</p>
-                <p className="text-xs text-muted-foreground">Visa, Mastercard</p>
-              </div>
-            </div>
+            {paymentMethod === 'fiat' ? (
+              <>
+                <div className="flex items-center gap-3 px-6 py-4 bg-card rounded-xl border border-border/50">
+                  <div className="w-10 h-10 rounded-lg bg-[#003087] flex items-center justify-center">
+                    <span className="text-white font-bold text-sm">PP</span>
+                  </div>
+                  <div>
+                    <p className="font-medium text-foreground">PayPal</p>
+                    <p className="text-xs text-muted-foreground">Fast & secure</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 px-6 py-4 bg-card rounded-xl border border-border/50">
+                  <div className="w-10 h-10 rounded-lg bg-[#00C3F7] flex items-center justify-center">
+                    <span className="text-white font-bold text-sm">PS</span>
+                  </div>
+                  <div>
+                    <p className="font-medium text-foreground">Paystack</p>
+                    <p className="text-xs text-muted-foreground">African payments</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 px-6 py-4 bg-card rounded-xl border border-border/50">
+                  <CreditCard className="w-10 h-10 text-muted-foreground" />
+                  <div>
+                    <p className="font-medium text-foreground">Credit Card</p>
+                    <p className="text-xs text-muted-foreground">Visa, Mastercard</p>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center gap-3 px-6 py-4 bg-card rounded-xl border border-border/50">
+                  <div className="w-10 h-10 rounded-lg bg-[#627eea] flex items-center justify-center">
+                    <span className="text-white font-bold text-sm">Ξ</span>
+                  </div>
+                  <div>
+                    <p className="font-medium text-foreground">Ethereum</p>
+                    <p className="text-xs text-muted-foreground">ETH & ERC20 tokens</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 px-6 py-4 bg-card rounded-xl border border-border/50">
+                  <div className="w-10 h-10 rounded-lg bg-[#f7931a] flex items-center justify-center">
+                    <span className="text-white font-bold text-sm">₿</span>
+                  </div>
+                  <div>
+                    <p className="font-medium text-foreground">Bitcoin</p>
+                    <p className="text-xs text-muted-foreground">BTC payments</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 px-6 py-4 bg-card rounded-xl border border-border/50">
+                  <div className="w-10 h-10 rounded-lg bg-[#0052ff] flex items-center justify-center">
+                    <span className="text-white font-bold text-sm">CB</span>
+                  </div>
+                  <div>
+                    <p className="font-medium text-foreground">Coinbase</p>
+                    <p className="text-xs text-muted-foreground">Crypto gateway</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 px-6 py-4 bg-card rounded-xl border border-border/50">
+                  <Network className="w-10 h-10 text-muted-foreground" />
+                  <div>
+                    <p className="font-medium text-foreground">MetaMask</p>
+                    <p className="text-xs text-muted-foreground">Web3 wallet</p>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </section>

@@ -27,7 +27,7 @@ import {
   CheckCircle,
   Loader2
 } from "lucide-react";
-import Header from "@/components/Header";
+import Header from "@/components/EnterpriseHeader";
 import Footer from "@/components/Footer";
 
 const UserManagement = () => {
@@ -35,7 +35,17 @@ const UserManagement = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [selectedUser, setSelectedUser] = useState<{
+    id: string;
+    email: string;
+    displayName: string;
+    role: string;
+    emailVerified: boolean;
+    mfaEnabled: boolean;
+    lastLogin: string | null;
+    accountLocked: boolean;
+    createdAt: string;
+  } | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -100,7 +110,15 @@ const UserManagement = () => {
     return matchesSearch && matchesRole && matchesStatus;
   });
 
-  const handleEditUser = async (userData: any) => {
+  const handleEditUser = async (userData: {
+    id: string;
+    email: string;
+    displayName: string;
+    role: string;
+    emailVerified: boolean;
+    mfaEnabled: boolean;
+    accountLocked: boolean;
+  }) => {
     setLoading(true);
     setMessage(null);
 

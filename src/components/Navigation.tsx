@@ -1,14 +1,20 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Leaf, LogIn, ShoppingBag, Briefcase, LayoutDashboard, Crown, Award, Zap, Shield, TrendingUp, Globe, Heart } from "lucide-react";
+import { Menu, X, Leaf, LogIn, ShoppingBag, Briefcase, LayoutDashboard, Crown, Award, Zap, Shield, TrendingUp, Globe, Heart, Network, Grid3X3, Calculator, Users, Trophy, Settings, FileText, BarChart3, Cog, Factory, Sprout, BookOpen, Building2, Zap as Lightning, TreePine, GraduationCap, CreditCard, Receipt, Wallet, Award as Certificate } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useAuth } from "@/hooks/useAuth";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
 
 const Navigation = () => {
-  const { user } = useAuth();
+  const { user } = useSupabaseAuth();
+  const { isAdmin } = useAdminAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
+
+  // Check if user has completed onboarding
+  const hasCompletedOnboarding = (user as any)?.onboardingCompleted || false;
 
   const navLinks = [
     { name: "Marketplace", href: "/marketplace", icon: ShoppingBag },
@@ -21,8 +27,64 @@ const Navigation = () => {
     { name: "Outreach", href: "/outreach", icon: Globe },
     { name: "Security", href: "/security", icon: Shield },
     { name: "Adoption", href: "/adoption", icon: Zap },
+    { name: "Architecture", href: "/architecture", icon: Network },
+    { name: "Dashboards", href: "/dashboards", icon: Grid3X3 },
     { name: "Portfolio", href: "/portfolio", icon: Briefcase },
+    { 
+      name: "Analytics & Insights", 
+      href: "#", 
+      icon: TrendingUp,
+      children: [
+        { name: "Careers", href: "/careers", icon: Users },
+        { name: "Leaderboard", href: "/leaderboard", icon: Trophy },
+        { name: "Calculator", href: "/calculator", icon: Calculator },
+        { name: "Reports & Analytics", href: "/reports-analytics", icon: BarChart3 },
+      ]
+    },
+    { 
+      name: "Solutions", 
+      href: "#", 
+      icon: Factory,
+      children: [
+        { name: "Carbon Offsetting", href: "/carbon-offsetting", icon: TreePine },
+        { name: "Impact Investment", href: "/impact-investment", icon: TrendingUp },
+        { name: "Regulatory Compliance", href: "/regulatory-compliance", icon: Shield },
+        { name: "Enterprise Solutions", href: "/enterprise-solutions", icon: Building2 },
+        { name: "SMB Solutions", href: "/smb-solutions", icon: Briefcase },
+        { name: "Agriculture Solutions", href: "/agriculture-solutions", icon: Sprout },
+        { name: "Renewable Energy", href: "/renewable-energy", icon: Lightning },
+      ]
+    },
+    { 
+      name: "Resources", 
+      href: "#", 
+      icon: BookOpen,
+      children: [
+        { name: "Education Hub", href: "/education-hub", icon: GraduationCap },
+        { name: "Certifications", href: "/certifications", icon: Certificate },
+        { name: "Privacy Policy", href: "/privacy-policy", icon: Shield },
+        { name: "Terms of Service", href: "/terms-of-service", icon: FileText },
+      ]
+    },
+    { 
+      name: "Billing", 
+      href: "#", 
+      icon: CreditCard,
+      children: [
+        { name: "Billing Dashboard", href: "/billing", icon: CreditCard },
+        { name: "Invoices", href: "/invoices", icon: Receipt },
+        { name: "Payment Methods", href: "/payment-methods", icon: Wallet },
+      ]
+    },
   ];
+
+  // Admin link - only visible to admin users
+  const adminLink = {
+    name: "Command Center",
+    href: "/admin",
+    icon: Settings,
+    adminOnly: true
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
@@ -61,26 +123,81 @@ const Navigation = () => {
             </div>
           </motion.div>
 
-          {/* Desktop Navigation */}
-          <motion.nav
-            className="hidden md:flex items-center gap-6 lg:gap-8 overflow-x-auto"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            aria-label="Main navigation"
-          >
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                to={link.href}
-                className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary rounded-md px-2 py-1 transition-colors duration-300 font-medium whitespace-nowrap"
-                aria-label={link.name}
-              >
-                <link.icon className="w-4 h-4" aria-hidden="true" />
-                {link.name}
-              </Link>
-            ))}
-          </motion.nav>
+            {/* Desktop Navigation */}
+            <motion.nav
+              className="hidden md:flex items-center gap-6 lg:gap-8 overflow-x-auto"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              aria-label="Main navigation"
+            >
+              {navLinks.map((link) => {
+                if (link.children) {
+                  return (
+                    <div key={link.name} className="relative group">
+                      <button
+                        className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary rounded-md px-2 py-1 transition-colors duration-300 font-medium whitespace-nowrap hover:bg-muted/50"
+                        aria-label={link.name}
+                      >
+                        <link.icon className="w-4 h-4" aria-hidden="true" />
+                        {link.name}
+                      </button>
+                      {/* Dropdown Menu */}
+                      <div className="absolute left-0 top-full mt-2 w-48 bg-card rounded-md shadow-lg border border-border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                        <div className="py-2">
+                          {link.children.map((child) => (
+                            <Link
+                              key={child.name}
+                              to={child.href}
+                              className={`flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors ${
+                                location.pathname === child.href 
+                                  ? "text-foreground bg-primary/10" 
+                                  : ""
+                              }`}
+                              aria-label={child.name}
+                            >
+                              <child.icon className="w-4 h-4" aria-hidden="true" />
+                              {child.name}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+                
+                return (
+                  <Link
+                    key={link.name}
+                    to={link.href}
+                    className={`flex items-center gap-1.5 text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary rounded-md px-2 py-1 transition-colors duration-300 font-medium whitespace-nowrap ${
+                      location.pathname === link.href 
+                        ? "text-foreground bg-primary/10" 
+                        : "hover:bg-muted/50"
+                    }`}
+                    aria-label={link.name}
+                  >
+                    <link.icon className="w-4 h-4" aria-hidden="true" />
+                    {link.name}
+                  </Link>
+                );
+              })}
+              {/* Admin Link - Only visible to admin users */}
+              {isAdmin && (
+                <Link
+                  to={adminLink.href}
+                  className={`flex items-center gap-1.5 text-amber-600 hover:text-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 rounded-md px-2 py-1 transition-colors duration-300 font-medium whitespace-nowrap ${
+                    location.pathname === adminLink.href 
+                      ? "text-amber-700 bg-amber-500/10" 
+                      : "hover:bg-amber-500/10"
+                  }`}
+                  aria-label={adminLink.name}
+                >
+                  <adminLink.icon className="w-4 h-4" aria-hidden="true" />
+                  {adminLink.name}
+                </Link>
+              )}
+            </motion.nav>
 
           {/* Desktop CTA */}
           <motion.div 
@@ -90,12 +207,20 @@ const Navigation = () => {
             transition={{ duration: 0.5, delay: 0.3 }}
           >
             {user ? (
-              <Button variant="hero" size="sm" asChild>
-                <Link to="/dashboard">
-                  <LayoutDashboard className="w-4 h-4 mr-2" />
-                  Dashboard
-                </Link>
-              </Button>
+              <>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/settings">
+                    <Cog className="w-4 h-4 mr-2" />
+                    Settings
+                  </Link>
+                </Button>
+                <Button variant="hero" size="sm" asChild>
+                  <Link to={hasCompletedOnboarding ? "/dashboard" : "/segment-selection"}>
+                    <LayoutDashboard className="w-4 h-4 mr-2" />
+                    {hasCompletedOnboarding ? "Dashboard" : "Complete Setup"}
+                  </Link>
+                </Button>
+              </>
             ) : (
               <Button variant="hero" size="sm" asChild>
                 <Link to="/auth">
@@ -129,26 +254,87 @@ const Navigation = () => {
             aria-label="Mobile navigation menu"
           >
             <div className="container mx-auto px-4 sm:px-6 py-6 flex flex-col gap-3">
-              {navLinks.map((link) => (
+              {navLinks.map((link) => {
+                if (link.children) {
+                  return (
+                    <div key={link.name} className="space-y-2">
+                      <div className="flex items-center justify-between text-muted-foreground hover:text-foreground hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary rounded-lg transition-colors py-3 px-2 font-medium">
+                        <div className="flex items-center gap-2">
+                          <link.icon className="w-4 h-4" aria-hidden="true" />
+                          {link.name}
+                        </div>
+                      </div>
+                      <div className="pl-6 space-y-1">
+                        {link.children.map((child) => (
+                          <Link
+                            key={child.name}
+                            to={child.href}
+                            className={`flex items-center gap-2 px-2 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors rounded-lg ${
+                              location.pathname === child.href 
+                                ? "text-foreground bg-primary/10" 
+                                : ""
+                            }`}
+                            onClick={() => setIsOpen(false)}
+                            aria-label={child.name}
+                          >
+                            <child.icon className="w-4 h-4" aria-hidden="true" />
+                            {child.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }
+                
+                return (
+                  <Link
+                    key={link.name}
+                    to={link.href}
+                    className={`flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary rounded-lg transition-colors py-3 px-2 font-medium ${
+                      location.pathname === link.href 
+                        ? "text-foreground bg-primary/10" 
+                        : ""
+                    }`}
+                    onClick={() => setIsOpen(false)}
+                    aria-label={link.name}
+                  >
+                    <link.icon className="w-4 h-4" aria-hidden="true" />
+                    {link.name}
+                  </Link>
+                );
+              })}
+              {/* Admin Link - Only visible to admin users in mobile menu */}
+              {isAdmin && (
                 <Link
-                  key={link.name}
-                  to={link.href}
-                  className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary rounded-lg transition-colors py-3 px-2 font-medium"
+                  to={adminLink.href}
+                  className={`flex items-center gap-2 text-amber-600 hover:text-amber-700 hover:bg-amber-500/10 focus:outline-none focus:ring-2 focus:ring-amber-500 rounded-lg transition-colors py-3 px-2 font-medium ${
+                    location.pathname === adminLink.href 
+                      ? "text-amber-700 bg-amber-500/10" 
+                      : ""
+                  }`}
                   onClick={() => setIsOpen(false)}
-                  aria-label={link.name}
+                  aria-label={adminLink.name}
                 >
-                  <link.icon className="w-4 h-4" aria-hidden="true" />
-                  {link.name}
+                  <adminLink.icon className="w-4 h-4" aria-hidden="true" />
+                  {adminLink.name}
                 </Link>
-              ))}
+              )}
               <div className="flex flex-col gap-2 pt-4 border-t border-border">
                 {user ? (
-                  <Button variant="hero" asChild className="w-full">
-                    <Link to="/dashboard">
-                      <LayoutDashboard className="w-4 h-4 mr-2" />
-                      Dashboard
-                    </Link>
-                  </Button>
+                  <>
+                    <Button variant="ghost" asChild className="w-full justify-start">
+                      <Link to="/settings">
+                        <Cog className="w-4 h-4 mr-2" />
+                        Settings
+                      </Link>
+                    </Button>
+                    <Button variant="hero" asChild className="w-full">
+                      <Link to={hasCompletedOnboarding ? "/dashboard" : "/segment-selection"}>
+                        <LayoutDashboard className="w-4 h-4 mr-2" />
+                        {hasCompletedOnboarding ? "Dashboard" : "Complete Setup"}
+                      </Link>
+                    </Button>
+                  </>
                 ) : (
                   <Button variant="hero" asChild className="w-full">
                     <Link to="/auth">

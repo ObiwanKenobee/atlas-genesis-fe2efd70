@@ -9,26 +9,11 @@ import { Badge } from "@/components/ui/badge";
 import { Search, BookOpen, MessageCircle, FileText, HelpCircle, ChevronRight, ExternalLink } from "lucide-react";
 import SEO from "@/components/SEO";
 import { useSEO } from "@/hooks/useSEO";
-import Header from "@/components/Header";
+import Header from "@/components/EnterpriseHeader";
 import Footer from "@/components/Footer";
 
 const HelpCenter = () => {
   const [searchQuery, setSearchQuery] = useState("");
-
-  const seoData = useSEO({
-    structuredData: {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": faqs.map(faq => ({
-        "@type": "Question",
-        "name": faq.question,
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": faq.answer
-        }
-      }))
-    }
-  });
 
   const faqs = [
     {
@@ -89,6 +74,21 @@ const HelpCenter = () => {
       link: "/help/security"
     }
   ];
+
+  const seoData = useSEO({
+    structuredData: {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": faqs.map(faq => ({
+        "@type": "Question",
+        "name": faq.question,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": faq.answer
+        }
+      }))
+    }
+  });
 
   return (
     <>

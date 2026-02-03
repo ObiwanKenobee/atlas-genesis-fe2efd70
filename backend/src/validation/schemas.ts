@@ -13,18 +13,61 @@ export const paginationSchema = z.object({
 }).strict();
 
 // User schemas
+// Enhanced user creation with role-based onboarding
 export const userCreateSchema = z.object({
-  email: emailSchema,
+  email: emailSchema.optional(),
+  phoneNumber: z.string().min(10).max(15).optional(),
   displayName: z.string().min(2).max(100),
-  password: passwordSchema,
-  role: z.enum(['user', 'admin', 'moderator']).default('user'),
-  emailVerified: z.boolean().default(false)
+  password: passwordSchema.optional(),
+  role: z.enum(['producer', 'investor', 'institution', 'researcher', 'admin', 'moderator']).default('producer'),
+  emailVerified: z.boolean().default(false),
+  phoneVerified: z.boolean().default(false)
+});
+
+// Role-specific onboarding schemas
+export const producerOnboardingSchema = z.object({
+  locationType: z.enum(['land', 'ocean', 'forest']),
+  location: z.object({
+    latitude: z.number().min(-90).max(90),
+    longitude: z.number().min(-180).max(180),
+    address: z.string().max(500).optional()
+  }),
+  verificationPhoto: z.string().url().optional()
+});
+
+export const investorOnboardingSchema = z.object({
+  investmentIntent: z.enum(['climate', 'health', 'oceans', 'mixed']),
+  riskProfile: z.object({
+    timeHorizon: z.enum(['short', 'medium', 'long']),
+    returnPreference: z.enum(['impact', 'balanced', 'financial'])
+  }),
+  investmentAmount: z.number().positive().optional()
+});
+
+export const institutionOnboardingSchema = z.object({
+  institutionType: z.enum(['government', 'ngo', 'enterprise', 'academic']),
+  jurisdiction: z.string().min(2).max(100),
+  governanceMode: z.enum(['observer', 'participant', 'steward']),
+  officialEmail: emailSchema
+});
+
+export const researcherOnboardingSchema = z.object({
+  researchPurpose: z.enum(['learn', 'teach', 'research', 'build']),
+  accessLevel: z.enum(['open', 'limited', 'advanced']),
+  fieldOfStudy: z.string().min(2).max(100).optional(),
+  institution: z.string().min(2).max(100).optional()
 });
 
 export const userUpdateSchema = z.object({
+  email: emailSchema.optional(),
+  phoneNumber: z.string().min(10).max(15).optional(),
   displayName: z.string().min(2).max(100).optional(),
+  role: z.enum(['producer', 'investor', 'institution', 'researcher', 'admin', 'moderator']).optional(),
   emailVerified: z.boolean().optional(),
-  accountLocked: z.boolean().optional()
+  phoneVerified: z.boolean().optional(),
+  accountLocked: z.boolean().optional(),
+  profileData: z.record(z.string(), z.any()).optional(),
+  preferences: z.record(z.string(), z.any()).optional()
 });
 
 export const loginSchema = z.object({

@@ -115,7 +115,7 @@ router.post('/riums', async (req: Request, res: Response) => {
 
 // Purchase RIUs
 router.post('/riums/:id/purchase', async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const id = req.params.id as string;
   const { buyerId, quantity, totalPrice } = req.body;
 
   if (!buyerId || !quantity) {

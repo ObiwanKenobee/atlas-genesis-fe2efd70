@@ -60,7 +60,7 @@ const Settings = () => {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const { theme, setTheme } = useTheme();
 
-  const API_BASE = process.env.NODE_ENV === 'production'
+  const API_BASE = import.meta.env.PROD
     ? 'https://api.atlas-genesis.com'
     : 'http://localhost:4000';
 

@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import Navigation from "@/components/Navigation";
+import EnterpriseHeader from "@/components/EnterpriseHeader";
 import { useMeasurementData } from "@/hooks/useMeasurementData";
 import { useRegenerativeMetrics } from "@/hooks/useRegenerativeMetrics";
 import { useBioregionalZones } from "@/hooks/useBioregionalZones";
 import { useValuationModel } from "@/hooks/useValuationModel";
 import MeasurementDashboard from "@/components/MeasurementDashboard";
+import PageHero from "@/components/PageHero";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Satellite, Leaf, TrendingUp, Shield } from "lucide-react";
@@ -24,15 +25,23 @@ const Measurements = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      <EnterpriseHeader />
+      <PageHero
+        title="Planetary Measurement & Verification"
+        subtitle="Real-time carbon and ecosystem data from satellite networks, soil sensors, and biodiversity monitors"
+        ctaText="View Dashboard"
+        ctaLink="#dashboard"
+        secondaryCtaText="Learn More"
+        secondaryCtaLink="/about"
+        badgeText="Data-Driven Impact"
+        stats={[
+          { value: "Sentinel-2", label: "Satellite Data" },
+          { value: "12M+", label: "Soil Sensors" },
+          { value: "99.9%", label: "Verification" },
+          { value: "24/7", label: "Real-time" }
+        ]}
+      />
       <main className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight mb-2">Planetary Measurement & Verification</h1>
-          <p className="text-lg text-muted-foreground">
-            Real-time carbon and ecosystem data from satellite networks, soil sensors, and biodiversity monitors
-          </p>
-        </div>
 
         {/* Feature Overview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

@@ -237,8 +237,8 @@ router.get('/access-logs', async (req, res) => {
     const offset = (Number(page) - 1) * Number(limit);
 
     // Build query with filters
-    let whereConditions = [];
-    let params = [];
+    const whereConditions = [];
+    const params = [];
     let paramIndex = 1;
 
     if (assetId) {
@@ -320,8 +320,8 @@ router.get('/scan-results', async (req, res) => {
     const { assetId, threatLevel, page = 1, limit = 50 } = req.query as any;
     const offset = (Number(page) - 1) * Number(limit);
 
-    let whereConditions = [];
-    let params = [];
+    const whereConditions = [];
+    const params = [];
     let paramIndex = 1;
 
     if (assetId) {

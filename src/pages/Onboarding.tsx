@@ -1,400 +1,460 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  Leaf, ArrowRight, ArrowLeft, Check, User, Building2,
-  Target, Globe, TreePine, Zap, Waves, CircleDot, Sparkles
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowRight, ChevronLeft, Check, Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { useOnboarding } from '@/hooks/useOnboarding';
+import { useAuth } from '@/hooks/useAuth';
 
-interface OnboardingData {
-  organization: string;
-  investmentGoal: string;
-  interests: string[];
-  monthlyBudget: string;
-}
-
-const INVESTMENT_GOALS = [
-  { id: "offset", label: "Carbon Offsetting", icon: TreePine, description: "Neutralize your carbon footprint" },
-  { id: "impact", label: "Impact Investment", icon: Target, description: "Generate returns while doing good" },
-  { id: "compliance", label: "Regulatory Compliance", icon: Check, description: "Meet sustainability requirements" },
-  { id: "exploration", label: "Just Exploring", icon: Globe, description: "Learn about carbon markets" },
-];
-
-const PROJECT_INTERESTS = [
-  { id: "reforestation", label: "Reforestation", icon: TreePine },
-  { id: "ocean_restoration", label: "Ocean Restoration", icon: Waves },
-  { id: "renewable_energy", label: "Renewable Energy", icon: Zap },
-  { id: "soil_carbon", label: "Soil Carbon", icon: CircleDot },
-];
-
-const BUDGET_RANGES = [
-  { id: "starter", label: "Under $1,000", description: "Perfect for getting started" },
-  { id: "growth", label: "$1,000 - $10,000", description: "Build a solid portfolio" },
-  { id: "scale", label: "$10,000 - $50,000", description: "Make significant impact" },
-  { id: "enterprise", label: "$50,000+", description: "Enterprise-level investing" },
-];
-
-const Onboarding = () => {
-  const { user, loading } = useAuth();
+export default function Onboarding() {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(0);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [data, setData] = useState<OnboardingData>({
-    organization: "",
-    investmentGoal: "",
-    interests: [],
-    monthlyBudget: "",
-  });
+  const { user } = useAuth();
+  const { onboardingState, nextStep, previousStep, completeStep, skipStep, updateOnboardingData, completeOnboarding, getSegmentConfig, getCurrentStepConfig } = useOnboarding();
+  const [formData, setFormData] = useState<Record<string, string>>({});
 
-  useEffect(() => {
-    if (!loading && !user) {
-      navigate("/auth");
-    }
-  }, [user, loading, navigate]);
+  const segmentConfig = getSegmentConfig();
+  const currentStepConfig = getCurrentStepConfig();
 
-  const steps = [
-    { title: "Organization", subtitle: "Tell us about yourself" },
-    { title: "Goals", subtitle: "What brings you here?" },
-    { title: "Interests", subtitle: "What projects excite you?" },
-    { title: "Budget", subtitle: "Investment capacity" },
-  ];
-
-  const handleNext = () => {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  const handleBack = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  const handleComplete = async () => {
-    if (!user) return;
-    
-    setIsSubmitting(true);
-    try {
-      // Update the user's profile with onboarding data
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          organization: data.organization || null,
-        })
-        .eq("user_id", user.id);
-
-      if (error) throw error;
-
-      // Store onboarding completion in localStorage
-      localStorage.setItem(`onboarding_completed_${user.id}`, "true");
-      
-      toast.success("Welcome to Atlas Sanctum! 🌿");
-      navigate("/dashboard");
-    } catch (error) {
-      console.error("Error completing onboarding:", error);
-      toast.error("Something went wrong. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const toggleInterest = (id: string) => {
-    setData((prev) => ({
-      ...prev,
-      interests: prev.interests.includes(id)
-        ? prev.interests.filter((i) => i !== id)
-        : [...prev.interests, id],
-    }));
-  };
-
-  const canProceed = () => {
-    switch (currentStep) {
-      case 0:
-        return true; // Organization is optional
-      case 1:
-        return data.investmentGoal !== "";
-      case 2:
-        return data.interests.length > 0;
-      case 3:
-        return data.monthlyBudget !== "";
-      default:
-        return false;
-    }
-  };
-
-  if (loading) {
+  if (!segmentConfig || !currentStepConfig) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full"
-        />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground">Loading onboarding...</p>
+        </div>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-hero relative overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          className="absolute top-1/4 -left-20 w-96 h-96 rounded-full bg-primary/10 blur-3xl"
-          animate={{ x: [0, 30, 0], y: [0, -20, 0] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute bottom-1/4 -right-20 w-80 h-80 rounded-full bg-ocean/10 blur-3xl"
-          animate={{ x: [0, -30, 0], y: [0, 20, 0] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </div>
+  const progress = ((onboardingState.currentStep + 1) / segmentConfig.onboardingSteps.length) * 100;
 
-      <div className="relative z-10 container mx-auto px-4 py-8 min-h-screen flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-ocean flex items-center justify-center">
-              <Leaf className="w-5 h-5 text-primary-foreground" />
+  const handleFieldChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleNext = () => {
+    completeStep(currentStepConfig.id, formData);
+    if (onboardingState.currentStep < segmentConfig.onboardingSteps.length - 1) {
+      nextStep();
+    } else {
+      completeOnboarding();
+      navigate(segmentConfig.defaultRoute);
+    }
+  };
+
+  const handlePrevious = () => {
+    previousStep();
+  };
+
+  const handleSkip = () => {
+    skipStep(currentStepConfig.id);
+    if (onboardingState.currentStep < segmentConfig.onboardingSteps.length - 1) {
+      nextStep();
+    } else {
+      completeOnboarding();
+      navigate(segmentConfig.defaultRoute);
+    }
+  };
+
+  const renderStepContent = () => {
+    switch (currentStepConfig.id) {
+      case 'welcome':
+        return (
+          <div className="text-center py-8">
+            <div className={`w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 ${segmentConfig.color.replace('text-', 'bg-')}/10`}>
+              <span className="text-4xl">
+                {segmentConfig.icon === 'TreePine' && '🌲'}
+                {segmentConfig.icon === 'GraduationCap' && '🎓'}
+                {segmentConfig.icon === 'Briefcase' && '💼'}
+                {segmentConfig.icon === 'Building2' && '🏢'}
+                {segmentConfig.icon === 'TrendingUp' && '📈'}
+                {segmentConfig.icon === 'Network' && '🔗'}
+                {segmentConfig.icon === 'Heart' && '❤️'}
+              </span>
             </div>
-            <span className="font-display text-xl font-semibold text-foreground">
-              Atlas Sanctum
-            </span>
+            <h2 className="text-2xl font-bold text-foreground mb-4">
+              Welcome to Atlas Sanctum
+            </h2>
+            <p className="text-lg text-muted-foreground mb-6">
+              You're joining as a <span className={`font-semibold ${segmentConfig.color}`}>{segmentConfig.name}</span>
+            </p>
+            <div className="bg-muted/50 border border-border rounded-lg p-6 max-w-md mx-auto">
+              <h3 className="font-semibold text-foreground mb-3">What you'll get:</h3>
+              <ul className="space-y-2 text-left">
+                {segmentConfig.features.map((feature, idx) => (
+                  <li key={idx} className="flex items-start gap-2 text-muted-foreground">
+                    <Check className={`w-4 h-4 ${segmentConfig.color} flex-shrink-0 mt-0.5`} />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-4 pt-4 border-t border-border">
+                <p className="text-sm text-muted-foreground">
+                  <strong className="text-foreground">Pricing:</strong> {segmentConfig.pricingModel}
+                </p>
+                <p className={`text-lg font-bold ${segmentConfig.color}`}>
+                  {segmentConfig.priceRange}
+                </p>
+              </div>
+            </div>
           </div>
-          
-          <Button
-            variant="ghost"
-            onClick={() => {
-              localStorage.setItem(`onboarding_completed_${user?.id}`, "true");
-              navigate("/dashboard");
-            }}
-            className="text-muted-foreground"
+        );
+
+      case 'profile':
+        return (
+          <div className="space-y-6 py-8">
+            <div className="space-y-2">
+              <Label htmlFor="fullName">Full Name</Label>
+              <Input
+                id="fullName"
+                placeholder="John Doe"
+                value={formData.fullName || user?.displayName || ''}
+                onChange={(e) => handleFieldChange('fullName', e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="organization">Organization (Optional)</Label>
+              <Input
+                id="organization"
+                placeholder="Your organization name"
+                value={formData.organization || ''}
+                onChange={(e) => handleFieldChange('organization', e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="bio">Tell us about your goals...</Label>
+              <Textarea
+                id="bio"
+                placeholder="Describe what you hope to achieve..."
+                value={formData.bio || ''}
+                onChange={(e) => handleFieldChange('bio', e.target.value)}
+                className="min-h-[120px]"
+              />
+            </div>
+          </div>
+        );
+
+      case 'location':
+        return (
+          <div className="space-y-6 py-8">
+            <div className="space-y-2">
+              <Label htmlFor="country">Country</Label>
+              <Input
+                id="country"
+                placeholder="United States"
+                value={formData.country || ''}
+                onChange={(e) => handleFieldChange('country', e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="region">Region/State</Label>
+              <Input
+                id="region"
+                placeholder="California"
+                value={formData.region || ''}
+                onChange={(e) => handleFieldChange('region', e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="bioregion">Bioregion (Optional)</Label>
+              <Input
+                id="bioregion"
+                placeholder="e.g., Pacific Northwest, etc."
+                value={formData.bioregion || ''}
+                onChange={(e) => handleFieldChange('bioregion', e.target.value)}
+              />
+            </div>
+          </div>
+        );
+
+      case 'verification':
+        return (
+          <div className="space-y-6 py-8">
+            <div className="space-y-2">
+              <Label htmlFor="idType">ID Type</Label>
+              <Input
+                id="idType"
+                placeholder="e.g., Passport, Driver's License, etc."
+                value={formData.idType || ''}
+                onChange={(e) => handleFieldChange('idType', e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="idNumber">ID Number</Label>
+              <Input
+                id="idNumber"
+                placeholder="Your ID number"
+                value={formData.idNumber || ''}
+                onChange={(e) => handleFieldChange('idNumber', e.target.value)}
+              />
+            </div>
+            <div className="bg-muted/50 border border-border rounded-lg p-4">
+              <p className="text-sm text-muted-foreground">
+                <strong className="text-foreground">Note:</strong> Identity verification is required for impact tracking and credit verification. Your information is securely stored and only shared with authorized verification partners.
+              </p>
+            </div>
+          </div>
+        );
+
+      case 'organization':
+      case 'company':
+      case 'firm':
+      case 'institution':
+        return (
+          <div className="space-y-6 py-8">
+            <div className="space-y-2">
+              <Label htmlFor="orgName">Organization Name</Label>
+              <Input
+                id="orgName"
+                placeholder="Your organization name"
+                value={formData.orgName || ''}
+                onChange={(e) => handleFieldChange('orgName', e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="orgType">Organization Type</Label>
+              <Input
+                id="orgType"
+                placeholder="e.g., Corporation, Nonprofit, etc."
+                value={formData.orgType || ''}
+                onChange={(e) => handleFieldChange('orgType', e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="orgSize">Number of Members</Label>
+              <Input
+                id="orgSize"
+                type="number"
+                placeholder="e.g., 1-10, 11-50, 50+"
+                value={formData.orgSize || ''}
+                onChange={(e) => handleFieldChange('orgSize', e.target.value)}
+              />
+            </div>
+          </div>
+        );
+
+      case 'goals':
+        return (
+          <div className="space-y-6 py-8">
+            <div className="space-y-2">
+              <Label htmlFor="primaryGoal">Primary Impact Goal</Label>
+              <Textarea
+                id="primaryGoal"
+                placeholder="e.g., Carbon restoration, biodiversity protection, etc."
+                value={formData.primaryGoal || ''}
+                onChange={(e) => handleFieldChange('primaryGoal', e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="targetYear">Target Year</Label>
+              <Input
+                id="targetYear"
+                type="number"
+                placeholder="e.g., 2030"
+                value={formData.targetYear || ''}
+                onChange={(e) => handleFieldChange('targetYear', e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="additionalGoals">Additional Goals (Optional)</Label>
+              <Textarea
+                id="additionalGoals"
+                placeholder="Describe any additional impact goals..."
+                value={formData.additionalGoals || ''}
+                onChange={(e) => handleFieldChange('additionalGoals', e.target.value)}
+                className="min-h-[100px]"
+              />
+            </div>
+          </div>
+        );
+
+      case 'payment':
+        return (
+          <div className="space-y-6 py-8">
+            <div className="bg-muted/50 border border-border rounded-lg p-6">
+              <p className="text-sm text-muted-foreground mb-4">
+                <strong className="text-foreground">Payment Setup:</strong> Configure your payment methods for transactions and subscriptions.
+              </p>
+              <Badge variant="secondary" className="mb-2">
+                Coming Soon
+              </Badge>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="details">Additional Details (Optional)</Label>
+              <Textarea
+                id="details"
+                placeholder="Any additional information..."
+                value={formData.details || ''}
+                onChange={(e) => handleFieldChange('details', e.target.value)}
+                className="min-h-[150px]"
+              />
+            </div>
+          </div>
+        );
+
+      case 'tutorial':
+        return (
+          <div className="space-y-6 py-8">
+            <div className="bg-muted/50 border border-border rounded-lg p-6">
+              <h3 className="font-semibold text-foreground mb-4">Platform Tutorial</h3>
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                    <span className="text-sm font-semibold text-primary">1</span>
+                  </div>
+                  <div>
+                    <p className="font-medium text-foreground">Explore Your Dashboard</p>
+                    <p className="text-sm text-muted-foreground">Access your personalized dashboard with metrics and insights.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                    <span className="text-sm font-semibold text-primary">2</span>
+                  </div>
+                  <div>
+                    <p className="font-medium text-foreground">Discover Features</p>
+                    <p className="text-sm text-muted-foreground">Browse marketplace, community, and other platform features.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                    <span className="text-sm font-semibold text-primary">3</span>
+                  </div>
+                  <div>
+                    <p className="font-medium text-foreground">Manage Your Account</p>
+                    <p className="text-sm text-muted-foreground">Update your profile, settings, and preferences anytime.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      default:
+        return (
+          <div className="space-y-6 py-8">
+            <div className="bg-muted/50 border border-border rounded-lg p-6">
+              <p className="text-sm text-muted-foreground">
+                This step is being configured. Please continue to the next step.
+              </p>
+            </div>
+          </div>
+        );
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Header */}
+        <div className="mb-8">
+          <button
+            onClick={() => navigate('/segment-selection')}
+            className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 mb-4"
           >
-            Skip for now
-          </Button>
+            <ChevronLeft className="w-4 h-4" />
+            Change Segment
+          </button>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-foreground mb-1">
+                {segmentConfig.name} Onboarding
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                Step {onboardingState.currentStep + 1} of {segmentConfig.onboardingSteps.length}
+              </p>
+            </div>
+            <Badge variant="secondary" className="ml-auto">
+              {segmentConfig.pricingModel}
+            </Badge>
+          </div>
         </div>
 
-        {/* Progress Indicator */}
-        <div className="flex items-center justify-center gap-2 mb-8">
-          {steps.map((step, index) => (
-            <div key={step.title} className="flex items-center">
-              <motion.div
-                initial={false}
-                animate={{
-                  scale: currentStep === index ? 1.1 : 1,
-                  backgroundColor:
-                    index < currentStep
-                      ? "hsl(var(--primary))"
-                      : index === currentStep
-                      ? "hsl(var(--primary))"
-                      : "hsl(var(--muted))",
-                }}
-                className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium ${
-                  index <= currentStep ? "text-primary-foreground" : "text-muted-foreground"
-                }`}
-              >
-                {index < currentStep ? <Check className="w-5 h-5" /> : index + 1}
-              </motion.div>
-              {index < steps.length - 1 && (
-                <div
-                  className={`w-12 h-1 mx-2 rounded-full transition-colors ${
-                    index < currentStep ? "bg-primary" : "bg-muted"
-                  }`}
-                />
-              )}
+        {/* Progress Bar */}
+        <div className="mb-8">
+          <Progress value={progress} className="h-2" />
+        </div>
+
+        {/* Step Indicators */}
+        <div className="flex items-center justify-center gap-3 mb-8">
+          {segmentConfig.onboardingSteps.map((step, index) => (
+            <div
+              key={step.id}
+              className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
+                index < onboardingState.currentStep
+                  ? 'bg-primary text-primary-foreground'
+                  : index === onboardingState.currentStep
+                  ? 'bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2'
+                  : 'bg-muted text-muted-foreground'
+              }`}
+            >
+              {index + 1}
             </div>
           ))}
         </div>
 
         {/* Step Content */}
-        <div className="flex-1 flex items-center justify-center">
-          <div className="w-full max-w-2xl">
+        <Card className="mb-8">
+          <CardContent className="p-8">
             <AnimatePresence mode="wait">
               <motion.div
-                key={currentStep}
+                key={currentStepConfig.id}
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
-                className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl p-8 shadow-elevated"
               >
-                {/* Step Header */}
-                <div className="text-center mb-8">
-                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/50 border border-border/50 mb-4">
-                    <Sparkles className="w-4 h-4 text-accent" />
-                    <span className="text-sm text-muted-foreground">
-                      Step {currentStep + 1} of {steps.length}
-                    </span>
-                  </div>
-                  <h2 className="font-display text-2xl font-bold text-foreground mb-2">
-                    {steps[currentStep].title}
+                <div className="mb-6">
+                  <h2 className="text-xl font-semibold text-foreground mb-2">
+                    {currentStepConfig.title}
                   </h2>
                   <p className="text-muted-foreground">
-                    {steps[currentStep].subtitle}
+                    {currentStepConfig.description}
                   </p>
                 </div>
-
-                {/* Step 1: Organization */}
-                {currentStep === 0 && (
-                  <div className="space-y-6">
-                    <div className="space-y-3">
-                      <Label htmlFor="organization">Organization Name (Optional)</Label>
-                      <div className="relative">
-                        <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                        <Input
-                          id="organization"
-                          placeholder="Your company or organization"
-                          value={data.organization}
-                          onChange={(e) => setData({ ...data, organization: e.target.value })}
-                          className="pl-11"
-                        />
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        This helps us personalize your experience. Individual investors can skip this.
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Step 2: Investment Goals */}
-                {currentStep === 1 && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {INVESTMENT_GOALS.map((goal) => (
-                      <motion.button
-                        key={goal.id}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => setData({ ...data, investmentGoal: goal.id })}
-                        className={`p-5 rounded-xl border-2 text-left transition-all ${
-                          data.investmentGoal === goal.id
-                            ? "border-primary bg-primary/10"
-                            : "border-border hover:border-primary/50"
-                        }`}
-                      >
-                        <goal.icon className={`w-8 h-8 mb-3 ${
-                          data.investmentGoal === goal.id ? "text-primary" : "text-muted-foreground"
-                        }`} />
-                        <h3 className="font-semibold text-foreground mb-1">{goal.label}</h3>
-                        <p className="text-sm text-muted-foreground">{goal.description}</p>
-                      </motion.button>
-                    ))}
-                  </div>
-                )}
-
-                {/* Step 3: Project Interests */}
-                {currentStep === 2 && (
-                  <div className="space-y-6">
-                    <p className="text-center text-muted-foreground mb-6">
-                      Select all that interest you
-                    </p>
-                    <div className="grid grid-cols-2 gap-4">
-                      {PROJECT_INTERESTS.map((interest) => (
-                        <motion.button
-                          key={interest.id}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          onClick={() => toggleInterest(interest.id)}
-                          className={`p-5 rounded-xl border-2 text-center transition-all ${
-                            data.interests.includes(interest.id)
-                              ? "border-primary bg-primary/10"
-                              : "border-border hover:border-primary/50"
-                          }`}
-                        >
-                          <interest.icon className={`w-10 h-10 mx-auto mb-3 ${
-                            data.interests.includes(interest.id) ? "text-primary" : "text-muted-foreground"
-                          }`} />
-                          <span className="font-medium text-foreground">{interest.label}</span>
-                        </motion.button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Step 4: Budget */}
-                {currentStep === 3 && (
-                  <div className="space-y-4">
-                    {BUDGET_RANGES.map((budget) => (
-                      <motion.button
-                        key={budget.id}
-                        whileHover={{ scale: 1.01 }}
-                        whileTap={{ scale: 0.99 }}
-                        onClick={() => setData({ ...data, monthlyBudget: budget.id })}
-                        className={`w-full p-5 rounded-xl border-2 text-left transition-all ${
-                          data.monthlyBudget === budget.id
-                            ? "border-primary bg-primary/10"
-                            : "border-border hover:border-primary/50"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h3 className="font-semibold text-foreground">{budget.label}</h3>
-                            <p className="text-sm text-muted-foreground">{budget.description}</p>
-                          </div>
-                          {data.monthlyBudget === budget.id && (
-                            <Check className="w-6 h-6 text-primary" />
-                          )}
-                        </div>
-                      </motion.button>
-                    ))}
-                  </div>
-                )}
+                {renderStepContent()}
               </motion.div>
             </AnimatePresence>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Navigation Buttons */}
-        <div className="flex items-center justify-between mt-8">
+        <div className="flex items-center justify-between">
           <Button
-            variant="ghost"
-            onClick={handleBack}
-            disabled={currentStep === 0}
-            className="gap-2"
+            variant="outline"
+            onClick={handlePrevious}
+            disabled={onboardingState.currentStep === 0}
           >
-            <ArrowLeft className="w-4 h-4" />
-            Back
+            <ChevronLeft className="w-4 h-4 mr-2" />
+            Previous
           </Button>
-
-          {currentStep < steps.length - 1 ? (
-            <Button
-              onClick={handleNext}
-              disabled={!canProceed()}
-              className="gap-2"
-            >
-              Continue
-              <ArrowRight className="w-4 h-4" />
-            </Button>
-          ) : (
-            <Button
-              onClick={handleComplete}
-              disabled={!canProceed() || isSubmitting}
-              className="gap-2 bg-gradient-to-r from-primary to-ocean hover:opacity-90"
-            >
-              {isSubmitting ? (
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                  className="w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full"
-                />
+          <div className="flex items-center gap-2">
+            {!currentStepConfig.required && (
+              <Button variant="ghost" onClick={handleSkip}>
+                Skip
+              </Button>
+            )}
+            <Button onClick={handleNext}>
+              {onboardingState.currentStep === segmentConfig.onboardingSteps.length - 1 ? (
+                <>
+                  Complete Onboarding
+                  <Sparkles className="w-4 h-4 ml-2" />
+                </>
               ) : (
                 <>
-                  Complete Setup
-                  <Sparkles className="w-4 h-4" />
+                  Next Step
+                  <ArrowRight className="w-4 h-4 ml-2" />
                 </>
               )}
             </Button>
-          )}
+          </div>
         </div>
       </div>
     </div>
   );
-};
-
-export default Onboarding;
+}

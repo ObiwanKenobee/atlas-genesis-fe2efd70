@@ -1,5 +1,5 @@
 import express from 'express';
-import { PaymentService } from '../services/payment';
+import { PaymentService, PaymentMethod } from '../services/payment';
 import { query } from '../db';
 import { emailService } from '../services/email';
 
@@ -8,7 +8,7 @@ const router = express.Router();
 // Initialize payment
 router.post('/initialize', async (req, res) => {
   try {
-    const { listingId, quantity, buyerId, email, amount } = req.body;
+    const { listingId, quantity, buyerId, email, amount, paymentMethod = 'paystack', currency = 'USD' } = req.body;
 
     if (!listingId || !quantity || !buyerId || !email || !amount) {
       return res.status(400).json({
@@ -24,9 +24,9 @@ router.post('/initialize', async (req, res) => {
     }
 
     // Generate unique reference
-    const reference = `atlas_${orderResult.order.id}_${Date.now()}`;
+    const reference = `${paymentMethod}_${orderResult.order.id}_${Date.now()}`;
 
-    // Initialize payment with Paystack
+    // Initialize payment with selected method
     const paymentResult = await PaymentService.initializePayment({
       amount: amount,
       email: email,
@@ -36,21 +36,25 @@ router.post('/initialize', async (req, res) => {
         listingId: listingId,
         quantity: quantity,
         buyerId: buyerId,
+        currency: currency,
       },
       callback_url: `${process.env.FRONTEND_URL}/payment/callback`,
+      paymentMethod: paymentMethod as PaymentMethod,
+      currency: currency,
     });
 
     if (!paymentResult.success) {
       return res.status(500).json(paymentResult);
     }
 
-    // Update order with payment reference
-    await PaymentService.updateOrderStatus(orderResult.order.id, 'pending', reference);
+    // Update order with payment reference and method
+    await PaymentService.updateOrderStatus(orderResult.order.id, 'pending', reference, paymentMethod);
 
     res.json({
       success: true,
       order: orderResult.order,
       payment: paymentResult.data,
+      paymentMethod: paymentResult.paymentMethod,
     });
   } catch (error: any) {
     console.error('Payment initialization error:', error);
@@ -65,6 +69,7 @@ router.post('/initialize', async (req, res) => {
 router.get('/verify/:reference', async (req, res) => {
   try {
     const { reference } = req.params;
+    const { paymentMethod = 'paystack' } = req.query;
 
     if (!reference) {
       return res.status(400).json({
@@ -73,8 +78,8 @@ router.get('/verify/:reference', async (req, res) => {
       });
     }
 
-    // Verify with Paystack
-    const verificationResult = await PaymentService.verifyPayment(reference);
+    // Verify with selected payment method
+    const verificationResult = await PaymentService.verifyPayment(reference, paymentMethod as PaymentMethod);
     if (!verificationResult.success) {
       return res.status(500).json(verificationResult);
     }
@@ -92,7 +97,7 @@ router.get('/verify/:reference', async (req, res) => {
 
     // Update order status based on payment status
     const status = paymentData.status === 'success' ? 'completed' : 'failed';
-    const updateResult = await PaymentService.updateOrderStatus(orderId, status, reference);
+    const updateResult = await PaymentService.updateOrderStatus(orderId, status, reference, paymentMethod as PaymentMethod);
 
     if (!updateResult.success) {
       return res.status(500).json(updateResult);
@@ -102,6 +107,7 @@ router.get('/verify/:reference', async (req, res) => {
       success: true,
       payment: paymentData,
       order: updateResult.order,
+      paymentMethod: verificationResult.paymentMethod,
     });
   } catch (error: any) {
     console.error('Payment verification error:', error);

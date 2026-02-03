@@ -11,7 +11,44 @@ interface SecurityPerformanceMetric {
   statusCode: number;
   ip: string;
   timestamp: Date;
+  userId?: string;
+  sessionId?: string;
+  threatLevel?: 'low' | 'medium' | 'high' | 'critical';
+  incidentId?: string;
   additionalData?: any;
+}
+
+interface SecurityAlertThreshold {
+  operation: string;
+  maxDuration: number;
+  maxMemoryDelta: number;
+  maxCpuDelta: number;
+  minSuccessRate: number;
+  alertCooldown: number; // minutes
+}
+
+interface SecurityIncident {
+  id: string;
+  operation: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  description: string;
+  metrics: SecurityPerformanceMetric[];
+  timestamp: Date;
+  resolved: boolean;
+  resolutionTime?: Date;
+  responseTime?: number;
+}
+
+interface SecurityKPIs {
+  totalRequests: number;
+  successRate: number;
+  avgResponseTime: number;
+  p95ResponseTime: number;
+  p99ResponseTime: number;
+  activeThreats: number;
+  incidentsResolved: number;
+  complianceScore: number;
+  uptime: number;
 }
 
 class SecurityPerformanceMonitor {

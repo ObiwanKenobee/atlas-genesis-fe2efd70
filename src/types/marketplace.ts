@@ -105,7 +105,7 @@ export interface BioregionalZone {
   country: string;
   climate_type: string | null;
   description: string | null;
-  coordinates: any | null;
+  coordinates: GeoPoint | GeoPolygon | null;
   biodiversity_index: number | null;
   carbon_sequestration_rate: number | null;
   active_projects: number | null;

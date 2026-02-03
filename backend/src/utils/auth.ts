@@ -6,14 +6,40 @@ import { query } from '../db';
 
 export interface User {
   id: string;
-  email: string;
+  email?: string;
+  phoneNumber?: string;
   displayName?: string;
   role: string;
   tenantId?: string;
-  emailVerified: boolean;
+  organizationId?: string;
+  emailVerified?: boolean;
+  phoneVerified?: boolean;
   mfaEnabled: boolean;
   lastLogin?: Date;
+  profileData?: any;
+  preferences?: any;
 }
+
+// Role hierarchy for access control
+export const roleHierarchy = {
+  'admin': 5,
+  'moderator': 4,
+  'institution': 3,
+  'investor': 3,
+  'researcher': 3,
+  'producer': 2,
+  'user': 1
+};
+
+// Role-specific capabilities
+export const roleCapabilities = {
+  'producer': ['view_projects', 'apply_for_funding', 'submit_measurements', 'access_educational_resources'],
+  'investor': ['view_projects', 'invest', 'track_portfolio', 'access_impact_reports'],
+  'institution': ['view_projects', 'fund_projects', 'monitor_compliance', 'access_admin_dashboard'],
+  'researcher': ['view_data', 'submit_research', 'collaborate', 'access_api'],
+  'admin': ['all'],
+  'moderator': ['moderate_content', 'manage_users', 'monitor_system']
+};
 
 export interface TokenPayload {
   userId: string;
@@ -66,7 +92,7 @@ export const generateAccessToken = (payload: Omit<TokenPayload, 'type' | 'iat' |
     ...payload,
     type: 'access'
   };
-  return jwt.sign(tokenPayload, JWT_ACCESS_SECRET, { expiresIn: JWT_ACCESS_EXPIRES_IN });
+  return jwt.sign(tokenPayload, JWT_ACCESS_SECRET as string, { expiresIn: JWT_ACCESS_EXPIRES_IN as any });
 };
 
 export const generateRefreshToken = (payload: Omit<TokenPayload, 'type' | 'iat' | 'exp'>): string => {
@@ -74,7 +100,7 @@ export const generateRefreshToken = (payload: Omit<TokenPayload, 'type' | 'iat' 
     ...payload,
     type: 'refresh'
   };
-  return jwt.sign(tokenPayload, JWT_REFRESH_SECRET, { expiresIn: JWT_REFRESH_EXPIRES_IN });
+  return jwt.sign(tokenPayload, JWT_REFRESH_SECRET as string, { expiresIn: JWT_REFRESH_EXPIRES_IN as any });
 };
 
 // JWT token verification
@@ -261,15 +287,13 @@ export const updateUserSessionActivity = async (sessionId: string): Promise<void
 
 // Role-based access control helpers
 export const checkPermission = (userRole: string, requiredRole: string): boolean => {
-  const roleHierarchy = {
-    'admin': 4,
-    'moderator': 3,
-    'investor': 2,
-    'individual': 1
-  };
-
   return (roleHierarchy[userRole as keyof typeof roleHierarchy] || 0) >=
          (roleHierarchy[requiredRole as keyof typeof roleHierarchy] || 0);
+};
+
+export const hasCapability = (userRole: string, capability: string): boolean => {
+  const capabilities = roleCapabilities[userRole as keyof typeof roleCapabilities];
+  return capabilities && (capabilities.includes('all') || capabilities.includes(capability));
 };
 
 export const checkTenantAccess = (userTenantId: string | null, resourceTenantId: string | null): boolean => {
@@ -423,11 +447,10 @@ export const generateSecureAccessToken = (
     ...payload,
     type: 'access',
     iss: JWT_ISSUER,
-    aud: JWT_AUDIENCE,
     deviceFingerprint
   };
-  return jwt.sign(tokenPayload, JWT_ACCESS_SECRET, {
-    expiresIn: JWT_ACCESS_EXPIRES_IN,
+  return jwt.sign(tokenPayload, JWT_ACCESS_SECRET as string, {
+    expiresIn: JWT_ACCESS_EXPIRES_IN as any,
     issuer: JWT_ISSUER,
     audience: JWT_AUDIENCE
   });
@@ -442,12 +465,11 @@ export const generateSecureRefreshToken = (
     ...payload,
     type: 'refresh',
     iss: JWT_ISSUER,
-    aud: JWT_AUDIENCE,
     familyId,
     deviceFingerprint
   };
-  return jwt.sign(tokenPayload, JWT_REFRESH_SECRET, {
-    expiresIn: JWT_REFRESH_EXPIRES_IN,
+  return jwt.sign(tokenPayload, JWT_REFRESH_SECRET as string, {
+    expiresIn: JWT_REFRESH_EXPIRES_IN as any,
     issuer: JWT_ISSUER,
     audience: JWT_AUDIENCE
   });
@@ -596,7 +618,7 @@ export const getSecurityDashboardData = async (userId?: string): Promise<any> =>
     totalUsers: 0,
     activeUsers: 0,
     lockedAccounts: 0,
-    recentSecurityEvents: [],
+    recentSecurityEvents: [] as any[],
     loginAttempts: {
       successful: 0,
       failed: 0,

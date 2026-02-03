@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Mail, Phone, MapPin, Clock, Send, CheckCircle, AlertCircle } from "lucide-react";
-import Header from "@/components/Header";
+import Header from "@/components/EnterpriseHeader";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/hooks/useAuth";
 

@@ -42,8 +42,8 @@ class SentinelHubClient {
   private baseUrl = 'https://services.sentinel-hub.com/api/v1';
 
   constructor(config: SentinelHubConfig = {}) {
-    this.clientId = config.clientId || process.env.REACT_APP_SENTINEL_CLIENT_ID || '';
-    this.clientSecret = config.clientSecret || process.env.REACT_APP_SENTINEL_CLIENT_SECRET || '';
+    this.clientId = config.clientId || import.meta.env.VITE_SENTINEL_CLIENT_ID || '';
+    this.clientSecret = config.clientSecret || import.meta.env.VITE_SENTINEL_CLIENT_SECRET || '';
     // Use mock data if credentials aren't available or explicitly set
     this.useMockData = config.useMockData !== false && (!this.clientId || !this.clientSecret);
   }
@@ -241,7 +241,7 @@ class SentinelHubClient {
     startDate: Date,
     endDate: Date
   ): SentinelResponse['data'] {
-    const data = [];
+    const data: SentinelResponse['data'] = [];
     const daysDiff = Math.floor((endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
 
     // Generate 3-5 mock acquisitions

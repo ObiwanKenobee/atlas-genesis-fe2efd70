@@ -1,5 +1,5 @@
 // Frontend API Service Layer
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
 const API_V2_BASE_URL = `${API_BASE_URL}/v2`;
 
 interface APIResponse<T> {
@@ -44,6 +44,11 @@ class ApiService {
 
     for (let attempt = 0; attempt <= retries; attempt++) {
       try {
+        // Validate URL format
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+          throw new Error('Invalid URL: must start with http:// or https://');
+        }
+
         const response = await fetch(url, {
           ...options,
           headers,
@@ -108,17 +113,17 @@ class ApiService {
 
   // Auth API
   auth = {
-    signup: (email: string, password: string, displayName?: string) =>
-      this.request<APIResponse<{ user: any; token: string }>>(
+    signup: (email: string, password: string, displayName?: string, role?: string) =>
+      this.request<APIResponse<{ user: any; message: string }>>(
         `${API_V2_BASE_URL}/auth/signup`,
         {
           method: 'POST',
-          body: JSON.stringify({ email, password, displayName }),
+          body: JSON.stringify({ email, password, displayName, role }),
         }
       ),
 
     login: (email: string, password: string) =>
-      this.request<APIResponse<{ user: any; token: string }>>(
+      this.request<APIResponse<{ user: any; tokens: { accessToken: string; refreshToken: string; expiresIn: number } }>>(
         `${API_V2_BASE_URL}/auth/login`,
         {
           method: 'POST',
@@ -129,12 +134,56 @@ class ApiService {
     getCurrentUser: () =>
       this.request<any>(`${API_V2_BASE_URL}/auth/me`),
 
-    updateProfile: (userId: string, updates: any) =>
+    updateProfile: (updates: any) =>
       this.request<any>(
         `${API_V2_BASE_URL}/auth/profile`,
         {
           method: 'PUT',
-          body: JSON.stringify({ userId, ...updates }),
+          body: JSON.stringify(updates),
+        }
+      ),
+
+    refreshToken: (refreshToken: string) =>
+      this.request<APIResponse<{ tokens: { accessToken: string; refreshToken: string; expiresIn: number } }>>(
+        `${API_V2_BASE_URL}/auth/refresh`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ refreshToken }),
+        }
+      ),
+
+    verifyEmail: (token: string) =>
+      this.request<APIResponse<{ message: string }>>(
+        `${API_V2_BASE_URL}/auth/verify-email`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ token }),
+        }
+      ),
+
+    resendVerification: () =>
+      this.request<APIResponse<{ message: string }>>(
+        `${API_V2_BASE_URL}/auth/resend-verification`,
+        {
+          method: 'POST',
+        }
+      ),
+
+    forgotPassword: (email: string) =>
+      this.request<APIResponse<{ message: string }>>(
+        `${API_V2_BASE_URL}/auth/forgot-password`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ email }),
+        }
+      ),
+
+    resetPassword: (token: string, newPassword: string) =>
+      this.request<APIResponse<{ message: string }>>(
+        `${API_V2_BASE_URL}/auth/reset-password`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ token, newPassword }),
         }
       ),
   };
@@ -273,9 +322,9 @@ class ApiService {
       ),
   };
 
-  // Payments API
+   // Payments API
   payments = {
-    initializePayment: (data: { listingId: string; quantity: number; buyerId: string; email: string; amount: number }) =>
+    initializePayment: (data: { listingId: string; quantity: number; buyerId: string; email: string; amount: number; paymentMethod?: string; currency?: string }) =>
       this.request<any>(
         `${API_BASE_URL}/payments/initialize`,
         {
@@ -284,8 +333,8 @@ class ApiService {
         }
       ),
 
-    verifyPayment: (reference: string) =>
-      this.request<any>(`${API_BASE_URL}/payments/verify/${reference}`),
+    verifyPayment: (reference: string, paymentMethod?: string) =>
+      this.request<any>(`${API_BASE_URL}/payments/verify/${reference}${paymentMethod ? `?paymentMethod=${paymentMethod}` : ''}`),
 
     getPaymentStatus: (orderId: string) =>
       this.request<any>(`${API_BASE_URL}/payments/status/${orderId}`),

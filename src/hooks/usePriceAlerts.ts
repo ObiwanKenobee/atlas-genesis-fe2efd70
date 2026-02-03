@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from './useAuth';
+import { useSupabaseAuth } from './useSupabaseAuth';
 import { toast } from 'sonner';
 
 export interface PriceAlert {
@@ -22,7 +22,7 @@ export interface PriceAlert {
 }
 
 export function usePriceAlerts() {
-  const { user } = useAuth();
+  const { user } = useSupabaseAuth();
   const queryClient = useQueryClient();
 
   const { data: alerts = [], isLoading, error } = useQuery({

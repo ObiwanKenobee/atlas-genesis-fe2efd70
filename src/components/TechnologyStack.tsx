@@ -86,7 +86,7 @@ const TechnologyStack = () => {
               transition={{ duration: 0.5, delay: index * 0.1 }}
               className="group"
             >
-              <div className="relative bg-card border border-border/50 rounded-lg sm:rounded-2xl p-4 sm:p-8 h-full hover:border-primary/30 transition-all duration-500 hover:shadow-glow overflow-hidden">
+              <div className="relative bg-card border border-border/50 rounded-lg sm:rounded-2xl p-4 sm:p-8 h-full hover:border-primary/30 transition-all duration-500 hover:shadow-glow overflow-hidden glass-panel">
                 {/* Gradient Background on Hover */}
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
@@ -125,7 +125,7 @@ const TechnologyStack = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="mt-12 sm:mt-16 md:mt-20 p-4 sm:p-8 rounded-2xl sm:rounded-3xl bg-card-gradient border border-border/50"
+          className="mt-12 sm:mt-16 md:mt-20 p-4 sm:p-8 rounded-2xl sm:rounded-3xl bg-card-gradient border border-border/50 glass-panel"
         >
           <div className="flex flex-col lg:flex-row items-center justify-between gap-6 sm:gap-8">
             <div className="flex-1">

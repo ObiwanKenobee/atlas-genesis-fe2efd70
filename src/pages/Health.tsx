@@ -1,5 +1,6 @@
 import React from "react";
-import Navigation from "@/components/Navigation";
+import EnterpriseHeader from "@/components/EnterpriseHeader";
+import PageHero from "@/components/PageHero";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Heart, Wind, Droplet, Leaf } from "lucide-react";
@@ -7,12 +8,23 @@ import { Heart, Wind, Droplet, Leaf } from "lucide-react";
 const Health = () => {
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
-      <main className="container mx-auto px-4 py-8 max-w-7xl">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight mb-2">Human Health Integration</h1>
-          <p className="text-lg text-muted-foreground">Air quality credits, water restoration, urban health scores, and health system participation</p>
-        </div>
+      <EnterpriseHeader />
+      <PageHero
+        title="Human Health Integration"
+        subtitle="Air quality credits, water restoration, urban health scores, and health system participation"
+        ctaText="Explore Health Data"
+        ctaLink="#health-data"
+        secondaryCtaText="Learn More"
+        secondaryCtaLink="/about"
+        badgeText="Health & Wellbeing"
+        stats={[
+          { value: "2.4M", label: "Lives Improved" },
+          { value: "45%", label: "Pollution Reduction" },
+          { value: "78%", label: "Water Quality" },
+          { value: "32%", label: "Health Access" }
+        ]}
+      />
+      <main className="container mx-auto px-4 py-8 max-w-7xl" id="health-data">
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <Card className="border-l-4 border-l-red-500">

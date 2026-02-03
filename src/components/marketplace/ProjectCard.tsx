@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { CarbonProject, PROJECT_TYPE_LABELS, PROJECT_TYPE_ICONS } from '@/types/marketplace';
 import { useMeasurementData } from '@/hooks/useMeasurementData';
 import { PriceAlertModal } from '@/components/PriceAlertModal';
-import { useAuth } from '@/hooks/useAuth';
+import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 
 interface ProjectCardProps {
   project: CarbonProject;
@@ -59,7 +59,7 @@ function MeasurementMiniChart({ projectId, title }: { projectId: string; title: 
 }
 
 export function ProjectCard({ project, index }: ProjectCardProps) {
-  const { user } = useAuth();
+  const { user } = useSupabaseAuth();
   const [showPriceAlert, setShowPriceAlert] = useState(false);
   const availabilityPercent = (project.available_credits / project.total_credits) * 100;
 
@@ -173,7 +173,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
                 </Button>
               )}
               <Button asChild size="sm" className="bg-primary hover:bg-primary/90">
-                <Link to={`/marketplace/${project.id}`} aria-label={`View details for ${project.title}`}>View Details</Link>
+                <Link to={`/project/${project.id}`} aria-label={`View details for ${project.title}`}>View Details</Link>
               </Button>
             </div>
           </div>

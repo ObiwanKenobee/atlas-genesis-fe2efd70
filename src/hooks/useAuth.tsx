@@ -1,14 +1,17 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { useState, useEffect, createContext, useContext } from 'react';
+import { apiService } from '@/lib/api/client';
 
 interface User {
   id: string;
   email: string;
-  displayName?: string;
+  displayName: string;
   role: string;
   tenantId?: string;
   emailVerified: boolean;
   mfaEnabled: boolean;
   lastLogin?: string;
+  segment?: string;
+  onboardingCompleted?: boolean;
 }
 
 interface Tokens {
@@ -20,9 +23,11 @@ interface Tokens {
 interface AuthContextType {
   user: User | null;
   tokens: Tokens | null;
+  session: Record<string, unknown> | null;
   loading: boolean;
   signUp: (email: string, password: string, displayName?: string, role?: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  demoSignIn: (role: 'user' | 'admin') => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   refreshToken: () => Promise<{ error: Error | null }>;
   verifyEmail: (token: string) => Promise<{ error: Error | null }>;
@@ -34,328 +39,243 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const API_BASE = process.env.NODE_ENV === 'production'
-  ? 'https://api.atlas-genesis.com'
-  : 'http://localhost:4000';
-
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [tokens, setTokens] = useState<Tokens | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Initialize auth state from localStorage
+  // Load saved user and tokens from localStorage on mount
   useEffect(() => {
-    const initializeAuth = async () => {
-      const storedTokens = localStorage.getItem('auth_tokens');
-      const storedUser = localStorage.getItem('auth_user');
-
-      if (storedTokens && storedUser) {
-        try {
-          const parsedTokens = JSON.parse(storedTokens);
-          const parsedUser = JSON.parse(storedUser);
-
-          // Check if access token is still valid
-          const tokenPayload = JSON.parse(atob(parsedTokens.accessToken.split('.')[1]));
-          const now = Math.floor(Date.now() / 1000);
-
-          if (tokenPayload.exp > now) {
-            setTokens(parsedTokens);
-            setUser(parsedUser);
-          } else if (parsedTokens.refreshToken) {
-            // Try to refresh token
-            const refreshResult = await refreshToken();
-            if (refreshResult.error) {
-              // Clear stored data if refresh fails
-              localStorage.removeItem('auth_tokens');
-              localStorage.removeItem('auth_user');
-            }
-          }
-        } catch (error) {
-          console.error('Error parsing stored auth data:', error);
-          localStorage.removeItem('auth_tokens');
-          localStorage.removeItem('auth_user');
-        }
+    const savedUser = localStorage.getItem('auth_user');
+    const savedTokens = localStorage.getItem('auth_tokens');
+    
+    if (savedUser && savedTokens) {
+      try {
+        setUser(JSON.parse(savedUser));
+        setTokens(JSON.parse(savedTokens));
+        apiService.setToken(JSON.parse(savedTokens).accessToken);
+      } catch (error) {
+        console.error('Failed to parse saved auth data:', error);
+        localStorage.removeItem('auth_user');
+        localStorage.removeItem('auth_tokens');
       }
-
-      setLoading(false);
-    };
-
-    initializeAuth();
+    }
+    
+    setLoading(false);
   }, []);
 
-  // Store auth data in localStorage
-  const storeAuthData = (userData: User, tokenData: Tokens) => {
-    localStorage.setItem('auth_user', JSON.stringify(userData));
-    localStorage.setItem('auth_tokens', JSON.stringify(tokenData));
-    setUser(userData);
-    setTokens(tokenData);
+  const signUp = async (email: string, password: string, displayName?: string, role?: string): Promise<{ error: Error | null }> => {
+    try {
+      const response = await apiService.auth.signup(email, password, displayName);
+      
+      if (response.error) {
+        return { error: new Error(response.error) };
+      }
+      
+      return { error: null };
+    } catch (error) {
+      return { error: error instanceof Error ? error : new Error('Sign up failed') };
+    }
   };
 
-  // Clear auth data
-  const clearAuthData = () => {
-    localStorage.removeItem('auth_user');
-    localStorage.removeItem('auth_tokens');
+  const signIn = async (email: string, password: string): Promise<{ error: Error | null }> => {
+    try {
+      // Check if this is a demo login
+      if (email.toLowerCase().includes('demo') && password === 'demo123') {
+        const demoUser = {
+          id: `demo-${Date.now()}`,
+          email: email,
+          displayName: email.split('@')[0],
+          role: email.includes('admin') ? 'admin' : 'user',
+          tenantId: 'demo-tenant',
+          emailVerified: true,
+          mfaEnabled: false,
+          lastLogin: new Date().toISOString()
+        };
+        
+        const demoTokens = {
+          accessToken: `demo-access-token-${Date.now()}`,
+          refreshToken: `demo-refresh-token-${Date.now()}`,
+          expiresIn: 3600 // 1 hour
+        };
+        
+        setUser(demoUser);
+        setTokens(demoTokens);
+        localStorage.setItem('auth_user', JSON.stringify(demoUser));
+        localStorage.setItem('auth_tokens', JSON.stringify(demoTokens));
+        apiService.setToken(demoTokens.accessToken);
+        
+        return { error: null };
+      }
+
+      // Regular login
+      const response = await apiService.auth.login(email, password);
+      
+      if (response.error) {
+        return { error: new Error(response.error) };
+      }
+      
+      // Save user and tokens
+      if (response.data) {
+        setUser(response.data.user);
+        setTokens(response.data.tokens);
+        localStorage.setItem('auth_user', JSON.stringify(response.data.user));
+        localStorage.setItem('auth_tokens', JSON.stringify(response.data.tokens));
+        apiService.setToken(response.data.tokens.accessToken);
+      }
+      
+      return { error: null };
+    } catch (error) {
+      return { error: error instanceof Error ? error : new Error('Sign in failed') };
+    }
+  };
+
+  const demoSignIn = async (role: 'user' | 'admin'): Promise<{ error: Error | null }> => {
+    const demoEmail = role === 'admin' ? 'admin@demo.com' : 'user@demo.com';
+    return signIn(demoEmail, 'demo123');
+  };
+
+  const signOut = async (): Promise<void> => {
     setUser(null);
     setTokens(null);
+    localStorage.removeItem('auth_user');
+    localStorage.removeItem('auth_tokens');
+    apiService.setToken('');
   };
 
-  const signUp = async (email: string, password: string, displayName?: string, role = 'individual') => {
-    try {
-      const response = await fetch(`${API_BASE}/api/v2/auth/signup`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: email.toLowerCase(),
-          password,
-          displayName,
-          role,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return { error: new Error(data.message || 'Signup failed') };
-      }
-
-      // For signup, we don't automatically sign in
-      // User needs to verify email first
-      return { error: null };
-    } catch (error) {
-      return { error: error as Error };
-    }
-  };
-
-  const signIn = async (email: string, password: string) => {
-    try {
-      const response = await fetch(`${API_BASE}/api/v2/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: email.toLowerCase(),
-          password,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return { error: new Error(data.message || 'Login failed') };
-      }
-
-      storeAuthData(data.user, data.tokens);
-      return { error: null };
-    } catch (error) {
-      return { error: error as Error };
-    }
-  };
-
-  const signOut = async () => {
-    try {
-      if (tokens?.refreshToken) {
-        await fetch(`${API_BASE}/api/v2/auth/logout`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${tokens.accessToken}`,
-          },
-          body: JSON.stringify({ refreshToken: tokens.refreshToken }),
-        });
-      }
-    } catch (error) {
-      console.error('Logout API call failed:', error);
-    } finally {
-      clearAuthData();
-    }
-  };
-
-  const refreshToken = async () => {
+  const refreshToken = async (): Promise<{ error: Error | null }> => {
     if (!tokens?.refreshToken) {
       return { error: new Error('No refresh token available') };
     }
 
     try {
-      const response = await fetch(`${API_BASE}/api/v2/auth/refresh`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          refreshToken: tokens.refreshToken,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        clearAuthData();
-        return { error: new Error(data.message || 'Token refresh failed') };
+      const response = await apiService.auth.refreshToken(tokens.refreshToken);
+      
+      if (response.error) {
+        // If refresh token is invalid, sign out the user
+        if (response.error.includes('Invalid') || response.error.includes('expired')) {
+          signOut();
+        }
+        return { error: new Error(response.error) };
       }
-
-      const newTokens = data.tokens;
-      if (user) {
-        storeAuthData(user, newTokens);
+      
+      if (response.data) {
+        setTokens(response.data.tokens);
+        localStorage.setItem('auth_tokens', JSON.stringify(response.data.tokens));
+        apiService.setToken(response.data.tokens.accessToken);
       }
-
+      
       return { error: null };
     } catch (error) {
-      clearAuthData();
-      return { error: error as Error };
+      // If refresh fails, sign out the user
+      signOut();
+      return { error: error instanceof Error ? error : new Error('Token refresh failed') };
     }
   };
 
-  const verifyEmail = async (token: string) => {
+  const verifyEmail = async (token: string): Promise<{ error: Error | null }> => {
     try {
-      const response = await fetch(`${API_BASE}/api/v2/auth/verify-email`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ token }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return { error: new Error(data.message || 'Email verification failed') };
+      const response = await apiService.auth.verifyEmail(token);
+      
+      if (response.error) {
+        return { error: new Error(response.error) };
       }
-
+      
       return { error: null };
     } catch (error) {
-      return { error: error as Error };
+      return { error: error instanceof Error ? error : new Error('Email verification failed') };
     }
   };
 
-  const resendVerification = async () => {
-    if (!tokens?.accessToken) {
-      return { error: new Error('Not authenticated') };
-    }
-
+  const resendVerification = async (): Promise<{ error: Error | null }> => {
     try {
-      const response = await fetch(`${API_BASE}/api/v2/auth/resend-verification`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${tokens.accessToken}`,
-        },
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return { error: new Error(data.message || 'Failed to resend verification') };
+      const response = await apiService.auth.resendVerification();
+      
+      if (response.error) {
+        return { error: new Error(response.error) };
       }
-
+      
       return { error: null };
     } catch (error) {
-      return { error: error as Error };
+      return { error: error instanceof Error ? error : new Error('Failed to resend verification email') };
     }
   };
 
-  const forgotPassword = async (email: string) => {
+  const forgotPassword = async (email: string): Promise<{ error: Error | null }> => {
     try {
-      const response = await fetch(`${API_BASE}/api/v2/auth/forgot-password`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: email.toLowerCase() }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return { error: new Error(data.message || 'Failed to send reset email') };
+      const response = await apiService.auth.forgotPassword(email);
+      
+      if (response.error) {
+        return { error: new Error(response.error) };
       }
-
+      
       return { error: null };
     } catch (error) {
-      return { error: error as Error };
+      return { error: error instanceof Error ? error : new Error('Failed to send password reset email') };
     }
   };
 
-  const resetPassword = async (token: string, newPassword: string) => {
+  const resetPassword = async (token: string, newPassword: string): Promise<{ error: Error | null }> => {
     try {
-      const response = await fetch(`${API_BASE}/api/v2/auth/reset-password`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ token, newPassword }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return { error: new Error(data.message || 'Password reset failed') };
+      const response = await apiService.auth.resetPassword(token, newPassword);
+      
+      if (response.error) {
+        return { error: new Error(response.error) };
       }
-
+      
       return { error: null };
     } catch (error) {
-      return { error: error as Error };
+      return { error: error instanceof Error ? error : new Error('Password reset failed') };
     }
   };
 
-  const updateProfile = async (profileData: Partial<User>) => {
-    if (!tokens?.accessToken) {
-      return { error: new Error('Not authenticated') };
-    }
-
+  const updateProfile = async (data: Partial<User>): Promise<{ error: Error | null }> => {
     try {
-      const response = await fetch(`${API_BASE}/api/v2/auth/profile`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${tokens.accessToken}`,
-        },
-        body: JSON.stringify(profileData),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return { error: new Error(data.message || 'Profile update failed') };
+      if (!user) {
+        return { error: new Error('User not authenticated') };
       }
 
-      // Update stored user data
-      if (user) {
-        const updatedUser = { ...user, ...data };
-        storeAuthData(updatedUser, tokens);
+      const response = await apiService.auth.updateProfile(data);
+      
+      if (response.error) {
+        return { error: new Error(response.error) };
       }
-
+      
+      // Update local user state
+      const updatedUser = { ...user, ...data };
+      setUser(updatedUser);
+      localStorage.setItem('auth_user', JSON.stringify(updatedUser));
+      
       return { error: null };
     } catch (error) {
-      return { error: error as Error };
+      return { error: error instanceof Error ? error : new Error('Profile update failed') };
     }
   };
 
-  return (
-    <AuthContext.Provider value={{
-      user,
-      tokens,
-      loading,
-      signUp,
-      signIn,
-      signOut,
-      refreshToken,
-      verifyEmail,
-      resendVerification,
-      forgotPassword,
-      resetPassword,
-      updateProfile
-    }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  const value: AuthContextType = {
+    user,
+    tokens,
+    session: null,
+    loading,
+    signUp,
+    signIn,
+    demoSignIn,
+    signOut,
+    refreshToken,
+    verifyEmail,
+    resendVerification,
+    forgotPassword,
+    resetPassword,
+    updateProfile
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-export const useAuth = () => {
+export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };

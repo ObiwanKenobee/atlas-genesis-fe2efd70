@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { CarbonProject, CreditHolding, Transaction, ProjectType } from '@/types/marketplace';
-import { useAuth } from './useAuth';
+import { useSupabaseAuth } from './useSupabaseAuth';
 import { toast } from 'sonner';
 
 export function useProjects(filters?: { type?: ProjectType; search?: string }) {
@@ -47,7 +47,7 @@ export function useProject(projectId: string | undefined) {
 }
 
 export function useUserHoldings() {
-  const { user } = useAuth();
+  const { user } = useSupabaseAuth();
   
   return useQuery({
     queryKey: ['credit-holdings', user?.id],
@@ -66,7 +66,7 @@ export function useUserHoldings() {
 }
 
 export function useUserTransactions() {
-  const { user } = useAuth();
+  const { user } = useSupabaseAuth();
   
   return useQuery({
     queryKey: ['transactions', user?.id],
@@ -85,7 +85,7 @@ export function useUserTransactions() {
 }
 
 export function usePurchaseCredits() {
-  const { user } = useAuth();
+  const { user } = useSupabaseAuth();
   const queryClient = useQueryClient();
 
   return useMutation({

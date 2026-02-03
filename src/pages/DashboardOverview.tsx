@@ -33,7 +33,7 @@ import {
   Clock,
   Settings,
 } from 'lucide-react';
-import Header from '@/components/Header';
+import Header from '@/components/EnterpriseHeader';
 import Footer from '@/components/Footer';
 
 // Register Chart.js components
@@ -271,14 +271,49 @@ const DashboardOverview: React.FC = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        // TODO: Replace with actual API calls
-        // const kpiResponse = await fetch('/api/dashboard/kpis');
-        // const trendsResponse = await fetch('/api/dashboard/market-trends');
-        // const co2Response = await fetch('/api/dashboard/co2-reductions');
-        // const activityResponse = await fetch('/api/dashboard/recent-activity');
 
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Attempt to load real data from backend endpoints. If any call fails,
+        // we fall back to the in-file mock data so the dashboard still renders.
+        const endpoints = [
+          '/api/dashboard/kpis',
+          '/api/dashboard/market-trends',
+          '/api/dashboard/co2-reductions',
+          '/api/dashboard/recent-activity',
+        ];
+
+        const results = await Promise.allSettled(endpoints.map(ep => fetch(ep)));
+
+        // Helper to safely parse JSON from a settled fetch
+        const parseIfOk = async (res: PromiseSettledResult<Response> | undefined) => {
+          if (!res || res.status !== 'fulfilled') return null;
+          const response = res.value;
+          if (!response.ok) return null;
+          try {
+            return await response.json();
+          } catch {
+            return null;
+          }
+        };
+
+        const [kpiJson, trendsJson, co2Json, activityJson] = await Promise.all(
+          results.map(r => parseIfOk(r))
+        );
+
+        if (kpiJson && Array.isArray(kpiJson)) {
+          setKpiData(kpiJson as KPIMetric[]);
+        }
+
+        if (trendsJson && typeof trendsJson === 'object') {
+          setMarketTrendsData(trendsJson as ChartData);
+        }
+
+        if (co2Json && typeof co2Json === 'object') {
+          setCo2ReductionsData(co2Json as ChartData);
+        }
+
+        if (activityJson && Array.isArray(activityJson)) {
+          setRecentActivity(activityJson as ActivityItem[]);
+        }
 
         setLastUpdated(new Date());
         setError(null);

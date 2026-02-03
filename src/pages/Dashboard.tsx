@@ -1,10 +1,13 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { InteractiveDashboard, InteractiveFeatureGrid } from '@/components/EnhancedPlatformComponents';
+import { PageTransition, InteractiveButton } from '@/components/Interactions';
 import {
   Leaf, LogOut, User, BarChart3, ShoppingCart, Briefcase,
   TrendingUp, Activity, Bell, Settings, Globe, TreePine,
-  ChevronRight, Shield, Wallet, ArrowUpRight, Plus, HelpCircle
+  ChevronRight, Shield, Wallet, ArrowUpRight, Plus, HelpCircle,
+  Calculator, Trophy
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,9 +15,11 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import QuickActions from "@/components/dashboard/QuickActions";
 import { OnboardingTour } from "@/components/OnboardingTour";
+import { ImpactWidget } from "@/components/dashboard/ImpactWidget";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useAdmin";
 import { useOnboardingTour } from "@/hooks/useOnboardingTour";
+import { usePriceAlertMonitor } from "@/hooks/usePriceAlertMonitor";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 interface Profile {
@@ -38,6 +43,7 @@ const Dashboard = () => {
   const { user, loading, signOut } = useAuth();
   const { data: isAdmin } = useIsAdmin();
   const { startTour, tourCompleted } = useOnboardingTour();
+  usePriceAlertMonitor(); // Start monitoring price alerts
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [holdings, setHoldings] = useState<CreditHolding[]>([]);
@@ -54,8 +60,16 @@ const Dashboard = () => {
       // Check if onboarding is complete
       const completed = localStorage.getItem(`onboarding_completed_${user.id}`);
       if (!completed) {
-        navigate("/onboarding");
-        return;
+        // For demo users, skip onboarding
+        if (user.email?.includes('demo')) {
+          localStorage.setItem(`onboarding_completed_${user.id}`, 'true');
+        } else {
+          // For real users, redirect to onboarding if not completed
+          // navigate("/onboarding");
+          // return;
+          // Temporarily skip onboarding for all users
+          localStorage.setItem(`onboarding_completed_${user.id}`, 'true');
+        }
       }
     }
   }, [user, loading, navigate]);
@@ -63,36 +77,124 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (user) {
-        // Fetch profile
-        const { data: profileData } = await supabase
-          .from("profiles")
-          .select("full_name, organization, avatar_url")
-          .eq("user_id", user.id)
-          .maybeSingle();
+        // For demo users, create mock data
+        if (user.email?.includes('demo')) {
+          // Different data for admin and regular users
+          if (user.email?.includes('admin')) {
+            setProfile({
+              full_name: 'Admin User',
+              organization: 'Atlas Sanctum Admin',
+              avatar_url: null
+            });
+            
+            // Create admin-specific mock holdings
+            const mockHoldings: CreditHolding[] = [
+              {
+                id: '1',
+                quantity: 500,
+                purchase_price: 15.50,
+                project_id: 'proj-1',
+                carbon_projects: {
+                  title: 'Amazon Rainforest Protection',
+                  project_type: 'Forest Conservation'
+                }
+              },
+              {
+                id: '2',
+                quantity: 250,
+                purchase_price: 22.00,
+                project_id: 'proj-2',
+                carbon_projects: {
+                  title: 'Solar Farm Initiative',
+                  project_type: 'Renewable Energy'
+                }
+              },
+              {
+                id: '3',
+                quantity: 300,
+                purchase_price: 18.75,
+                project_id: 'proj-3',
+                carbon_projects: {
+                  title: 'Ocean Conservation Project',
+                  project_type: 'Marine Protection'
+                }
+              }
+            ];
+            
+            setHoldings(mockHoldings);
+            const credits = mockHoldings.reduce((sum, h) => sum + h.quantity, 0);
+            const value = mockHoldings.reduce((sum, h) => sum + h.quantity * h.purchase_price, 0);
+            setTotalCredits(credits);
+            setPortfolioValue(value);
+          } else {
+            setProfile({
+              full_name: 'Demo User',
+              organization: 'Demo Organization',
+              avatar_url: null
+            });
+            
+            // Create regular user mock holdings
+            const mockHoldings: CreditHolding[] = [
+              {
+                id: '1',
+                quantity: 100,
+                purchase_price: 15.50,
+                project_id: 'proj-1',
+                carbon_projects: {
+                  title: 'Amazon Rainforest Protection',
+                  project_type: 'Forest Conservation'
+                }
+              },
+              {
+                id: '2',
+                quantity: 50,
+                purchase_price: 22.00,
+                project_id: 'proj-2',
+                carbon_projects: {
+                  title: 'Solar Farm Initiative',
+                  project_type: 'Renewable Energy'
+                }
+              }
+            ];
+            
+            setHoldings(mockHoldings);
+            const credits = mockHoldings.reduce((sum, h) => sum + h.quantity, 0);
+            const value = mockHoldings.reduce((sum, h) => sum + h.quantity * h.purchase_price, 0);
+            setTotalCredits(credits);
+            setPortfolioValue(value);
+          }
+        } else {
+          // For real users, fetch from Supabase
+          const { data: profileData } = await supabase
+            .from("profiles")
+            .select("full_name, organization, avatar_url")
+            .eq("user_id", user.id)
+            .maybeSingle();
 
-        if (profileData) setProfile(profileData);
+          if (profileData) setProfile(profileData);
 
-        // Fetch holdings
-        const { data: holdingsData } = await supabase
-          .from("credit_holdings")
-          .select(`
-            id,
-            quantity,
-            purchase_price,
-            project_id,
-            carbon_projects (
-              title,
-              project_type
-            )
-          `)
-          .eq("user_id", user.id);
+          // Fetch holdings
+          const { data: holdingsData } = await supabase
+            .from("credit_holdings")
+            .select(`
+              id,
+              quantity,
+              purchase_price,
+              project_id,
+              carbon_projects (
+                title,
+                project_type
+              )
+            `)
+            .eq("user_id", user.id);
 
-        if (holdingsData) {
-          setHoldings(holdingsData as CreditHolding[]);
-          const credits = holdingsData.reduce((sum, h) => sum + h.quantity, 0);
-          const value = holdingsData.reduce((sum, h) => sum + h.quantity * h.purchase_price, 0);
-          setTotalCredits(credits);
-          setPortfolioValue(value);
+          if (holdingsData) {
+            setHoldings(holdingsData as CreditHolding[]);
+            const credits = holdingsData.reduce((sum, h) => sum + h.quantity, 0);
+            const value = holdingsData.reduce((sum, h) => sum + h.quantity * h.purchase_price, 0);
+            setTotalCredits(credits);
+            setPortfolioValue(value);
+          }
         }
       }
     };
@@ -107,14 +209,20 @@ const Dashboard = () => {
   };
 
   if (loading) {
+    // Using lazy import to avoid circular dependencies
+    const DashboardSkeleton = React.lazy(() => import('@/components/skeletons/DashboardSkeleton'));
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full"
-        />
-      </div>
+      <React.Suspense fallback={
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full"
+          />
+        </div>
+      }>
+        <DashboardSkeleton />
+      </React.Suspense>
     );
   }
 
@@ -161,13 +269,16 @@ const Dashboard = () => {
 
   const quickLinks = [
     { label: "Browse Marketplace", icon: ShoppingCart, href: "/marketplace", color: "bg-primary/10 text-primary" },
+    { label: "Carbon Calculator", icon: Calculator, href: "/calculator", color: "bg-accent/10 text-accent" },
     { label: "View Portfolio", icon: Briefcase, href: "/portfolio", color: "bg-ocean/10 text-ocean" },
-    { label: "Explore Bioregions", icon: Globe, href: "/bioregions", color: "bg-accent/10 text-accent" },
+    { label: "Explore Bioregions", icon: Globe, href: "/bioregions", color: "bg-emerald-500/10 text-emerald-600" },
+    { label: "Achievements", icon: Trophy, href: "/profile#achievements", color: "bg-amber-500/10 text-amber-600" },
     { label: "Settings", icon: Settings, href: "/settings", color: "bg-muted text-muted-foreground" },
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <PageTransition>
+      <div className="min-h-screen bg-background">
       {/* Onboarding Tour */}
       <OnboardingTour />
 
@@ -272,17 +383,13 @@ const Dashboard = () => {
                       Explore verified carbon credit projects and make your first investment in planetary regeneration.
                     </p>
                     <div className="flex flex-wrap gap-3 justify-center md:justify-start">
-                      <Button asChild className="gap-2">
-                        <Link to="/marketplace">
-                          Browse Projects
-                          <ArrowUpRight className="w-4 h-4" />
-                        </Link>
-                      </Button>
-                      <Button variant="outline" asChild>
-                        <Link to="/bioregions">
-                          Explore Bioregions
-                        </Link>
-                      </Button>
+                      <InteractiveButton variant="primary" onClick={() => navigate('/marketplace')}>
+                        Browse Projects
+                        <ArrowUpRight className="w-4 h-4" />
+                      </InteractiveButton>
+                      <InteractiveButton variant="secondary" onClick={() => navigate('/bioregions')}>
+                        Explore Bioregions
+                      </InteractiveButton>
                     </div>
                   </div>
                 </div>
@@ -331,7 +438,7 @@ const Dashboard = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 sm:mb-8"
+          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6 sm:mb-8"
           data-tour="quick-links"
         >
           {quickLinks.map((link, index) => (
@@ -353,7 +460,28 @@ const Dashboard = () => {
           ))}
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
+        {/* Carbon Impact Widget */}
+        {totalCredits > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="mt-8"
+          >
+            <ImpactWidget />
+          </motion.div>
+        )}
+
+        {/* Interactive Dashboard Metrics */}
+        <InteractiveDashboard />
+
+        {/* Interactive Feature Grid */}
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold text-foreground mb-6">Platform Features</h2>
+          <InteractiveFeatureGrid />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mt-12">
           {/* Recent Activity or Getting Started */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -433,6 +561,7 @@ const Dashboard = () => {
         </div>
       </main>
     </div>
+    </PageTransition>
   );
 };
 

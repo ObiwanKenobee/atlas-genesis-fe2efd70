@@ -1,20 +1,37 @@
 import passport from 'passport';
-import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import { Strategy as GitHubStrategy } from 'passport-github2';
+import { Strategy as GoogleStrategy, Profile as GoogleProfile } from 'passport-google-oauth20';
+import { Strategy as GitHubStrategy, Profile as GitHubProfile } from 'passport-github2';
 import { Strategy as MicrosoftStrategy } from 'passport-microsoft';
 import { query } from '../db';
-import { hashPassword } from '../utils/auth';
+import { hashPassword, User } from '../utils/auth';
+
+// Extend Express User type to match our User interface
+declare global {
+  namespace Express {
+    interface User {
+      id: string;
+      email?: string;
+      displayName?: string;
+      role: string;
+      tenantId?: string;
+      emailVerified: boolean;
+      mfaEnabled: boolean;
+      lastLogin?: Date;
+    }
+  }
+}
 
 // Google OAuth Strategy (only if credentials are provided)
 if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
   passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: `${process.env.FRONTEND_URL}/api/auth/google/callback`
-  }, async (accessToken, refreshToken, profile, done) => {
+    callbackURL: `${process.env.FRONTEND_URL}/api/auth/google/callback`,
+    passReqToCallback: false
+  }, async (accessToken: string, refreshToken: string, profile: GoogleProfile, done: (err: any, user?: Express.User | false) => void) => {
     try {
       // Check if user already exists
-      let result = await query('SELECT * FROM users WHERE oauth_provider = $1 AND oauth_id = $2', ['google', profile.id]);
+      const result = await query('SELECT * FROM users WHERE oauth_provider = $1 AND oauth_id = $2', ['google', profile.id]);
 
       if (result.rowCount > 0) {
         // Update last login
@@ -25,7 +42,7 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
       // Create new user
       const email = profile.emails?.[0]?.value;
       if (!email) {
-        return done(new Error('No email provided by Google'), null);
+        return done(new Error('No email provided by Google'), false);
       }
 
       // Check if email already exists
@@ -52,7 +69,7 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
 
       return done(null, newUser.rows[0]);
     } catch (error) {
-      return done(error, null);
+      return done(error, false);
     }
   }));
 }
@@ -64,10 +81,10 @@ if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
     callbackURL: `${process.env.FRONTEND_URL}/api/auth/github/callback`,
     scope: ['user:email']
-  }, async (accessToken, refreshToken, profile, done) => {
+  }, async (accessToken: string, refreshToken: string, profile: GitHubProfile, done: (err: any, user?: User | false) => void) => {
     try {
       // Check if user already exists
-      let result = await query('SELECT * FROM users WHERE oauth_provider = $1 AND oauth_id = $2', ['github', profile.id]);
+      const result = await query('SELECT * FROM users WHERE oauth_provider = $1 AND oauth_id = $2', ['github', profile.id]);
 
       if (result.rowCount > 0) {
         await query('UPDATE users SET last_login = NOW() WHERE id = $1', [result.rows[0].id]);
@@ -77,7 +94,7 @@ if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
       // Get email from profile
       const email = profile.emails?.[0]?.value;
       if (!email) {
-        return done(new Error('No email provided by GitHub'), null);
+        return done(new Error('No email provided by GitHub'), false);
       }
 
       // Check if email already exists
@@ -103,7 +120,7 @@ if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
 
       return done(null, newUser.rows[0]);
     } catch (error) {
-      return done(error, null);
+      return done(error, false);
     }
   }));
 }
@@ -115,10 +132,10 @@ if (process.env.MICROSOFT_CLIENT_ID && process.env.MICROSOFT_CLIENT_SECRET) {
     clientSecret: process.env.MICROSOFT_CLIENT_SECRET,
     callbackURL: `${process.env.FRONTEND_URL}/api/auth/microsoft/callback`,
     scope: ['user.read']
-  }, async (accessToken, refreshToken, profile, done) => {
+  }, async (accessToken: string, refreshToken: string, profile: any, done: (err: any, user?: User | false) => void) => {
     try {
       // Check if user already exists
-      let result = await query('SELECT * FROM users WHERE oauth_provider = $1 AND oauth_id = $2', ['microsoft', profile.id]);
+      const result = await query('SELECT * FROM users WHERE oauth_provider = $1 AND oauth_id = $2', ['microsoft', profile.id]);
 
       if (result.rowCount > 0) {
         await query('UPDATE users SET last_login = NOW() WHERE id = $1', [result.rows[0].id]);
@@ -128,7 +145,7 @@ if (process.env.MICROSOFT_CLIENT_ID && process.env.MICROSOFT_CLIENT_SECRET) {
       // Get email from profile
       const email = profile.emails?.[0]?.value || profile.userPrincipalName;
       if (!email) {
-        return done(new Error('No email provided by Microsoft'), null);
+        return done(new Error('No email provided by Microsoft'), false);
       }
 
       // Check if email already exists
@@ -154,27 +171,27 @@ if (process.env.MICROSOFT_CLIENT_ID && process.env.MICROSOFT_CLIENT_SECRET) {
 
       return done(null, newUser.rows[0]);
     } catch (error) {
-      return done(error, null);
+      return done(error, false);
     }
   }));
 }
 
 // Serialize user for session
-passport.serializeUser((user: any, done) => {
+passport.serializeUser((user: Express.User, done) => {
   done(null, user.id);
 });
 
 // Deserialize user from session
-passport.deserializeUser(async (id: string, done) => {
+passport.deserializeUser(async (id: string, done: (err: any, user?: Express.User | false) => void) => {
   try {
     const result = await query('SELECT * FROM users WHERE id = $1', [id]);
     if (result.rowCount > 0) {
       done(null, result.rows[0]);
     } else {
-      done(new Error('User not found'), null);
+      done(new Error('User not found'), false);
     }
   } catch (error) {
-    done(error, null);
+    done(error, false);
   }
 });
 

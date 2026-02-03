@@ -46,7 +46,7 @@ router.get('/headers-check', (req, res) => {
     'strict-transport-security': !!responseHeaders['strict-transport-security']
   };
 
-  const missing = Object.keys(checks).filter(key => !checks[key]);
+  const missing = Object.keys(checks).filter(key => !(checks as any)[key]);
 
   if (missing.length > 0) {
     logSecurityEvent('security_headers_missing', null, {

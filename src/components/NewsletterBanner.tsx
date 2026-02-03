@@ -51,15 +51,18 @@ const NewsletterBanner = () => {
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
         className="fixed bottom-4 left-4 right-4 md:left-auto md:right-6 md:bottom-6 z-50 max-w-md"
       >
-        <div className="relative bg-gradient-to-br from-card via-card to-primary/10 border border-border/50 rounded-2xl shadow-elevated backdrop-blur-xl overflow-hidden">
+        <div className="relative bg-gradient-to-br from-card via-card to-primary/10 border border-border/50 rounded-2xl shadow-elevated backdrop-blur-xl overflow-hidden glass-panel">
           {/* Decorative gradient orb */}
           <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/20 rounded-full blur-2xl" />
           <div className="absolute -bottom-10 -left-10 w-24 h-24 bg-accent/20 rounded-full blur-2xl" />
           
           {/* Close button */}
           <button
+            type="button"
             onClick={() => setIsVisible(false)}
             className="absolute top-3 right-3 p-1.5 rounded-full hover:bg-muted/50 transition-colors z-10"
+            aria-label="Close newsletter banner"
+            title="Close newsletter banner"
           >
             <X className="w-4 h-4 text-muted-foreground" />
           </button>

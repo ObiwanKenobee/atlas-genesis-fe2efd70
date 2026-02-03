@@ -1,0 +1,63 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "value": "eastus"
+    },
+    "environment": {
+      "value": "production"
+    },
+    "frontendAppName": {
+      "value": "atlas-genesis-frontend"
+    },
+    "backendAppName": {
+      "value": "atlas-genesis-backend"
+    },
+    "databaseServerName": {
+      "value": "atlas-genesis-db"
+    },
+    "databaseName": {
+      "value": "atlas_genesis"
+    },
+    "keyVaultName": {
+      "value": "atlas-genesis-kv"
+    },
+    "cdnProfileName": {
+      "value": "atlas-genesis-cdn"
+    },
+    "cdnEndpointName": {
+      "value": "atlas-genesis-frontend"
+    },
+    "appInsightsName": {
+      "value": "atlas-genesis-insights"
+    },
+    "containerRegistryName": {
+      "value": "atlasgenesisregistry"
+    },
+    "databaseAdminPassword": {
+      "value": "YourSecureDatabasePassword123!"
+    },
+    "jwtAccessSecret": {
+      "value": "your-super-secure-access-secret-key-min-32-chars"
+    },
+    "jwtRefreshSecret": {
+      "value": "your-super-secure-refresh-secret-key-min-32-chars"
+    },
+    "sendgridApiKey": {
+      "value": "your-sendgrid-api-key"
+    },
+    "paystackSecretKey": {
+      "value": "your-paystack-secret-key"
+    },
+    "supabaseUrl": {
+      "value": "https://your-project.supabase.co"
+    },
+    "supabaseAnonKey": {
+      "value": "your-supabase-anon-key"
+    },
+    "userObjectId": {
+      "value": "your-azure-ad-user-object-id"
+    }
+  }
+}

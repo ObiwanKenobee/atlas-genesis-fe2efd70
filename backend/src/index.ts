@@ -1,4 +1,14 @@
+import './tracing';
+import './secrets';
+import { runStartupChecks } from './startupChecks';
+import { checkReadiness } from './readiness';
+import metrics from './metrics';
+import featureFlags from './featureFlags';
+import adminFlagsRouter from './routes/adminFlags';
 import express, { Request, Response, NextFunction } from 'express';
+import session from 'express-session';
+import connectRedis from 'connect-redis';
+import redisClient from './redisClient';
 import http from 'http';
 import { Server as SocketIOServer, Socket } from 'socket.io';
 import cors from 'cors';
@@ -41,6 +51,10 @@ import auditPublicRouter from './routes/audit-public';
 import paymentsRouter from './routes/payments';
 import securityRouter from './routes/security';
 import adminFilesRouter from './routes/admin/files';
+import regenerativeFinanceRouter from './routes/regenerative-finance';
+import defiRouter from './routes/defi';
+import communityRouter from './routes/community';
+import educationRouter from './routes/education';
 
 // Import session cleanup utility
 import { cleanupExpiredSessions } from './utils/auth';
@@ -52,6 +66,29 @@ import measurementsV2Router from './routes/measurements-v2';
 import projectsRouter from './routes/projects';
 
 const app = express();
+
+// Redis-backed sessions when REDIS_URL is configured
+try {
+  const RedisStore = connectRedis(session as any);
+  if (process.env.REDIS_URL) {
+    app.use(
+      session({
+        store: new RedisStore({ client: redisClient as any }),
+        secret: process.env.SESSION_SECRET || 'change-me',
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+          secure: process.env.NODE_ENV === 'production',
+          httpOnly: true,
+          sameSite: 'lax',
+          maxAge: 1000 * 60 * 60 * 24
+        }
+      })
+    );
+  }
+} catch (err) {
+  console.warn('Redis session store not configured', err);
+}
 
 // Security headers (must be first)
 app.use(securityHeaders);
@@ -211,6 +248,13 @@ app.use(securityLogger);
 // Request logging
 app.use(requestLogger);
 
+// Prometheus metrics middleware (captures durations and counts)
+app.use(metrics.metricsMiddleware);
+
+// Attach feature flags to each request
+app.use(featureFlags.attachFlagsMiddleware);
+
+
 // API versioning middleware
 app.use('/api', (req: Request, res: Response, next: NextFunction) => {
   // Extract API version from header, query param, or URL
@@ -262,23 +306,39 @@ app.get('/health', async (req, res) => {
       replayAttackPreventionActive: true
     };
 
-    res.json({
-      status: 'ok',
-      timestamp: new Date().toISOString(),
-      version: '2.0.0',
-      environment: process.env.NODE_ENV || 'development',
-      uptime: Math.floor(uptime),
+    // Service health checks
+    const services = {
+      database: 'connected',
+      websocket: io ? 'active' : 'inactive',
+      api: 'active'
+    };
+
+    // Performance metrics
+    const performanceMetrics = {
       responseTime: `${responseTime}ms`,
       memory: {
         used: `${Math.round(memoryUsage.heapUsed / 1024 / 1024)}MB`,
         total: `${Math.round(memoryUsage.heapTotal / 1024 / 1024)}MB`,
         external: `${Math.round(memoryUsage.external / 1024 / 1024)}MB`
       },
+      uptime: Math.floor(uptime),
+      cpuUsage: process.cpuUsage ? `${process.cpuUsage().user / 1000000}s` : 'N/A'
+    };
+
+    // Determine overall health status based on checks
+    const isHealthy = Object.values(services).every(status => status === 'active' || status === 'connected');
+
+    res.status(isHealthy ? 200 : 503).json({
+      status: isHealthy ? 'ok' : 'degraded',
+      timestamp: new Date().toISOString(),
+      version: '2.0.0',
+      environment: process.env.NODE_ENV || 'development',
+      uptime: performanceMetrics.uptime,
+      responseTime: performanceMetrics.responseTime,
+      memory: performanceMetrics.memory,
+      cpuUsage: performanceMetrics.cpuUsage,
       security: securityStatus,
-      services: {
-        database: 'connected',
-        websocket: io ? 'active' : 'inactive'
-      }
+      services: services
     });
   } catch (error) {
     logSecurityEvent('health_check_failed', null, {
@@ -295,6 +355,17 @@ app.get('/health', async (req, res) => {
   }
 });
 
+// Expose Prometheus metrics
+app.get('/metrics', metrics.metricsEndpoint);
+
+// Expose feature flags for frontend/runtime (read-only)
+app.get('/api/flags', (req: Request, res: Response) => {
+  res.json(featureFlags.getAllFlags());
+});
+
+// Admin routes for toggling runtime flags
+app.use('/api/admin/flags', adminFlagsRouter);
+
 // Original API Routes
 app.use('/api/auth', authRouter);
 app.use('/api/assets', assetsRouter);
@@ -308,6 +379,10 @@ app.use('/api/audit-public', auditPublicRouter);
 app.use('/api/payments', paymentsRouter);
 app.use('/api/security', securityRouter);
 app.use('/api/admin/files', adminFilesRouter);
+app.use('/api/regenerative-finance', regenerativeFinanceRouter);
+app.use('/api/defi', defiRouter);
+app.use('/api/community', communityRouter);
+app.use('/api/education', educationRouter);
 
 // V2 API Routes with enhanced functionality
 app.use('/api/v2/auth', authV2Router);
@@ -316,12 +391,13 @@ app.use('/api/v2/measurements', measurementsV2Router);
 app.use('/api/v2/projects', projectsRouter);
 
 // Root endpoint with API documentation
-app.get('/api', (req, res) => {
+app.get('/', (req, res) => {
   res.json({
     name: 'Atlas Genesis - Regenerative Carbon Credit Platform API',
     version: '2.0.0',
     endpoints: {
       health: '/health',
+      api: '/api',
       auth: {
         v1: '/api/auth',
         v2: '/api/v2/auth'
@@ -338,7 +414,45 @@ app.get('/api', (req, res) => {
       governance: '/api/governance',
       assets: '/api/assets',
       ethics: '/api/ethics',
-      payments: '/api/payments'
+      payments: '/api/payments',
+      'regenerative-finance': '/api/regenerative-finance',
+      'defi': '/api/defi',
+      'community': '/api/community',
+      'education': '/api/education'
+    },
+    documentation: 'https://docs.atlas-genesis.com'
+  });
+});
+
+// API root endpoint (deprecated but kept for compatibility)
+app.get('/api', (req, res) => {
+  res.json({
+    name: 'Atlas Genesis - Regenerative Carbon Credit Platform API',
+    version: '2.0.0',
+    endpoints: {
+      health: '/health',
+      api: '/api',
+      auth: {
+        v1: '/api/auth',
+        v2: '/api/v2/auth'
+      },
+      marketplace: {
+        v1: '/api/marketplace',
+        v2: '/api/v2/marketplace'
+      },
+      measurements: {
+        v1: '/api/measurements',
+        v2: '/api/v2/measurements'
+      },
+      projects: '/api/v2/projects',
+      governance: '/api/governance',
+      assets: '/api/assets',
+      ethics: '/api/ethics',
+      payments: '/api/payments',
+      'regenerative-finance': '/api/regenerative-finance',
+      'defi': '/api/defi',
+      'community': '/api/community',
+      'education': '/api/education'
     },
     documentation: 'https://docs.atlas-genesis.com'
   });
@@ -628,11 +742,32 @@ setInterval(async () => {
   }
 }, 60 * 60 * 1000); // Run every hour
 
-const PORT = process.env.PORT || 4000;
-server.listen(PORT, () => {
-  console.log(`🚀 Atlas Genesis API running on http://localhost:${PORT}`);
-  console.log(`📚 API Documentation: http://localhost:${PORT}/api`);
-  console.log(`❤️  Health Check: http://localhost:${PORT}/health`);
-  console.log(`🌍 CORS enabled for: ${allowedOrigins.join(', ')}`);
-  console.log(`🔌 WebSocket server ready for real-time connections`);
+// Start server after performing startup checks (fail-fast in prod if secrets missing)
+(async () => {
+  try {
+    await runStartupChecks();
+  } catch (err) {
+    console.error('Startup checks failed', err);
+    process.exit(1);
+  }
+
+  const PORT = process.env.PORT || 4000;
+  server.listen(PORT, () => {
+    console.log(`🚀 Atlas Genesis API running on http://localhost:${PORT}`);
+    console.log(`📚 API Documentation: http://localhost:${PORT}/api`);
+    console.log(`❤️  Health Check: http://localhost:${PORT}/health`);
+    console.log(`🌍 CORS enabled for: ${allowedOrigins.join(', ')}`);
+    console.log(`🔌 WebSocket server ready for real-time connections`);
+  });
+})();
+
+// Readiness endpoint for orchestration
+app.get('/ready', async (req: any, res: any) => {
+  try {
+    const { ok, details } = await checkReadiness();
+    if (ok) return res.status(200).json({ status: 'ready', details });
+    return res.status(503).json({ status: 'not_ready', details });
+  } catch (err: any) {
+    return res.status(500).json({ status: 'error', message: err.message || String(err) });
+  }
 });

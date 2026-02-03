@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import Navigation from "@/components/Navigation";
+import EnterpriseHeader from "@/components/EnterpriseHeader";
 import EcosystemRecoveryTracker from "@/components/EcosystemRecoveryTracker";
+import PageHero from "@/components/PageHero";
 import { useRegenerativeMetrics } from "@/hooks/useRegenerativeMetrics";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -14,15 +15,23 @@ const RegenerativeAgriculture = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      <EnterpriseHeader />
+      <PageHero
+        title="Regenerative Agriculture & Ecosystem Recovery"
+        subtitle="Soil microbiome health, crop diversity metrics, mangrove/kelp restoration, and pollinator recovery"
+        ctaText="Explore Projects"
+        ctaLink="#projects"
+        secondaryCtaText="Learn More"
+        secondaryCtaLink="/about"
+        badgeText="Sustainable Farming"
+        stats={[
+          { value: "82%", label: "Microbiome Health" },
+          { value: "78%", label: "Biodiversity" },
+          { value: "94%", label: "Water Retention" },
+          { value: "35%", label: "Carbon Sequestration" }
+        ]}
+      />
       <main className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight mb-2">Regenerative Agriculture & Ecosystem Recovery</h1>
-          <p className="text-lg text-muted-foreground">
-            Soil microbiome health, crop diversity metrics, mangrove/kelp restoration, and pollinator recovery
-          </p>
-        </div>
 
         {/* Impact Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">

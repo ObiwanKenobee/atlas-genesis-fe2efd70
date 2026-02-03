@@ -24,6 +24,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import ApiStatus from "@/components/ApiStatus";
 
 const Footer = () => {
   const [email, setEmail] = useState("");
@@ -60,9 +61,9 @@ const Footer = () => {
 
   const resourceLinks = [
     { name: "API Documentation", href: "/help/documentation" },
-    { name: "Impact Guides", href: "#" },
-    { name: "Community Forum", href: "#" },
-    { name: "Case Studies", href: "#" },
+    { name: "Impact Guides", href: "/outreach" },
+    { name: "Community Forum", href: "/community" },
+    { name: "Case Studies", href: "/education" },
   ];
 
   const supportLinks = [
@@ -74,15 +75,15 @@ const Footer = () => {
   const legalLinks = [
     { name: "Privacy Policy", href: "/privacy-policy" },
     { name: "Terms of Service", href: "/terms-of-service" },
-    { name: "Cookie Policy", href: "#" },
-    { name: "Accessibility Statement", href: "#" },
+    { name: "Cookie Policy", href: "/cookie-policy" },
+    { name: "Accessibility Statement", href: "/accessibility" },
   ];
 
   const companyLinks = [
-    { name: "About Atlas", href: "#" },
-    { name: "Join Our Team", href: "#" },
-    { name: "Media Kit", href: "#" },
-    { name: "Get in Touch", href: "#" },
+    { name: "About Atlas", href: "/about" },
+    { name: "Join Our Team", href: "/careers" },
+    { name: "Media Kit", href: "/media-kit" },
+    { name: "Get in Touch", href: "/contact" },
   ];
 
   const socialLinks = [
@@ -94,7 +95,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-slate-950/50 border-t border-border/30 relative">
+    <footer className="bg-regenerative border-t border-border/30 relative glass-panel">
       {/* Gradient Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-emerald-500/5 to-transparent pointer-events-none"></div>
 
@@ -111,17 +112,19 @@ const Footer = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                aria-label="Email address for newsletter subscription"
                 className="flex-1 px-4 py-3 rounded-lg bg-slate-900/50 border border-border/30 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
               />
               <Button
                 type="submit"
                 disabled={subscribeStatus === "loading"}
-                className="gap-2 whitespace-nowrap"
+                className="gap-2 whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                aria-label="Subscribe to newsletter"
               >
                 {subscribeStatus === "loading" ? (
-                  "Subscribing..."
+                  <span aria-live="polite">Subscribing...</span>
                 ) : subscribeStatus === "success" ? (
-                  "✓ Subscribed!"
+                  <span aria-live="polite">✓ Subscribed!</span>
                 ) : (
                   <>
                     Subscribe <Send className="w-4 h-4" />
@@ -134,12 +137,12 @@ const Footer = () => {
         </div>
 
         {/* Main Footer Content */}
-        <div className="py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+        <div className="py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-6">
           {/* Brand & Contact */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 sm:col-span-2">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-blue-600 flex items-center justify-center">
-                <Leaf className="w-5 h-5 text-white" />
+                <Leaf className="w-5 h-5 text-white" aria-hidden="true" />
               </div>
               <div>
                 <div className="font-bold text-lg text-foreground">
@@ -153,22 +156,22 @@ const Footer = () => {
 
             {/* Contact Info */}
             <div className="space-y-3 mb-6">
-              <a href="mailto:hello@atlassanctum.com" className="flex items-center gap-3 text-sm text-muted-foreground hover:text-emerald-400 transition-colors">
-                <Mail className="w-4 h-4 flex-shrink-0" />
+              <a href="mailto:hello@atlassanctum.com" className="flex items-center gap-3 text-sm text-muted-foreground hover:text-emerald-400 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/50 rounded">
+                <Mail className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                 <span>hello@atlassanctum.com</span>
               </a>
-              <a href="tel:+1234567890" className="flex items-center gap-3 text-sm text-muted-foreground hover:text-emerald-400 transition-colors">
-                <Phone className="w-4 h-4 flex-shrink-0" />
+              <a href="tel:+1234567890" className="flex items-center gap-3 text-sm text-muted-foreground hover:text-emerald-400 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/50 rounded">
+                <Phone className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                 <span>+1 (234) 567-890</span>
               </a>
               <div className="flex items-start gap-3 text-sm text-muted-foreground">
-                <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" aria-hidden="true" />
                 <span>San Francisco, CA<br />United States</span>
               </div>
             </div>
 
             {/* Social Links */}
-            <div className="flex gap-3">
+            <div className="flex gap-3 flex-wrap">
               {socialLinks.map((social, index) => {
                 const href = social.href || "#";
                 const isExternal = href && href.startsWith("http");
@@ -179,7 +182,7 @@ const Footer = () => {
                     href={href}
                     aria-label={social.label}
                     {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                    className="p-2 rounded-lg bg-slate-900/50 text-muted-foreground hover:text-emerald-400 hover:bg-slate-900 transition-all"
+                    className="p-2 rounded-lg bg-slate-900/50 text-muted-foreground hover:text-emerald-400 hover:bg-slate-900 transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                   >
                     {social.icon}
                   </a>
@@ -189,82 +192,27 @@ const Footer = () => {
           </div>
 
           {/* Features */}
-<div>
-  <h4 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider">
-    Features
-  </h4>
-  <ul className="space-y-3">
-    {featureLinks.slice(0, 4).map((link) => (
-      <li key={`feature-${link.name}`}>
-        <Link
-          to={link.href}
-          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-emerald-400 transition-colors group"
-        >
-          <span className="text-emerald-600 group-hover:text-emerald-400">
-            {link.icon}
-          </span>
-          {link.name}
-          <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all" />
-        </Link>
-      </li>
-    ))}
-  </ul>
-</div>
-
-{/* Download Apps */}
-<div className="space-y-3">
-  <div className="text-sm font-semibold">📱 Download Apps</div>
-
-  <a
-    href="#"
-    className="block bg-black/20 rounded-lg p-2 hover:bg-black/30 transition-colors"
-  >
-    <div className="flex items-center space-x-2">
-      <span className="text-lg">📱</span>
-      <div className="text-xs">
-        <div className="font-semibold">Download on the</div>
-        <div>App Store</div>
-      </div>
-    </div>
-  </a>
-
-  <a
-    href="https://drive.google.com/file/d/1QEykzmJOKIKu6sABbPx2zeGXX1MZBcCr/view"
-    className="block bg-black/20 rounded-lg p-2 hover:bg-black/30 transition-colors"
-  >
-    <div className="flex items-center space-x-2">
-      <span className="text-lg">📦</span>
-      <div className="text-xs leading-tight">
-        <div className="font-semibold">Download</div>
-        <div>APK</div>
-      </div>
-    </div>
-  </a>
-
-  <a
-    href="#"
-    className="block bg-black/20 rounded-lg p-2 hover:bg-black/30 transition-colors"
-  >
-    <div className="flex items-center space-x-2">
-      <span className="text-lg">🤖</span>
-      <div className="text-xs">
-        <div className="font-semibold">Get it on</div>
-        <div>Google Play</div>
-      </div>
-    </div>
-  </a>
-
-  {/* USSD Alternative */}
-  {ussdMode && (
-    <div className="bg-green-600/30 p-3 rounded-lg">
-      <div className="text-sm font-semibold mb-1">📱 No App Needed</div>
-      <div className="text-lg font-bold">*384*7#</div>
-      <div className="text-xs text-orange-200">
-        Works on any phone
-      </div>
-    </div>
-  )}
-</div>
+          <div>
+            <h4 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider">
+              Features
+            </h4>
+            <ul className="space-y-3">
+              {featureLinks.slice(0, 4).map((link) => (
+                <li key={`feature-${link.name}`}>
+                  <Link
+                    to={link.href}
+                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-emerald-400 transition-colors duration-200 group focus:outline-none focus:ring-2 focus:ring-emerald-500/50 rounded"
+                  >
+                    <span className="text-emerald-600 group-hover:text-emerald-400 transition-colors duration-200">
+                      {link.icon}
+                    </span>
+                    {link.name}
+                    <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all duration-200" aria-hidden="true" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
 
           {/* More Features */}
           <div>
@@ -274,16 +222,66 @@ const Footer = () => {
                 <li key={`feature-${link.name}`}>
                   <Link
                     to={link.href}
-                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-emerald-400 transition-colors group"
+                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-emerald-400 transition-colors duration-200 group focus:outline-none focus:ring-2 focus:ring-emerald-500/50 rounded"
                   >
-                    <span className="text-emerald-600 group-hover:text-emerald-400">{link.icon}</span>
+                    <span className="text-emerald-600 group-hover:text-emerald-400 transition-colors duration-200">{link.icon}</span>
                     {link.name}
-                    <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all" />
+                    <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all duration-200" aria-hidden="true" />
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
+
+             {/* App Store Badges (Hidden in USSD mode) */}
+            {!ussdMode && (
+              <div className="space-y-3">
+                <div className="text-sm font-semibold">📱 Download Apps:</div>
+                <div className="space-y-2">
+                  <a
+                    href="#"
+                    className="block bg-black/20 rounded-lg p-2 hover:bg-black/30 transition-colors"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <span className="text-lg">📱</span>
+                      <div className="text-xs">
+                        <div className="font-semibold">Download on the</div>
+                        <div>App Store</div>
+                      </div>
+                    </div>
+                  </a>
+
+                  <a
+                  href="https://drive.google.com/file/d/1QEykzmJOKIKu6sABbPx2zeGXX1MZBcCr/view"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block bg-black/20 rounded-lg p-2 hover:bg-black/30 transition-colors"
+                  >
+                  <div className="flex items-center space-x-2">
+                 <span className="text-lg">📦</span>
+                <div className="text-xs">
+                <div className="font-semibold">Get it on</div>
+                <div>Google Drive</div>
+                </div>
+                </div>
+                </a>
+
+
+                  <a
+                    href="#"
+                    className="block bg-black/20 rounded-lg p-2 hover:bg-black/30 transition-colors"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <span className="text-lg">🤖</span>
+                      <div className="text-xs">
+                        <div className="font-semibold">Get it on</div>
+                        <div>Google Play</div>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            )}
 
           {/* Platform */}
           <div>
@@ -293,10 +291,10 @@ const Footer = () => {
                 <li key={`platform-${link.name}`}>
                   <Link
                     to={link.href}
-                    className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors flex items-center gap-2 group"
+                    className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors duration-200 flex items-center gap-2 group focus:outline-none focus:ring-2 focus:ring-emerald-500/50 rounded"
                   >
                     {link.name}
-                    <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all" />
+                    <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all duration-200" aria-hidden="true" />
                   </Link>
                 </li>
               ))}
@@ -308,10 +306,10 @@ const Footer = () => {
                  <li key={`resource-${link.name}`}>
                    <Link
                      to={link.href}
-                     className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors flex items-center gap-2 group"
+                     className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors duration-200 flex items-center gap-2 group focus:outline-none focus:ring-2 focus:ring-emerald-500/50 rounded"
                    >
                      {link.name}
-                     <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all" />
+                     <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all duration-200" aria-hidden="true" />
                    </Link>
                  </li>
                ))}
@@ -323,10 +321,10 @@ const Footer = () => {
                  <li key={`support-${link.name}`}>
                    <Link
                      to={link.href}
-                     className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors flex items-center gap-2 group"
+                     className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors duration-200 flex items-center gap-2 group focus:outline-none focus:ring-2 focus:ring-emerald-500/50 rounded"
                    >
                      {link.name}
-                     <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all" />
+                     <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all duration-200" aria-hidden="true" />
                    </Link>
                  </li>
                ))}
@@ -341,10 +339,10 @@ const Footer = () => {
                 <li key={`legal-${link.name}`}>
                   <Link
                     to={link.href}
-                    className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors flex items-center gap-2 group"
+                    className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors duration-200 flex items-center gap-2 group focus:outline-none focus:ring-2 focus:ring-emerald-500/50 rounded"
                   >
                     {link.name}
-                    <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all" />
+                    <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all duration-200" aria-hidden="true" />
                   </Link>
                 </li>
               ))}
@@ -356,10 +354,10 @@ const Footer = () => {
                 <li key={`company-${link.name}`}>
                   <Link
                     to={link.href}
-                    className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors flex items-center gap-2 group"
+                    className="text-sm text-muted-foreground hover:text-emerald-400 transition-colors duration-200 flex items-center gap-2 group focus:outline-none focus:ring-2 focus:ring-emerald-500/50 rounded"
                   >
                     {link.name}
-                    <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all" />
+                    <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all duration-200" aria-hidden="true" />
                   </Link>
                 </li>
               ))}
@@ -377,24 +375,27 @@ const Footer = () => {
 
           {/* Status Indicators */}
           <div className="flex flex-wrap justify-center gap-6 text-xs text-muted-foreground">
-            <a href="#" className="hover:text-emerald-400 transition-colors flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-              All Systems Operational
-            </a>
-            <a href="#" className="hover:text-emerald-400 transition-colors flex items-center gap-2">
-              <Globe className="w-3 h-3" />
+            <div className="flex items-center gap-2">
+              <ApiStatus showLabel />
+            </div>
+            <a href="/contact" className="hover:text-emerald-400 transition-colors flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+              <Globe className="w-3 h-3" aria-hidden="true" />
               Global Network
             </a>
-            <a href="#" className="hover:text-emerald-400 transition-colors flex items-center gap-2">
-              <Lock className="w-3 h-3" />
+            <a href="/security" className="hover:text-emerald-400 transition-colors flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+              <Lock className="w-3 h-3" aria-hidden="true" />
               Enterprise Security
             </a>
-          </div>              
+          </div>
            
 
           {/* Language & Theme */}
           <div className="flex items-center gap-4">
-            <select className="px-3 py-2 rounded-lg bg-slate-900/50 border border-border/30 text-xs text-muted-foreground hover:text-foreground focus:outline-none transition-colors cursor-pointer">
+            <select 
+              className="px-3 py-2 rounded-lg bg-slate-900/50 border border-border/30 text-xs text-muted-foreground hover:text-foreground focus:outline-none transition-colors cursor-pointer"
+              aria-label="Select language"
+              title="Select language"
+            >
               <option>English</option>
               <option>Español</option>
               <option>Français</option>
@@ -407,14 +408,22 @@ const Footer = () => {
         <div className="py-8 border-t border-border/30 text-center">
           <div className="inline-block">
             <p className="text-sm text-muted-foreground mb-3">Ready to join the regeneration?</p>
-            <Button asChild size="lg" className="gap-2">
-              <Link to="/marketplace">
-                Explore Platform <ArrowRight className="w-4 h-4" />
-              </Link>
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button asChild size="lg" className="gap-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                <Link to="/auth" className="focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                  Start Free <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="gap-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                <Link to="/contact" className="focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                  Talk to Sales
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       </div>
+      
     </footer>
   );
 };

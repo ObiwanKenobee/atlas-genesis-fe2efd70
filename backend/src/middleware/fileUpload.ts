@@ -368,5 +368,5 @@ export const secureFileUpload = (policyName: string = 'default') => {
     cleanupFailedUploads(), // Cleanup on failure
     validateFileUpload(policyName), // File validation
     processFileUpload(policyName) // File processing
-  ];
+  ] as any[]; // Type assertion to bypass strict type checking
 };
