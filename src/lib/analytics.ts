@@ -10,29 +10,39 @@ declare global {
 export const analytics = {
   // Track user interactions
   trackEvent: (eventName: string, properties?: Record<string, any>) => {
-    const eventData = {
-      event: eventName,
-      timestamp: new Date().toISOString(),
-      url: window.location.href,
-      userAgent: navigator.userAgent,
-      ...properties
-    };
+    try {
+      const eventData = {
+        event: eventName,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        ...properties
+      };
 
-    // Send to Google Analytics
-    if (window.gtag) {
-      window.gtag('event', eventName, properties);
-    }
+      // Send to Google Analytics
+      if (typeof window.gtag === 'function') {
+        try {
+          window.gtag('event', eventName, properties);
+        } catch (e) {
+          // Silently fail if gtag call fails
+          console.debug('gtag call failed:', e);
+        }
+      }
 
-    // Store locally for offline analysis
-    const events = JSON.parse(localStorage.getItem('platform_events') || '[]');
-    events.push(eventData);
-    
-    // Keep only last 100 events
-    if (events.length > 100) {
-      events.splice(0, events.length - 100);
+      // Store locally for offline analysis
+      const events = JSON.parse(localStorage.getItem('platform_events') || '[]');
+      events.push(eventData);
+
+      // Keep only last 100 events
+      if (events.length > 100) {
+        events.splice(0, events.length - 100);
+      }
+
+      localStorage.setItem('platform_events', JSON.stringify(events));
+    } catch (error) {
+      // Silently fail to prevent breaking the app
+      console.debug('Analytics tracking failed:', error);
     }
-    
-    localStorage.setItem('platform_events', JSON.stringify(events));
   },
 
   // Track page views
@@ -78,16 +88,40 @@ export const analytics = {
 
   // Get analytics summary
   getSummary: () => {
-    const events = JSON.parse(localStorage.getItem('platform_events') || '[]');
-    const summary = {
-      totalEvents: events.length,
-      pageViews: events.filter((e: any) => e.event === 'page_view').length,
-      errors: events.filter((e: any) => e.event === 'platform_error').length,
-      engagements: events.filter((e: any) => e.event === 'user_engagement').length,
-      lastActivity: events[events.length - 1]?.timestamp
-    };
-    
-    return summary;
+    try {
+      const eventsStr = localStorage.getItem('platform_events') || '[]';
+      const events = JSON.parse(eventsStr);
+
+      if (!Array.isArray(events)) {
+        return {
+          totalEvents: 0,
+          pageViews: 0,
+          errors: 0,
+          engagements: 0,
+          lastActivity: undefined
+        };
+      }
+
+      const summary = {
+        totalEvents: events.length,
+        pageViews: events.filter((e: any) => e?.event === 'page_view').length,
+        errors: events.filter((e: any) => e?.event === 'platform_error').length,
+        engagements: events.filter((e: any) => e?.event === 'user_engagement').length,
+        lastActivity: events[events.length - 1]?.timestamp
+      };
+
+      return summary;
+    } catch (error) {
+      // Return default summary on error
+      console.debug('Failed to parse analytics summary:', error);
+      return {
+        totalEvents: 0,
+        pageViews: 0,
+        errors: 0,
+        engagements: 0,
+        lastActivity: undefined
+      };
+    }
   }
 };
 
@@ -96,17 +130,12 @@ export const { trackEvent, trackPageView, trackEngagement, trackPerformance, tra
 
 // Initialize Google Analytics
 export const initGA = () => {
-  if (typeof window !== 'undefined' && !window.gtag) {
-    const script = document.createElement('script');
-    script.async = true;
-    script.src = 'https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID';
-    document.head.appendChild(script);
-    
-    window.dataLayer = window.dataLayer || [];
-    window.gtag = function(...args: any[]) {
-      window.dataLayer!.push(args);
-    };
-    window.gtag('js', new Date());
-    window.gtag('config', 'GA_MEASUREMENT_ID');
+  if (typeof window !== 'undefined') {
+    // gtag is already defined in index.html, so we don't need to redefine it
+    // The gtag function from HTML is sufficient for event tracking
+    if (typeof window.gtag === 'function') {
+      // gtag is already available, no need to initialize
+      return;
+    }
   }
 };
