@@ -1,32 +1,27 @@
 <!doctype html>
 <html lang="en">
-  <head><!-- Google Analytics - Wrapped in error handling to prevent Function@[native code] errors -->
+  <head><!-- Google Analytics - Minimal implementation to prevent Function@[native code] errors -->
 <script>
-  // Create safe gtag stub before any external scripts load
-  // This prevents errors when GA script loads or if it fails
-  window.dataLayer = window.dataLayer || [];
-  window.gtag = function() {
-    try {
-      window.dataLayer.push(arguments);
-    } catch(e) {
-      // Silently ignore any errors
-    }
-  };
-  window.gtag('js', new Date());
-  window.gtag('config', 'G-KSE7DJK5WR', { 'anonymize_ip': true });
-</script>
-<script>
-  // Load GA asynchronously with error handling
-  (function() {
-    var script = document.createElement('script');
-    script.async = true;
-    script.src = 'https://www.googletagmanager.com/gtag/js?id=G-KSE7DJK5WR';
-    script.onerror = function() {
-      // GA failed to load, but gtag stub is already available
-      console.debug('Google Analytics failed to load');
+  // Initialize dataLayer safely
+  if (typeof window !== 'undefined') {
+    window.dataLayer = window.dataLayer || [];
+
+    // Create a safe gtag function that never errors
+    window.gtag = function() {
+      try {
+        // Convert arguments to array safely to avoid serialization issues
+        var args = [];
+        for (var i = 0; i < arguments.length; i++) {
+          args.push(arguments[i]);
+        }
+        if (Array.isArray(window.dataLayer)) {
+          window.dataLayer.push(args);
+        }
+      } catch(e) {
+        // Silently ignore all errors to prevent breaking the app
+      }
     };
-    document.head.appendChild(script);
-  })();
+  }
 </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
