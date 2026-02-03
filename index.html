@@ -1,29 +1,17 @@
 <!doctype html>
 <html lang="en">
-  <head><!-- Google tag (gtag.js) -->
-<!-- Load GA asynchronously; let it manage its own gtag function -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-KSE7DJK5WR"></script>
+  <head><!-- Google Analytics tag (gtag.js) -->
+<!-- Simple stub to prevent errors if GA script fails to load -->
 <script>
-  // Wrap gtag calls in try-catch to handle errors gracefully
-  // This creates a safe wrapper that won't break the app if GA fails
   window.dataLayer = window.dataLayer || [];
-
-  var gtagStub = function(){};
-
-  // Create a proxy that safely calls the real gtag when available
-  var originalGtag = window.gtag;
-  window.gtag = new Proxy(gtagStub, {
-    apply: function(target, thisArg, args) {
-      try {
-        if (typeof window.gtag === 'function' && window.gtag !== this) {
-          return originalGtag.apply(thisArg, args);
-        }
-      } catch(e) {
-        // Silently fail
-      }
-      return undefined;
-    }
-  });
+</script>
+<!-- Load GA script - it will define its own window.gtag -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-KSE7DJK5WR"></script>
+<!-- Stub gtag function in case GA script fails -->
+<script>
+  if (typeof window.gtag !== 'function') {
+    window.gtag = function() { /* GA not loaded */ };
+  }
 </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
