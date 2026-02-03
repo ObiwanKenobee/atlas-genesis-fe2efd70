@@ -211,7 +211,7 @@ export function ProjectCategoryCard({
               asChild
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground gap-2"
             >
-              <Link to={`/marketplace?type=${type}`} aria-label={`Explore ${PROJECT_TYPE_LABELS[type]} category`}>
+              <Link to="/explore-verified-projects" aria-label={`Explore ${PROJECT_TYPE_LABELS[type]} category`}>
                 Explore Category
                 <ArrowRight className="w-4 h-4" />
               </Link>
