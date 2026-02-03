@@ -1,43 +1,29 @@
 <!doctype html>
 <html lang="en">
-  <head><!-- Google tag (gtag.js) -->
+  <head><!-- Google tag (gtag.js) - Simplified to avoid race conditions -->
+<script>
+  // Initialize dataLayer before GA script loads
+  window.dataLayer = window.dataLayer || [];
+
+  // Create a safe gtag stub that won't conflict with GA's gtag
+  if (typeof window.gtag === 'undefined') {
+    window.gtag = function() {};
+  }
+</script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-KSE7DJK5WR"></script>
 <script>
-  (function() {
-    // Initialize dataLayer as an array
-    if (typeof window !== 'undefined') {
-      window.dataLayer = window.dataLayer || [];
-
-      // Define gtag function with comprehensive error handling
-      window.gtag = function(){
-        try {
-          // Ensure dataLayer is still an array
-          if (!Array.isArray(window.dataLayer)) {
-            window.dataLayer = [];
-          }
-
-          // Safely convert arguments to array
-          var args = [];
-          for (var i = 0; i < arguments.length; i++) {
-            args.push(arguments[i]);
-          }
-
-          // Push to dataLayer
-          window.dataLayer.push(args);
-        } catch(e) {
-          // Fail silently to prevent breaking the app
-          if (typeof console !== 'undefined' && console.debug) {
-            console.debug('gtag error:', e);
-          }
-        }
-      };
-
-      // Ensure gtag is callable even if GA script fails
-      if (typeof window.gtag !== 'function') {
-        window.gtag = function() {};
+  // Initialize GA only after the async script may have loaded
+  // GA script will define its own gtag, but we provide a stub just in case
+  window.addEventListener('DOMContentLoaded', function() {
+    if (typeof window.gtag === 'function') {
+      try {
+        window.gtag('js', new Date());
+        window.gtag('config', 'G-KSE7DJK5WR');
+      } catch(e) {
+        // Silently fail if gtag initialization fails
       }
     }
-  })();
+  });
 </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
