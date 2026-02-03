@@ -88,16 +88,40 @@ export const analytics = {
 
   // Get analytics summary
   getSummary: () => {
-    const events = JSON.parse(localStorage.getItem('platform_events') || '[]');
-    const summary = {
-      totalEvents: events.length,
-      pageViews: events.filter((e: any) => e.event === 'page_view').length,
-      errors: events.filter((e: any) => e.event === 'platform_error').length,
-      engagements: events.filter((e: any) => e.event === 'user_engagement').length,
-      lastActivity: events[events.length - 1]?.timestamp
-    };
-    
-    return summary;
+    try {
+      const eventsStr = localStorage.getItem('platform_events') || '[]';
+      const events = JSON.parse(eventsStr);
+
+      if (!Array.isArray(events)) {
+        return {
+          totalEvents: 0,
+          pageViews: 0,
+          errors: 0,
+          engagements: 0,
+          lastActivity: undefined
+        };
+      }
+
+      const summary = {
+        totalEvents: events.length,
+        pageViews: events.filter((e: any) => e?.event === 'page_view').length,
+        errors: events.filter((e: any) => e?.event === 'platform_error').length,
+        engagements: events.filter((e: any) => e?.event === 'user_engagement').length,
+        lastActivity: events[events.length - 1]?.timestamp
+      };
+
+      return summary;
+    } catch (error) {
+      // Return default summary on error
+      console.debug('Failed to parse analytics summary:', error);
+      return {
+        totalEvents: 0,
+        pageViews: 0,
+        errors: 0,
+        engagements: 0,
+        lastActivity: undefined
+      };
+    }
   }
 };
 
