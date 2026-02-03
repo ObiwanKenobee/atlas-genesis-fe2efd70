@@ -10,29 +10,39 @@ declare global {
 export const analytics = {
   // Track user interactions
   trackEvent: (eventName: string, properties?: Record<string, any>) => {
-    const eventData = {
-      event: eventName,
-      timestamp: new Date().toISOString(),
-      url: window.location.href,
-      userAgent: navigator.userAgent,
-      ...properties
-    };
+    try {
+      const eventData = {
+        event: eventName,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        ...properties
+      };
 
-    // Send to Google Analytics
-    if (window.gtag) {
-      window.gtag('event', eventName, properties);
-    }
+      // Send to Google Analytics
+      if (typeof window.gtag === 'function') {
+        try {
+          window.gtag('event', eventName, properties);
+        } catch (e) {
+          // Silently fail if gtag call fails
+          console.debug('gtag call failed:', e);
+        }
+      }
 
-    // Store locally for offline analysis
-    const events = JSON.parse(localStorage.getItem('platform_events') || '[]');
-    events.push(eventData);
-    
-    // Keep only last 100 events
-    if (events.length > 100) {
-      events.splice(0, events.length - 100);
+      // Store locally for offline analysis
+      const events = JSON.parse(localStorage.getItem('platform_events') || '[]');
+      events.push(eventData);
+
+      // Keep only last 100 events
+      if (events.length > 100) {
+        events.splice(0, events.length - 100);
+      }
+
+      localStorage.setItem('platform_events', JSON.stringify(events));
+    } catch (error) {
+      // Silently fail to prevent breaking the app
+      console.debug('Analytics tracking failed:', error);
     }
-    
-    localStorage.setItem('platform_events', JSON.stringify(events));
   },
 
   // Track page views
