@@ -4,7 +4,15 @@
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-KSE7DJK5WR"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(Array.prototype.slice.call(arguments));}
+  window.gtag = function(){
+    try {
+      if (window.dataLayer && typeof window.dataLayer.push === 'function') {
+        window.dataLayer.push(Array.prototype.slice.call(arguments));
+      }
+    } catch(e) {
+      // Silently fail to prevent breaking the app
+    }
+  };
 </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
