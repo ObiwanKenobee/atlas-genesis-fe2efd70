@@ -3,11 +3,11 @@
 import { Pool } from 'pg';
 
 // In-memory storage
-let users: any[] = [];
-let transactions: any[] = [];
-let tokens: any[] = [];
-let rius: any[] = [];
-let carbonProjects: any[] = [
+const users: any[] = [];
+const transactions: any[] = [];
+const tokens: any[] = [];
+const rius: any[] = [];
+const carbonProjects: any[] = [
   {
     id: '1',
     title: 'Amazon Rainforest Protection',
@@ -102,8 +102,8 @@ let carbonProjects: any[] = [
     updated_at: new Date().toISOString()
   }
 ];
-let measurementData: any[] = [];
-let featureFlagsStorage: any[] = [];
+const measurementData: any[] = [];
+const featureFlagsStorage: any[] = [];
 
 // Mock query function
 export async function query(text: string, params: any[] = []) {

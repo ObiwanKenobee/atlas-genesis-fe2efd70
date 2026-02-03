@@ -2,40 +2,19 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
-import { Shield, Lock, AlertTriangle, ExternalLink } from 'lucide-react';
+import { Lock, AlertTriangle, ExternalLink } from 'lucide-react';
 import AdminApp from './AdminFigma/app/App';
-import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
   const { isAdmin, loading, user } = useAdminAuth();
   const navigate = useNavigate();
 
-  const handleDemoLogin = () => {
-    navigate('/demo-login');
-  };
-
-  const handleQuickDemoAccess = () => {
-    navigate('/demo-login');
-  };
-
-  useEffect(() => {
-    if (!loading && !user) {
-      navigate('/auth');
-    }
-  }, [loading, user, navigate]);
-
-const AdminDashboard = () => {
-  const { isAdmin, loading, user } = useAdminAuth();
-  const navigate = useNavigate();
+  const handleDemoLogin = () => navigate('/demo-login');
 
   useEffect(() => {
     if (!loading) {
-      if (!user) {
-        navigate('/auth');
-      } else if (!isAdmin) {
-        navigate('/dashboard');
-      }
+      if (!user) navigate('/auth');
+      else if (!isAdmin) navigate('/dashboard');
     }
   }, [user, isAdmin, loading, navigate]);
 

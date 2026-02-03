@@ -156,8 +156,8 @@ router.get('/', authenticate, validateWithZod(fileUploadQuerySchema, { logSecuri
     const offset = (Number(page) - 1) * Number(limit);
 
     // Build query with security filtering
-    let whereConditions = [];
-    let params = [];
+    const whereConditions = [];
+    const params = [];
     let paramIndex = 1;
 
     // Users can only see their own assets or public assets

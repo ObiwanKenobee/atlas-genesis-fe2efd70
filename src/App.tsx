@@ -20,6 +20,8 @@ import RVXInnovations from './pages/RVXInnovations';
 import DashboardWithSidebar from './pages/DashboardWithSidebar';
 import Dashboard from './pages/Dashboard';
 import Auth from './pages/Auth';
+import { EnhancedAuthProvider } from './contexts/EnhancedAuthContext';
+import EnhancedAuth from './pages/EnhancedAuth';
 import Portfolio from './pages/Portfolio';
 import Profile from './pages/Profile';
 import Marketplace from './pages/Marketplace';

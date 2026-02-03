@@ -22,11 +22,11 @@ async function initClient() {
     const credential = new DefaultAzureCredential();
     client = new SecretClient(vaultUrl, credential);
     enabled = true;
-    // eslint-disable-next-line no-console
+     
     console.log('Azure Key Vault client initialized for', process.env.AZURE_KEY_VAULT_NAME);
   } catch (err) {
     // SDK not installed or auth issue — fall back to env
-    // eslint-disable-next-line no-console
+     
     console.warn('Azure Key Vault not initialized, falling back to env:', err?.message || err);
     enabled = false;
     client = null;
@@ -47,7 +47,7 @@ export async function getSecret(name: string): Promise<MaybeSecret> {
     const resp = await client.getSecret(name);
     return resp && resp.value;
   } catch (err) {
-    // eslint-disable-next-line no-console
+     
     console.warn('Key Vault getSecret failed for', name, err?.message || err);
     return undefined;
   }

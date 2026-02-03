@@ -33,17 +33,17 @@ export async function runStartupChecks() {
   if (missing.length > 0) {
     const msg = `Missing required secrets: ${missing.join(', ')}`;
     if (process.env.NODE_ENV === 'production') {
-      // eslint-disable-next-line no-console
+       
       console.error('[startupChecks] FATAL:', msg);
       // Give short delay to flush logs
       await new Promise((r) => setTimeout(r, 100));
       process.exit(1);
     } else {
-      // eslint-disable-next-line no-console
+       
       console.warn('[startupChecks] Warning (non-production):', msg);
     }
   } else {
-    // eslint-disable-next-line no-console
+     
     console.log('[startupChecks] All required secrets present');
   }
 }

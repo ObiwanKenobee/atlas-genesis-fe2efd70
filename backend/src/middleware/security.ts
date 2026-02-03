@@ -67,7 +67,7 @@ export const createRateLimit = (config: RateLimitConfig) => {
 export const createTieredRateLimit = (baseConfig: RateLimitConfig) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const user = (req as any).user;
-    let config = { ...baseConfig };
+    const config = { ...baseConfig };
 
     if (user?.role) {
       switch (user.role) {

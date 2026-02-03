@@ -22,11 +22,11 @@ const sdk = new NodeSDK({
 
 sdk.start()
   .then(() => {
-    // eslint-disable-next-line no-console
+     
     console.log('OpenTelemetry initialized');
   })
   .catch((err) => {
-    // eslint-disable-next-line no-console
+     
     console.error('Error initializing OpenTelemetry', err);
   });
 
@@ -34,10 +34,10 @@ sdk.start()
 process.on('SIGTERM', async () => {
   try {
     await sdk.shutdown();
-    // eslint-disable-next-line no-console
+     
     console.log('Tracing terminated');
   } catch (err) {
-    // eslint-disable-next-line no-console
+     
     console.error('Error terminating tracing', err);
   } finally {
     process.exit(0);

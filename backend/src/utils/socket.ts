@@ -36,7 +36,7 @@ export class SocketEmitter {
     targetTenants?: string[];
     data?: any;
   }) {
-    let targetRooms: string[] = [];
+    const targetRooms: string[] = [];
 
     if (notification.targetRoles) {
       targetRooms.push(...notification.targetRoles.map(role => `role:${role}`));
