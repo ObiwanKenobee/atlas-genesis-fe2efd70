@@ -82,6 +82,7 @@ import MFASetup from './pages/enterprise/MFASetup';
 import Checkout from './pages/Checkout';
 import CustomerPortal from './pages/CustomerPortal';
 import SubscriptionPlans from './pages/SubscriptionPlans';
+import ExploreVerifiedProjects from './pages/ExploreVerifiedProjects';
 import DemoLogin from './pages/DemoLogin';
 import {
   CarbonOffsetting,
@@ -121,6 +122,7 @@ const App = () => {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/marketplace" element={<Marketplace />} />
+              <Route path="/explore-verified-projects" element={<ExploreVerifiedProjects />} />
               <Route path="/portfolio" element={<Portfolio />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/bioregions" element={<Bioregions />} />

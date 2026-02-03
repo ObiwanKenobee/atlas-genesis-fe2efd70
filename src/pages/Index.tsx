@@ -2,7 +2,6 @@ import SEO from "@/components/SEO";
 import { useSEO } from "@/hooks/useSEO";
 import EnterpriseHeader from "@/components/EnterpriseHeader";
 import HeroSection from "@/components/HeroSection";
-import ExploreVerifiedProjects from "@/components/ExploreVerifiedProjects";
 import PlatformLayers from "@/components/PlatformLayers";
 import ImpactMetrics from "@/components/ImpactMetrics";
 import TechnologyStack from "@/components/TechnologyStack";
@@ -40,7 +39,6 @@ const Index = () => {
         <EnterpriseHeader />
         <main className="pt-24">
           <HeroSection />
-          <ExploreVerifiedProjects />
           <PlatformLayers />
           <ImpactMetrics />
           <TechnologyStack />
