@@ -54,7 +54,7 @@ export default function ImpactDashboard() {
   const metrics = [
     {
       label: 'Total Carbon Offset',
-      value: portfolioSummary?.totalCarbonOffset.toLocaleString() || '1,250',
+      value: portfolioSummary?.totalCO2Offset?.toLocaleString() || '1,250',
       unit: 'tons CO₂',
       change: '+15%',
       trend: 'up',

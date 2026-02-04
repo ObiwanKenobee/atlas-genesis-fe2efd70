@@ -5,7 +5,6 @@ export {
   InteractionProvider,
   useInteractions,
   ToastContainer,
-  useToast,
 } from './InteractionSystem';
 
 // Micro Interactions
@@ -40,7 +39,8 @@ export type {
   PurchaseFlowProps,
   OnboardingTourProps,
   NotificationCenterProps,
-  NotificationItem,
   CommandPaletteProps,
-  CommandItem,
 } from './InteractionSystem';
+
+// Provide useToast from sonner instead
+export { toast as useToast } from 'sonner';

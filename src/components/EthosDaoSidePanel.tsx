@@ -42,9 +42,9 @@ interface EthosMember {
 
 interface Proposal {
   id: string;
-  title description: string;
-: string;
-   status: 'draft' | 'active' | 'voting' | 'passed' | 'rejected';
+  title: string;
+  description: string;
+  status: 'draft' | 'active' | 'voting' | 'passed' | 'rejected';
   votesYes: number;
   votesNo: number;
   totalVotes: number;
@@ -428,7 +428,7 @@ const EthosDaoSidePanel: React.FC<EthosDaoSidePanelProps> = ({ userType = 'donor
 // Add Form Component
 const AddForm: React.FC<{
   modalType: 'member' | 'proposal' | 'achievement';
-  onSubmit: (item: Record<string, unknown>) => void;
+  onSubmit: (item: EthosMember | Proposal | Achievement) => void;
   onCancel: () => void;
 }> = ({ modalType, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
