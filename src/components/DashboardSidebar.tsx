@@ -20,6 +20,12 @@ import {
   Wallet,
   TrendingUp,
   MapPin,
+  Brain,
+  Zap,
+  Trophy,
+  Link2,
+  Coins,
+  Sparkles,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -91,6 +97,50 @@ const mainNavItems: NavItem[] = [
 ];
 
 const exploreNavItems: NavItem[] = [
+  {
+    title: 'AI Insights',
+    href: '/ai-insights',
+    icon: Brain,
+    badge: 'AI',
+    children: [
+      { title: 'Predictions', href: '/ai-insights', icon: TrendingUp },
+      { title: 'Recommendations', href: '/ai-insights?tab=recommendations', icon: Sparkles },
+    ],
+  },
+  {
+    title: 'Carbon Market',
+    href: '/carbon-marketplace',
+    icon: Coins,
+    badge: 'DeFi',
+    children: [
+      { title: 'Marketplace', href: '/carbon-marketplace', icon: ShoppingCart },
+      { title: 'Trading', href: '/carbon-marketplace?tab=trading', icon: Zap },
+      { title: 'Bonds', href: '/carbon-marketplace?tab=bonds', icon: Coins },
+    ],
+  },
+  {
+    title: 'Challenges',
+    href: '/impact-challenges',
+    icon: Trophy,
+    badge: 'New',
+    children: [
+      { title: 'Achievements', href: '/impact-challenges', icon: Trophy },
+      { title: 'Leaderboard', href: '/impact-challenges?tab=leaderboard', icon: TrendingUp },
+      { title: 'Team Challenges', href: '/impact-challenges?tab=teams', icon: Users },
+      { title: 'Quests', href: '/impact-challenges?tab=quests', icon: MapPin },
+    ],
+  },
+  {
+    title: 'Blockchain',
+    href: '/blockchain-verification',
+    icon: Link2,
+    badge: 'Web3',
+    children: [
+      { title: 'Verified Projects', href: '/blockchain-verification', icon: Shield },
+      { title: 'Impact NFTs', href: '/blockchain-verification?tab=nfts', icon: Zap },
+      { title: 'DAO Governance', href: '/blockchain-verification?tab=governance', icon: Users },
+    ],
+  },
   {
     title: 'Bioregions',
     href: '/bioregions',

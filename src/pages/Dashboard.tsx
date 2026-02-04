@@ -2,6 +2,7 @@ import React, { useEffect, useState, Suspense } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { InteractiveDashboard, InteractiveFeatureGrid } from '@/components/EnhancedPlatformComponents';
+import { InnovationsHub, InnovationsWidget } from '@/components/InnovationsHub';
 import { PageTransition, InteractiveButton } from '@/components/Interactions';
 import {
   Leaf, LogOut, User, BarChart3, ShoppingCart, Briefcase,
@@ -479,6 +480,11 @@ const Dashboard = () => {
         <div className="mt-12">
           <h2 className="text-2xl font-bold text-foreground mb-6">Platform Features</h2>
           <InteractiveFeatureGrid />
+        </div>
+
+        {/* Platform Innovations Hub */}
+        <div className="mt-12">
+          <InnovationsHub />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mt-12">

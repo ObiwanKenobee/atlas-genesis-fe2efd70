@@ -64,6 +64,7 @@ import authV2Router from './routes/auth-v2';
 import marketplaceV2Router from './routes/marketplace-v2';
 import measurementsV2Router from './routes/measurements-v2';
 import projectsRouter from './routes/projects';
+import aiRecommendationsRouter from './routes/aiRecommendations';
 
 const app = express();
 
@@ -389,6 +390,7 @@ app.use('/api/v2/auth', authV2Router);
 app.use('/api/v2/marketplace', marketplaceV2Router);
 app.use('/api/v2/measurements', measurementsV2Router);
 app.use('/api/v2/projects', projectsRouter);
+app.use('/api/v2/ai', aiRecommendationsRouter);
 
 // Root endpoint with API documentation
 app.get('/', (req, res) => {

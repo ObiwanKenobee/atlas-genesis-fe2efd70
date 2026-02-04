@@ -84,6 +84,10 @@ import CustomerPortal from './pages/CustomerPortal';
 import SubscriptionPlans from './pages/SubscriptionPlans';
 import ExploreVerifiedProjects from './pages/ExploreVerifiedProjects';
 import DemoLogin from './pages/DemoLogin';
+import AIInsights from './components/ai/AIInsights';
+import CarbonCreditMarketplace from './components/defi/CarbonCreditMarketplace';
+import GamificationHub from './components/gamification/GamificationHub';
+import BlockchainVerification from './components/blockchain/BlockchainVerification';
 import {
   CarbonOffsetting,
   ImpactInvestment,
@@ -239,6 +243,10 @@ const App = () => {
               <Route path="/education-hub" element={<EducationHub />} />
               <Route path="/certifications" element={<Certifications />} />
               <Route path="/demo-login" element={<DemoLogin />} />
+              <Route path="/ai-insights" element={<AIInsights />} />
+              <Route path="/carbon-marketplace" element={<CarbonCreditMarketplace />} />
+              <Route path="/impact-challenges" element={<GamificationHub />} />
+              <Route path="/blockchain-verification" element={<BlockchainVerification />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AnimatePresence>

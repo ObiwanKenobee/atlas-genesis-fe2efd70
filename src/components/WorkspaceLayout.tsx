@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Leaf, 
-  LayoutDashboard, 
-  CreditCard, 
-  Settings, 
+import {
+  Leaf,
+  LayoutDashboard,
+  CreditCard,
+  Settings,
   LogOut,
   ChevronLeft,
   ChevronRight,
@@ -17,10 +17,18 @@ import {
   Briefcase,
   Building,
   Globe,
-  Shield
+  Shield,
+  Hexagon,
+  Users as UsersIcon,
+  TrendingUp,
+  Target,
+  Award,
+  Heart
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 import { useEnhancedAuth } from '@/hooks/useEnhancedAuth';
 
 interface WorkspaceLayoutProps {
@@ -48,16 +56,39 @@ const quickLinks = [
   { href: '/settings', icon: Settings, label: 'Settings' },
 ];
 
-export default function WorkspaceLayout({ 
-  children, 
-  title, 
+// Collective impact data
+const impactMetrics = [
+  { label: 'Carbon Sequestered', value: '12,234 t', change: '+19%', icon: TrendingUp, color: 'text-emerald-500' },
+  { label: 'Water Conserved', value: '450M L', change: '+12%', icon: Heart, color: 'text-blue-500' },
+  { label: 'Active Stewards', value: '2,847', change: '+156', icon: UsersIcon, color: 'text-purple-500' },
+  { label: 'Biodiversity Score', value: '87/100', change: 'Above target', icon: Target, color: 'text-pink-500' },
+];
+
+// Collective achievements
+const achievements = [
+  { title: 'Carbon Neutral Certified', description: '3 consecutive years', icon: Award },
+  { title: '1000 Projects Funded', description: 'Restoration initiatives', icon: TrendingUp },
+  { title: 'Knowledge Shared', description: '500+ research papers', icon: Heart },
+];
+
+// Team members
+const teamMembers = [
+  { id: '1', name: 'Regen Leader', role: 'Steward', avatar: '🌱', status: 'online', contributions: 1247 },
+  { id: '2', name: 'Climate Scientist', role: 'Researcher', avatar: '🔬', status: 'online', contributions: 892 },
+  { id: '3', name: 'Community Builder', role: 'Facilitator', avatar: '🤝', status: 'away', contributions: 756 },
+];
+
+export default function WorkspaceLayout({
+  children,
+  title,
   subtitle,
-  userType 
+  userType
 }: WorkspaceLayoutProps) {
   const location = useLocation();
   const { isDemoMode, currentDemoUser, exitDemoMode } = useEnhancedAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showCollective, setShowCollective] = useState(true);
 
   const config = userTypeConfig[userType];
   const Icon = config.icon;
@@ -98,10 +129,21 @@ export default function WorkspaceLayout({
                 Demo Mode
               </Badge>
             )}
-            
-            <Button 
-              variant="ghost" 
-              size="icon" 
+
+            {/* Collective Toggle */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowCollective(!showCollective)}
+              className={`flex items-center gap-2 ${showCollective ? 'text-emerald-400' : 'text-slate-400'}`}
+            >
+              <Hexagon className="w-4 h-4" />
+              <span className="hidden sm:inline">Collective</span>
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="icon"
               className="text-slate-400 hover:text-white hover:bg-slate-800"
             >
               <Bell className="w-5 h-5" />
@@ -203,16 +245,130 @@ export default function WorkspaceLayout({
           </nav>
         </aside>
 
-        {/* Main Content */}
-        <main className="flex-1 p-6">
+        {/* Main Content Area */}
+        <div className="flex-1 flex gap-6 p-6">
+          {/* Dashboard Content */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
+            className={`flex-1 ${showCollective ? 'lg:w-2/3' : 'w-full'}`}
           >
             {children}
           </motion.div>
-        </main>
+
+          {/* EthosDAO Collective Panel */}
+          <AnimatePresence>
+            {showCollective && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.3 }}
+                className="hidden lg:block w-1/3 space-y-6"
+              >
+                {/* Collective Header */}
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 border border-emerald-500/20">
+                    <Hexagon className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h2 className="font-semibold text-white">EthosDAO Collective</h2>
+                    <p className="text-xs text-slate-400">Regenerative ecosystem</p>
+                  </div>
+                </div>
+
+                {/* Impact Metrics */}
+                <Card className="bg-slate-800/50 border-slate-700/50">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-slate-300">Impact Metrics</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {impactMetrics.map((metric) => (
+                      <div key={metric.label} className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <metric.icon className={`w-4 h-4 ${metric.color}`} />
+                          <span className="text-sm text-slate-400">{metric.label}</span>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm font-medium text-white">{metric.value}</div>
+                          <div className="text-xs text-emerald-500">{metric.change}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+
+                {/* Active Team */}
+                <Card className="bg-slate-800/50 border-slate-700/50">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-slate-300">Active Stewards</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {teamMembers.map((member) => (
+                      <div key={member.id} className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-sm">
+                          {member.avatar}
+                        </div>
+                        <div className="flex-1">
+                          <div className="text-sm font-medium text-white">{member.name}</div>
+                          <div className="text-xs text-slate-400">{member.role}</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                        </div>
+                      </div>
+                    ))}
+                    <Button variant="ghost" size="sm" className="w-full text-xs text-slate-400 hover:text-white">
+                      View All Members
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                {/* Achievements */}
+                <Card className="bg-slate-800/50 border-slate-700/50">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-slate-300">Collective Achievements</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {achievements.map((achievement) => (
+                      <div key={achievement.title} className="flex items-start gap-3 p-2 rounded-lg bg-slate-700/30">
+                        <Award className="w-5 h-5 text-emerald-500 mt-0.5" />
+                        <div>
+                          <div className="text-sm font-medium text-white">{achievement.title}</div>
+                          <div className="text-xs text-slate-400">{achievement.description}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+
+                {/* Voting Progress */}
+                <Card className="bg-slate-800/50 border-slate-700/50">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-slate-300">Active Proposals</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="p-3 rounded-lg bg-slate-700/30">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm text-white">Expand Rainforest Initiative</span>
+                        <Badge variant="secondary" className="text-xs">Active</Badge>
+                      </div>
+                      <Progress value={72} className="h-2 mb-1" />
+                      <div className="flex justify-between text-xs text-slate-400">
+                        <span>72% Yes</span>
+                        <span>2 days left</span>
+                      </div>
+                    </div>
+                    <Button variant="outline" size="sm" className="w-full text-xs">
+                      View All Proposals
+                    </Button>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   );
