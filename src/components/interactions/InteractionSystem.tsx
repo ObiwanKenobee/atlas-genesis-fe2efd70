@@ -1042,8 +1042,7 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
   );
 }
 
-// Export all components
+// Export types
 export type { ToastType };
-export { ToastContainer, useToast };
 export type { AnimatedLikeProps, AnimatedBookmarkProps, AnimatedShareProps, AnimatedViewsProps, AnimatedCounterProps, LoadingSpinnerProps, SkeletonPulseProps };
 export type { PurchaseFlowProps, OnboardingTourProps, NotificationCenterProps, CommandPaletteProps };

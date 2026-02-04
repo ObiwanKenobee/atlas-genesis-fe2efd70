@@ -1,19 +1,26 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Leaf, Award, TrendingUp, CheckCircle2, Bell } from 'lucide-react';
+import { MapPin, Leaf, Award, TrendingUp, CheckCircle2, Bell, ShoppingCart, GitCompareArrows, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { LineChart, Line, ResponsiveContainer } from 'recharts';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { CarbonProject, PROJECT_TYPE_LABELS, PROJECT_TYPE_ICONS } from '@/types/marketplace';
 import { useMeasurementData } from '@/hooks/useMeasurementData';
 import { PriceAlertModal } from '@/components/PriceAlertModal';
+import { PurchaseModal } from './PurchaseModal';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
+import { cn } from '@/lib/utils';
 
 interface ProjectCardProps {
   project: CarbonProject;
   index: number;
+  isCompareMode?: boolean;
+  isSelectedForCompare?: boolean;
+  onToggleCompare?: (project: CarbonProject) => void;
+  compareDisabled?: boolean;
 }
 
 /**
@@ -58,10 +65,26 @@ function MeasurementMiniChart({ projectId, title }: { projectId: string; title: 
   );
 }
 
-export function ProjectCard({ project, index }: ProjectCardProps) {
+export function ProjectCard({ 
+  project, 
+  index,
+  isCompareMode = false,
+  isSelectedForCompare = false,
+  onToggleCompare,
+  compareDisabled = false,
+}: ProjectCardProps) {
   const { user } = useSupabaseAuth();
   const [showPriceAlert, setShowPriceAlert] = useState(false);
+  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   const availabilityPercent = (project.available_credits / project.total_credits) * 100;
+
+  const handleCompareClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onToggleCompare && !compareDisabled) {
+      onToggleCompare(project);
+    }
+  };
 
   return (
     <motion.div
@@ -69,7 +92,42 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
     >
-      <Card className="group overflow-hidden bg-card-gradient border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-glow" role="article" aria-labelledby={`project-title-${project.id}`}>
+      <Card 
+        className={cn(
+          "group overflow-hidden bg-card-gradient border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-glow relative",
+          isSelectedForCompare && "ring-2 ring-primary border-primary/50"
+        )}
+        role="article" 
+        aria-labelledby={`project-title-${project.id}`}
+      >
+        {/* Compare Mode Checkbox Overlay */}
+        {isCompareMode && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="absolute top-2 left-2 z-20"
+          >
+            <button
+              onClick={handleCompareClick}
+              disabled={compareDisabled && !isSelectedForCompare}
+              className={cn(
+                "flex items-center justify-center w-8 h-8 rounded-full border-2 transition-all duration-200",
+                isSelectedForCompare 
+                  ? "bg-primary border-primary text-primary-foreground" 
+                  : "bg-background/90 backdrop-blur-sm border-border hover:border-primary",
+                compareDisabled && !isSelectedForCompare && "opacity-50 cursor-not-allowed"
+              )}
+              aria-label={isSelectedForCompare ? `Remove ${project.title} from comparison` : `Add ${project.title} to comparison`}
+            >
+              {isSelectedForCompare ? (
+                <Check className="w-4 h-4" />
+              ) : (
+                <GitCompareArrows className="w-4 h-4 text-muted-foreground" />
+              )}
+            </button>
+          </motion.div>
+        )}
+
         <div className="relative h-48 overflow-hidden">
           <img
             src={project.image_url || 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800'}
@@ -151,7 +209,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
             </div>
           )}
 
-          {/* Price and Action */}
+          {/* Price and Actions */}
           <div className="flex items-center justify-between pt-2 border-t border-border/50">
             <div>
               <div className="flex items-center gap-1">
@@ -172,8 +230,17 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
                   <Bell className="w-4 h-4" />
                 </Button>
               )}
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setShowPurchaseModal(true)}
+                className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+              >
+                <ShoppingCart className="w-4 h-4 mr-1" />
+                Buy
+              </Button>
               <Button asChild size="sm" className="bg-primary hover:bg-primary/90">
-                <Link to={`/project/${project.id}`} aria-label={`View details for ${project.title}`}>View Details</Link>
+                <Link to={`/project/${project.id}`} aria-label={`View details for ${project.title}`}>Details</Link>
               </Button>
             </div>
           </div>
@@ -190,6 +257,15 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
             title: project.title,
             price_per_credit: project.price_per_credit,
           }}
+        />
+      )}
+
+      {/* Purchase Modal */}
+      {showPurchaseModal && (
+        <PurchaseModal
+          project={project}
+          isOpen={showPurchaseModal}
+          onClose={() => setShowPurchaseModal(false)}
         />
       )}
     </motion.div>
