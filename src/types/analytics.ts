@@ -3,8 +3,8 @@
 // Chart Configuration Types
 export interface ChartConfig {
   type: 'line' | 'bar' | 'pie' | 'area' | 'radar' | 'doughnut' | 'scatter' | 'bubble';
-  title: string;
-  dataSource: string;
+  title?: string;
+  dataSource?: string;
   refreshInterval?: number;
   legend?: boolean;
   grid?: boolean;

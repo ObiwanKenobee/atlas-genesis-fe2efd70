@@ -228,6 +228,7 @@ class NotificationService {
       type: toast.type,
       dismissible: true,
       persistent: false,
+      status: 'delivered',
       createdAt: new Date().toISOString(),
     };
     this.addInAppNotification(inAppNotification);
@@ -315,6 +316,7 @@ class NotificationService {
         body: replaceVariables(template.pushTemplate.body, variables),
         icon: template.pushTemplate.icon,
         imageUrl: template.pushTemplate.imageUrl,
+        status: 'pending',
         metadata: { templateId, variables },
         createdAt: new Date().toISOString(),
       } as PushNotification;
@@ -332,6 +334,7 @@ class NotificationService {
         textBody: template.emailTemplate.textBody
           ? replaceVariables(template.emailTemplate.textBody, variables)
           : undefined,
+        status: 'pending',
         metadata: { templateId, variables },
         createdAt: new Date().toISOString(),
       } as EmailNotification;
@@ -345,6 +348,7 @@ class NotificationService {
         channel: 'sms',
         to: variables.phone || '',
         body: replaceVariables(template.smsTemplate.body, variables),
+        status: 'pending',
         metadata: { templateId, variables },
         createdAt: new Date().toISOString(),
       } as SMSNotification;
@@ -361,6 +365,7 @@ class NotificationService {
         type: template.inAppTemplate.type,
         dismissible: true,
         persistent: false,
+        status: 'pending',
         metadata: { templateId, variables },
         createdAt: new Date().toISOString(),
       } as InAppNotification;

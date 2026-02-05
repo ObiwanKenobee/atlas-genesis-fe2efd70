@@ -52,20 +52,26 @@ interface WidgetConfigModalProps {
 
 const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({ widget, onSave, onClose }) => {
   const [config, setConfig] = useState<Partial<DashboardWidget>>(
-    widget || {
-      type: 'line',
-      title: '',
-      config: {
-        type: 'line',
-        title: '',
-        dataSource: '',
-        colors: ['#3b82f6'],
-      },
-    }
+    widget && Object.keys(widget).length > 0
+      ? widget
+      : {
+          type: 'chart',
+          title: '',
+          config: {
+            type: 'line',
+            title: 'New Chart',
+            dataSource: 'revenue',
+            colors: ['#3b82f6'],
+          },
+        }
+  );
+  
+  const [chartType, setChartType] = useState<ChartConfig['type']>(
+    config.config?.type || 'line'
   );
 
   const handleSave = () => {
-    if (config.title && config.config?.dataSource) {
+    if (config.title) {
       onSave(config);
     }
   };
@@ -105,7 +111,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({ widget, onSave, o
                     onClick={() =>
                       setConfig({
                         ...config,
-                        type: wt.type as DashboardWidget['type'],
+                          type: 'chart',
                         config: {
                           ...config.config,
                           type: wt.type as ChartConfig['type'],
@@ -113,7 +119,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({ widget, onSave, o
                       })
                     }
                     className={`flex flex-col items-center gap-2 p-3 rounded-lg border transition-colors ${
-                      config.type === wt.type
+                        config.config?.type === wt.type
                         ? 'border-blue-500 bg-blue-500/20'
                         : 'border-gray-700 hover:border-gray-600'
                     }`}
@@ -355,9 +361,16 @@ const ReportBuilder: React.FC = () => {
     if (editingWidget?.id) {
       setWidgets(widgets.map((w) => (w.id === editingWidget.id ? { ...w, ...updatedWidget } : w)));
     } else {
+      const fullConfig: ChartConfig = {
+        type: (updatedWidget.config?.type || updatedWidget.type || 'line') as ChartConfig['type'],
+        title: updatedWidget.title || 'New Chart',
+        dataSource: updatedWidget.config?.dataSource || 'revenue',
+        colors: updatedWidget.config?.colors || ['#3b82f6'],
+      };
       const newWidget: DashboardWidget = {
         ...updatedWidget as DashboardWidget,
         id: `widget-${Date.now()}`,
+        config: fullConfig,
         position: { x: 0, y: 0, width: 6, height: 3 },
       };
       setWidgets([...widgets, newWidget]);
@@ -624,7 +637,7 @@ const ReportBuilder: React.FC = () => {
       {/* Widget Configuration Modal */}
       {showWidgetModal && (
         <WidgetConfigModal
-          widget={editingWidget || undefined}
+          widget={editingWidget || {}}
           onSave={updateWidget}
           onClose={() => {
             setShowWidgetModal(false);

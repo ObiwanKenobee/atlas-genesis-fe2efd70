@@ -162,7 +162,7 @@ export default function ProjectCreate() {
         location: location.location,
         country: location.country,
         projectType: projectInfo.projectType,
-        climateClassification: location.climateClassification,
+        climateClassification: projectInfo.climateClassification,
         pricePerCredit: carbon.pricePerCredit,
         totalCredits: carbon.totalCredits,
         vintageYear: carbon.vintageYear,

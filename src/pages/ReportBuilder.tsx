@@ -316,7 +316,7 @@ export default function ReportBuilder() {
                             dataKey="value"
                           >
                             {widget.data.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={entry.color} />
+                              <Cell key={`cell-${index}`} fill={(entry as { color?: string }).color || '#10b981'} />
                             ))}
                           </Pie>
                           <Tooltip />
