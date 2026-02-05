@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -154,8 +155,23 @@ export function ProjectCategoryCard({
                 {topProjects.map((project) => (
                   <div
                     key={project.id}
-                    className="flex items-center justify-between p-2.5 rounded-lg bg-background/60 border border-background/80 hover:bg-background transition-colors group"
+                    className={`flex items-center justify-between p-2.5 rounded-lg bg-background/60 border transition-colors group ${
+                      isCompareMode && selectedForCompare.some(p => p.id === project.id)
+                        ? 'border-primary bg-primary/5'
+                        : 'border-background/80 hover:bg-background'
+                    }`}
                   >
+                    {/* Compare Checkbox */}
+                    {isCompareMode && (
+                      <div className="mr-3 flex-shrink-0">
+                        <Checkbox
+                          checked={selectedForCompare.some(p => p.id === project.id)}
+                          onCheckedChange={() => onToggleCompare?.(project)}
+                          disabled={!selectedForCompare.some(p => p.id === project.id) && selectedForCompare.length >= 4}
+                          aria-label={`Select ${project.title} for comparison`}
+                        />
+                      </div>
+                    )}
                     <div className="flex-1 min-w-0">
                       <Link 
                         to={`/project/${project.id}`}

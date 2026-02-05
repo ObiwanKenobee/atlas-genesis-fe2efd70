@@ -7,4 +7,4 @@ export * from '../../types/analytics';
 
 // Services
 export { default as exportService, exportToCSV, exportToExcel, exportToPDF } from '../../services/exportService';
-export { analyticsWsService, WebSocketService } from '../../services/websocketService';
+// WebSocket service removed - using Supabase Realtime instead

@@ -509,7 +509,7 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ templateId }) =
             <WidgetCard
               key={widget.id}
               widget={widget}
-              data={getChartData(widget.config.dataSource)}
+              data={getChartData(widget.config.dataSource || 'revenue')}
               onRefresh={() => handleRefreshWidget(widget.id)}
             />
           ))}
