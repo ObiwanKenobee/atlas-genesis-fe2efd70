@@ -14,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CarbonProject, PROJECT_TYPE_LABELS, PROJECT_TYPE_ICONS } from '@/types/marketplace';
 import { Link } from 'react-router-dom';
 import { ComparisonChart } from './ComparisonChart';
+import { ComparisonPDFExport } from './ComparisonPDFExport';
 import { cn } from '@/lib/utils';
 
 interface ProjectComparisonModalProps {
@@ -350,6 +351,7 @@ export function ProjectComparisonModal({
 
         {/* Action Buttons */}
         <div className="flex gap-3 pt-4 border-t border-border/30">
+          <ComparisonPDFExport projects={selectedProjects} />
           <Button
             variant="outline"
             onClick={onClose}
