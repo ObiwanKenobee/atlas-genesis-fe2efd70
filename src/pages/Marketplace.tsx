@@ -21,6 +21,7 @@ import { MarketplaceApisTab } from "@/components/marketplace/MarketplaceApisTab"
 import { filterAndSortProjects, formatFilterName, SortBy, FilterType } from "@/utils/marketplaceUtils";
 import { CarbonProject } from "@/types/marketplace";
 import { ProjectComparisonModal } from "@/components/marketplace/ProjectComparisonModal";
+import { PriceAlertForm } from "@/components/marketplace/PriceAlertForm";
 import { motion, AnimatePresence } from "framer-motion";
 
 const Marketplace = () => {
@@ -183,7 +184,8 @@ const Marketplace = () => {
                 ))}
                 
                 {/* Compare Projects Button */}
-                <div className="ml-auto">
+                <div className="ml-auto flex items-center gap-2">
+                  <PriceAlertForm />
                   {!isCompareMode ? (
                     <Button
                       variant="outline"
