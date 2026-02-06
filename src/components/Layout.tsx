@@ -1,6 +1,7 @@
 import React from 'react';
 import EnterpriseHeader from './EnterpriseHeader';
 import Footer from './Footer';
+import { PriceAlertNotification } from './PriceAlertNotification';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -14,6 +15,7 @@ const Layout: React.FC<LayoutProps> = ({ children, showFooter = true }) => (
       {children}
     </main>
     {showFooter && <Footer />}
+    <PriceAlertNotification />
   </div>
 );
 
