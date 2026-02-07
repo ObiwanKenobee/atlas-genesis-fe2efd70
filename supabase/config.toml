@@ -6,6 +6,9 @@ verify_jwt = true
 [functions.process-paypal]
 verify_jwt = true
 
+[functions.process-payment]
+verify_jwt = true
+
 [functions.verify-payment]
 verify_jwt = false
 
