@@ -30,6 +30,8 @@ import {
   Award,
   Layout,
   UsersRound,
+  Crown,
+  Rocket,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -37,6 +39,65 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CheckoutModal, PaymentStatus } from "@/components/pricing";
+
+// Subscription Plans
+const SUBSCRIPTION_PLANS = [
+  {
+    id: "starter",
+    name: "Starter",
+    description: "Perfect for individuals getting started with carbon offsetting",
+    monthlyPrice: 29,
+    yearlyPrice: 290,
+    features: [
+      "Up to 100 carbon credits/year",
+      "Basic portfolio tracking",
+      "Email support",
+      "Monthly impact reports",
+      "Access to verified projects",
+    ],
+    icon: Leaf,
+    popular: false,
+  },
+  {
+    id: "professional",
+    name: "Professional",
+    description: "For growing businesses committed to sustainability",
+    monthlyPrice: 99,
+    yearlyPrice: 990,
+    features: [
+      "Up to 1,000 carbon credits/year",
+      "Advanced portfolio analytics",
+      "Priority support",
+      "Weekly impact reports",
+      "API access",
+      "Custom certificates",
+      "Team collaboration (5 users)",
+    ],
+    icon: Rocket,
+    popular: true,
+  },
+  {
+    id: "enterprise",
+    name: "Enterprise",
+    description: "Complete solution for large organizations",
+    monthlyPrice: 499,
+    yearlyPrice: 4990,
+    features: [
+      "Unlimited carbon credits",
+      "Enterprise analytics & dashboards",
+      "Dedicated account manager",
+      "Real-time impact tracking",
+      "Full API access",
+      "Custom integrations",
+      "Unlimited team members",
+      "White-label options",
+      "Compliance reporting",
+    ],
+    icon: Crown,
+    popular: false,
+  },
+];
 
 const BUSINESS_MODEL_SEGMENTS = [
   {
@@ -275,6 +336,31 @@ export default function Pricing() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [paymentMethod, setPaymentMethod] = useState<'fiat' | 'crypto'>('fiat');
+  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('yearly');
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<{
+    id: string;
+    name: string;
+    price: number;
+    billingPeriod: 'monthly' | 'yearly';
+    features: string[];
+  } | null>(null);
+
+  const handleSelectPlan = (plan: typeof SUBSCRIPTION_PLANS[0]) => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    
+    setSelectedPlan({
+      id: plan.id,
+      name: plan.name,
+      price: billingPeriod === 'monthly' ? plan.monthlyPrice : plan.yearlyPrice,
+      billingPeriod,
+      features: plan.features,
+    });
+    setCheckoutOpen(true);
+  };
 
   const handleSelectSegment = (segmentId: string) => {
     if (!user) {
@@ -333,6 +419,90 @@ export default function Pricing() {
               Free for producers and communities
             </Badge>
           </motion.div>
+
+          {/* Subscription Plans Section */}
+          <div className="mt-16 mb-16">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-semibold text-foreground mb-4">
+                Choose Your Plan
+              </h2>
+              <div className="flex items-center justify-center gap-3">
+                <span className={`text-sm ${billingPeriod === 'monthly' ? 'text-foreground' : 'text-muted-foreground'}`}>
+                  Monthly
+                </span>
+                <Switch
+                  checked={billingPeriod === 'yearly'}
+                  onCheckedChange={(checked) => setBillingPeriod(checked ? 'yearly' : 'monthly')}
+                />
+                <span className={`text-sm ${billingPeriod === 'yearly' ? 'text-foreground' : 'text-muted-foreground'}`}>
+                  Yearly
+                </span>
+                <Badge className="ml-2 bg-primary/20 text-primary">Save 20%</Badge>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+              {SUBSCRIPTION_PLANS.map((plan, index) => (
+                <motion.div
+                  key={plan.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="relative"
+                >
+                  {plan.popular && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+                      <Badge className="bg-primary text-primary-foreground shadow-lg">
+                        <Star className="w-3 h-3 mr-1" />
+                        Most Popular
+                      </Badge>
+                    </div>
+                  )}
+                  <Card
+                    className={`relative h-full ${
+                      plan.popular
+                        ? 'border-primary bg-primary/5 shadow-lg shadow-primary/10'
+                        : 'bg-card/50 border-border/50 hover:border-primary/30'
+                    } transition-colors`}
+                  >
+                    <CardHeader className="text-center pb-4">
+                      <div className={`w-12 h-12 mx-auto rounded-xl ${plan.popular ? 'bg-primary' : 'bg-primary/10'} flex items-center justify-center mb-4`}>
+                        <plan.icon className={`w-6 h-6 ${plan.popular ? 'text-primary-foreground' : 'text-primary'}`} />
+                      </div>
+                      <h3 className="text-xl font-semibold text-foreground">{plan.name}</h3>
+                      <p className="text-sm text-muted-foreground">{plan.description}</p>
+                      <div className="mt-4">
+                        <span className="text-4xl font-bold text-foreground">
+                          ${billingPeriod === 'monthly' ? plan.monthlyPrice : plan.yearlyPrice}
+                        </span>
+                        <span className="text-muted-foreground">
+                          /{billingPeriod === 'monthly' ? 'mo' : 'yr'}
+                        </span>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <ul className="space-y-3 mb-6">
+                        {plan.features.map((feature, idx) => (
+                          <li key={idx} className="flex items-start gap-2 text-sm">
+                            <Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                            <span className="text-muted-foreground">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <Button
+                        onClick={() => handleSelectPlan(plan)}
+                        className={`w-full ${plan.popular ? '' : 'bg-muted hover:bg-muted/80 text-foreground'}`}
+                        variant={plan.popular ? 'default' : 'outline'}
+                      >
+                        <CreditCard className="w-4 h-4 mr-2" />
+                        Get Started
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </div>
 
           {/* Pricing Tabs */}
           <Tabs defaultValue="business-models" className="max-w-7xl mx-auto mt-16">
@@ -662,6 +832,19 @@ export default function Pricing() {
           </div>
         </div>
       </section>
+
+      {/* Checkout Modal */}
+      <CheckoutModal
+        isOpen={checkoutOpen}
+        onClose={() => setCheckoutOpen(false)}
+        plan={selectedPlan}
+      />
+
+      {/* Payment Status Overlay */}
+      <PaymentStatus
+        onContinue={() => {}}
+        onRetry={() => setCheckoutOpen(true)}
+      />
     </div>
   );
 }
