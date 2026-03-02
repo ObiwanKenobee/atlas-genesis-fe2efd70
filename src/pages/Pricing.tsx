@@ -32,6 +32,7 @@ import {
   UsersRound,
   Crown,
   Rocket,
+  Receipt,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -39,7 +40,8 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CheckoutModal, PaymentStatus } from "@/components/pricing";
+import { CheckoutModal, PaymentStatus, InvoiceGenerator, SubscriptionStatus } from "@/components/pricing";
+import { useSubscription } from "@/hooks/useSubscription";
 
 // Subscription Plans
 const SUBSCRIPTION_PLANS = [
@@ -338,6 +340,7 @@ export default function Pricing() {
   const [paymentMethod, setPaymentMethod] = useState<'fiat' | 'crypto'>('fiat');
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('yearly');
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const { activeSubscription, invoices, isLoadingSubscription, isLoadingInvoices } = useSubscription();
   const [selectedPlan, setSelectedPlan] = useState<{
     id: string;
     name: string;
@@ -809,6 +812,37 @@ export default function Pricing() {
           </div>
         </div>
       </section>
+
+      {/* Active Subscription & Invoices */}
+      {user && (activeSubscription || (invoices && invoices.length > 0)) && (
+        <section className="py-16 bg-muted/10">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            {activeSubscription && (
+              <div>
+                <h2 className="text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <Crown className="w-6 h-6 text-primary" />
+                  Your Subscription
+                </h2>
+                <SubscriptionStatus subscription={activeSubscription} />
+              </div>
+            )}
+
+            {invoices && invoices.length > 0 && (
+              <div>
+                <h2 className="text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <Receipt className="w-6 h-6 text-primary" />
+                  Invoice History
+                </h2>
+                <div className="grid gap-4 md:grid-cols-2">
+                  {invoices.slice(0, 6).map((invoice) => (
+                    <InvoiceGenerator key={invoice.id} invoice={invoice} />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-b from-background to-muted/20">
