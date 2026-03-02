@@ -39,31 +39,24 @@ import {
   Sun
 } from 'lucide-react';
 
-// Types for AI predictions
+// Types for AI predictions with uncertainty quantification
 interface CarbonPrediction {
   projectId: string;
   currentSequestration: number;
   predictedSequestration: number;
+  predictedLowerCI: number;  // 95% confidence interval lower bound
+  predictedUpperCI: number;  // 95% confidence interval upper bound
   confidenceScore: number;
+  confidenceLevel: number;  // e.g., 0.95 for 95% CI
   predictionPeriod: string;
   trend: 'increasing' | 'stable' | 'decreasing';
   seasonalVariation: number;
   recommendations: string[];
-}
-
-interface ProjectRecommendation {
-  id: string;
-  projectName: string;
-  category: string;
-  relevanceScore: number;
-  reasons: string[];
-  expectedImpact: {
-    carbonReduction: number;
-    waterConservation: number;
-    biodiversityScore: number;
-    communityBenefit: number;
-  };
-  riskLevel: 'low' | 'medium' | 'high';
+  epistemicStatus: 'well_supported' | 'supported' | 'preliminary' | 'speculative';
+  modelVersion: string;
+  lastCalibrated: string;
+  dataQualityScore: number;
+  deferralReason?: string;
 }
 
 interface SmartInsight {
@@ -72,18 +65,23 @@ interface SmartInsight {
   title: string;
   description: string;
   confidence: number;
+  confidenceInterval: [number, number];  // Lower and upper bounds
   impact: 'high' | 'medium' | 'low';
   actionable: boolean;
   actionItems?: string[];
+  uncertaintyExplanation?: string;  // Human-readable explanation of uncertainty
 }
 
-// Mock data for demo mode
+// Mock data for demo mode with uncertainty quantification
 const mockCarbonPredictions: CarbonPrediction[] = [
   {
     projectId: 'amazon-rainforest',
     currentSequestration: 1250,
     predictedSequestration: 1850,
+    predictedLowerCI: 1650,
+    predictedUpperCI: 2050,
     confidenceScore: 0.89,
+    confidenceLevel: 0.95,
     predictionPeriod: 'year',
     trend: 'increasing',
     seasonalVariation: 0.12,
@@ -91,13 +89,20 @@ const mockCarbonPredictions: CarbonPrediction[] = [
       'Consider expanding protected area by 20%',
       'Invest in anti-deforestation monitoring',
       'Partner with indigenous communities for stewardship'
-    ]
+    ],
+    epistemicStatus: 'well_supported',
+    modelVersion: 'v2.1.0',
+    lastCalibrated: '2024-01-15',
+    dataQualityScore: 0.92
   },
   {
     projectId: 'coral-reef-restoration',
     currentSequestration: 320,
     predictedSequestration: 580,
+    predictedLowerCI: 450,
+    predictedUpperCI: 710,
     confidenceScore: 0.76,
+    confidenceLevel: 0.90,
     predictionPeriod: 'year',
     trend: 'increasing',
     seasonalVariation: 0.08,
@@ -105,13 +110,20 @@ const mockCarbonPredictions: CarbonPrediction[] = [
       'Deploy additional coral nurseries',
       'Monitor water temperature closely',
       'Engage local fishing communities'
-    ]
+    ],
+    epistemicStatus: 'supported',
+    modelVersion: 'v2.0.5',
+    lastCalibrated: '2024-01-10',
+    dataQualityScore: 0.78
   },
   {
     projectId: 'mangrove-conservation',
     currentSequestration: 890,
     predictedSequestration: 1100,
+    predictedLowerCI: 980,
+    predictedUpperCI: 1220,
     confidenceScore: 0.92,
+    confidenceLevel: 0.95,
     predictionPeriod: 'year',
     trend: 'stable',
     seasonalVariation: 0.05,
@@ -119,46 +131,11 @@ const mockCarbonPredictions: CarbonPrediction[] = [
       'Maintain current protection levels',
       'Expand community-based monitoring',
       'Explore carbon credit opportunities'
-    ]
-  }
-];
-
-const mockRecommendations: ProjectRecommendation[] = [
-  {
-    id: 'rec-1',
-    projectName: 'Atlantic Forest Restoration',
-    category: 'forest_conservation',
-    relevanceScore: 0.94,
-    reasons: ['Matches your interest in forests', 'High carbon potential', 'Verified methodology'],
-    expectedImpact: { carbonReduction: 2500, waterConservation: 450, biodiversityScore: 87, communityBenefit: 72 },
-    riskLevel: 'low'
-  },
-  {
-    id: 'rec-2',
-    projectName: 'Great Barrier Reef Protection',
-    category: 'ocean_conservation',
-    relevanceScore: 0.88,
-    reasons: ['Aligned with ocean interests', 'Strong community involvement', 'Proven results'],
-    expectedImpact: { carbonReduction: 1200, waterConservation: 800, biodiversityScore: 95, communityBenefit: 65 },
-    riskLevel: 'medium'
-  },
-  {
-    id: 'rec-3',
-    projectName: 'African Savanna Regeneration',
-    category: 'grassland_restoration',
-    relevanceScore: 0.82,
-    reasons: ['Supports biodiversity', 'Community-led approach', 'Scalable impact'],
-    expectedImpact: { carbonReduction: 1800, waterConservation: 300, biodiversityScore: 78, communityBenefit: 88 },
-    riskLevel: 'low'
-  },
-  {
-    id: 'rec-4',
-    projectName: 'Peatland Conservation Indonesia',
-    category: 'wetland_conservation',
-    relevanceScore: 0.79,
-    reasons: ['High carbon storage potential', 'Critical ecosystem', 'Verified outcomes'],
-    expectedImpact: { carbonReduction: 3500, waterConservation: 600, biodiversityScore: 72, communityBenefit: 58 },
-    riskLevel: 'high'
+    ],
+    epistemicStatus: 'well_supported',
+    modelVersion: 'v2.1.2',
+    lastCalibrated: '2024-01-18',
+    dataQualityScore: 0.95
   }
 ];
 
@@ -169,9 +146,11 @@ const mockInsights: SmartInsight[] = [
     title: 'Carbon Sequestration Surge Expected',
     description: 'Based on recent growth patterns, forest projects are projected to exceed annual carbon targets by 15-20%.',
     confidence: 0.88,
+    confidenceInterval: [0.82, 0.94],
     impact: 'high',
     actionable: true,
-    actionItems: ['Review top-performing projects', 'Consider scaling successful interventions']
+    actionItems: ['Review top-performing projects', 'Consider scaling successful interventions'],
+    uncertaintyExplanation: 'Based on 5 years of historical data with strong correlation patterns'
   },
   {
     id: 'insight-2',
@@ -179,9 +158,11 @@ const mockInsights: SmartInsight[] = [
     title: 'Community-Led Projects Gaining Momentum',
     description: 'Projects with strong community involvement show 2.3x better long-term sustainability outcomes.',
     confidence: 0.82,
+    confidenceInterval: [0.75, 0.89],
     impact: 'medium',
     actionable: true,
-    actionItems: ['Prioritize community proposals', 'Invest in community capacity building']
+    actionItems: ['Prioritize community proposals', 'Invest in community capacity building'],
+    uncertaintyExplanation: 'Analysis of 234 projects across 12 bioregions'
   },
   {
     id: 'insight-3',
@@ -189,9 +170,11 @@ const mockInsights: SmartInsight[] = [
     title: 'Blue Carbon Projects Underfunded',
     description: 'Ocean-based carbon projects represent only 5% of portfolio but show exceptional cost-effectiveness.',
     confidence: 0.79,
+    confidenceInterval: [0.71, 0.87],
     impact: 'high',
     actionable: true,
-    actionItems: ['Review ocean conservation opportunities', 'Consider pilot investment in blue carbon']
+    actionItems: ['Review ocean conservation opportunities', 'Consider pilot investment in blue carbon'],
+    uncertaintyExplanation: 'Limited historical data; projection based on 28 blue carbon projects'
   },
   {
     id: 'insight-4',
@@ -199,9 +182,11 @@ const mockInsights: SmartInsight[] = [
     title: 'Dry Season Impact Alert',
     description: 'Several Mediterranean climate projects showing stress indicators. Consider supplementary irrigation.',
     confidence: 0.91,
+    confidenceInterval: [0.86, 0.96],
     impact: 'high',
     actionable: true,
-    actionItems: ['Assess water needs', 'Implement drought mitigation strategies']
+    actionItems: ['Assess water needs', 'Implement drought mitigation strategies'],
+    uncertaintyExplanation: 'High confidence due to satellite monitoring data and ground sensors'
   }
 ];
 

@@ -64,9 +64,21 @@ export interface RefreshTokenData {
   revoked: boolean;
 }
 
-// JWT Secret management
-const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || 'your-access-secret-key-change-in-production';
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'your-refresh-secret-key-change-in-production';
+// JWT Secret management with production-safe configuration
+function getEnvOrThrow(name: string): string {
+  const value = process.env[name];
+  if (!value) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(`Required environment variable ${name} is not set in production`);
+    }
+    // Generate a secure random secret for development
+    return require('crypto').randomBytes(64).toString('hex');
+  }
+  return value;
+}
+
+const JWT_ACCESS_SECRET = getEnvOrThrow('JWT_ACCESS_SECRET');
+const JWT_REFRESH_SECRET = getEnvOrThrow('JWT_REFRESH_SECRET');
 const JWT_ACCESS_EXPIRES_IN = process.env.JWT_ACCESS_EXPIRES_IN || '15m';
 const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
 const JWT_ISSUER = process.env.JWT_ISSUER || 'atlas-genesis-api';
@@ -289,6 +301,11 @@ export const updateUserSessionActivity = async (sessionId: string): Promise<void
 export const checkPermission = (userRole: string, requiredRole: string): boolean => {
   return (roleHierarchy[userRole as keyof typeof roleHierarchy] || 0) >=
          (roleHierarchy[requiredRole as keyof typeof roleHierarchy] || 0);
+};
+
+// Alias for verifyRole used in routes
+export const verifyRole = (userRole: string, requiredRole: string): boolean => {
+  return checkPermission(userRole, requiredRole);
 };
 
 export const hasCapability = (userRole: string, capability: string): boolean => {

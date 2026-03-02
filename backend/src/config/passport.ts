@@ -14,6 +14,7 @@ declare global {
       displayName?: string;
       role: string;
       tenantId?: string;
+      organizationId?: string;
       emailVerified: boolean;
       mfaEnabled: boolean;
       lastLogin?: Date;

@@ -15,18 +15,31 @@ async function initClient() {
   if (client || !process.env.AZURE_KEY_VAULT_NAME) return;
 
   try {
-    // Lazy import to keep local dev simple when SDK not installed
-    const { DefaultAzureCredential } = await import('@azure/identity');
-    const { SecretClient } = await import('@azure/keyvault-secrets');
+    // Use require() for dynamic loading to avoid TypeScript module resolution issues
+    let DefaultAzureCredential: any;
+    let SecretClient: any;
+
+    try {
+      const identityModule = require('@azure/identity');
+      DefaultAzureCredential = identityModule.DefaultAzureCredential;
+      const keyvaultModule = require('@azure/keyvault-secrets');
+      SecretClient = keyvaultModule.SecretClient;
+    } catch (moduleErr) {
+      // Azure SDK not installed — fall back to env
+      console.warn('Azure SDK modules not available, falling back to env vars');
+      enabled = false;
+      client = null;
+      return;
+    }
+
     const vaultUrl = `https://${process.env.AZURE_KEY_VAULT_NAME}.vault.azure.net`;
     const credential = new DefaultAzureCredential();
     client = new SecretClient(vaultUrl, credential);
     enabled = true;
-     
+
     console.log('Azure Key Vault client initialized for', process.env.AZURE_KEY_VAULT_NAME);
   } catch (err) {
     // SDK not installed or auth issue — fall back to env
-     
     console.warn('Azure Key Vault not initialized, falling back to env:', err?.message || err);
     enabled = false;
     client = null;
@@ -47,36 +60,19 @@ export async function getSecret(name: string): Promise<MaybeSecret> {
     const resp = await client.getSecret(name);
     return resp && resp.value;
   } catch (err) {
-     
-    console.warn('Key Vault getSecret failed for', name, err?.message || err);
+    console.error(`Failed to get secret ${name}:`, err?.message || err);
     return undefined;
   }
 }
 
-// Load a set of secrets and set them on process.env when missing
-export async function loadSecrets(names: string[]) {
-  if (!names || names.length === 0) return;
+export async function loadSecrets(names: string[]): Promise<Record<string, MaybeSecret>> {
+  const results: Record<string, MaybeSecret> = {};
 
-  await initClient();
-  for (const n of names) {
-    const envKey = n.toUpperCase();
-    if (process.env[envKey]) continue; // don't overwrite existing env
-    try {
-      const val = await getSecret(n);
-      if (val !== undefined) {
-        process.env[envKey] = val;
-      }
-    } catch (e) {
-      // ignore per-secret errors
-    }
-  }
+  await Promise.all(
+    names.map(async (name) => {
+      results[name] = await getSecret(name);
+    })
+  );
+
+  return results;
 }
-
-// Optionally preload common secrets on import if AZURE_KEY_VAULT_PRELOAD is set (comma-separated)
-if (process.env.AZURE_KEY_VAULT_PRELOAD) {
-  const list = (process.env.AZURE_KEY_VAULT_PRELOAD || '').split(',').map((s) => s.trim()).filter(Boolean);
-  // fire-and-forget; best-effort
-  loadSecrets(list).catch(() => {});
-}
-
-export default { getSecret, loadSecrets };

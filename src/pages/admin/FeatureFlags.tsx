@@ -1,23 +1,27 @@
 import React, { useEffect, useState } from 'react';
+import { useAdmin } from '../../contexts/AdminContext';
 import Layout from '../../components/Layout';
+import adminConnector from '../../services/adminConnector';
 
 type Flags = Record<string, boolean>;
 
-const ADMIN_TOKEN_KEY = 'admin_token';
-
 const FeatureFlagsAdmin: React.FC = () => {
+  const { isAuthenticated, isLoading, logout } = useAdmin();
   const [flags, setFlags] = useState<Flags>({});
   const [loading, setLoading] = useState(false);
-  const [token, setToken] = useState<string | null>(sessionStorage.getItem(ADMIN_TOKEN_KEY));
   const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState<string | null>(null);
 
   const fetchFlags = async () => {
     setLoading(true);
     setError(null);
     try {
-      const headers: any = {};
-      if (token) headers['X-Admin-Token'] = token;
-      const res = await fetch('/api/admin/flags', { headers });
+      const token = adminConnector.getToken();
+      const res = await fetch('/api/admin/flags', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
       if (!res.ok) {
         throw new Error(`Failed to load flags: ${res.status}`);
       }
@@ -31,91 +35,124 @@ const FeatureFlagsAdmin: React.FC = () => {
   };
 
   useEffect(() => {
-    if (token) fetchFlags();
-  }, [token]);
+    if (isAuthenticated) {
+      fetchFlags();
+    }
+  }, [isAuthenticated]);
 
-  const saveToken = (t: string) => {
-    sessionStorage.setItem(ADMIN_TOKEN_KEY, t);
-    setToken(t);
-  };
-
-  const clearToken = () => {
-    sessionStorage.removeItem(ADMIN_TOKEN_KEY);
-    setToken(null);
-  };
-
-  const toggleFlag = async (key: string) => {
-    const current = !!flags[key];
+  const toggleFlag = async (flag: string) => {
+    setSaving(flag);
     try {
-      const headers: any = { 'Content-Type': 'application/json' };
-      if (token) headers['X-Admin-Token'] = token;
-      const res = await fetch(`/api/admin/flags/${encodeURIComponent(key)}`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({ value: !current })
+      const token = adminConnector.getToken();
+      const res = await fetch(`/api/admin/flags/${flag}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ enabled: !flags[flag] }),
       });
-      if (!res.ok) throw new Error('Failed to update flag');
-      const updated = await res.json();
-      setFlags((prev) => ({ ...prev, ...updated }));
+      if (!res.ok) {
+        throw new Error(`Failed to update flag: ${res.status}`);
+      }
+      setFlags(prev => ({ ...prev, [flag]: !prev[flag] }));
     } catch (err: any) {
-      setError(err.message || 'Update failed');
+      setError(err.message || 'Failed to update flag');
+    } finally {
+      setSaving(null);
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-slate-400">Loading feature flags...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-white mb-4">Admin Access Required</h1>
+          <p className="text-slate-400">Please log in to access feature flags.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto py-8">
-        <h1 className="text-3xl font-bold mb-4">Feature Flags</h1>
-
-        <div className="mb-4">
-          <label className="block text-sm text-gray-600 mb-1">Admin token</label>
-          {token ? (
-            <div className="flex items-center gap-2">
-              <code className="bg-gray-100 px-2 py-1 rounded">****{token.slice(-6)}</code>
-              <button className="ml-2 text-sm text-red-500" onClick={clearToken}>Clear</button>
-            </div>
-          ) : (
-            <div className="flex gap-2">
-              <input type="password" placeholder="Enter admin token" id="adminToken" className="input" />
-              <button
-                onClick={() => {
-                  const v = (document.getElementById('adminToken') as HTMLInputElement).value;
-                  saveToken(v);
-                }}
-                className="btn"
-              >
-                Save
-              </button>
-            </div>
-          )}
-        </div>
-
-        {error && <div className="text-red-500 mb-4">{error}</div>}
-
-        <div className="bg-white shadow rounded p-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {loading ? (
-              <div>Loading…</div>
-            ) : (
-              Object.keys(flags).map((k) => (
-                <div key={k} className="flex items-center justify-between p-2 border rounded">
-                  <div>
-                    <div className="font-medium">{k}</div>
-                    <div className="text-sm text-gray-500">{String(flags[k])}</div>
-                  </div>
-                  <div>
-                    <button
-                      onClick={() => toggleFlag(k)}
-                      className={`px-3 py-1 rounded ${flags[k] ? 'bg-green-500 text-white' : 'bg-gray-200'}`}
-                    >
-                      {flags[k] ? 'On' : 'Off'}
-                    </button>
-                  </div>
-                </div>
-              ))
-            )}
+      <div className="p-8 bg-slate-900 min-h-screen">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-white">Feature Flags</h1>
+            <p className="text-slate-400 mt-1">Manage platform feature flags</p>
+          </div>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={logout}
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+            >
+              Logout
+            </button>
           </div>
         </div>
+
+        {error && (
+          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/50 rounded-lg">
+            <p className="text-red-400 text-sm">{error}</p>
+          </div>
+        )}
+
+        {/* Flags Grid */}
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Object.entries(flags).map(([flag, enabled]) => (
+              <div
+                key={flag}
+                className={`p-4 rounded-lg border transition-all ${
+                  enabled
+                    ? 'bg-green-500/10 border-green-500/30'
+                    : 'bg-slate-800 border-slate-700'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-3 h-3 rounded-full ${enabled ? 'bg-green-500' : 'bg-slate-500'}`} />
+                    <span className="text-white font-medium">{flag}</span>
+                  </div>
+                  <button
+                    onClick={() => toggleFlag(flag)}
+                    disabled={saving === flag}
+                    className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                      enabled
+                        ? 'bg-green-600 hover:bg-green-700 text-white'
+                        : 'bg-slate-600 hover:bg-slate-700 text-white'
+                    } ${saving === flag ? 'opacity-50 cursor-wait' : ''}`}
+                  >
+                    {saving === flag ? 'Saving...' : enabled ? 'Enabled' : 'Disabled'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {Object.keys(flags).length === 0 && !loading && (
+          <div className="text-center py-12">
+            <p className="text-slate-400">No feature flags found.</p>
+          </div>
+        )}
       </div>
     </Layout>
   );

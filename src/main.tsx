@@ -4,10 +4,12 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from 'next-themes';
 import { Toaster } from 'sonner';
 import { HelmetProvider } from 'react-helmet-async';
-import { AuthProvider } from './hooks/useAuth';
-import { SupabaseAuthProvider } from './hooks/useSupabaseAuth';
+import { AuthProvider } from './hooks/useAuth.tsx';
+import { SupabaseAuthProvider } from './hooks/useSupabaseAuth.tsx';
+import { AdminProvider } from './contexts/AdminContext.tsx';
 import App from './App.tsx';
 import './index.css';
+import './App.css';
 import featureFlags from './lib/featureFlags';
 
 const queryClient = new QueryClient({
@@ -36,8 +38,9 @@ async function bootstrap() {
       <HelmetProvider>
         <QueryClientProvider client={queryClient}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-              <AuthProvider>
-                <SupabaseAuthProvider>
+            <AuthProvider>
+              <SupabaseAuthProvider>
+                <AdminProvider>
                   <App />
                   <Toaster 
                     position="bottom-right" 
@@ -46,8 +49,9 @@ async function bootstrap() {
                     closeButton
                     theme="system"
                   />
-                </SupabaseAuthProvider>
-              </AuthProvider>
+                </AdminProvider>
+              </SupabaseAuthProvider>
+            </AuthProvider>
           </ThemeProvider>
         </QueryClientProvider>
       </HelmetProvider>

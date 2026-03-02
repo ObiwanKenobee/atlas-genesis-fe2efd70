@@ -15,6 +15,9 @@ import {
   Phone,
   MapPin,
   Sparkles,
+  Tag,
+  AlertCircle,
+  Percent,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -89,6 +92,14 @@ export function CheckoutModal({ isOpen, onClose, plan }: CheckoutModalProps) {
     taxId: '',
   });
 
+  const [promoCode, setPromoCode] = useState('');
+  const [appliedPromo, setAppliedPromo] = useState<{
+    code: string;
+    discountAmount: number;
+    discountType: string;
+  } | null>(null);
+  const [promoError, setPromoError] = useState('');
+  const [isValidatingPromo, setIsValidatingPromo] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -101,6 +112,9 @@ export function CheckoutModal({ isOpen, onClose, plan }: CheckoutModalProps) {
     if (!isOpen) {
       setStep('billing');
       resetPayment();
+      setPromoCode('');
+      setAppliedPromo(null);
+      setPromoError('');
     }
   }, [isOpen, resetPayment]);
 
@@ -118,6 +132,49 @@ export function CheckoutModal({ isOpen, onClose, plan }: CheckoutModalProps) {
     return Object.keys(newErrors).length === 0;
   };
 
+  const validatePromoCode = async () => {
+    if (!promoCode.trim()) return;
+    
+    setIsValidatingPromo(true);
+    setPromoError('');
+
+    try {
+      const response = await fetch('/api/promocodes/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: promoCode,
+          planId: plan?.id,
+          billingInterval: plan?.billingPeriod,
+          purchaseAmount: plan?.price,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.valid) {
+        setAppliedPromo({
+          code: data.promoCode.code,
+          discountAmount: data.discountAmount,
+          discountType: data.promoCode.discountType,
+        });
+      } else {
+        setPromoError(data.errorMessage || 'Invalid promo code');
+      }
+    } catch (err) {
+      setPromoError('Failed to validate promo code');
+    } finally {
+      setIsValidatingPromo(false);
+    }
+  };
+
+  const calculateTotal = () => {
+    if (!plan) return 0;
+    const subtotal = plan.price;
+    const discount = appliedPromo?.discountAmount || 0;
+    return Math.max(0, subtotal - discount);
+  };
+
   const handleContinueToPayment = () => {
     if (validateBilling()) {
       setStep('payment');
@@ -131,12 +188,14 @@ export function CheckoutModal({ isOpen, onClose, plan }: CheckoutModalProps) {
 
     const result = await initiatePayment({
       provider: paymentMethod,
-      amount: plan.price,
+      amount: calculateTotal(),
       currency: 'USD',
       metadata: {
         planId: plan.id,
         planName: plan.name,
         billingPeriod: plan.billingPeriod,
+        promoCode: appliedPromo?.code,
+        discountAmount: appliedPromo?.discountAmount,
       },
       billingDetails: {
         firstName: billingDetails.firstName,
@@ -159,6 +218,10 @@ export function CheckoutModal({ isOpen, onClose, plan }: CheckoutModalProps) {
   };
 
   if (!plan) return null;
+
+  const subtotal = plan.price;
+  const discount = appliedPromo?.discountAmount || 0;
+  const total = calculateTotal();
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -361,6 +424,67 @@ export function CheckoutModal({ isOpen, onClose, plan }: CheckoutModalProps) {
               exit={{ opacity: 0, x: -20 }}
               className="space-y-6 py-4"
             >
+              {/* Promo Code Section */}
+              {!appliedPromo ? (
+                <div className="p-4 bg-muted/50 rounded-lg">
+                  <Label className="text-sm font-medium flex items-center gap-2 mb-2">
+                    <Tag className="w-4 h-4" />
+                    Have a promo code?
+                  </Label>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Enter promo code"
+                      value={promoCode}
+                      onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                      className="flex-1"
+                    />
+                    <Button
+                      variant="outline"
+                      onClick={validatePromoCode}
+                      disabled={isValidatingPromo || !promoCode.trim()}
+                    >
+                      {isValidatingPromo ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        'Apply'
+                      )}
+                    </Button>
+                  </div>
+                  {promoError && (
+                    <p className="text-xs text-destructive mt-2 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
+                      {promoError}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 text-emerald-500" />
+                      <div>
+                        <p className="font-medium text-emerald-700 dark:text-emerald-400">
+                          Promo code applied: {appliedPromo.code}
+                        </p>
+                        <p className="text-sm text-emerald-600 dark:text-emerald-500">
+                          You save ${appliedPromo.discountAmount.toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setAppliedPromo(null);
+                        setPromoCode('');
+                      }}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                </div>
+              )}
+
               {/* Order Summary */}
               <div className="p-4 bg-muted/50 rounded-lg space-y-3">
                 <h3 className="font-semibold flex items-center gap-2">
@@ -369,8 +493,14 @@ export function CheckoutModal({ isOpen, onClose, plan }: CheckoutModalProps) {
                 </h3>
                 <div className="flex justify-between text-sm">
                   <span>{plan.name} ({plan.billingPeriod})</span>
-                  <span>${plan.price.toFixed(2)}</span>
+                  <span>${subtotal.toFixed(2)}</span>
                 </div>
+                {appliedPromo && (
+                  <div className="flex justify-between text-sm text-emerald-600">
+                    <span>Discount ({appliedPromo.code})</span>
+                    <span>-${discount.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm text-muted-foreground">
                   <span>Platform fee</span>
                   <span>$0.00</span>
@@ -378,7 +508,7 @@ export function CheckoutModal({ isOpen, onClose, plan }: CheckoutModalProps) {
                 <Separator />
                 <div className="flex justify-between font-semibold">
                   <span>Total</span>
-                  <span className="text-primary">${plan.price.toFixed(2)} / {plan.billingPeriod === 'monthly' ? 'mo' : 'yr'}</span>
+                  <span className="text-primary">${total.toFixed(2)} / {plan.billingPeriod === 'monthly' ? 'mo' : 'yr'}</span>
                 </div>
               </div>
 
@@ -440,7 +570,7 @@ export function CheckoutModal({ isOpen, onClose, plan }: CheckoutModalProps) {
                   ) : (
                     <>
                       <Lock className="w-4 h-4 mr-2" />
-                      Pay ${plan.price.toFixed(2)}
+                      Pay ${total.toFixed(2)}
                     </>
                   )}
                 </Button>

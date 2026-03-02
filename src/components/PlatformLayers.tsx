@@ -9,7 +9,8 @@ import {
   ChevronRight,
   ChevronDown,
   Network,
-  Sparkles
+  Sparkles,
+  Calculator
 } from "lucide-react";
 
 const layers = [
@@ -87,6 +88,21 @@ const layers = [
       subtext: "Economic impact"
     },
     relatedPages: ["/marketplace", "/regenerative-agriculture"]
+  },
+    {
+    number: "06",
+    title: "Cardano Layer",
+    description: "Probabilistic Civilization Infrastructure (PCI) - A probability-native civilization stack that models uncertainty and future viability.",
+    detailedDescription: "Built on top of Cardano (philosophically and technically), this layer evolves Atlas Sanctum from a measurement engine into a probability-native civilization stack. It introduces Probabilistic Value Units (PVUs) weighted by long-term survival likelihood, regenerative markets for trading ecological futures, and adaptive governance curves that adjust automatically as probabilities shift. The Atlas Probabilistic Oracle (APO) runs Monte Carlo-style civilization simulations to publish risk heatmaps and inform capital flows.",
+    icon: Calculator,
+    color: "from-purple-500 to-indigo-600",
+    features: ["Probabilistic Value Units", "Regeneration Markets", "Adaptive Governance", "Scenario Trees", "Probability Curves"],
+    metrics: {
+      label: "Simulation Runs",
+      value: "10,000+",
+      subtext: "Monte Carlo simulations"
+    },
+    relatedPages: ["/cardano-layer"]
   }
 ];
 
@@ -115,10 +131,10 @@ const PlatformLayers = () => {
             Platform Architecture
           </span>
           <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mt-3 sm:mt-4 mb-4 sm:mb-6">
-            Five Layers of{" "}
+            Six Layers of{" "}
             <span className="text-gradient">Regeneration</span>
           </h2>
-          <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto px-4 sm:px-0">
+          <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto px-4 sm:px-0 text-center">
             A multi-layered ecosystem designed to preserve humanity and the planet,
             blending impact finance with ethical technology.
           </p>

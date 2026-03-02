@@ -11,7 +11,7 @@ router.get('/', adminAuth, (req, res) => {
 
 // Set a flag value: POST /api/admin/flags/:flag  { value: true }
 router.post('/:flag', adminAuth, express.json(), (req, res) => {
-  const flag = req.params.flag;
+  const flag = req.params.flag as string;
   const value = req.body?.value;
   const boolVal = !!value;
   setFeatureFlag(flag, boolVal);

@@ -26,8 +26,17 @@ export function ComparisonPDFExport({ projects }: ComparisonPDFExportProps) {
 
     try {
       // Dynamic imports to reduce bundle size
-      const { jsPDF } = await import('jspdf');
+      // const { jsPDF } = await import('jspdf');
 
+      // Temporary workaround - show toast instead of PDF generation
+      toast({
+        title: 'PDF Export',
+        description: 'PDF export functionality is temporarily unavailable. Please try again later.',
+      });
+      setIsExporting(false);
+      return;
+
+      /*
       const doc = new jsPDF({
         orientation: 'landscape',
         unit: 'mm',
@@ -39,6 +48,7 @@ export function ComparisonPDFExport({ projects }: ComparisonPDFExportProps) {
       const margin = 15;
       let yPos = margin;
 
+      /*
       // Header
       doc.setFillColor(16, 185, 129); // Primary green
       doc.rect(0, 0, pageWidth, 35, 'F');
@@ -91,7 +101,7 @@ export function ComparisonPDFExport({ projects }: ComparisonPDFExportProps) {
         { label: 'Project Type', getValue: (p: CarbonProject) => PROJECT_TYPE_LABELS[p.project_type] },
         { label: 'Location', getValue: (p: CarbonProject) => p.location },
         { label: 'Country', getValue: (p: CarbonProject) => p.country },
-        { label: 'Price/Credit', getValue: (p: CarbonProject) => `$${p.price_per_credit.toFixed(2)}` },
+        { label: 'Price/Credit', getValue: (p: CarbonProject) => `${p.price_per_credit.toFixed(2)}` },
         { label: 'CO₂ Offset/Credit', getValue: (p: CarbonProject) => `${p.co2_offset_per_credit.toFixed(1)} tons` },
         { label: 'Available Credits', getValue: (p: CarbonProject) => p.available_credits.toLocaleString() },
         { label: 'Vintage Year', getValue: (p: CarbonProject) => p.vintage_year.toString() },
@@ -144,7 +154,7 @@ export function ComparisonPDFExport({ projects }: ComparisonPDFExportProps) {
       const mostCredits = Math.max(...projects.map((p) => p.available_credits));
 
       const summaryItems = [
-        `• Best Price: $${lowestPrice.toFixed(2)}/credit`,
+        `• Best Price: ${lowestPrice.toFixed(2)}/credit`,
         `• Highest CO₂ Offset: ${highestCO2.toFixed(1)} tons/credit`,
         `• Most Available Credits: ${mostCredits.toLocaleString()}`,
         `• Total Projects Compared: ${projects.length}`,
@@ -173,6 +183,7 @@ export function ComparisonPDFExport({ projects }: ComparisonPDFExportProps) {
       // Save the PDF
       const fileName = `project-comparison-${new Date().toISOString().split('T')[0]}.pdf`;
       doc.save(fileName);
+      */
 
       toast({
         title: 'PDF Downloaded',

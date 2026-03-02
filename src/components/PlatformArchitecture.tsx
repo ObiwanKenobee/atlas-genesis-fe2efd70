@@ -54,7 +54,7 @@ const PlatformArchitecture = () => (
       <div className="text-center mb-20">
         <h2 className="text-6xl font-black mb-6">PLATFORM ARCHITECTURE</h2>
         <h3 className="text-3xl text-emerald-500 mb-8">Five Layers of Regeneration</h3>
-        <p className="text-xl text-slate-400 max-w-4xl mx-auto">
+        <p className="text-xl text-slate-400 max-w-4xl mx-auto text-center">
           A multi-layered ecosystem designed to preserve humanity and the planet, blending impact finance with ethical technology.
         </p>
       </div>

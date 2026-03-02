@@ -8,7 +8,8 @@
     "start": "node dist/index.js",
     "build": "tsc",
     "lint": "eslint . --ext .ts,.tsx",
-    "migrate": "ts-node ./scripts/migrate.ts"
+    "migrate": "ts-node ./scripts/migrate.ts",
+    "seed:admin": "ts-node db/seedAdmin.ts"
   },
   "dependencies": {
     "@opentelemetry/api": "^1.9.0",
@@ -18,6 +19,7 @@
     "@opentelemetry/sdk-node": "^0.52.0",
     "@sendgrid/mail": "^8.1.6",
     "@types/bcrypt": "^6.0.0",
+    "@types/bcryptjs": "^2.4.6",
     "@types/multer": "^2.0.0",
     "@types/nodemailer": "^7.0.4",
     "@types/passport": "^1.0.17",
@@ -27,6 +29,7 @@
     "@types/socket.io": "^3.0.1",
     "@types/speakeasy": "^2.0.10",
     "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
     "connect-redis": "^7.0.0",
     "cors": "^2.8.5",
     "csrf": "^3.1.0",

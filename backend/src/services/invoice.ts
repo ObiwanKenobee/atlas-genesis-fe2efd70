@@ -1,417 +1,293 @@
 /**
  * Invoice Service
- * 
- * Enterprise invoice service with Stripe integration for invoice management,
- * PDF generation, and billing operations.
+ * Handles invoice generation and management
  */
 
-import Stripe from 'stripe';
 import { query } from '../db';
 
-// Initialize Stripe with your secret key
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2024-11-20.acacia',
-});
+// In-memory storage for invoices (extends mock database)
+const invoices: Map<string, any> = new Map();
+const invoiceItems: Map<string, any[]> = new Map();
 
-export interface Invoice {
-  id: string;
+// Initialize with some sample invoices
+const initInvoices = () => {
+  const sampleInvoices = [
+    {
+      id: 'inv_001',
+      user_id: 'user_demo',
+      organization_id: 'org_demo',
+      subscription_id: 'sub_demo',
+      invoice_number: 'INV-2024-001',
+      status: 'paid',
+      amount: 990,
+      currency: 'USD',
+      subtotal: 990,
+      tax_amount: 0,
+      discount_amount: 0,
+      due_date: new Date('2024-01-15').toISOString(),
+      paid_at: new Date('2024-01-15').toISOString(),
+      created_at: new Date('2024-01-01').toISOString(),
+      billing_details: {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john@example.com',
+        company: 'Example Corp',
+        address: '123 Main St',
+        city: 'San Francisco',
+        state: 'CA',
+        postalCode: '94102',
+        country: 'US',
+        taxId: '',
+      },
+    },
+  ];
+
+  sampleInvoices.forEach((inv) => {
+    invoices.set(inv.id, inv);
+    invoiceItems.set(inv.id, [
+      {
+        id: `item_${inv.id}_1`,
+        invoice_id: inv.id,
+        description: `${inv.id.includes('year') ? 'Annual' : 'Monthly'} Subscription - Professional Plan`,
+        quantity: 1,
+        unit_price: inv.amount,
+        amount: inv.amount,
+      },
+    ]);
+  });
+};
+
+initInvoices();
+
+export interface InvoiceInput {
   userId: string;
-  organizationId: string;
-  subscriptionId: string;
-  stripeInvoiceId: string;
+  organizationId?: string;
+  subscriptionId?: string;
   invoiceNumber: string;
-  status: 'draft' | 'open' | 'paid' | 'void' | 'uncollectible';
   amount: number;
-  currency: string;
+  currency?: string;
+  subtotal: number;
+  taxAmount?: number;
+  discountAmount?: number;
   dueDate: Date;
-  paidAt?: Date;
-  createdAt: Date;
-  updatedAt: Date;
+  billingDetails: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    company?: string;
+    address: string;
+    city: string;
+    state?: string;
+    postalCode: string;
+    country: string;
+    taxId?: string;
+  };
+  items: {
+    description: string;
+    quantity: number;
+    unitPrice: number;
+    amount: number;
+  }[];
 }
 
-export interface InvoiceItem {
+export interface Invoice extends InvoiceInput {
   id: string;
-  invoiceId: string;
-  description: string;
-  quantity: number;
-  unitPrice: number;
-  amount: number;
-  createdAt: Date;
+  status: 'draft' | 'open' | 'paid' | 'void' | 'uncollectible';
+  paidAt?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface InvoiceSettings {
-  id: string;
-  organizationId: string;
-  invoicePrefix: string;
-  invoiceNumber: number;
-  defaultPaymentTerms: number;
-  taxRate: number;
-  taxId?: string;
-  companyName?: string;
-  companyAddress?: string;
-  companyEmail?: string;
-  companyPhone?: string;
-  logoUrl?: string;
-  notes?: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export class InvoiceService {
+class InvoiceService {
   /**
-   * Create invoice from Stripe webhook
+   * Generate a new invoice
    */
-  async createInvoiceFromStripe(
-    stripeInvoice: Stripe.Invoice,
-    userId: string,
-    organizationId: string
-  ): Promise<Invoice> {
-    // Get invoice settings
-    const settingsResult = await query(
-      `SELECT * FROM invoice_settings WHERE organization_id = $1`,
-      [organizationId]
-    );
+  async generateInvoice(input: InvoiceInput): Promise<Invoice> {
+    const id = `inv_${Date.now()}`;
+    const now = new Date().toISOString();
 
-    const settings = settingsResult.length > 0 ? settingsResult[0] : null;
+    const invoice: Invoice = {
+      ...input,
+      id,
+      currency: input.currency || 'USD',
+      taxAmount: input.taxAmount || 0,
+      discountAmount: input.discountAmount || 0,
+      status: 'open',
+      createdAt: now,
+      updatedAt: now,
+    };
 
-    // Generate invoice number
-    const invoiceNumber = settings
-      ? `${settings.invoicePrefix}${settings.invoiceNumber}`
-      : `INV-${stripeInvoice.number}`;
+    invoices.set(id, invoice);
 
-    // Create invoice in database
-    const result = await query(
-      `INSERT INTO invoices (
-        user_id, organization_id, subscription_id, stripe_invoice_id,
-        invoice_number, status, amount, currency, due_date,
-        created_at, updated_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), NOW())
-      RETURNING *`,
-      [
-        userId,
-        organizationId,
-        stripeInvoice.subscription as string,
-        stripeInvoice.id,
-        invoiceNumber,
-        stripeInvoice.status,
-        stripeInvoice.total / 100,
-        stripeInvoice.currency,
-        new Date(stripeInvoice.due_date * 1000),
-      ]
-    );
+    // Store invoice items
+    const items = input.items.map((item, index) => ({
+      id: `item_${id}_${index + 1}`,
+      invoice_id: id,
+      ...item,
+    }));
+    invoiceItems.set(id, items);
 
-    // Create invoice items
-    for (const lineItem of stripeInvoice.lines.data) {
-      await query(
-        `INSERT INTO invoice_items (
-          invoice_id, description, quantity, unit_price, amount, created_at
-        ) VALUES ($1, $2, $3, $4, $5, NOW())`,
-        [
-          result[0].id,
-          lineItem.description || 'Subscription',
-          lineItem.quantity || 1,
-          (lineItem.price?.unit_amount || 0) / 100,
-          (lineItem.amount || 0) / 100,
-        ]
-      );
-    }
-
-    // Update invoice number
-    if (settings) {
-      await query(
-        `UPDATE invoice_settings SET invoice_number = invoice_number + 1 WHERE id = $1`,
-        [settings.id]
-      );
-    }
-
-    return result[0];
+    return invoice;
   }
 
   /**
    * Get invoice by ID
    */
-  async getInvoice(invoiceId: string): Promise<Invoice | null> {
-    const result = await query(
-      `SELECT * FROM invoices WHERE id = $1`,
-      [invoiceId]
-    );
-
-    return result[0] || null;
-  }
-
-  /**
-   * Get invoices for organization
-   */
-  async getOrganizationInvoices(
-    organizationId: string,
-    limit: number = 20,
-    offset: number = 0
-  ): Promise<Invoice[]> {
-    const result = await query(
-      `SELECT * FROM invoices 
-       WHERE organization_id = $1 
-       ORDER BY created_at DESC 
-       LIMIT $2 OFFSET $3`,
-      [organizationId, limit, offset]
-    );
-
-    return result;
-  }
-
-  /**
-   * Get invoice items
-   */
-  async getInvoiceItems(invoiceId: string): Promise<InvoiceItem[]> {
-    const result = await query(
-      `SELECT * FROM invoice_items WHERE invoice_id = $1 ORDER BY created_at`,
-      [invoiceId]
-    );
-
-    return result;
+  async getInvoice(id: string): Promise<Invoice | null> {
+    return invoices.get(id) || null;
   }
 
   /**
    * Get invoice with items
    */
-  async getInvoiceWithItems(invoiceId: string): Promise<{
-    invoice: Invoice;
-    items: InvoiceItem[];
-  }> {
-    const invoice = await this.getInvoice(invoiceId);
-    if (!invoice) {
-      throw new Error('Invoice not found');
-    }
+  async getInvoiceWithItems(id: string) {
+    const invoice = invoices.get(id);
+    if (!invoice) return null;
 
-    const items = await this.getInvoiceItems(invoiceId);
-
-    return { invoice, items };
+    const items = invoiceItems.get(id) || [];
+    return { ...invoice, items };
   }
 
   /**
-   * Download invoice PDF
+   * Get invoices for user
    */
-  async downloadInvoicePDF(invoiceId: string): Promise<Buffer> {
-    const invoice = await this.getInvoice(invoiceId);
-    if (!invoice) {
-      throw new Error('Invoice not found');
+  async getUserInvoices(userId: string): Promise<Invoice[]> {
+    const userInvoices: Invoice[] = [];
+    for (const invoice of invoices.values()) {
+      if (invoice.user_id === userId) {
+        userInvoices.push(invoice);
+      }
     }
-
-    // Get PDF from Stripe
-    const stripeInvoice = await stripe.invoices.retrieve(invoice.stripeInvoiceId, {
-      expand: ['invoice_pdf'],
-    });
-
-    const pdfUrl = stripeInvoice.invoice_pdf;
-    if (!pdfUrl) {
-      throw new Error('PDF not available');
-    }
-
-    // Download PDF
-    const response = await fetch(pdfUrl);
-    const buffer = Buffer.from(await response.arrayBuffer());
-
-    return buffer;
-  }
-
-  /**
-   * Get invoice settings
-   */
-  async getInvoiceSettings(organizationId: string): Promise<InvoiceSettings> {
-    const result = await query(
-      `SELECT * FROM invoice_settings WHERE organization_id = $1`,
-      [organizationId]
+    return userInvoices.sort((a, b) => 
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
-
-    if (result.length === 0) {
-      // Create default settings
-      const defaultResult = await query(
-        `INSERT INTO invoice_settings (
-          organization_id, invoice_prefix, invoice_number, 
-          default_payment_terms, tax_rate, created_at, updated_at
-        ) VALUES ($1, 'INV-', 1, 30, 0, NOW(), NOW())
-        RETURNING *`,
-        [organizationId]
-      );
-      return defaultResult[0];
-    }
-
-    return result[0];
   }
 
   /**
-   * Update invoice settings
+   * Mark invoice as paid
    */
-  async updateInvoiceSettings(
-    organizationId: string,
-    updates: Partial<{
-      invoicePrefix: string;
-      defaultPaymentTerms: number;
-      taxRate: number;
-      taxId: string;
-      companyName: string;
-      companyAddress: string;
-      companyEmail: string;
-      companyPhone: string;
-      logoUrl: string;
-      notes: string;
-    }>
-  ): Promise<InvoiceSettings> {
-    const fields: string[] = [];
-    const values: any[] = [];
-    let paramIndex = 1;
+  async markAsPaid(id: string): Promise<Invoice | null> {
+    const invoice = invoices.get(id);
+    if (!invoice) return null;
 
-    if (updates.invoicePrefix !== undefined) {
-      fields.push(`invoice_prefix = $${paramIndex++}`);
-      values.push(updates.invoicePrefix);
-    }
-    if (updates.defaultPaymentTerms !== undefined) {
-      fields.push(`default_payment_terms = $${paramIndex++}`);
-      values.push(updates.defaultPaymentTerms);
-    }
-    if (updates.taxRate !== undefined) {
-      fields.push(`tax_rate = $${paramIndex++}`);
-      values.push(updates.taxRate);
-    }
-    if (updates.taxId !== undefined) {
-      fields.push(`tax_id = $${paramIndex++}`);
-      values.push(updates.taxId);
-    }
-    if (updates.companyName !== undefined) {
-      fields.push(`company_name = $${paramIndex++}`);
-      values.push(updates.companyName);
-    }
-    if (updates.companyAddress !== undefined) {
-      fields.push(`company_address = $${paramIndex++}`);
-      values.push(updates.companyAddress);
-    }
-    if (updates.companyEmail !== undefined) {
-      fields.push(`company_email = $${paramIndex++}`);
-      values.push(updates.companyEmail);
-    }
-    if (updates.companyPhone !== undefined) {
-      fields.push(`company_phone = $${paramIndex++}`);
-      values.push(updates.companyPhone);
-    }
-    if (updates.logoUrl !== undefined) {
-      fields.push(`logo_url = $${paramIndex++}`);
-      values.push(updates.logoUrl);
-    }
-    if (updates.notes !== undefined) {
-      fields.push(`notes = $${paramIndex++}`);
-      values.push(updates.notes);
-    }
+    invoice.status = 'paid';
+    invoice.paid_at = new Date().toISOString();
+    invoice.updated_at = new Date().toISOString();
 
-    fields.push(`updated_at = NOW()`);
-    values.push(organizationId);
-
-    const result = await query(
-      `UPDATE invoice_settings SET ${fields.join(', ')} WHERE organization_id = $${paramIndex++} RETURNING *`,
-      values
-    );
-
-    return result[0];
+    invoices.set(id, invoice);
+    return invoice;
   }
 
   /**
-   * Get invoice statistics
+   * Generate invoice PDF content (returns HTML for PDF generation)
    */
-  async getInvoiceStatistics(
-    organizationId: string,
-    startDate: Date,
-    endDate: Date
-  ): Promise<{
-    totalInvoices: number;
-    totalAmount: number;
-    paidAmount: number;
-    pendingAmount: number;
-    overdueAmount: number;
-    averageInvoiceAmount: number;
-  }> {
-    const result = await query(
-      `SELECT 
-        COUNT(*) as total_invoices,
-        SUM(amount) as total_amount,
-        SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END) as paid_amount,
-        SUM(CASE WHEN status = 'open' THEN amount ELSE 0 END) as pending_amount,
-        SUM(CASE WHEN status = 'open' AND due_date < NOW() THEN amount ELSE 0 END) as overdue_amount,
-        AVG(amount) as average_invoice_amount
-       FROM invoices
-       WHERE organization_id = $1
-         AND created_at >= $2
-         AND created_at <= $3`,
-      [organizationId, startDate, endDate]
-    );
+  async generateInvoicePDF(invoiceId: string): Promise<string | null> {
+    const invoice = await this.getInvoiceWithItems(invoiceId);
+    if (!invoice) return null;
 
-    const stats = result[0];
+    const taxAmount = invoice.taxAmount || 0;
+    const discountAmount = invoice.discountAmount || 0;
 
-    return {
-      totalInvoices: parseInt(stats.total_invoices) || 0,
-      totalAmount: parseFloat(stats.total_amount) || 0,
-      paidAmount: parseFloat(stats.paid_amount) || 0,
-      pendingAmount: parseFloat(stats.pending_amount) || 0,
-      overdueAmount: parseFloat(stats.overdue_amount) || 0,
-      averageInvoiceAmount: parseFloat(stats.average_invoice_amount) || 0,
-    };
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; padding: 40px; }
+          .header { text-align: center; margin-bottom: 40px; }
+          .logo { font-size: 24px; font-weight: bold; color: #10b981; }
+          .invoice-title { font-size: 32px; margin: 20px 0; }
+          .section { margin: 30px 0; }
+          .label { font-weight: bold; color: #666; }
+          table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+          th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+          th { background-color: #f9fafb; }
+          .totals { margin-top: 30px; text-align: right; }
+          .total-row { margin: 10px 0; }
+          .grand-total { font-size: 20px; font-weight: bold; color: #10b981; }
+          .footer { margin-top: 50px; text-align: center; color: #666; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div class="logo">🌿 Atlas Sanctum</div>
+          <div class="invoice-title">INVOICE</div>
+          <div>Invoice #: ${invoice.invoice_number}</div>
+          <div>Date: ${new Date(invoice.createdAt).toLocaleDateString()}</div>
+        </div>
+
+        <div class="section">
+          <h3>Bill To:</h3>
+          <p>
+            ${invoice.billingDetails.firstName} ${invoice.billingDetails.lastName}<br>
+            ${invoice.billingDetails.company ? invoice.billingDetails.company + '<br>' : ''}
+            ${invoice.billingDetails.address}<br>
+            ${invoice.billingDetails.city}, ${invoice.billingDetails.state || ''} ${invoice.billingDetails.postalCode}<br>
+            ${invoice.billingDetails.country}<br>
+            ${invoice.billingDetails.email}
+          </p>
+        </div>
+
+        <div class="section">
+          <h3>Subscription Details</h3>
+          <p><span class="label">Plan:</span> Professional Plan</p>
+          <p><span class="label">Billing Period:</span> ${invoice.amount >= 500 ? 'Annual' : 'Monthly'}</p>
+          <p><span class="label">Status:</span> ${invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}</p>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Qty</th>
+              <th>Unit Price</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${invoice.items.map(item => `
+              <tr>
+                <td>${item.description}</td>
+                <td>${item.quantity}</td>
+                <td>$${item.unit_price.toFixed(2)}</td>
+                <td>$${item.amount.toFixed(2)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+
+        <div class="totals">
+          <div class="total-row">Subtotal: $${invoice.subtotal.toFixed(2)}</div>
+          ${discountAmount > 0 ? `<div class="total-row" style="color: #10b981;">Discount: -$${discountAmount.toFixed(2)}</div>` : ''}
+          ${taxAmount > 0 ? `<div class="total-row">Tax: $${taxAmount.toFixed(2)}</div>` : ''}
+          <div class="total-row grand-total">Total: $${invoice.amount.toFixed(2)}</div>
+        </div>
+
+        <div class="footer">
+          <p>Thank you for your subscription to Atlas Sanctum!</p>
+          <p>For questions, contact: hello@atlassanctum.com</p>
+          <p>Atlas Sanctum - Regenerating Earth's Future</p>
+        </div>
+      </body>
+      </html>
+    `;
   }
 
   /**
-   * Void invoice
+   * Get next invoice number
    */
-  async voidInvoice(invoiceId: string): Promise<Invoice> {
-    const invoice = await this.getInvoice(invoiceId);
-    if (!invoice) {
-      throw new Error('Invoice not found');
+  async getNextInvoiceNumber(): Promise<string> {
+    let maxNumber = 0;
+    for (const invoice of invoices.values()) {
+      const match = invoice.invoice_number.match(/INV-(\d+)-(\d+)/);
+      if (match) {
+        const num = parseInt(match[2], 10);
+        if (num > maxNumber) maxNumber = num;
+      }
     }
-
-    // Void in Stripe
-    await stripe.invoices.voidInvoice(invoice.stripeInvoiceId);
-
-    // Update in database
-    const result = await query(
-      `UPDATE invoices 
-       SET status = 'void', updated_at = NOW()
-       WHERE id = $1
-       RETURNING *`,
-      [invoiceId]
-    );
-
-    return result[0];
-  }
-
-  /**
-   * Retry invoice payment
-   */
-  async retryInvoicePayment(invoiceId: string): Promise<Stripe.Invoice> {
-    const invoice = await this.getInvoice(invoiceId);
-    if (!invoice) {
-      throw new Error('Invoice not found');
-    }
-
-    // Retry payment in Stripe
-    const stripeInvoice = await stripe.invoices.pay(invoice.stripeInvoiceId);
-
-    // Update status in database
-    await query(
-      `UPDATE invoices SET status = $1, updated_at = NOW() WHERE id = $2`,
-      [stripeInvoice.status, invoiceId]
-    );
-
-    return stripeInvoice;
-  }
-
-  /**
-   * Send invoice email
-   */
-  async sendInvoiceEmail(invoiceId: string): Promise<void> {
-    const invoice = await this.getInvoice(invoiceId);
-    if (!invoice) {
-      throw new Error('Invoice not found');
-    }
-
-    // Send invoice via Stripe
-    await stripe.invoices.sendInvoice(invoice.stripeInvoiceId);
+    const year = new Date().getFullYear();
+    return `INV-${year}-${String(maxNumber + 1).padStart(3, '0')}`;
   }
 }
 
-// Export singleton instance
 export const invoiceService = new InvoiceService();

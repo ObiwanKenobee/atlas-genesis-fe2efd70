@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "lib": ["ES2020"],
+    "outDir": "./dist",
+    "rootDir": "./",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "moduleResolution": "node"
+  },
+  "include": [
+    "01-foundations/**/*",
+    "02-server-side/**/*",
+    "03-databases/**/*",
+    "04-auth/**/*",
+    "05-apis/**/*",
+    "06-async/**/*",
+    "07-websockets/**/*",
+    "08-testing/**/*"
+  ],
+  "exclude": ["node_modules", "dist"]
+}

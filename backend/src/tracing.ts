@@ -20,24 +20,20 @@ const sdk = new NodeSDK({
   instrumentations: [new HttpInstrumentation(), new ExpressInstrumentation()],
 });
 
-sdk.start()
-  .then(() => {
-     
-    console.log('OpenTelemetry initialized');
-  })
-  .catch((err) => {
-     
-    console.error('Error initializing OpenTelemetry', err);
-  });
+// Start the SDK
+try {
+  sdk.start();
+  console.log('OpenTelemetry initialized');
+} catch (err) {
+  console.error('Error initializing OpenTelemetry', err);
+}
 
 // Graceful shutdown
 process.on('SIGTERM', async () => {
   try {
     await sdk.shutdown();
-     
     console.log('Tracing terminated');
   } catch (err) {
-     
     console.error('Error terminating tracing', err);
   } finally {
     process.exit(0);

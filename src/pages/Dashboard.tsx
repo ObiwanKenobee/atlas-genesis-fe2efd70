@@ -273,6 +273,7 @@ const Dashboard = () => {
     { label: "Carbon Calculator", icon: Calculator, href: "/calculator", color: "bg-accent/10 text-accent" },
     { label: "View Portfolio", icon: Briefcase, href: "/portfolio", color: "bg-ocean/10 text-ocean" },
     { label: "Explore Bioregions", icon: Globe, href: "/bioregions", color: "bg-emerald-500/10 text-emerald-600" },
+    { label: "Cardano Layer", icon: Shield, href: "/cardano-layer", color: "bg-purple-500/10 text-purple-600" },
     { label: "Achievements", icon: Trophy, href: "/profile#achievements", color: "bg-amber-500/10 text-amber-600" },
     { label: "Settings", icon: Settings, href: "/settings", color: "bg-muted text-muted-foreground" },
   ];

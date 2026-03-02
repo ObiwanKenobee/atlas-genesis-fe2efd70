@@ -48,13 +48,24 @@ import ethicsRouter from './routes/ethics';
 import identityRouter from './routes/identity';
 import auditRouter from './routes/audit';
 import auditPublicRouter from './routes/audit-public';
+import auditLogsRouter from './routes/audit-logs';
+import healthRouter from './routes/health';
 import paymentsRouter from './routes/payments';
 import securityRouter from './routes/security';
 import adminFilesRouter from './routes/admin/files';
+import adminRouter from './routes/admin';
 import regenerativeFinanceRouter from './routes/regenerative-finance';
 import defiRouter from './routes/defi';
 import communityRouter from './routes/community';
 import educationRouter from './routes/education';
+import decentralizedGovernanceRouter from './routes/decentralizedGovernance';
+import rveRouter from './routes/rve';
+import dataIntegrationRouter from './routes/dataIntegration';
+import culturalKnowledgeRouter from './routes/culturalKnowledge';
+import apiDatabaseRouter from './routes/apiDatabase';
+import globalImpactEconomyRouter from './routes/globalImpactEconomy';
+import rateLimitsRouter from './routes/rate-limits';
+import modelGovernanceRouter from './routes/modelGovernance';
 
 // Import session cleanup utility
 import { cleanupExpiredSessions } from './utils/auth';
@@ -63,19 +74,37 @@ import { cleanupExpiredSessions } from './utils/auth';
 import authV2Router from './routes/auth-v2';
 import marketplaceV2Router from './routes/marketplace-v2';
 import measurementsV2Router from './routes/measurements-v2';
+import measurementsV3Router from './routes/measurements-v3';
 import projectsRouter from './routes/projects';
 import aiRecommendationsRouter from './routes/aiRecommendations';
 
 const app = express();
 
+// Helper to get session secret with production-safe fallback
+function getSessionSecret(): string {
+  const secret = process.env.SESSION_SECRET;
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('SESSION_SECRET environment variable is required in production');
+    }
+    // Generate secure random secret for development
+    const crypto = require('crypto');
+    return crypto.randomBytes(64).toString('hex');
+  }
+  return secret;
+}
+
 // Redis-backed sessions when REDIS_URL is configured
 try {
-  const RedisStore = connectRedis(session as any);
   if (process.env.REDIS_URL) {
+    const RedisStore = require('connect-redis').default;
+    const redisStore = new (RedisStore as new (config: any) => any)({
+      client: redisClient
+    });
     app.use(
       session({
-        store: new RedisStore({ client: redisClient as any }),
-        secret: process.env.SESSION_SECRET || 'change-me',
+        store: redisStore,
+        secret: getSessionSecret(),
         resave: false,
         saveUninitialized: false,
         cookie: {
@@ -380,17 +409,35 @@ app.use('/api/audit-public', auditPublicRouter);
 app.use('/api/payments', paymentsRouter);
 app.use('/api/security', securityRouter);
 app.use('/api/admin/files', adminFilesRouter);
+app.use('/api/admin', adminRouter);
 app.use('/api/regenerative-finance', regenerativeFinanceRouter);
 app.use('/api/defi', defiRouter);
+app.use('/api/rve', rveRouter);
 app.use('/api/community', communityRouter);
 app.use('/api/education', educationRouter);
+app.use('/api/decentralized-governance', decentralizedGovernanceRouter);
+
+// Health check and monitoring routes
+app.use('/api/health', healthRouter);
+
+// Audit logging routes
+app.use('/api/audit', auditLogsRouter);
+
+// Rate limiting management routes
+app.use('/api/rate-limits', rateLimitsRouter);
 
 // V2 API Routes with enhanced functionality
 app.use('/api/v2/auth', authV2Router);
 app.use('/api/v2/marketplace', marketplaceV2Router);
 app.use('/api/v2/measurements', measurementsV2Router);
+app.use('/api/v3/measurements', measurementsV3Router);
 app.use('/api/v2/projects', projectsRouter);
 app.use('/api/v2/ai', aiRecommendationsRouter);
+app.use('/api/data-integration', dataIntegrationRouter);
+app.use('/api/cultural-knowledge', culturalKnowledgeRouter);
+app.use('/api/database', apiDatabaseRouter);
+app.use('/api/global-impact-economy', globalImpactEconomyRouter);
+app.use('/api/governance/models', modelGovernanceRouter);
 
 // Root endpoint with API documentation
 app.get('/', (req, res) => {

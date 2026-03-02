@@ -45,7 +45,7 @@ const CTASection = () => {
             Revolution
           </h2>
           
-          <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto text-center">
             Be part of the world's largest ecosystem for regenerating land, 
             oceans, and human flourishing. Together, we scale to trillions.
           </p>

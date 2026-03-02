@@ -2,10 +2,11 @@ import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import { Request, Response, NextFunction } from 'express';
 import Tokens from 'csrf';
-import { randomBytes } from 'crypto';
+import crypto, { randomBytes } from 'crypto';
 import { logSecurityEvent } from '../utils/logger';
 import { recordSecurityPerformanceMetric, getSecurityPerformanceMetrics } from '../services/securityPerformance';
 import { performance } from 'perf_hooks';
+import redisClient from '../redisClient';
 
 // Rate limiting configurations with enhanced features
 interface RateLimitConfig {
@@ -315,17 +316,21 @@ export const requestFingerprinting = (req: Request, res: Response, next: NextFun
 };
 
 // Request deduplication to prevent replay attacks
-const requestCache = new Map<string, { timestamp: number; count: number }>();
+// Use Redis for distributed scaling, fallback to memory for single-instance
 const REQUEST_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 const MAX_REQUESTS_PER_WINDOW = 3; // Allow up to 3 identical requests per window
+const USE_REDIS = process.env.REDIS_URL ? true : false;
 
-export const preventReplayAttacks = (req: Request, res: Response, next: NextFunction) => {
+interface RequestCacheEntry {
+  timestamp: number;
+  count: number;
+}
+
+export const preventReplayAttacks = async (req: Request, res: Response, next: NextFunction) => {
   // Only apply to state-changing operations
   if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
     return next();
   }
-
-  const crypto = require('crypto');
 
   // Create a hash of the request for deduplication
   const requestSignature = {
@@ -336,53 +341,100 @@ export const preventReplayAttacks = (req: Request, res: Response, next: NextFunc
     timestamp: Math.floor(Date.now() / (REQUEST_CACHE_TTL / 10)) // Round to 30-second windows
   };
 
-  const signatureHash = crypto.createHash('sha256')
-    .update(JSON.stringify(requestSignature))
-    .digest('hex');
-
+  const signatureHash = `replay:${crypto.createHash('sha256').update(JSON.stringify(requestSignature)).digest('hex')}`;
   const now = Date.now();
-  const cached = requestCache.get(signatureHash);
 
-  if (cached) {
-    if (now - cached.timestamp < REQUEST_CACHE_TTL) {
-      cached.count++;
+  try {
+    if (USE_REDIS) {
+      // Use Redis for distributed replay attack prevention
+      const cached = await redisClient.get(signatureHash);
+      
+      if (cached) {
+        const entry: RequestCacheEntry = JSON.parse(cached);
+        
+        if (now - entry.timestamp < REQUEST_CACHE_TTL) {
+          entry.count++;
+          
+          if (entry.count > MAX_REQUESTS_PER_WINDOW) {
+            logSecurityEvent('replay_attack_detected', (req as any).user?.id || null, {
+              signatureHash,
+              requestCount: entry.count,
+              path: req.path,
+              method: req.method,
+              ip: req.ip,
+              userAgent: req.get('User-Agent')
+            }, 'high');
 
-      if (cached.count > MAX_REQUESTS_PER_WINDOW) {
-        logSecurityEvent('replay_attack_detected', (req as any).user?.id || null, {
-          signatureHash,
-          requestCount: cached.count,
-          path: req.path,
-          method: req.method,
-          ip: req.ip,
-          userAgent: req.get('User-Agent')
-        }, 'high');
-
-        return res.status(429).json({
-          code: 'duplicate_request',
-          message: 'Duplicate request detected',
-          timestamp: new Date().toISOString()
-        });
+            return res.status(429).json({
+              code: 'duplicate_request',
+              message: 'Duplicate request detected',
+              timestamp: new Date().toISOString()
+            });
+          }
+          
+          // Update count in Redis
+          await redisClient.setex(signatureHash, Math.ceil(REQUEST_CACHE_TTL / 1000), JSON.stringify(entry));
+        } else {
+          // Reset if window expired
+          await redisClient.setex(signatureHash, Math.ceil(REQUEST_CACHE_TTL / 1000), JSON.stringify({ timestamp: now, count: 1 }));
+        }
+      } else {
+        await redisClient.setex(signatureHash, Math.ceil(REQUEST_CACHE_TTL / 1000), JSON.stringify({ timestamp: now, count: 1 }));
       }
     } else {
-      // Reset if window expired
-      requestCache.set(signatureHash, { timestamp: now, count: 1 });
+      // Fallback to memory cache for single-instance deployment
+      const memoryCache = (global as any).__requestCache || new Map();
+      (global as any).__requestCache = memoryCache;
+      
+      const cached = memoryCache.get(signatureHash);
+      
+      if (cached) {
+        if (now - cached.timestamp < REQUEST_CACHE_TTL) {
+          cached.count++;
+
+          if (cached.count > MAX_REQUESTS_PER_WINDOW) {
+            logSecurityEvent('replay_attack_detected', (req as any).user?.id || null, {
+              signatureHash,
+              requestCount: cached.count,
+              path: req.path,
+              method: req.method,
+              ip: req.ip,
+              userAgent: req.get('User-Agent')
+            }, 'high');
+
+            return res.status(429).json({
+              code: 'duplicate_request',
+              message: 'Duplicate request detected',
+              timestamp: new Date().toISOString()
+            });
+          }
+        } else {
+          // Reset if window expired
+          memoryCache.set(signatureHash, { timestamp: now, count: 1 });
+        }
+      } else {
+        memoryCache.set(signatureHash, { timestamp: now, count: 1 });
+      }
+      
+      // Periodic cleanup of memory cache
+      if (!memoryCache.cleanupInterval) {
+        memoryCache.cleanupInterval = setInterval(() => {
+          const cleanupNow = Date.now();
+          for (const [key, value] of memoryCache.entries()) {
+            if (cleanupNow - (value as RequestCacheEntry).timestamp > REQUEST_CACHE_TTL) {
+              memoryCache.delete(key);
+            }
+          }
+        }, REQUEST_CACHE_TTL / 2);
+      }
     }
-  } else {
-    requestCache.set(signatureHash, { timestamp: now, count: 1 });
+  } catch (error) {
+    // On Redis error, log and continue (fail open for availability)
+    console.error('[security] Redis error in replay prevention:', error);
   }
 
   next();
 };
-
-// Cleanup old request cache entries
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, value] of requestCache.entries()) {
-    if (now - value.timestamp > REQUEST_CACHE_TTL) {
-      requestCache.delete(key);
-    }
-  }
-}, REQUEST_CACHE_TTL / 2);
 
 // Security headers middleware with enhanced CSP and additional headers
 export const securityHeaders = (req: Request, res: Response, next: NextFunction) => {

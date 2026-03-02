@@ -105,34 +105,41 @@ const EnterpriseHeader = () => {
     platform: {
       label: "Platform",
       sections: [
-        {
-          title: "Core Features",
-          items: [
-            {
-              name: "Marketplace",
-              href: "/marketplace",
-              icon: <ShoppingBag className="w-5 h-5" />,
-              description: "Browse and purchase carbon credits",
-              badge: "Popular",
-            },
-            {
-              name: "Portfolio",
-              href: "/portfolio",
-              icon: <Wallet className="w-5 h-5" />,
-              description: "Track your carbon investments",
-            },
-            {
-              name: "Bioregions",
-              href: "/bioregions",
-              icon: <Map className="w-5 h-5" />,
-              description: "Explore geographic impact zones",
-            },
-            {
-              name: "Measurements",
-              href: "/measurements",
-              icon: <BarChart3 className="w-5 h-5" />,
-              description: "Real-time environmental data",
-            },
+         {
+            title: "Core Features",
+            items: [
+              {
+                name: "Marketplace",
+                href: "/marketplace",
+                icon: <ShoppingBag className="w-5 h-5" />,
+                description: "Browse and purchase carbon credits",
+                badge: "Popular",
+              },
+              {
+                name: "Portfolio",
+                href: "/portfolio",
+                icon: <Wallet className="w-5 h-5" />,
+                description: "Track your carbon investments",
+              },
+              {
+                name: "Bioregions",
+                href: "/bioregions",
+                icon: <Map className="w-5 h-5" />,
+                description: "Explore geographic impact zones",
+              },
+              {
+                name: "Measurements",
+                href: "/measurements",
+                icon: <BarChart3 className="w-5 h-5" />,
+                description: "Real-time environmental data",
+              },
+              {
+                name: "Cardano Layer",
+                href: "/cardano-layer",
+                icon: <Calculator className="w-5 h-5" />,
+                description: "Probabilistic civilization infrastructure",
+                badge: "New",
+              },
           ],
         },
         {

@@ -4,11 +4,11 @@ import { useMeasurementData } from "@/hooks/useMeasurementData";
 import { useRegenerativeMetrics } from "@/hooks/useRegenerativeMetrics";
 import { useBioregionalZones } from "@/hooks/useBioregionalZones";
 import { useValuationModel } from "@/hooks/useValuationModel";
-import MeasurementDashboard from "@/components/MeasurementDashboard";
+import PlanetaryMeasurementDashboard from "@/components/PlanetaryMeasurementDashboard";
 import PageHero from "@/components/PageHero";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Satellite, Leaf, TrendingUp, Shield } from "lucide-react";
+import { Satellite, Leaf, TrendingUp, Shield, Activity } from "lucide-react";
 
 const Measurements = () => {
   // Sample project ID - in a real app this would come from URL params or user selection
@@ -26,23 +26,11 @@ const Measurements = () => {
   return (
     <div className="min-h-screen bg-background">
       <EnterpriseHeader />
-      <PageHero
-        title="Planetary Measurement & Verification"
-        subtitle="Real-time carbon and ecosystem data from satellite networks, soil sensors, and biodiversity monitors"
-        ctaText="View Dashboard"
-        ctaLink="#dashboard"
-        secondaryCtaText="Learn More"
-        secondaryCtaLink="/about"
-        badgeText="Data-Driven Impact"
-        stats={[
-          { value: "Sentinel-2", label: "Satellite Data" },
-          { value: "12M+", label: "Soil Sensors" },
-          { value: "99.9%", label: "Verification" },
-          { value: "24/7", label: "Real-time" }
-        ]}
-      />
+      
+      {/* New Planetary Measurement Dashboard */}
+      <PlanetaryMeasurementDashboard />
+      
       <main className="container mx-auto px-4 py-8 max-w-7xl">
-
         {/* Feature Overview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <Card className="border-left-4 border-emerald-500">
@@ -99,26 +87,53 @@ const Measurements = () => {
         </div>
 
         {/* Main Tabs */}
-        <Tabs defaultValue="dashboard" className="w-full">
+        <Tabs defaultValue="overview" className="w-full">
           <TabsList className="grid w-full grid-cols-4 mb-6">
-            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-            <TabsTrigger value="details">Details</TabsTrigger>
-            <TabsTrigger value="methodology">Methodology</TabsTrigger>
-            <TabsTrigger value="audit">Audit Trail</TabsTrigger>
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="satellite">Satellite Data</TabsTrigger>
+            <TabsTrigger value="ground">Ground Sensors</TabsTrigger>
+            <TabsTrigger value="biodiversity">Biodiversity</TabsTrigger>
           </TabsList>
 
-          {/* Dashboard Tab */}
-          <TabsContent value="dashboard" className="space-y-6">
-            <MeasurementDashboard
-              projectId={selectedProjectId || ""}
-              measurements={measurements.data}
-              regenerativeMetrics={regenerativeMetrics.data}
-              isLoading={isLoading}
-            />
+          {/* Overview Tab */}
+          <TabsContent value="overview" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Activity className="h-5 w-5 text-green-500" />
+                  Measurement & Verification System
+                </CardTitle>
+                <CardDescription>
+                  Comprehensive environmental monitoring platform for real-time ecological data
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="p-4 bg-green-50 rounded-lg">
+                    <h4 className="font-semibold text-green-800 mb-2">Carbon Flux Monitoring</h4>
+                    <p className="text-sm text-green-700">
+                      Satellite-derived carbon sequestration rates, GPP, ecosystem respiration, and NEE measurements
+                    </p>
+                  </div>
+                  <div className="p-4 bg-amber-50 rounded-lg">
+                    <h4 className="font-semibold text-amber-800 mb-2">Soil Health Tracking</h4>
+                    <p className="text-sm text-amber-700">
+                      Moisture, nutrients, pH, organic matter, and microbial activity from ground sensors
+                    </p>
+                  </div>
+                  <div className="p-4 bg-blue-50 rounded-lg">
+                    <h4 className="font-semibold text-blue-800 mb-2">Deforestation Alerts</h4>
+                    <p className="text-sm text-blue-700">
+                      Real-time detection of forest cover change with automated alerts and verification
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
-          {/* Details Tab */}
-          <TabsContent value="details" className="space-y-6">
+          {/* Satellite Data Tab */}
+          <TabsContent value="satellite" className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle>Satellite Data Sources</CardTitle>
@@ -145,151 +160,93 @@ const Measurements = () => {
                     </p>
                   </div>
                   <div className="p-4 border rounded-lg">
-                    <h4 className="font-semibold mb-2">IoT Sensors</h4>
+                    <h4 className="font-semibold mb-2">Planet Labs</h4>
                     <p className="text-sm text-muted-foreground">
-                      Ground-truth validation from soil probes, weather stations, and sensor networks
+                      Daily revisit, 3m resolution, rapid change detection for near real-time monitoring
                     </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
 
+          {/* Ground Sensors Tab */}
+          <TabsContent value="ground" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Ocean Carbon Tracking</CardTitle>
-                <CardDescription>Blue carbon measurement and verification systems</CardDescription>
+                <CardTitle>Ground-Based Sensor Network</CardTitle>
+                <CardDescription>IoT sensors for soil and environmental monitoring</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex gap-4 items-start">
-                    <div className="text-2xl">🌊</div>
+                    <div className="text-2xl">🌱</div>
                     <div>
-                      <h4 className="font-semibold">Argo Float Network</h4>
+                      <h4 className="font-semibold">Soil Moisture Probes</h4>
                       <p className="text-sm text-muted-foreground">
-                        Autonomous profiling floats measuring water column properties down to 2000m
+                        Capacitive and TDR sensors measuring volumetric water content at multiple depths
                       </p>
                     </div>
                   </div>
                   <div className="flex gap-4 items-start">
                     <div className="text-2xl">🧪</div>
                     <div>
-                      <h4 className="font-semibold">Alkalinity Sensors</h4>
+                      <h4 className="font-semibold">NIR Spectroscopy</h4>
                       <p className="text-sm text-muted-foreground">
-                        Direct measurement of ocean acidification and dissolved inorganic carbon
+                        Non-destructive nutrient analysis including NPK, organic matter, and pH
                       </p>
                     </div>
                   </div>
                   <div className="flex gap-4 items-start">
-                    <div className="text-2xl">🧬</div>
+                    <div className="text-2xl">🦠</div>
                     <div>
-                      <h4 className="font-semibold">Chlorophyll Fluorescence</h4>
+                      <h4 className="font-semibold">Microbial Activity Sensors</h4>
                       <p className="text-sm text-muted-foreground">
-                        Real-time phytoplankton productivity and photosynthetic carbon uptake
+                        Soil respiration and enzyme activity indicators for soil health assessment
                       </p>
                     </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
 
+          {/* Biodiversity Tab */}
+          <TabsContent value="biodiversity" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Biodiversity Detection</CardTitle>
-                <CardDescription>Prevent monoculture fraud with advanced monitoring</CardDescription>
+                <CardTitle>Biodiversity Monitoring Systems</CardTitle>
+                <CardDescription>Advanced detection and identification of species diversity</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex gap-4 items-start">
-                    <div className="text-2xl">🧬</div>
+                    <div className="text-2xl">🎤</div>
                     <div>
-                      <h4 className="font-semibold">eDNA Sequencing</h4>
+                      <h4 className="font-semibold">Acoustic Monitoring</h4>
                       <p className="text-sm text-muted-foreground">
-                        Genetic analysis of soil and water samples to identify species diversity without visual surveys
+                        Automated species detection through bioacoustic analysis and vocalization patterns
                       </p>
                     </div>
                   </div>
                   <div className="flex gap-4 items-start">
-                    <div className="text-2xl">🔊</div>
+                    <div className="text-2xl">📷</div>
                     <div>
-                      <h4 className="font-semibold">Bioacoustic Monitoring</h4>
+                      <h4 className="font-semibold">Camera Traps</h4>
                       <p className="text-sm text-muted-foreground">
-                        Automated sound analysis to detect animal presence and ecosystem activity patterns
+                        Motion-activated cameras with AI species identification and activity patterns
                       </p>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Methodology Tab */}
-          <TabsContent value="methodology" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Measurement Methodology</CardTitle>
-                <CardDescription>Scientific protocols and validation procedures</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="font-semibold mb-2">CO₂ Level Measurement</h4>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Using normalized difference vegetation index (NDVI) from multispectral satellite imagery to infer
-                      photosynthetic activity and carbon sequestration rates.
-                    </p>
-                    <p className="text-xs text-gray-500">Validated against ground-truth measurements every 30 days</p>
-                  </div>
-
-                  <div className="border-t pt-4">
-                    <h4 className="font-semibold mb-2">Soil Carbon Validation</h4>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Near-infrared (NIR) spectroscopy combined with soil probe measurements to determine organic matter
-                      content and carbon permanence.
-                    </p>
-                    <p className="text-xs text-gray-500">Certified against ISO 14064-2 standards</p>
-                  </div>
-
-                  <div className="border-t pt-4">
-                    <h4 className="font-semibold mb-2">Biodiversity Scoring</h4>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Multi-dimensional scoring combining species richness (eDNA), functional diversity (bioacoustics),
-                      and ecosystem resilience indicators.
-                    </p>
-                    <p className="text-xs text-gray-500">0-100 scale with confidence intervals</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Audit Trail Tab */}
-          <TabsContent value="audit" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Verification Audit Trail</CardTitle>
-                <CardDescription>Complete record of all measurements and validations</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {measurements.data.length > 0 ? (
-                    <div className="space-y-2 max-h-96 overflow-y-auto">
-                      {measurements.data.slice(0, 10).map((m, idx) => (
-                        <div key={idx} className="p-3 border rounded-lg text-sm">
-                          <div className="flex justify-between items-start mb-1">
-                            <span className="font-semibold">{new Date(m.measurement_date).toLocaleDateString()}</span>
-                            <span className={`px-2 py-1 rounded text-xs ${m.anomaly_flag ? "bg-orange-100 text-orange-800" : "bg-green-100 text-green-800"}`}>
-                              {m.anomaly_flag ? "⚠️ Anomaly" : "✓ Verified"}
-                            </span>
-                          </div>
-                          <p className="text-muted-foreground">
-                            CO₂: {m.co2_level}ppm | Source: {m.satellite_source} | Confidence: {(m.confidence_level * 100).toFixed(0)}%
-                          </p>
-                        </div>
-                      ))}
+                  <div className="flex gap-4 items-start">
+                    <div className="text-2xl">🧬</div>
+                    <div>
+                      <h4 className="font-semibold">eDNA Analysis</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Environmental DNA sequencing for comprehensive species inventory without direct observation
+                      </p>
                     </div>
-                  ) : (
-                    <p className="text-muted-foreground text-center py-8">No measurement data available</p>
-                  )}
+                  </div>
                 </div>
               </CardContent>
             </Card>

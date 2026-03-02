@@ -18,6 +18,23 @@ export default defineConfig(({ mode }) => ({
     headers: {
       'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' ws: wss: https://www.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net https://iwremcrvzoprfrytvoze.supabase.co; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';",
     },
+    proxy: {
+      '/api/admin': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/decentralized-api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
   plugins: [
     react(),

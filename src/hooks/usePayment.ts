@@ -27,6 +27,8 @@ interface PaymentMetadata {
   creditType?: string;
   quantity?: number;
   projectId?: string;
+  promoCode?: string;
+  discountAmount?: number;
 }
 
 interface PaymentRequest {

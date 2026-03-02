@@ -20,8 +20,8 @@ import RVXInnovations from './pages/RVXInnovations';
 import DashboardWithSidebar from './pages/DashboardWithSidebar';
 import Dashboard from './pages/Dashboard';
 import Auth from './pages/Auth';
-import { EnhancedAuthProvider } from './contexts/EnhancedAuthContext';
-import { ProtectedRoute } from './components/ProtectedRoute';
+import { EnhancedAuthProvider } from './contexts/EnhancedAuthContext.tsx';
+import { ProtectedRoute } from './components/ProtectedRoute.tsx';
 import Portfolio from './pages/Portfolio';
 import Profile from './pages/Profile';
 import Marketplace from './pages/Marketplace';
@@ -48,8 +48,10 @@ import Community from './pages/Community';
 import Education from './pages/Education';
 import CarbonCalculator from './pages/CarbonCalculator';
 import Leaderboard from './pages/Leaderboard';
+import CardanoLayer from './pages/CardanoLayer';
 import AdminCommandCenter from './pages/admin/AdminCommandCenter';
 import FeatureFlagsAdmin from './pages/admin/FeatureFlags';
+import AdminProtectedRoute from './components/AdminProtectedRoute.tsx';
 import Careers from './pages/Careers';
 import NotFound from './pages/NotFound';
 import SegmentSelection from './pages/SegmentSelection';
@@ -88,6 +90,7 @@ import AIInsights from './components/ai/AIInsights';
 import CarbonCreditMarketplace from './components/defi/CarbonCreditMarketplace';
 import GamificationHub from './components/gamification/GamificationHub';
 import BlockchainVerification from './components/blockchain/BlockchainVerification';
+import DecentralizedGovernanceDashboard from './layers/Decentralizedaigovernancedesign-main/src/app/App';
 import {
   CarbonOffsetting,
   ImpactInvestment,
@@ -99,7 +102,7 @@ import {
   EducationHub,
   Certifications
 } from './pages/InfrastructurePages';
-import { OnboardingProvider } from './hooks/useOnboarding';
+import { OnboardingProvider } from './hooks/useOnboarding.tsx';
 
 const SimplePage = ({ title, description }: { title: string; description: string }) => (
   <Layout>
@@ -167,13 +170,22 @@ const App = () => {
               <Route path="/demo" element={<Demo />} />
               <Route path="/project/:id" element={<ProjectDetail />} />
               <Route path="/transactions" element={<TransactionHistory />} />
-              <Route path="/calculator" element={<CarbonCalculator />} />
-              <Route path="/leaderboard" element={<Leaderboard />} />
+               <Route path="/calculator" element={<CarbonCalculator />} />
+               <Route path="/leaderboard" element={<Leaderboard />} />
+               <Route path="/cardano-layer" element={<CardanoLayer />} />
               <Route path="/architecture" element={<EngineeringArchitecture />} />
               <Route path="/dashboards" element={<Dashboard />} />
               <Route path="/careers" element={<Careers />} />
-              <Route path="/admin" element={<AdminCommandCenter />} />
-              <Route path="/admin/flags" element={<FeatureFlagsAdmin />} />
+              <Route path="/admin" element={
+                  <AdminProtectedRoute>
+                    <AdminCommandCenter />
+                  </AdminProtectedRoute>
+                } />
+                <Route path="/admin/flags" element={
+                  <AdminProtectedRoute>
+                    <FeatureFlagsAdmin />
+                  </AdminProtectedRoute>
+                } />
               <Route path="/segment-selection" element={<SegmentSelection />} />
               <Route path="/onboarding" element={<Onboarding />} />
               <Route path="/dashboard-overview" element={<DashboardOverview />} />
@@ -247,6 +259,7 @@ const App = () => {
               <Route path="/carbon-marketplace" element={<CarbonCreditMarketplace />} />
               <Route path="/impact-challenges" element={<GamificationHub />} />
               <Route path="/blockchain-verification" element={<BlockchainVerification />} />
+              <Route path="/decentralized-governance" element={<DecentralizedGovernanceDashboard />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AnimatePresence>

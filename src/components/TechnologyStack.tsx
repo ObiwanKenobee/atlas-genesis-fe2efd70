@@ -69,7 +69,7 @@ const TechnologyStack = () => {
             Built for{" "}
             <span className="text-gradient">Scale & Trust</span>
           </h2>
-          <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto px-4 sm:px-0">
+          <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto px-4 sm:px-0 text-center">
             Enterprise-grade infrastructure combining the latest in blockchain,
             AI, and cloud technology to power global regeneration.
           </p>
