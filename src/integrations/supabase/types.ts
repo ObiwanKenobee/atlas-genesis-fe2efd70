@@ -181,6 +181,77 @@ export type Database = {
           },
         ]
       }
+      invoices: {
+        Row: {
+          amount: number
+          billing_address: string | null
+          billing_email: string | null
+          billing_name: string | null
+          created_at: string
+          currency: string
+          id: string
+          invoice_number: string
+          issued_at: string
+          items: Json
+          paid_at: string | null
+          payment_method: string | null
+          payment_reference: string | null
+          pdf_url: string | null
+          status: string
+          subscription_id: string | null
+          transaction_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          billing_address?: string | null
+          billing_email?: string | null
+          billing_name?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          invoice_number: string
+          issued_at?: string
+          items?: Json
+          paid_at?: string | null
+          payment_method?: string | null
+          payment_reference?: string | null
+          pdf_url?: string | null
+          status?: string
+          subscription_id?: string | null
+          transaction_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          billing_address?: string | null
+          billing_email?: string | null
+          billing_name?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          invoice_number?: string
+          issued_at?: string
+          items?: Json
+          paid_at?: string | null
+          payment_method?: string | null
+          payment_reference?: string | null
+          pdf_url?: string | null
+          status?: string
+          subscription_id?: string | null
+          transaction_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       measurement_data: {
         Row: {
           confidence_level: number | null
@@ -419,6 +490,63 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      subscriptions: {
+        Row: {
+          amount: number
+          billing_period: string
+          canceled_at: string | null
+          created_at: string
+          currency: string
+          current_period_end: string
+          current_period_start: string
+          id: string
+          metadata: Json | null
+          payment_method: string | null
+          payment_reference: string | null
+          plan_id: string
+          plan_name: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          billing_period?: string
+          canceled_at?: string | null
+          created_at?: string
+          currency?: string
+          current_period_end: string
+          current_period_start?: string
+          id?: string
+          metadata?: Json | null
+          payment_method?: string | null
+          payment_reference?: string | null
+          plan_id: string
+          plan_name: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          billing_period?: string
+          canceled_at?: string | null
+          created_at?: string
+          currency?: string
+          current_period_end?: string
+          current_period_start?: string
+          id?: string
+          metadata?: Json | null
+          payment_method?: string | null
+          payment_reference?: string | null
+          plan_id?: string
+          plan_name?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       transactions: {
         Row: {
