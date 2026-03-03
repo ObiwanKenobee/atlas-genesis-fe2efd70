@@ -139,6 +139,51 @@ const mockCarbonPredictions: CarbonPrediction[] = [
   }
 ];
 
+interface ProjectRecommendation {
+  id: string;
+  projectName: string;
+  matchScore: number;
+  relevanceScore: number;
+  riskLevel: 'low' | 'medium' | 'high';
+  expectedReturn: string;
+  category: string;
+  description: string;
+  expectedImpact: {
+    carbonReduction: number;
+    waterConservation: number;
+    biodiversityScore: number;
+    communityBenefit: number;
+  };
+  reasons: string[];
+}
+
+const mockRecommendations: ProjectRecommendation[] = [
+  {
+    id: 'rec-1',
+    projectName: 'Amazon Reforestation Initiative',
+    matchScore: 0.95,
+    relevanceScore: 0.95,
+    riskLevel: 'low',
+    expectedReturn: '12-18%',
+    category: 'Reforestation',
+    description: 'High-impact reforestation project with strong community support.',
+    expectedImpact: { carbonReduction: 1200, waterConservation: 450, biodiversityScore: 87, communityBenefit: 92 },
+    reasons: ['Strong historical performance', 'Community-led stewardship', 'Verified methodology'],
+  },
+  {
+    id: 'rec-2',
+    projectName: 'Blue Carbon Mangrove Restoration',
+    matchScore: 0.88,
+    relevanceScore: 0.88,
+    riskLevel: 'medium',
+    expectedReturn: '8-14%',
+    category: 'Ocean Restoration',
+    description: 'Coastal mangrove restoration with significant biodiversity co-benefits.',
+    expectedImpact: { carbonReduction: 800, waterConservation: 320, biodiversityScore: 79, communityBenefit: 85 },
+    reasons: ['Growing blue carbon market', 'Coastal protection co-benefits', 'Low competition'],
+  },
+];
+
 const mockInsights: SmartInsight[] = [
   {
     id: 'insight-1',

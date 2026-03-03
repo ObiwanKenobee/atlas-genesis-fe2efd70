@@ -187,7 +187,7 @@ export function ComparisonPDFExport({ projects }: ComparisonPDFExportProps) {
 
       toast({
         title: 'PDF Downloaded',
-        description: `Comparison saved as ${fileName}`,
+        description: 'Comparison saved successfully',
       });
     } catch (error) {
       console.error('PDF generation error:', error);

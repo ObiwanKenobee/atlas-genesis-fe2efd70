@@ -367,9 +367,9 @@ export class EnhancedOracleServiceImpl implements IEnhancedOracleService {
         // In production: query attestations from storage
         
         const trustLevel = this.evaluateTrustLevelSync(attestations.length > 0 ? attestations[0] : null);
-        const confidenceSync();
+        const confidence = this.calculateConfidenceSync();
         
-        = this.calculateConfidence const result: VerificationResult = {
+        const result: VerificationResult = {
           isValid: true,
           confidence,
           trustLevel,

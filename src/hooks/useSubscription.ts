@@ -141,7 +141,7 @@ export function useSubscription() {
 
       const { data, error } = await supabase
         .from('invoices')
-        .insert({
+        .insert([{
           user_id: user.id,
           subscription_id: params.subscriptionId || null,
           transaction_id: params.transactionId || null,
@@ -152,11 +152,11 @@ export function useSubscription() {
           billing_name: params.billingName,
           billing_email: params.billingEmail,
           billing_address: params.billingAddress,
-          items: params.items as unknown as Record<string, unknown>,
+          items: params.items as any,
           payment_method: params.paymentMethod,
           payment_reference: params.paymentReference,
           paid_at: new Date().toISOString(),
-        })
+        }])
         .select()
         .single();
 
