@@ -1,157 +1,67 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Download, FileText, CheckCircle, Loader2 } from 'lucide-react';
+import React from 'react';
 import { Invoice } from '@/hooks/useSubscription';
-import jsPDF from 'jspdf';
-import { format } from 'date-fns';
 
 interface InvoiceGeneratorProps {
   invoice: Invoice;
 }
 
 export function InvoiceGenerator({ invoice }: InvoiceGeneratorProps) {
-  const [generating, setGenerating] = useState(false);
-
-  const generatePDF = async () => {
-    setGenerating(true);
-    try {
-      const doc = new jsPDF();
-      const items = (invoice.items || []) as { description: string; quantity: number; unitPrice: number; total: number }[];
-
-      // Header
-      doc.setFontSize(24);
-      doc.setTextColor(16, 185, 129);
-      doc.text('INVOICE', 20, 30);
-
-      doc.setFontSize(10);
-      doc.setTextColor(100, 100, 100);
-      doc.text('Regenerative Platform', 20, 40);
-      doc.text('Carbon Credits & Sustainability', 20, 46);
-
-      // Invoice details
-      doc.setFontSize(10);
-      doc.setTextColor(60, 60, 60);
-      doc.text(`Invoice #: ${invoice.invoice_number}`, 140, 30);
-      doc.text(`Date: ${format(new Date(invoice.issued_at), 'MMM dd, yyyy')}`, 140, 36);
-      doc.text(`Status: ${invoice.status.toUpperCase()}`, 140, 42);
-
-      // Bill To
-      doc.setFontSize(12);
-      doc.setTextColor(30, 30, 30);
-      doc.text('Bill To:', 20, 65);
-      doc.setFontSize(10);
-      doc.setTextColor(60, 60, 60);
-      doc.text(invoice.billing_name || 'N/A', 20, 72);
-      doc.text(invoice.billing_email || 'N/A', 20, 78);
-      if (invoice.billing_address) {
-        doc.text(invoice.billing_address, 20, 84);
-      }
-
-      // Table header
-      const tableTop = 100;
-      doc.setFillColor(245, 245, 245);
-      doc.rect(20, tableTop - 6, 170, 10, 'F');
-      doc.setFontSize(9);
-      doc.setTextColor(80, 80, 80);
-      doc.text('Description', 22, tableTop);
-      doc.text('Qty', 110, tableTop);
-      doc.text('Unit Price', 130, tableTop);
-      doc.text('Total', 165, tableTop);
-
-      // Table rows
-      let y = tableTop + 10;
-      doc.setTextColor(40, 40, 40);
-      items.forEach((item) => {
-        doc.text(item.description || 'Item', 22, y);
-        doc.text(String(item.quantity || 1), 110, y);
-        doc.text(`$${(item.unitPrice || 0).toFixed(2)}`, 130, y);
-        doc.text(`$${(item.total || 0).toFixed(2)}`, 165, y);
-        y += 8;
-      });
-
-      // Total
-      y += 5;
-      doc.setDrawColor(200, 200, 200);
-      doc.line(20, y, 190, y);
-      y += 10;
-      doc.setFontSize(12);
-      doc.setTextColor(16, 185, 129);
-      doc.text(`Total: $${invoice.amount.toFixed(2)} ${invoice.currency}`, 140, y);
-
-      // Payment info
-      y += 15;
-      doc.setFontSize(9);
-      doc.setTextColor(100, 100, 100);
-      doc.text(`Payment Method: ${invoice.payment_method || 'N/A'}`, 20, y);
-      doc.text(`Reference: ${invoice.payment_reference || 'N/A'}`, 20, y + 6);
-      if (invoice.paid_at) {
-        doc.text(`Paid: ${format(new Date(invoice.paid_at), 'MMM dd, yyyy HH:mm')}`, 20, y + 12);
-      }
-
-      // Footer
-      doc.setFontSize(8);
-      doc.setTextColor(150, 150, 150);
-      doc.text('Thank you for investing in Earth\'s regeneration.', 20, 280);
-
-      doc.save(`${invoice.invoice_number}.pdf`);
-    } finally {
-      setGenerating(false);
-    }
-  };
-
   const items = (invoice.items || []) as { description: string; quantity: number; unitPrice: number; total: number }[];
 
   return (
-    <Card className="border-border/50">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <FileText className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <CardTitle className="text-sm font-medium">{invoice.invoice_number}</CardTitle>
-              <p className="text-xs text-muted-foreground">
-                {format(new Date(invoice.issued_at), 'MMM dd, yyyy')}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Badge
-              variant={invoice.status === 'paid' ? 'default' : 'secondary'}
-              className={invoice.status === 'paid' ? 'bg-primary/20 text-primary' : ''}
-            >
-              {invoice.status === 'paid' && <CheckCircle className="w-3 h-3 mr-1" />}
-              {invoice.status}
-            </Badge>
-            <Button size="sm" variant="outline" onClick={generatePDF} disabled={generating}>
-              {generating ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Download className="w-4 h-4" />
-              )}
-            </Button>
+    <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '16px', maxWidth: '600px', margin: '0 auto', backgroundColor: 'white' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+        <div style={{ width: '40px', height: '40px', borderRadius: '8px', backgroundColor: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#10b981' }}>
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <div style={{ fontSize: '16px', fontWeight: '600', color: '#111827' }}>{invoice.invoice_number}</div>
+          <div style={{ fontSize: '12px', color: '#6b7280' }}>
+            {new Date(invoice.issued_at).toLocaleDateString()}
           </div>
         </div>
-      </CardHeader>
-      <CardContent className="pt-0">
-        <div className="space-y-1 text-sm">
-          {items.map((item, i) => (
-            <div key={i} className="flex justify-between text-muted-foreground">
-              <span>{item.description}</span>
-              <span>${item.total?.toFixed(2)}</span>
-            </div>
-          ))}
+        <div style={{ marginLeft: 'auto' }}>
+          <div style={{
+            padding: '4px 8px',
+            borderRadius: '6px',
+            fontSize: '12px',
+            fontWeight: '500',
+            backgroundColor: invoice.status === 'paid' ? '#f0fdf4' : '#f3f4f6',
+            color: invoice.status === 'paid' ? '#10b981' : '#6b7280',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px'
+          }}>
+            {invoice.status === 'paid' && (
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+            )}
+            {invoice.status}
+          </div>
         </div>
-        <Separator className="my-2" />
-        <div className="flex justify-between font-semibold text-sm">
+      </div>
+      
+      <div style={{ fontSize: '12px', color: '#6b7280' }}>
+        {items.map((item, i) => (
+          <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0' }}>
+            <span>{item.description}</span>
+            <span>${item.total?.toFixed(2)}</span>
+          </div>
+        ))}
+        <hr style={{ border: '0', borderTop: '1px solid #e5e7eb', margin: '16px 0' }} />
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: '600', fontSize: '14px', color: '#111827' }}>
           <span>Total</span>
-          <span className="text-primary">${invoice.amount.toFixed(2)} {invoice.currency}</span>
+          <span style={{ color: '#10b981' }}>${invoice.amount.toFixed(2)} {invoice.currency}</span>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

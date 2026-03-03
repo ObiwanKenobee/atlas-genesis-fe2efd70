@@ -40,7 +40,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CheckoutModal, PaymentStatus, InvoiceGenerator, SubscriptionStatus } from "@/components/pricing";
+import { CheckoutModal, PaymentStatus, SubscriptionStatus } from "@/components/pricing";
 import { useSubscription } from "@/hooks/useSubscription";
 
 // Subscription Plans
@@ -833,11 +833,11 @@ export default function Pricing() {
                   <Receipt className="w-6 h-6 text-primary" />
                   Invoice History
                 </h2>
-                <div className="grid gap-4 md:grid-cols-2">
+                {/* <div className="grid gap-4 md:grid-cols-2">
                   {invoices.slice(0, 6).map((invoice) => (
                     <InvoiceGenerator key={invoice.id} invoice={invoice} />
                   ))}
-                </div>
+                </div> */}
               </div>
             )}
           </div>

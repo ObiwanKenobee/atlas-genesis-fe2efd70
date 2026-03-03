@@ -89,7 +89,7 @@ const layers = [
     },
     relatedPages: ["/marketplace", "/regenerative-agriculture"]
   },
-    {
+ /**    {
     number: "06",
     title: "Cardano Layer",
     description: "Probabilistic Civilization Infrastructure (PCI) - A probability-native civilization stack that models uncertainty and future viability.",
@@ -103,8 +103,8 @@ const layers = [
       subtext: "Monte Carlo simulations"
     },
     relatedPages: ["/cardano-layer"]
-  }
-];
+  } */
+]; 
 
 const PlatformLayers = () => {
   const [expandedLayer, setExpandedLayer] = useState<number | null>(null);
