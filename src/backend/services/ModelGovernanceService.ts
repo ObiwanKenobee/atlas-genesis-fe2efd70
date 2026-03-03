@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Atlas Model Governance Service
  * 

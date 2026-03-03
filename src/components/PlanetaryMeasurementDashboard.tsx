@@ -288,7 +288,7 @@ const PlanetaryMeasurementDashboard: React.FC = () => {
             />
             <MetricCard
               title="Active Alerts"
-              value={data.alerts.total}
+              value={`${data.alerts.total}`}
               unit={`${data.alerts.critical} critical`}
               trend={data.alerts.critical > 0 ? 'up' : 'stable'}
               icon={<Bell className="text-red-500" />}
@@ -351,7 +351,7 @@ const PlanetaryMeasurementDashboard: React.FC = () => {
               <span className="text-sm text-gray-500">{data.alerts.total} active alerts</span>
             </div>
             <div className="space-y-3">
-              {data.alerts.recent.slice(0, 5).map(alert => (
+              {data.alerts.recent.slice(0, 5).map((alert: any) => (
                 <AlertCard key={alert.id} alert={alert} onAcknowledge={handleAcknowledgeAlert} />
               ))}
             </div>
@@ -385,6 +385,7 @@ const PlanetaryMeasurementDashboard: React.FC = () => {
                       { name: 'Carbon Sink', value: data.carbon.carbonSinkRegions },
                       { name: 'Carbon Source', value: data.carbon.carbonSourceRegions }
                     ]}
+                    dataKey="value"
                     cx="50%"
                     cy="50%"
                     innerRadius={60}

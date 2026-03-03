@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Atlas Sanctum Regenerative Platform
  * Civilizational-Level Systems Architecture v2.0

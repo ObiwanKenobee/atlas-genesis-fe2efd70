@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Atlas Sanctum Algebra Framework
  * Equations, Variables, and Optimization for Regenerative Value

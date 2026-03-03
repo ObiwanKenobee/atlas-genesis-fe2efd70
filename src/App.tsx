@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'; // v18
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import ApiStatus from './components/ApiStatus';

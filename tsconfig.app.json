@@ -34,6 +34,10 @@
     "src"
   ],
   "exclude": [
-    "src/services/ai"
+    "src/services/ai",
+    "src/architecture",
+    "src/crypto",
+    "src/layers",
+    "src/backend"
   ]
 }

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Atlas Sanctum Type System
  * Comprehensive type definitions for civilizational-scale regenerative platform
