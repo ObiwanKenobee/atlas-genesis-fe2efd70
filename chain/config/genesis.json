@@ -1,0 +1,64 @@
+{
+  "chain_id": "sanctum-1",
+  "genesis_time": "2026-01-01T00:00:00Z",
+  "app_state": {
+    "identity": {
+      "users": [
+        {
+          "address": "sanctum1adminaddr000000000000000000000000000",
+          "role": "ADMIN",
+          "reputation_score": "0.000000000000000000",
+          "metadata": "Genesis admin",
+          "registered_at": 1735689600
+        }
+      ]
+    },
+    "oracle": { "oracles": [] },
+    "impact": { "records": [] },
+    "rewards": {
+      "distributions": [],
+      "treasury_address": "sanctum1treasury000000000000000000000000000000"
+    },
+    "regeneration": { "projects": [] },
+    "bank": {
+      "params": { "default_send_enabled": true },
+      "balances": [],
+      "supply": [],
+      "denom_metadata": [
+        {
+          "description": "Atlas Sanctum governance token",
+          "denom_units": [
+            { "denom": "usan", "exponent": 0 },
+            { "denom": "san",  "exponent": 6 }
+          ],
+          "base": "usan", "display": "san", "name": "SAN", "symbol": "SAN"
+        },
+        {
+          "description": "Health impact token",
+          "denom_units": [
+            { "denom": "uhlt", "exponent": 0 },
+            { "denom": "hlt",  "exponent": 6 }
+          ],
+          "base": "uhlt", "display": "hlt", "name": "HLT", "symbol": "HLT"
+        },
+        {
+          "description": "Regeneration token",
+          "denom_units": [
+            { "denom": "ureg", "exponent": 0 },
+            { "denom": "reg",  "exponent": 6 }
+          ],
+          "base": "ureg", "display": "reg", "name": "REG", "symbol": "REG"
+        }
+      ]
+    },
+    "staking": {
+      "params": {
+        "unbonding_time": "1814400s",
+        "max_validators": 100,
+        "bond_denom": "usan"
+      },
+      "validators": [],
+      "delegations": []
+    }
+  }
+}
