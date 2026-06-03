@@ -102,6 +102,7 @@ import {
   EducationHub,
   Certifications
 } from './pages/InfrastructurePages';
+import Prototype from './pages/Prototype';
 import { OnboardingProvider } from './hooks/useOnboarding.tsx';
 
 const SimplePage = ({ title, description }: { title: string; description: string }) => (
@@ -125,6 +126,7 @@ const App = () => {
         <BrowserRouter>
           <AnimatePresence mode="wait">
             <Routes>
+              <Route path="/prototype" element={<Prototype />} />
               <Route path="/" element={<Index />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/auth" element={<Auth />} />

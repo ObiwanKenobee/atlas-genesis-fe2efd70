@@ -1,10 +1,6 @@
-// @ts-nocheck
 /**
  * Atlas Sanctum Algebra Framework
  * Equations, Variables, and Optimization for Regenerative Value
- * 
- * This module provides algebraic structures for translating ecological outcomes
- * into quantifiable financial instruments and social impact metrics.
  */
 
 // ============================================================================
@@ -301,7 +297,7 @@ export class LinearEquations {
     const solution = new Map<string, number>();
     for (let i = n - 1; i >= 0; i--) {
       let sum = matrix[i][n];
-      for (let j = i + 1; n; j++) {
+      for (let j = i + 1; j < n; j++) {  // fixed: was `; n;` causing infinite loop
         sum -= matrix[i][j] * (solution.get(`x${j}`) || 0);
       }
       solution.set(`x${i}`, sum / matrix[i][i]);

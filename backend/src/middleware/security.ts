@@ -500,34 +500,16 @@ export const securityHeaders = (req: Request, res: Response, next: NextFunction)
   });
 };
 
-// Input sanitization middleware
+// Input sanitization middleware — XSS only, NOT SQL keywords (use parameterized queries for SQL safety)
 export const sanitizeInput = (req: Request, res: Response, next: NextFunction) => {
-  // Enhanced input sanitization with comprehensive string manipulation
   const sanitizeString = (str: string): string => {
     if (typeof str !== 'string') return str;
-    
     return str
-      // Remove script tags
       .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-      // Remove JavaScript URLs
       .replace(/javascript:/gi, '')
-      // Remove event handlers
       .replace(/on\w+\s*=/gi, '')
-      // Remove iframe tags
       .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
-      // Remove style tags
-      .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
-      // Remove comment tags
       .replace(/<!--[\s\S]*?-->/gi, '')
-      // Escape HTML characters
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;')
-      // Remove SQL injection patterns
-      .replace(/\b(SELECT|INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|TRUNCATE|EXEC|UNION|OR|AND|NOT|XOR|LIKE|IN|BETWEEN|IS|NULL|FROM|WHERE|GROUP|HAVING|ORDER|LIMIT|OFFSET|JOIN|LEFT|RIGHT|INNER|OUTER|FETCH|TOP)\b/gi, '')
-      // Trim whitespace
       .trim();
   };
 
@@ -580,10 +562,34 @@ export const csrfToken = (req: Request, res: Response, next: NextFunction) => {
   next();
 };
 
-// CSRF protection middleware for state-changing operations
+// CSRF protection — skipped for Bearer token requests (JWT auth is CSRF-safe by design)
+// Applied only to cookie-session-based requests
 export const csrfProtection = (req: Request, res: Response, next: NextFunction) => {
-  // Skip CSRF check for all requests (temporary for testing)
-  return next();
+  // JWT Bearer token requests are inherently CSRF-safe
+  if (req.headers.authorization?.startsWith('Bearer ')) {
+    return next();
+  }
+  // Skip safe methods
+  if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
+    return next();
+  }
+  // For cookie-session requests, validate CSRF token
+  const csrfHeader = req.headers['x-csrf-token'] as string;
+  const csrfBody = req.body?._csrf as string;
+  const token = csrfHeader || csrfBody;
+  if (!token) {
+    logSecurityEvent('csrf_missing_token', (req as any).user?.id || null, {
+      path: req.path, method: req.method, ip: req.ip
+    }, 'medium');
+    return res.status(403).json({ code: 'csrf_invalid', message: 'CSRF token required' });
+  }
+  if (!tokens.verify(csrfSecret, token)) {
+    logSecurityEvent('csrf_invalid_token', (req as any).user?.id || null, {
+      path: req.path, method: req.method, ip: req.ip
+    }, 'high');
+    return res.status(403).json({ code: 'csrf_invalid', message: 'Invalid CSRF token' });
+  }
+  next();
 };
 
 // Request logging middleware for security events

@@ -420,8 +420,8 @@ app.use('/api/decentralized-governance', decentralizedGovernanceRouter);
 // Health check and monitoring routes
 app.use('/api/health', healthRouter);
 
-// Audit logging routes
-app.use('/api/audit', auditLogsRouter);
+// Audit logging routes (consolidated — removed duplicate /api/audit registration)
+app.use('/api/audit-logs', auditLogsRouter);
 
 // Rate limiting management routes
 app.use('/api/rate-limits', rateLimitsRouter);

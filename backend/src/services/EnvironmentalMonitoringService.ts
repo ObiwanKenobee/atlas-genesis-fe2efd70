@@ -1284,10 +1284,10 @@ class EnvironmentalMonitoringService {
       exportId: `EXP-${Date.now()}`,
       regionId,
       dataTypes,
-      period: { startDate      exportedAt: new Date().toISOString(),
+      period: { startDate, endDate },
+      exportedAt: new Date().toISOString(),
       format,
-, endDate },
-Sharing      dataAgreement: sharingAgreement,
+      dataAgreement: sharingAgreement,
       citations: [
         'Please cite this data according to Atlas Humanitarian Data Policy',
         'Data DOI: 10.5555/atlas.measurements.2024'
