@@ -38,6 +38,8 @@
     "src/architecture",
     "src/crypto",
     "src/layers",
-    "src/backend"
+    "src/backend",
+    "src/sanctum-ai",
+    "src/sanctum"
   ]
 }
