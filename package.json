@@ -20,7 +20,10 @@
     "lighthouse:local": "lhci autorun --config=.lighthouserc.json",
     "lighthouse:ci": "lhci autorun --upload.target=temporary-public-storage",
     "test": "vitest run src/lib/sorting/creditSorters.test.ts",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json",
+    "smoke": "node scripts/smoke-routes.mjs",
+    "predeploy": "node scripts/pre-deploy.mjs"
   },
   "prepare": "husky install",
   "lint-staged": {
