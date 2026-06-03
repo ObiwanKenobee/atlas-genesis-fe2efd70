@@ -2,9 +2,10 @@ import * as Sentry from "@sentry/react";
 
 const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN as string | undefined;
 const ENV = import.meta.env.MODE;
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const BACKEND_ERROR_ENDPOINT =
   (import.meta.env.VITE_ERROR_REPORT_ENDPOINT as string | undefined) ||
-  "/api/client-errors";
+  (SUPABASE_URL ? `${SUPABASE_URL}/functions/v1/client-errors` : "/api/client-errors");
 
 let initialized = false;
 
