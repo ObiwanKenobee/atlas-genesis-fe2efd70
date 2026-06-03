@@ -4,8 +4,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from 'next-themes';
 import { Toaster } from 'sonner';
 import { HelmetProvider } from 'react-helmet-async';
-import { AuthProvider } from './hooks/useAuth.tsx';
-import { SupabaseAuthProvider } from './hooks/useSupabaseAuth.tsx';
 import { AdminProvider } from './contexts/AdminContext.tsx';
 import App from './App.tsx';
 import './index.css';
@@ -27,7 +25,7 @@ const queryClient = new QueryClient({
 // Bootstrap feature flags from backend at runtime before rendering
 async function bootstrap() {
   try {
-    const res = await fetch('/api/flags');
+    const res = await fetch('/api/flags', { signal: AbortSignal.timeout(2000) });
     if (res.ok) {
       const flags = await res.json();
       featureFlags.initFeatureFlags(flags);
@@ -41,20 +39,16 @@ async function bootstrap() {
       <HelmetProvider>
         <QueryClientProvider client={queryClient}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <AuthProvider>
-              <SupabaseAuthProvider>
-                <AdminProvider>
-                  <App />
-                  <Toaster 
-                    position="bottom-right" 
-                    expand={false}
-                    richColors
-                    closeButton
-                    theme="system"
-                  />
-                </AdminProvider>
-              </SupabaseAuthProvider>
-            </AuthProvider>
+            <AdminProvider>
+              <App />
+              <Toaster 
+                position="bottom-right" 
+                expand={false}
+                richColors
+                closeButton
+                theme="system"
+              />
+            </AdminProvider>
           </ThemeProvider>
         </QueryClientProvider>
       </HelmetProvider>

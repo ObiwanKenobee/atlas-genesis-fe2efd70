@@ -16,22 +16,22 @@ interface SEOProps {
   canonical?: string;
   robots?: string;
   hreflang?: Array<{ lang: string; url: string }>;
-  structuredData?: object;
+  structuredData?: object | object[];
   noindex?: boolean;
   nofollow?: boolean;
 }
 
 const SEO: React.FC<SEOProps> = ({
-  title = 'Atlas Genesis - Regenerative Agriculture Platform',
-  description = 'Empowering sustainable agriculture through innovative technology and data-driven insights. Join the movement for regenerative agriculture and climate-positive farming.',
-  keywords = 'regenerative agriculture, sustainable farming, climate change, carbon credits, biodiversity, ecosystem restoration',
+  title = 'Atlas Sanctum - Regenerative Platform',
+  description = 'Atlas Sanctum is the civilization operating system for regenerative agriculture, climate health, commerce, and ecosystem intelligence.',
+  keywords = 'Atlas Sanctum, regenerative platform, climate resilience, regenerative agriculture, carbon credits, ecosystem intelligence, sustainable infrastructure',
   image = '/og-image.jpg',
   url,
   type = 'website',
-  siteName = 'Atlas Genesis',
+  siteName = 'Atlas Sanctum',
   twitterCard = 'summary_large_image',
-  twitterSite = '@atlasgenesis',
-  twitterCreator = '@atlasgenesis',
+  twitterSite = '@AtlasSanctum',
+  twitterCreator = '@AtlasSanctum',
   canonical,
   robots,
   hreflang,
@@ -40,8 +40,9 @@ const SEO: React.FC<SEOProps> = ({
   nofollow = false,
 }) => {
   const startTime = performance.now();
+  const brandName = 'Atlas Sanctum';
 
-  const fullTitle = title.includes('Atlas Genesis') ? title : `${title} | Atlas Genesis`;
+  const fullTitle = title.includes(brandName) ? title : `${title} | ${brandName}`;
   const fullUrl = url ? `${window.location.origin}${url}` : window.location.href;
   const canonicalUrl = canonical || fullUrl;
 
@@ -101,12 +102,15 @@ const SEO: React.FC<SEOProps> = ({
         </script>
       )}
 
+      {/* Sitemap */}
+      <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
+
       {/* Search Console Verification */}
       <meta name="google-site-verification" content="your-google-verification-code" />
       <meta name="msvalidate.01" content="your-bing-verification-code" />
 
       {/* Additional meta tags for SEO */}
-      <meta name="author" content="Atlas Genesis Team" />
+      <meta name="author" content="Atlas Sanctum Team" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <meta httpEquiv="Content-Language" content="en-US" />
     </Helmet>

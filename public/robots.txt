@@ -39,4 +39,4 @@ Disallow: /profile
 Crawl-delay: 1
 
 # Sitemap
-Sitemap: https://atlasgenesis.com/sitemap.xml
+Sitemap: https://atlassanctum.com/sitemap.xml

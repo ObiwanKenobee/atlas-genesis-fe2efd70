@@ -12,9 +12,9 @@ interface SEOData {
 }
 
 const defaultSEO: SEOData = {
-  title: 'Atlas Genesis - Regenerative Agriculture Platform',
-  description: 'Empowering sustainable agriculture through innovative technology and data-driven insights. Join the movement for regenerative agriculture and climate-positive farming.',
-  keywords: 'regenerative agriculture, sustainable farming, climate change, carbon credits, biodiversity, ecosystem restoration',
+  title: 'Atlas Sanctum - Regenerative Platform',
+  description: 'Atlas Sanctum is the civilization operating system for regenerative agriculture, climate health, commerce, and ecosystem intelligence.',
+  keywords: 'Atlas Sanctum, regenerative platform, climate resilience, regenerative agriculture, carbon credits, ecosystem intelligence, sustainable infrastructure',
   image: '/og-image.jpg',
   type: 'website',
 };
