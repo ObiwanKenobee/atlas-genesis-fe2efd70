@@ -11,6 +11,9 @@ import App from './App.tsx';
 import './index.css';
 import './App.css';
 import featureFlags from './lib/featureFlags';
+import { initErrorReporting } from './lib/errorReporting';
+
+initErrorReporting();
 
 const queryClient = new QueryClient({
   defaultOptions: {
