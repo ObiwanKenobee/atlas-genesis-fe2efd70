@@ -57,6 +57,27 @@ let currentAuthState: Record<string, unknown> | null = null;
 export function setErrorAuthState(state: Record<string, unknown> | null) {
   currentAuthState = state;
   if (SENTRY_DSN) Sentry.setContext("auth", state as any);
+  // Drop a breadcrumb on every auth state transition so subsequent errors
+  // carry the history of how we got here (loading → authenticated → role change).
+  Sentry.addBreadcrumb({
+    category: "auth",
+    type: "info",
+    level: "info",
+    message: "auth state changed",
+    data: state ?? undefined,
+    timestamp: Date.now() / 1000,
+  });
+}
+
+export function addAuthBreadcrumb(message: string, data?: Record<string, unknown>) {
+  Sentry.addBreadcrumb({
+    category: "auth",
+    type: "info",
+    level: "info",
+    message,
+    data,
+    timestamp: Date.now() / 1000,
+  });
 }
 
 async function reportToBackend(payload: Record<string, unknown>) {

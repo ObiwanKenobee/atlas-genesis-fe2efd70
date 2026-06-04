@@ -24,6 +24,7 @@ import { EnhancedAuthProvider } from './contexts/EnhancedAuthContext.tsx';
 import { AuthProvider } from './hooks/useAuth';
 import AuthFallback from './components/AuthFallback';
 import { SentryErrorBoundary } from './lib/errorReporting';
+import RouteErrorBoundary from './components/RouteErrorBoundary';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
 import Portfolio from './pages/Portfolio';
 import Profile from './pages/Profile';
@@ -129,6 +130,7 @@ const App = () => {
         <AuthProvider>
           <SentryErrorBoundary fallback={<AuthFallback />}>
             <BrowserRouter>
+          <RouteErrorBoundary>
           <AnimatePresence mode="wait">
             <Routes>
               <Route path="/prototype" element={<Prototype />} />
@@ -270,6 +272,7 @@ const App = () => {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AnimatePresence>
+          </RouteErrorBoundary>
           <BackToTop />
             </BrowserRouter>
           </SentryErrorBoundary>
