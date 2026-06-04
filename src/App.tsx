@@ -130,11 +130,9 @@ const App = () => {
         <AuthProvider>
           <SentryErrorBoundary fallback={<AuthFallback />}>
             <BrowserRouter>
+          <RouteErrorBoundary>
           <AnimatePresence mode="wait">
             <Routes>
-            {/* RouteErrorBoundary wraps the entire route tree; per-route key
-                resets boundary state on navigation so one bad page can't
-                permanently break navigation. */}
               <Route path="/prototype" element={<Prototype />} />
               <Route path="/" element={<Index />} />
               <Route path="/dashboard" element={<Dashboard />} />
@@ -274,6 +272,7 @@ const App = () => {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AnimatePresence>
+          </RouteErrorBoundary>
           <BackToTop />
             </BrowserRouter>
           </SentryErrorBoundary>
