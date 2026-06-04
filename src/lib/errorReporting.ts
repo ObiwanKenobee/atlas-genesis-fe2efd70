@@ -52,6 +52,12 @@ export function setErrorUser(user: { id?: string; email?: string } | null) {
 }
 
 let currentUser: { id?: string; email?: string } | null = null;
+let currentAuthState: Record<string, unknown> | null = null;
+
+export function setErrorAuthState(state: Record<string, unknown> | null) {
+  currentAuthState = state;
+  if (SENTRY_DSN) Sentry.setContext("auth", state as any);
+}
 
 async function reportToBackend(payload: Record<string, unknown>) {
   try {
@@ -61,6 +67,7 @@ async function reportToBackend(payload: Record<string, unknown>) {
       userAgent: typeof navigator !== "undefined" ? navigator.userAgent : "",
       timestamp: new Date().toISOString(),
       user: currentUser,
+      authState: currentAuthState,
       env: ENV,
     });
     if (navigator.sendBeacon) {
