@@ -246,8 +246,11 @@ deploy_to_vercel() {
     log_info "Deploying to Vercel..."
     
     if command -v vercel &> /dev/null; then
-        vercel --prod
+        vercel --prod --confirm
         log_success "Deployed to Vercel"
+    elif command -v npx &> /dev/null; then
+        npx --yes vercel --prod --confirm
+        log_success "Deployed to Vercel via npx"
     else
         log_warning "Vercel CLI not found. Install with: npm i -g vercel"
         log_info "Manual deployment: Upload $BUILD_DIR to Vercel"
