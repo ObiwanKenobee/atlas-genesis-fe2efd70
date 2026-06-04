@@ -55,6 +55,19 @@ export const EnhancedAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
   // Auth Events
   const [authEvents, setAuthEvents] = useState<AuthEvent[]>([]);
 
+  // Sync auth state into error reporter for diagnostic payloads
+  useEffect(() => {
+    setErrorUser(user ? { id: user.id, email: user.email } : null);
+    setErrorAuthState({
+      status,
+      loading,
+      isDemoMode,
+      hasUser: !!user,
+      currentDashboard,
+      role: user?.role ?? null,
+    });
+  }, [user, status, loading, isDemoMode, currentDashboard]);
+
   // Initialize auth state from localStorage
   useEffect(() => {
     const initializeAuth = () => {
