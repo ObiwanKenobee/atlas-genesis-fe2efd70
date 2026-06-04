@@ -24,6 +24,7 @@ import { EnhancedAuthProvider } from './contexts/EnhancedAuthContext.tsx';
 import { AuthProvider } from './hooks/useAuth';
 import AuthFallback from './components/AuthFallback';
 import { SentryErrorBoundary } from './lib/errorReporting';
+import RouteErrorBoundary from './components/RouteErrorBoundary';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
 import Portfolio from './pages/Portfolio';
 import Profile from './pages/Profile';
@@ -131,6 +132,9 @@ const App = () => {
             <BrowserRouter>
           <AnimatePresence mode="wait">
             <Routes>
+            {/* RouteErrorBoundary wraps the entire route tree; per-route key
+                resets boundary state on navigation so one bad page can't
+                permanently break navigation. */}
               <Route path="/prototype" element={<Prototype />} />
               <Route path="/" element={<Index />} />
               <Route path="/dashboard" element={<Dashboard />} />
