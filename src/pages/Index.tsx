@@ -17,7 +17,6 @@ const Index = () => {
     keywords: 'Atlas Sanctum, regenerative platform, climate resilience, carbon credits, regenerative agriculture, ecosystem intelligence, sustainable finance',
     image: '/og-image.jpg',
     url: '/',
-    canonical: 'https://atlassanctum.com/',
     structuredData: [
       {
         "@context": "https://schema.org",
