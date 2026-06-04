@@ -7,6 +7,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { apiService } from '@/lib/api/client';
+import { setErrorAuthState, setErrorUser } from '@/lib/errorReporting';
 import type {
   User,
   Tokens,
