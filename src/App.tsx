@@ -21,6 +21,9 @@ import DashboardWithSidebar from './pages/DashboardWithSidebar';
 import Dashboard from './pages/Dashboard';
 import Auth from './pages/Auth';
 import { EnhancedAuthProvider } from './contexts/EnhancedAuthContext.tsx';
+import { AuthProvider } from './hooks/useAuth';
+import AuthFallback from './components/AuthFallback';
+import { SentryErrorBoundary } from './lib/errorReporting';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
 import Portfolio from './pages/Portfolio';
 import Profile from './pages/Profile';
@@ -123,7 +126,9 @@ const App = () => {
   return (
     <OnboardingProvider>
       <EnhancedAuthProvider>
-        <BrowserRouter>
+        <AuthProvider>
+          <SentryErrorBoundary fallback={<AuthFallback />}>
+            <BrowserRouter>
           <AnimatePresence mode="wait">
             <Routes>
               <Route path="/prototype" element={<Prototype />} />
@@ -266,7 +271,9 @@ const App = () => {
             </Routes>
           </AnimatePresence>
           <BackToTop />
-        </BrowserRouter>
+            </BrowserRouter>
+          </SentryErrorBoundary>
+        </AuthProvider>
       </EnhancedAuthProvider>
     </OnboardingProvider>
   );
