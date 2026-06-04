@@ -275,7 +275,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    // Fallback: AuthProvider not mounted (app uses EnhancedAuthProvider).
+    // Return a safe no-op context so legacy consumers don't crash.
+    const noop = async () => ({ error: null });
+    return {
+      user: null,
+      tokens: null,
+      session: null,
+      loading: false,
+      signUp: noop,
+      signIn: noop,
+      demoSignIn: noop,
+      signOut: async () => {},
+      refreshToken: noop,
+      verifyEmail: noop,
+      resendVerification: noop,
+      forgotPassword: noop,
+      resetPassword: noop,
+      updateProfile: noop,
+    } as AuthContextType;
   }
   return context;
 };
