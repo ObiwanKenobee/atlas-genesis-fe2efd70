@@ -69,10 +69,23 @@ export const setFeatureFlag = async (key: string, value: boolean) => {
   }
 };
 
-// Express middleware to attach flags to request
-export const attachFlagsMiddleware = async (req: any, res: any, next: any) => {
-  req.featureFlags = await getAllFlags();
+// Warm the cache at startup and refresh every 60s
+let cacheReady = false;
+
+export const warmCache = async () => {
+  await getAllFlags();
+  cacheReady = true;
+};
+
+setInterval(warmCache, 60_000);
+
+// Express middleware — serves from in-memory cache, never blocks a request
+export const attachFlagsMiddleware = (req: any, res: any, next: any) => {
+  req.featureFlags = { ...cache };
   next();
 };
 
-export default { getAllFlags, isFeatureEnabled, setFeatureFlag, attachFlagsMiddleware };
+// Sync getter for the /api/flags route
+export const getAllFlagsSync = (): Flags => ({ ...cache });
+
+export default { getAllFlags, getAllFlagsSync, isFeatureEnabled, setFeatureFlag, attachFlagsMiddleware, warmCache };

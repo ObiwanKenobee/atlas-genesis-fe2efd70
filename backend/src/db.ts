@@ -38,8 +38,11 @@ function getDatabaseConfig(): DatabaseConfig {
 // Check if we're in a test environment that allows mock database
 const isTestEnvironment = process.env.NODE_ENV === 'test' || process.env.USE_MOCK_DB === 'true';
 
+// Support DATABASE_URL (Supabase/Render/Heroku style) as well as individual vars
+const hasDatabaseConfig = !!(process.env.DATABASE_URL || process.env.DATABASE_HOST);
+
 // Determine which database to use
-const useMockDatabase = isTestEnvironment || !process.env.DATABASE_HOST;
+const useMockDatabase = isTestEnvironment || !hasDatabaseConfig;
 
 let pool: Pool;
 let query: (text: string, params?: any[]) => Promise<any>;
@@ -56,7 +59,7 @@ if (useMockDatabase) {
   
   console.log(`[db] Connecting to PostgreSQL: ${config.host}:${config.port}/${config.database}`);
   
-  pool = new Pool(config as PoolConfig);
+  pool = new Pool(process.env.DATABASE_URL ? { connectionString: process.env.DATABASE_URL, ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false } : config as PoolConfig);
   
   // Handle pool errors
   pool.on('error', (err: Error) => {

@@ -15,7 +15,7 @@ export async function runStartupChecks() {
   }
 
   // Check required secrets
-  const required = (process.env.REQUIRED_SECRETS || 'JWT_ACCESS_SECRET,JWT_REFRESH_SECRET,SESSION_SECRET,ADMIN_API_KEY,DATABASE_URL').split(',').map(s => s.trim()).filter(Boolean);
+  const required = (process.env.REQUIRED_SECRETS || 'JWT_ACCESS_SECRET,JWT_REFRESH_SECRET,SESSION_SECRET').split(',').map(s => s.trim()).filter(Boolean);
 
   if (!required.length) {
     console.log('[startupChecks] No required secrets configured');

@@ -3,7 +3,7 @@ import './secrets';
 import { runStartupChecks } from './startupChecks';
 import { checkReadiness } from './readiness';
 import metrics from './metrics';
-import featureFlags from './featureFlags';
+import featureFlags, { warmCache, getAllFlagsSync } from './featureFlags';
 import adminFlagsRouter from './routes/adminFlags';
 import express, { Request, Response, NextFunction } from 'express';
 import session from 'express-session';
@@ -388,9 +388,9 @@ app.get('/health', async (req, res) => {
 // Expose Prometheus metrics
 app.get('/metrics', metrics.metricsEndpoint);
 
-// Expose feature flags for frontend/runtime (read-only)
+// Expose feature flags for frontend/runtime (read-only, served from cache)
 app.get('/api/flags', (req: Request, res: Response) => {
-  res.json(featureFlags.getAllFlags());
+  res.json(getAllFlagsSync());
 });
 
 // Admin routes for toggling runtime flags
@@ -795,6 +795,7 @@ setInterval(async () => {
 (async () => {
   try {
     await runStartupChecks();
+    await warmCache(); // pre-load feature flags before serving traffic
   } catch (err) {
     console.error('Startup checks failed', err);
     process.exit(1);
