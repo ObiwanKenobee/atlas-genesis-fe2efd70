@@ -6,21 +6,60 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const COOLDOWN_MS = 60_000; // 1 request / minute per browser
+const MIN_FILL_MS = 1500; // bots usually submit faster than this
+const COOLDOWN_KEY = "newsletter:lastAttemptAt";
+
 const NewsletterBanner = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [openedAt, setOpenedAt] = useState<number | null>(null);
+  const [honeypot, setHoneypot] = useState("");
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
 
+    // Bot protection — invisible honeypot
+    if (honeypot) {
+      toast.success("Welcome to our newsletter!");
+      setIsVisible(false);
+      return;
+    }
+
+    // Bot protection — minimum interaction time
+    if (openedAt && Date.now() - openedAt < MIN_FILL_MS) {
+      toast.error("Please take a moment to review before subscribing.");
+      return;
+    }
+
+    // Client-side rate limit (per browser)
+    try {
+      const last = Number(localStorage.getItem(COOLDOWN_KEY) || 0);
+      if (last && Date.now() - last < COOLDOWN_MS) {
+        toast.error("Please wait a moment before trying again.");
+        return;
+      }
+    } catch {
+      /* localStorage unavailable — skip */
+    }
+
+    // Email format validation
+    const normalized = email.trim().toLowerCase();
+    if (!EMAIL_RE.test(normalized) || normalized.length > 255) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+
     setIsLoading(true);
     try {
+      try { localStorage.setItem(COOLDOWN_KEY, String(Date.now())); } catch { /* noop */ }
       const { error } = await supabase
         .from("newsletter_subscriptions")
-        .insert({ email, subscription_type: "general" });
+        .insert({ email: normalized, subscription_type: "general" });
 
       if (error) {
         if (error.code === "23505") {
@@ -71,7 +110,7 @@ const NewsletterBanner = () => {
             {!isExpanded ? (
               <motion.div
                 className="flex items-center gap-4 cursor-pointer"
-                onClick={() => setIsExpanded(true)}
+                onClick={() => { setIsExpanded(true); setOpenedAt(Date.now()); }}
               >
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-ocean flex items-center justify-center flex-shrink-0">
                   <Mail className="w-6 h-6 text-primary-foreground" />
@@ -108,6 +147,17 @@ const NewsletterBanner = () => {
                 </div>
 
                 <form onSubmit={handleSubscribe} className="space-y-3">
+                  {/* Honeypot — hidden from users, bots fill it */}
+                  <input
+                    type="text"
+                    name="website"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={honeypot}
+                    onChange={(e) => setHoneypot(e.target.value)}
+                    aria-hidden="true"
+                    style={{ position: "absolute", left: "-10000px", width: 1, height: 1, opacity: 0 }}
+                  />
                   <Input
                     type="email"
                     placeholder="Enter your email"
