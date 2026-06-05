@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, X, Sparkles, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,39 @@ const COOLDOWN_MS = 60_000; // 1 request / minute per browser
 const MIN_FILL_MS = 1500; // bots usually submit faster than this
 const COOLDOWN_KEY = "newsletter:lastAttemptAt";
 
+// Optional bot-protection widgets — render only when a site key is provided.
+// Supports either Cloudflare Turnstile or hCaptcha. Site keys are public.
+const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined;
+const HCAPTCHA_SITE_KEY = import.meta.env.VITE_HCAPTCHA_SITE_KEY as string | undefined;
+const CAPTCHA_PROVIDER: "turnstile" | "hcaptcha" | null = TURNSTILE_SITE_KEY
+  ? "turnstile"
+  : HCAPTCHA_SITE_KEY
+    ? "hcaptcha"
+    : null;
+
+declare global {
+  interface Window {
+    turnstile?: { render: (el: HTMLElement, opts: Record<string, unknown>) => string; reset?: (id?: string) => void };
+    hcaptcha?: { render: (el: HTMLElement, opts: Record<string, unknown>) => string; reset?: (id?: string) => void };
+  }
+}
+
+function useCaptchaScript() {
+  useEffect(() => {
+    if (!CAPTCHA_PROVIDER) return;
+    const src =
+      CAPTCHA_PROVIDER === "turnstile"
+        ? "https://challenges.cloudflare.com/turnstile/v0/api.js"
+        : "https://js.hcaptcha.com/1/api.js";
+    if (document.querySelector(`script[src="${src}"]`)) return;
+    const s = document.createElement("script");
+    s.src = src;
+    s.async = true;
+    s.defer = true;
+    document.head.appendChild(s);
+  }, []);
+}
+
 const NewsletterBanner = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [email, setEmail] = useState("");
@@ -18,6 +51,39 @@ const NewsletterBanner = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [openedAt, setOpenedAt] = useState<number | null>(null);
   const [honeypot, setHoneypot] = useState("");
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaRef = useRef<HTMLDivElement | null>(null);
+  const captchaWidgetId = useRef<string | null>(null);
+
+  useCaptchaScript();
+
+  // Mount captcha widget when the form expands
+  useEffect(() => {
+    if (!isExpanded || !CAPTCHA_PROVIDER || !captchaRef.current) return;
+    let cancelled = false;
+    const interval = window.setInterval(() => {
+      if (cancelled) return;
+      const api = CAPTCHA_PROVIDER === "turnstile" ? window.turnstile : window.hcaptcha;
+      if (!api || !captchaRef.current || captchaWidgetId.current) return;
+      const siteKey = (CAPTCHA_PROVIDER === "turnstile" ? TURNSTILE_SITE_KEY : HCAPTCHA_SITE_KEY) as string;
+      try {
+        captchaWidgetId.current = api.render(captchaRef.current, {
+          sitekey: siteKey,
+          callback: (token: string) => setCaptchaToken(token),
+          "expired-callback": () => setCaptchaToken(null),
+          "error-callback": () => setCaptchaToken(null),
+          size: "normal",
+        });
+        window.clearInterval(interval);
+      } catch {
+        /* widget still loading */
+      }
+    }, 200);
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+    };
+  }, [isExpanded]);
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,12 +120,21 @@ const NewsletterBanner = () => {
       return;
     }
 
+    // Captcha verification (optional)
+    if (CAPTCHA_PROVIDER && !captchaToken) {
+      toast.error("Please complete the verification challenge.");
+      return;
+    }
+
     setIsLoading(true);
     try {
       try { localStorage.setItem(COOLDOWN_KEY, String(Date.now())); } catch { /* noop */ }
       const { error } = await supabase
         .from("newsletter_subscriptions")
-        .insert({ email: normalized, subscription_type: "general" });
+        .insert({
+          email: normalized,
+          subscription_type: "general",
+        });
 
       if (error) {
         if (error.code === "23505") {
@@ -76,6 +151,11 @@ const NewsletterBanner = () => {
       toast.error("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
+      if (CAPTCHA_PROVIDER) {
+        const api = CAPTCHA_PROVIDER === "turnstile" ? window.turnstile : window.hcaptcha;
+        try { api?.reset?.(captchaWidgetId.current ?? undefined); } catch { /* noop */ }
+        setCaptchaToken(null);
+      }
     }
   };
 
@@ -157,6 +237,7 @@ const NewsletterBanner = () => {
                     onChange={(e) => setHoneypot(e.target.value)}
                     aria-hidden="true"
                     style={{ position: "absolute", left: "-10000px", width: 1, height: 1, opacity: 0 }}
+                    data-testid="newsletter-honeypot"
                   />
                   <Input
                     type="email"
@@ -165,7 +246,11 @@ const NewsletterBanner = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     className="bg-background/50 border-border/50"
                     required
+                    data-testid="newsletter-email"
                   />
+                  {CAPTCHA_PROVIDER && (
+                    <div ref={captchaRef} data-testid="newsletter-captcha" className="flex justify-center" />
+                  )}
                   <div className="flex gap-2">
                     <Button
                       type="button"
@@ -181,6 +266,7 @@ const NewsletterBanner = () => {
                       size="sm"
                       disabled={isLoading}
                       className="flex-1 bg-gradient-to-r from-primary to-ocean"
+                      data-testid="newsletter-submit"
                     >
                       {isLoading ? "Subscribing..." : "Subscribe"}
                     </Button>
