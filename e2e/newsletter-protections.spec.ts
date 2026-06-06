@@ -13,6 +13,77 @@ async function openNewsletter(page: import("@playwright/test").Page) {
 }
 
 test.describe("Newsletter signup — abuse protections", () => {
+  test("invalid captcha token is rejected by the edge function", async ({ page }) => {
+    // Stub the edge function so the test runs without real captcha keys
+    await page.route("**/functions/v1/newsletter-subscribe", (route) =>
+      route.fulfill({
+        status: 400,
+        contentType: "application/json",
+        body: JSON.stringify({ error: "captcha_failed", reason: "invalid-input-response" }),
+      }),
+    );
+    await openNewsletter(page);
+    await page.getByTestId("newsletter-email").fill("captcha@example.com");
+    await page.waitForTimeout(1700);
+    await page.getByTestId("newsletter-submit").click();
+    await expect(page.getByText(/verification failed/i)).toBeVisible();
+  });
+
+  test("repeated rapid submits hit the backend cooldown (429)", async ({ page }) => {
+    let calls = 0;
+    await page.route("**/functions/v1/newsletter-subscribe", (route) => {
+      calls += 1;
+      if (calls === 1) {
+        return route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ success: true }),
+        });
+      }
+      return route.fulfill({
+        status: 429,
+        contentType: "application/json",
+        body: JSON.stringify({ error: "rate_limited", retry_after_seconds: 60 }),
+      });
+    });
+
+    await openNewsletter(page);
+    await page.getByTestId("newsletter-email").fill("rapid@example.com");
+    await page.waitForTimeout(1700);
+    await page.getByTestId("newsletter-submit").click();
+    // Banner closes on success; reopen for second attempt.
+    await page.evaluate(() => localStorage.removeItem("newsletter:lastAttemptAt"));
+    await page.reload();
+    await openNewsletter(page);
+    await page.getByTestId("newsletter-email").fill("rapid@example.com");
+    await page.waitForTimeout(1700);
+    await page.getByTestId("newsletter-submit").click();
+    await expect(page.getByText(/wait a moment before trying again/i)).toBeVisible();
+  });
+
+  test("parallel submissions cannot bypass the interaction gate", async ({ page }) => {
+    const requests: string[] = [];
+    await page.route("**/functions/v1/newsletter-subscribe", (route) => {
+      requests.push(route.request().url());
+      return route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ success: true }),
+      });
+    });
+    await openNewsletter(page);
+    await page.getByTestId("newsletter-email").fill("parallel@example.com");
+    // Fire 5 clicks in parallel BEFORE the min-fill timer expires
+    await Promise.all(
+      Array.from({ length: 5 }).map(() =>
+        page.getByTestId("newsletter-submit").click({ noWaitAfter: true }).catch(() => {}),
+      ),
+    );
+    await page.waitForTimeout(500);
+    expect(requests).toHaveLength(0);
+    await expect(page.getByText(/take a moment to review/i)).toBeVisible();
+  });
+
   test("honeypot field swallows bot submissions silently", async ({ page }) => {
     await openNewsletter(page);
 

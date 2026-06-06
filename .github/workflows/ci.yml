@@ -53,7 +53,23 @@ jobs:
         run: npm run smoke -- http://localhost:4173
 
       - name: Playwright — newsletter abuse protections
+        id: pw_protections
         run: npx playwright install --with-deps chromium && E2E_BASE_URL=http://localhost:4173 npx playwright test e2e/newsletter-protections.spec.ts
+
+      - name: Playwright — newsletter visual regression
+        id: pw_visual
+        run: E2E_BASE_URL=http://localhost:4173 npx playwright test e2e/newsletter-visual.spec.ts
+
+      - name: Upload Playwright report (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ github.run_id }}
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 14
 
   security-scan:
     name: Supabase security scan

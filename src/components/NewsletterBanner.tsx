@@ -129,19 +129,38 @@ const NewsletterBanner = () => {
     setIsLoading(true);
     try {
       try { localStorage.setItem(COOLDOWN_KEY, String(Date.now())); } catch { /* noop */ }
-      const { error } = await supabase
-        .from("newsletter_subscriptions")
-        .insert({
-          email: normalized,
-          subscription_type: "general",
-        });
-
-      if (error) {
-        if (error.code === "23505") {
-          toast.info("You're already subscribed!");
+      const { data, error } = await supabase.functions.invoke(
+        "newsletter-subscribe",
+        {
+          body: {
+            email: normalized,
+            honeypot,
+            captchaToken: captchaToken ?? undefined,
+            captchaProvider: CAPTCHA_PROVIDER ?? undefined,
+            subscription_type: "general",
+          },
+        },
+      );
+      const payload = (data ?? {}) as {
+        success?: boolean;
+        already_subscribed?: boolean;
+        error?: string;
+        retry_after_seconds?: number;
+      };
+      if (error || payload.error) {
+        const code = payload.error || "unknown";
+        if (code === "rate_limited") {
+          toast.error("Please wait a moment before trying again.");
+        } else if (code === "captcha_failed" || code === "captcha_required") {
+          toast.error("Verification failed. Please try the challenge again.");
+        } else if (code === "invalid_email") {
+          toast.error("Please enter a valid email address.");
         } else {
-          throw error;
+          toast.error("Something went wrong. Please try again.");
         }
+      } else if (payload.already_subscribed) {
+        toast.info("You're already subscribed!");
+        setIsVisible(false);
       } else {
         toast.success("Welcome to our newsletter!");
         setIsVisible(false);

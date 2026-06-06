@@ -22,6 +22,7 @@ import Dashboard from './pages/Dashboard';
 import Auth from './pages/Auth';
 import { EnhancedAuthProvider } from './contexts/EnhancedAuthContext.tsx';
 import { AuthProvider } from './hooks/useAuth';
+import { SupabaseAuthProvider } from './hooks/useSupabaseAuth';
 import AuthFallback from './components/AuthFallback';
 import { SentryErrorBoundary } from './lib/errorReporting';
 import RouteErrorBoundary from './components/RouteErrorBoundary';
@@ -128,6 +129,7 @@ const App = () => {
     <OnboardingProvider>
       <EnhancedAuthProvider>
         <AuthProvider>
+          <SupabaseAuthProvider>
           <SentryErrorBoundary fallback={<AuthFallback />}>
             <BrowserRouter>
           <RouteErrorBoundary>
@@ -276,6 +278,7 @@ const App = () => {
           <BackToTop />
             </BrowserRouter>
           </SentryErrorBoundary>
+          </SupabaseAuthProvider>
         </AuthProvider>
       </EnhancedAuthProvider>
     </OnboardingProvider>
