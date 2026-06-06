@@ -56,6 +56,7 @@ import Leaderboard from './pages/Leaderboard';
 import CardanoLayer from './pages/CardanoLayer';
 import AdminCommandCenter from './pages/admin/AdminCommandCenter';
 import FeatureFlagsAdmin from './pages/admin/FeatureFlags';
+import NewsletterAttempts from './pages/admin/NewsletterAttempts';
 import AdminProtectedRoute from './components/AdminProtectedRoute.tsx';
 import Careers from './pages/Careers';
 import NotFound from './pages/NotFound';
@@ -195,6 +196,11 @@ const App = () => {
                 <Route path="/admin/flags" element={
                   <AdminProtectedRoute>
                     <FeatureFlagsAdmin />
+                  </AdminProtectedRoute>
+                } />
+                <Route path="/admin/newsletter" element={
+                  <AdminProtectedRoute>
+                    <NewsletterAttempts />
                   </AdminProtectedRoute>
                 } />
               <Route path="/segment-selection" element={<SegmentSelection />} />
