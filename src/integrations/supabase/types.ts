@@ -318,6 +318,33 @@ export type Database = {
           },
         ]
       }
+      newsletter_subscription_attempts: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          ip_address: string | null
+          reason: string | null
+          succeeded: boolean
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          ip_address?: string | null
+          reason?: string | null
+          succeeded?: boolean
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          ip_address?: string | null
+          reason?: string | null
+          succeeded?: boolean
+        }
+        Relationships: []
+      }
       newsletter_subscriptions: {
         Row: {
           email: string
@@ -705,6 +732,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_newsletter_rate_limit: {
+        Args: { _email: string; _ip: string; _window_seconds?: number }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
