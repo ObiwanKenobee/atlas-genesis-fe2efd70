@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, X, Sparkles, ArrowRight } from "lucide-react";
+import { Mail, X, Sparkles, ArrowRight, ShieldAlert, Clock, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
@@ -52,6 +52,15 @@ const NewsletterBanner = () => {
   const [openedAt, setOpenedAt] = useState<number | null>(null);
   const [honeypot, setHoneypot] = useState("");
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  type ErrorKind =
+    | "captcha_failed"
+    | "captcha_required"
+    | "rate_limited"
+    | "cooldown_active"
+    | "invalid_email"
+    | "min_interaction"
+    | "generic";
+  const [errorState, setErrorState] = useState<{ kind: ErrorKind; message: string } | null>(null);
   const captchaRef = useRef<HTMLDivElement | null>(null);
   const captchaWidgetId = useRef<string | null>(null);
 
@@ -87,6 +96,8 @@ const NewsletterBanner = () => {
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+    setErrorState(null);
     if (!email) return;
 
     // Bot protection — invisible honeypot
@@ -98,7 +109,7 @@ const NewsletterBanner = () => {
 
     // Bot protection — minimum interaction time
     if (openedAt && Date.now() - openedAt < MIN_FILL_MS) {
-      toast.error("Please take a moment to review before subscribing.");
+      setErrorState({ kind: "min_interaction", message: "Please take a moment to review before subscribing." });
       return;
     }
 
@@ -106,7 +117,11 @@ const NewsletterBanner = () => {
     try {
       const last = Number(localStorage.getItem(COOLDOWN_KEY) || 0);
       if (last && Date.now() - last < COOLDOWN_MS) {
-        toast.error("Please wait a moment before trying again.");
+        const remaining = Math.ceil((COOLDOWN_MS - (Date.now() - last)) / 1000);
+        setErrorState({
+          kind: "cooldown_active",
+          message: `Cooldown active — try again in ${remaining}s.`,
+        });
         return;
       }
     } catch {
@@ -116,13 +131,13 @@ const NewsletterBanner = () => {
     // Email format validation
     const normalized = email.trim().toLowerCase();
     if (!EMAIL_RE.test(normalized) || normalized.length > 255) {
-      toast.error("Please enter a valid email address.");
+      setErrorState({ kind: "invalid_email", message: "Please enter a valid email address." });
       return;
     }
 
     // Captcha verification (optional)
     if (CAPTCHA_PROVIDER && !captchaToken) {
-      toast.error("Please complete the verification challenge.");
+      setErrorState({ kind: "captcha_required", message: "Please complete the verification challenge." });
       return;
     }
 
@@ -150,13 +165,20 @@ const NewsletterBanner = () => {
       if (error || payload.error) {
         const code = payload.error || "unknown";
         if (code === "rate_limited") {
-          toast.error("Please wait a moment before trying again.");
+          const seconds = payload.retry_after_seconds ?? 60;
+          setErrorState({
+            kind: "rate_limited",
+            message: `Too many recent attempts. Please try again in ${seconds}s.`,
+          });
         } else if (code === "captcha_failed" || code === "captcha_required") {
-          toast.error("Verification failed. Please try the challenge again.");
+          setErrorState({
+            kind: "captcha_failed",
+            message: "Verification failed. Please complete the challenge again.",
+          });
         } else if (code === "invalid_email") {
-          toast.error("Please enter a valid email address.");
+          setErrorState({ kind: "invalid_email", message: "Please enter a valid email address." });
         } else {
-          toast.error("Something went wrong. Please try again.");
+          setErrorState({ kind: "generic", message: "Something went wrong. Please try again." });
         }
       } else if (payload.already_subscribed) {
         toast.info("You're already subscribed!");
@@ -167,7 +189,7 @@ const NewsletterBanner = () => {
       }
     } catch (error) {
       console.error("Subscription error:", error);
-      toast.error("Something went wrong. Please try again.");
+      setErrorState({ kind: "generic", message: "Network error. Please try again." });
     } finally {
       setIsLoading(false);
       if (CAPTCHA_PROVIDER) {
@@ -269,6 +291,22 @@ const NewsletterBanner = () => {
                   />
                   {CAPTCHA_PROVIDER && (
                     <div ref={captchaRef} data-testid="newsletter-captcha" className="flex justify-center" />
+                  )}
+                  {errorState && (
+                    <div
+                      role="alert"
+                      data-testid={`newsletter-error-${errorState.kind}`}
+                      className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+                    >
+                      {errorState.kind === "captcha_failed" || errorState.kind === "captcha_required" ? (
+                        <ShieldAlert className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                      ) : errorState.kind === "rate_limited" || errorState.kind === "cooldown_active" ? (
+                        <Clock className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                      ) : (
+                        <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                      )}
+                      <span>{errorState.message}</span>
+                    </div>
                   )}
                   <div className="flex gap-2">
                     <Button

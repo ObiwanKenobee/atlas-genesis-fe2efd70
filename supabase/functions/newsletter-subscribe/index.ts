@@ -35,9 +35,9 @@ async function verifyCaptcha(
       ? Deno.env.get("TURNSTILE_SECRET_KEY")
       : Deno.env.get("HCAPTCHA_SECRET_KEY");
   if (!secret) {
-    // No secret configured — treat as soft-pass so deployments without
-    // captcha still work. Honeypot + rate limit + email validation remain.
-    return { ok: true, reason: "no_secret_configured" };
+    // Fail closed: if a client submits a captcha token we MUST be able to
+    // verify it. Refusing the request is safer than silently accepting it.
+    return { ok: false, reason: "no_secret_configured" };
   }
   const url =
     provider === "turnstile"
@@ -92,16 +92,17 @@ Deno.serve(async (req) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
 
-  // Backend cooldown check (independent of any client-side gate)
-  const { data: allowed, error: rlError } = await supabase.rpc(
-    "check_newsletter_rate_limit",
+  // Atomic cooldown: claim_newsletter_slot inserts-or-rejects in a single
+  // statement so parallel requests for the same email/IP cannot both pass.
+  const { data: claimed, error: rlError } = await supabase.rpc(
+    "claim_newsletter_slot",
     { _email: email, _ip: ip, _window_seconds: WINDOW_SECONDS },
   );
   if (rlError) {
     console.error("rate limit rpc error", rlError);
     return json(500, { error: "rate_limit_check_failed" });
   }
-  if (allowed === false) {
+  if (claimed === false) {
     return json(429, { error: "rate_limited", retry_after_seconds: WINDOW_SECONDS });
   }
 
