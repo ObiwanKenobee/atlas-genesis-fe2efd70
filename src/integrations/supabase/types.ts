@@ -325,7 +325,7 @@ export type Database = {
           id: string
           ip_address: string | null
           reason: string | null
-          succeeded: boolean
+          succeeded: boolean | null
         }
         Insert: {
           created_at?: string
@@ -333,7 +333,7 @@ export type Database = {
           id?: string
           ip_address?: string | null
           reason?: string | null
-          succeeded?: boolean
+          succeeded?: boolean | null
         }
         Update: {
           created_at?: string
@@ -341,7 +341,7 @@ export type Database = {
           id?: string
           ip_address?: string | null
           reason?: string | null
-          succeeded?: boolean
+          succeeded?: boolean | null
         }
         Relationships: []
       }
@@ -733,6 +733,10 @@ export type Database = {
     }
     Functions: {
       check_newsletter_rate_limit: {
+        Args: { _email: string; _ip: string; _window_seconds?: number }
+        Returns: boolean
+      }
+      claim_newsletter_slot: {
         Args: { _email: string; _ip: string; _window_seconds?: number }
         Returns: boolean
       }
