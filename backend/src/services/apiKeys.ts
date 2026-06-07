@@ -69,10 +69,10 @@ export class APIKeyService {
     // Store in database
     const result = await query(
       `INSERT INTO api_keys (
-        user_id, organization_id, name, key_prefix, key_hash, 
+        user_id, organization_id, name, key_prefix, key_hash,
         scopes, rate_limit, rate_limit_window, allowed_ips, allowed_origins,
-        is_active, created_at, updated_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, NOW(), NOW()) 
+        expires_at, is_active, created_at, updated_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, true, NOW(), NOW())
       RETURNING *`,
       [
         userId,
@@ -89,7 +89,7 @@ export class APIKeyService {
       ]
     );
 
-    const keyData = result[0];
+    const keyData = result.rows[0];
     return { fullKey, keyData };
   }
 
@@ -97,23 +97,23 @@ export class APIKeyService {
    * Validate an API key
    */
   async validateKey(apiKey: string): Promise<{ valid: boolean; keyData?: APIKey; error?: string }> {
-    // Extract prefix and hash
-    const prefix = apiKey.substring(0, this.KEY_PREFIX.length);
-    const hash = apiKey.substring(this.KEY_PREFIX.length);
+    if (!apiKey.startsWith(this.KEY_PREFIX)) {
+      return { valid: false, error: 'Invalid key format' };
+    }
+    // Hash the full key for comparison — never store or compare plaintext keys
+    const keyHash = this.hashKey(apiKey);
 
-    // Look up in database
     const result = await query(
-      `SELECT * FROM api_keys WHERE key_prefix = $1 AND key_hash = $2`,
-      [prefix, hash]
+      `SELECT * FROM api_keys WHERE key_prefix = $1 AND key_hash = $2 AND is_active = true`,
+      [this.KEY_PREFIX, keyHash]
     );
 
-    if (result.length === 0) {
+    if (result.rowCount === 0) {
       return { valid: false, error: 'Invalid or expired key' };
     }
 
-    const keyData = result[0];
+    const keyData = result.rows[0];
 
-    // Check expiration
     if (keyData.expires_at && new Date(keyData.expires_at) < new Date()) {
       return { valid: false, error: 'Key has expired' };
     }
@@ -151,32 +151,23 @@ export class APIKeyService {
       `SELECT * FROM api_keys WHERE user_id = $1 ORDER BY created_at DESC`,
       [userId]
     );
-
-    return result;
+    return result.rows;
   }
 
-  /**
-   * Get API keys for an organization
-   */
   async getKeysForOrganization(organizationId: string): Promise<APIKey[]> {
     const result = await query(
       `SELECT * FROM api_keys WHERE organization_id = $1 ORDER BY created_at DESC`,
       [organizationId]
     );
-
-    return result;
+    return result.rows;
   }
 
-  /**
-   * Get API key by ID
-   */
   async getKeyById(apiKeyId: string, userId: string): Promise<APIKey | null> {
     const result = await query(
       `SELECT * FROM api_keys WHERE id = $1 AND user_id = $2`,
       [apiKeyId, userId]
     );
-
-    return result[0] || null;
+    return result.rows[0] || null;
   }
 
   /**
@@ -237,7 +228,7 @@ export class APIKeyService {
       values
     );
 
-    return result[0];
+    return result.rows[0];
   }
 
   /**
@@ -298,7 +289,7 @@ export class APIKeyService {
       [apiKeyId, startDate, endDate]
     );
 
-    const stats = result[0];
+    const stats = result.rows[0];
 
     // Get requests by endpoint
     const endpointResult = await query(
@@ -313,11 +304,10 @@ export class APIKeyService {
     );
 
     const requestsByEndpoint: Record<string, number> = {};
-    endpointResult.forEach((row: any) => {
+    endpointResult.rows.forEach((row: any) => {
       requestsByEndpoint[row.endpoint] = parseInt(row.count);
     });
 
-    // Get requests by method
     const methodResult = await query(
       `SELECT method, COUNT(*) as count
        FROM api_key_usage
@@ -330,11 +320,10 @@ export class APIKeyService {
     );
 
     const requestsByMethod: Record<string, number> = {};
-    methodResult.forEach((row: any) => {
+    methodResult.rows.forEach((row: any) => {
       requestsByMethod[row.method] = parseInt(row.count);
     });
 
-    // Get requests by hour
     const hourResult = await query(
       `SELECT 
         DATE_TRUNC('hour', timestamp) as hour,
@@ -349,7 +338,7 @@ export class APIKeyService {
     );
 
     const requestsByHour: Record<string, number> = {};
-    hourResult.forEach((row: any) => {
+    hourResult.rows.forEach((row: any) => {
       requestsByHour[row.hour] = parseInt(row.count);
     });
 
@@ -384,9 +373,8 @@ export class APIKeyService {
       [organizationId]
     );
 
-    const stats = result[0];
+    const stats = result.rows[0];
 
-    // Get average response time
     const avgResult = await query(
       `SELECT AVG(response_time) as avg_response_time
        FROM api_key_usage aku
@@ -413,8 +401,8 @@ export class APIKeyService {
       totalKeys: parseInt(stats.total_keys),
       activeKeys: parseInt(stats.active_keys),
       totalRequests: parseInt(stats.total_requests) || 0,
-      averageResponseTime: parseFloat(avgResult[0]?.avg_response_time) || 0,
-      topEndpoints: topEndpointsResult.map((row: any) => ({
+      averageResponseTime: parseFloat(avgResult.rows[0]?.avg_response_time) || 0,
+      topEndpoints: topEndpointsResult.rows.map((row: any) => ({
         endpoint: row.endpoint,
         count: parseInt(row.count),
       })),
@@ -425,13 +413,12 @@ export class APIKeyService {
    * Clean up old usage records
    */
   async cleanupOldUsageRecords(daysToKeep: number = 90): Promise<number> {
+    // Use parameterized query — never interpolate values into SQL strings
     const result = await query(
-      `DELETE FROM api_key_usage 
-       WHERE timestamp < NOW() - INTERVAL '${daysToKeep} days'
-       RETURNING id`
+      `DELETE FROM api_key_usage WHERE timestamp < NOW() - ($1 * INTERVAL '1 day') RETURNING id`,
+      [Math.max(1, Math.floor(daysToKeep))]
     );
-
-    return result.length;
+    return result.rowCount ?? 0;
   }
 
   /**

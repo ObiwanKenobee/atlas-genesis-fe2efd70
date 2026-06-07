@@ -717,11 +717,17 @@ router.get('/google/callback',
       version: currentVersion
     }, deviceFingerprint);
 
-    // Redirect to frontend with tokens
+    // Set refresh token as httpOnly cookie; return access token in response body via fragment
+    // Using fragment (#) prevents tokens from reaching server logs
+    res.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/api'
+    });
     const redirectUrl = new URL(`${process.env.FRONTEND_URL}/auth/callback`);
-    redirectUrl.searchParams.set('accessToken', accessToken);
-    redirectUrl.searchParams.set('refreshToken', refreshToken);
-
+    redirectUrl.hash = `access_token=${encodeURIComponent(accessToken)}`;
     res.redirect(redirectUrl.toString());
   }
 );
@@ -744,7 +750,7 @@ router.get('/github/callback',
       version: currentVersion
     }, deviceFingerprint);
 
-    const refreshTokenData = await createRefreshToken(user.id, {
+    await createRefreshToken(user.id, {
       ip: req.ip,
       userAgent: req.get('User-Agent'),
       provider: 'github',
@@ -759,10 +765,15 @@ router.get('/github/callback',
       version: currentVersion
     }, deviceFingerprint);
 
+    res.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/api'
+    });
     const redirectUrl = new URL(`${process.env.FRONTEND_URL}/auth/callback`);
-    redirectUrl.searchParams.set('accessToken', accessToken);
-    redirectUrl.searchParams.set('refreshToken', refreshToken);
-
+    redirectUrl.hash = `access_token=${encodeURIComponent(accessToken)}`;
     res.redirect(redirectUrl.toString());
   }
 );
@@ -785,7 +796,7 @@ router.get('/microsoft/callback',
       version: currentVersion
     }, deviceFingerprint);
 
-    const refreshTokenData = await createRefreshToken(user.id, {
+    await createRefreshToken(user.id, {
       ip: req.ip,
       userAgent: req.get('User-Agent'),
       provider: 'microsoft',
@@ -800,10 +811,15 @@ router.get('/microsoft/callback',
       version: currentVersion
     }, deviceFingerprint);
 
+    res.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/api'
+    });
     const redirectUrl = new URL(`${process.env.FRONTEND_URL}/auth/callback`);
-    redirectUrl.searchParams.set('accessToken', accessToken);
-    redirectUrl.searchParams.set('refreshToken', refreshToken);
-
+    redirectUrl.hash = `access_token=${encodeURIComponent(accessToken)}`;
     res.redirect(redirectUrl.toString());
   }
 );

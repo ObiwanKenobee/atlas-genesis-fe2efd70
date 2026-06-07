@@ -210,74 +210,51 @@ export const addRateLimitHeaders = (req: Request, res: Response, next: NextFunct
   next();
 };
 
-// API Key validation middleware
+// API Key validation middleware — validates against the api_keys table using HMAC hash
 export const validateApiKey = async (req: Request, res: Response, next: NextFunction) => {
   const apiKey = req.headers['x-api-key'] as string;
 
   if (!apiKey) {
-    // API key not provided - this is fine for regular authenticated requests
-    return next();
+    return next(); // API key is optional; Bearer JWT auth takes over
   }
 
   try {
-    // In a real implementation, you would validate against a database
-    // For now, we'll do basic validation
-    if (apiKey.length < 20) {
-      logSecurityEvent('invalid_api_key', null, {
-        keyLength: apiKey.length,
-        path: req.path,
-        method: req.method,
-        ip: req.ip
-      }, 'medium');
-      return res.status(401).json({
-        code: 'invalid_api_key',
-        message: 'Invalid API key format',
-        timestamp: new Date().toISOString()
-      });
+    // Validate format: must start with 'atlas_' and be at least 40 chars total
+    if (!apiKey.startsWith('atlas_') || apiKey.length < 40) {
+      logSecurityEvent('invalid_api_key', null, { path: req.path, method: req.method, ip: req.ip }, 'medium');
+      return res.status(401).json({ code: 'invalid_api_key', message: 'Invalid API key format', timestamp: new Date().toISOString() });
     }
 
-    // Check if API key is in a blacklist (simulated)
-    const blacklistedKeys = process.env.BLACKLISTED_API_KEYS?.split(',') || [];
-    if (blacklistedKeys.includes(apiKey)) {
-      logSecurityEvent('blacklisted_api_key', null, {
-        path: req.path,
-        method: req.method,
-        ip: req.ip,
-        userAgent: req.get('User-Agent')
-      }, 'high');
-      return res.status(401).json({
-        code: 'api_key_blacklisted',
-        message: 'API key has been revoked',
-        timestamp: new Date().toISOString()
-      });
+    // Hash the incoming key the same way it was stored (SHA-256)
+    const keyHash = crypto.createHash('sha256').update(apiKey).digest('hex');
+    const keyPrefix = apiKey.substring(0, 6); // 'atlas_'
+
+    const { query } = require('../db');
+    const result = await query(
+      `SELECT id, user_id, scopes, rate_limit, allowed_ips, is_active, expires_at
+       FROM api_keys WHERE key_prefix = $1 AND key_hash = $2 AND is_active = true`,
+      [keyPrefix, keyHash]
+    );
+
+    if (result.rowCount === 0) {
+      logSecurityEvent('invalid_api_key', null, { path: req.path, method: req.method, ip: req.ip }, 'medium');
+      return res.status(401).json({ code: 'invalid_api_key', message: 'Invalid or revoked API key', timestamp: new Date().toISOString() });
     }
 
-    // Attach API key info to request for rate limiting and logging
-    (req as any).apiKey = {
-      key: apiKey,
-      validated: true,
-      timestamp: new Date().toISOString()
-    };
+    const keyData = result.rows[0];
 
-    logSecurityEvent('api_key_validated', null, {
-      path: req.path,
-      method: req.method,
-      ip: req.ip
-    }, 'low');
+    if (keyData.expires_at && new Date(keyData.expires_at) < new Date()) {
+      logSecurityEvent('expired_api_key', null, { path: req.path, method: req.method, ip: req.ip }, 'medium');
+      return res.status(401).json({ code: 'api_key_expired', message: 'API key has expired', timestamp: new Date().toISOString() });
+    }
 
+    (req as any).apiKey = { id: keyData.id, userId: keyData.user_id, scopes: keyData.scopes, rateLimit: keyData.rate_limit, validated: true };
+
+    logSecurityEvent('api_key_validated', keyData.user_id, { path: req.path, method: req.method, ip: req.ip }, 'low');
     next();
   } catch (error) {
-    logSecurityEvent('api_key_validation_error', null, {
-      error: (error as Error).message,
-      path: req.path,
-      method: req.method,
-      ip: req.ip
-    }, 'medium');
-    return res.status(500).json({
-      code: 'api_key_validation_error',
-      message: 'API key validation failed',
-      timestamp: new Date().toISOString()
-    });
+    logSecurityEvent('api_key_validation_error', null, { error: (error as Error).message, path: req.path, ip: req.ip }, 'medium');
+    return res.status(500).json({ code: 'api_key_validation_error', message: 'API key validation failed', timestamp: new Date().toISOString() });
   }
 };
 

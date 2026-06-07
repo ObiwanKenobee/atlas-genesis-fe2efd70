@@ -8,10 +8,14 @@
 import Stripe from 'stripe';
 import { query } from '../db';
 
-// Initialize Stripe with your secret key
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2024-11-20.acacia',
-});
+// Initialize Stripe lazily — only when a real key is present
+function getStripe(): Stripe {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key || key.startsWith('your_') || key.startsWith('sk_test_your')) {
+    throw new Error('Stripe is not configured. Set STRIPE_SECRET_KEY in .env');
+  }
+  return new Stripe(key, { apiVersion: '2024-11-20.acacia' });
+}
 
 export interface PaymentMethod {
   id: string;

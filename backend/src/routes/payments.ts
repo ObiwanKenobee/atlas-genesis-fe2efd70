@@ -2,11 +2,13 @@ import express from 'express';
 import { PaymentService, PaymentMethod } from '../services/payment';
 import { query } from '../db';
 import { emailService } from '../services/email';
+import { authenticate } from '../middleware/auth';
+import crypto from 'crypto';
 
 const router = express.Router();
 
-// Initialize payment
-router.post('/initialize', async (req, res) => {
+// Initialize payment — requires authenticated user
+router.post('/initialize', authenticate, async (req: any, res) => {
   try {
     const { listingId, quantity, buyerId, email, amount, paymentMethod = 'paystack', currency = 'USD' } = req.body;
 
@@ -65,8 +67,8 @@ router.post('/initialize', async (req, res) => {
   }
 });
 
-// Verify payment
-router.get('/verify/:reference', async (req, res) => {
+// Verify payment — requires authenticated user
+router.get('/verify/:reference', authenticate, async (req: any, res) => {
   try {
     const { reference } = req.params;
     const { paymentMethod = 'paystack' } = req.query;
@@ -118,11 +120,14 @@ router.get('/verify/:reference', async (req, res) => {
   }
 });
 
-// Webhook handler for Paystack
+// Webhook handler for Paystack — public endpoint, signature-verified
 router.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
   try {
     const secret = process.env.PAYSTACK_SECRET_KEY;
-    const hash = require('crypto').createHmac('sha512', secret).update(JSON.stringify(req.body)).digest('hex');
+    if (!secret) {
+      return res.status(500).send('Webhook secret not configured');
+    }
+    const hash = crypto.createHmac('sha512', secret).update(JSON.stringify(req.body)).digest('hex');
 
     if (hash !== req.headers['x-paystack-signature']) {
       return res.status(400).send('Invalid signature');
@@ -171,8 +176,8 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
   }
 });
 
-// Get payment status
-router.get('/status/:orderId', async (req, res) => {
+// Get payment status — requires authenticated user
+router.get('/status/:orderId', authenticate, async (req: any, res) => {
   try {
     const { orderId } = req.params;
 
