@@ -41,6 +41,12 @@ jobs:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
+      - name: Newsletter race-condition test
+        run: npx vitest run src/test/newsletter-race.test.ts src/test/newsletter-window-boundaries.test.ts
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+
       - name: Install puppeteer for smoke test
         run: npm install --no-save puppeteer
 
@@ -59,6 +65,18 @@ jobs:
       - name: Playwright — newsletter visual regression
         id: pw_visual
         run: E2E_BASE_URL=http://localhost:4173 npx playwright test e2e/newsletter-visual.spec.ts
+
+      - name: Playwright — newsletter inline error states
+        id: pw_inline
+        run: E2E_BASE_URL=http://localhost:4173 npx playwright test e2e/newsletter-inline-errors.spec.ts
+
+      - name: Playwright — admin newsletter access control
+        id: pw_admin_access
+        run: E2E_BASE_URL=http://localhost:4173 npx playwright test e2e/admin-newsletter-access.spec.ts
+
+      - name: Playwright — admin newsletter CSV export
+        id: pw_admin_export
+        run: E2E_BASE_URL=http://localhost:4173 npx playwright test e2e/admin-newsletter-export.spec.ts
 
       - name: Upload Playwright report (on failure)
         if: failure()
