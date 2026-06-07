@@ -27,13 +27,25 @@ const stubFunction = async (
 };
 
 const tagNavigation = (page: import("@playwright/test").Page) => {
-  // If a full navigation happens, this flag flips — we assert it stays true.
+  // If a full navigation happens, this flag is wiped — we assert it stays true.
   return page.evaluate(() => {
     (window as unknown as { __noReload: boolean }).__noReload = true;
+    window.addEventListener("beforeunload", () => {
+      (window as unknown as { __reloaded: boolean }).__reloaded = true;
+    });
   });
 };
 const assertNoReload = (page: import("@playwright/test").Page) =>
   page.evaluate(() => (window as unknown as { __noReload?: boolean }).__noReload === true);
+
+const assertAccessibleAlert = async (
+  alert: ReturnType<import("@playwright/test").Page["getByTestId"]>,
+  expectedText: RegExp,
+) => {
+  await expect(alert).toBeVisible();
+  await expect(alert).toHaveAttribute("role", "alert");
+  await expect(alert).toContainText(expectedText);
+};
 
 test.describe("Newsletter inline error states", () => {
   test.beforeEach(async ({ context }) => {
@@ -51,7 +63,10 @@ test.describe("Newsletter inline error states", () => {
       if (input) input.type = "text";
     });
     await page.getByTestId("newsletter-submit").click();
-    await expect(page.getByTestId("newsletter-error-invalid_email")).toBeVisible();
+    await assertAccessibleAlert(
+      page.getByTestId("newsletter-error-invalid_email"),
+      /valid email/i,
+    );
     expect(await assertNoReload(page)).toBe(true);
   });
 
@@ -68,9 +83,10 @@ test.describe("Newsletter inline error states", () => {
     await page.getByTestId("newsletter-email").fill("user@example.com");
     await page.getByTestId("newsletter-submit").click();
     const alert = page.getByTestId("newsletter-error-rate_limited");
-    await expect(alert).toBeVisible();
-    await expect(alert).toContainText(/42s/);
+    await assertAccessibleAlert(alert, /42s/);
     expect(await assertNoReload(page)).toBe(true);
+    // URL must not have navigated away from the home route.
+    expect(new URL(page.url()).pathname).toBe("/");
   });
 
   test("shows captcha_failed error from server response", async ({ page }) => {
@@ -85,8 +101,12 @@ test.describe("Newsletter inline error states", () => {
     await tagNavigation(page);
     await page.getByTestId("newsletter-email").fill("user@example.com");
     await page.getByTestId("newsletter-submit").click();
-    await expect(page.getByTestId("newsletter-error-captcha_failed")).toBeVisible();
+    await assertAccessibleAlert(
+      page.getByTestId("newsletter-error-captcha_failed"),
+      /verification|captcha/i,
+    );
     expect(await assertNoReload(page)).toBe(true);
+    expect(new URL(page.url()).pathname).toBe("/");
   });
 
   test("shows cooldown_active error from client-side throttle", async ({ page, context }) => {
@@ -102,7 +122,11 @@ test.describe("Newsletter inline error states", () => {
     await tagNavigation(page);
     await page.getByTestId("newsletter-email").fill("user@example.com");
     await page.getByTestId("newsletter-submit").click();
-    await expect(page.getByTestId("newsletter-error-cooldown_active")).toBeVisible();
+    await assertAccessibleAlert(
+      page.getByTestId("newsletter-error-cooldown_active"),
+      /wait|cooldown|moment/i,
+    );
     expect(await assertNoReload(page)).toBe(true);
+    expect(new URL(page.url()).pathname).toBe("/");
   });
 });
