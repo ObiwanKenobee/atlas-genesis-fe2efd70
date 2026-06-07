@@ -58,6 +58,7 @@ import AdminCommandCenter from './pages/admin/AdminCommandCenter';
 import FeatureFlagsAdmin from './pages/admin/FeatureFlags';
 import NewsletterAttempts from './pages/admin/NewsletterAttempts';
 import AdminProtectedRoute from './components/AdminProtectedRoute.tsx';
+import AdminRoleRoute from './components/AdminRoleRoute';
 import Careers from './pages/Careers';
 import NotFound from './pages/NotFound';
 import SegmentSelection from './pages/SegmentSelection';
@@ -201,9 +202,9 @@ const App = () => {
                   </AdminProtectedRoute>
                 } />
                 <Route path="/admin/newsletter" element={
-                  <AdminProtectedRoute>
+                  <AdminRoleRoute>
                     <NewsletterAttempts />
-                  </AdminProtectedRoute>
+                  </AdminRoleRoute>
                 } />
               <Route path="/segment-selection" element={<SegmentSelection />} />
               <Route path="/onboarding" element={<Onboarding />} />

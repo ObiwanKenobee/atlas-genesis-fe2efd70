@@ -3,8 +3,9 @@ import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import Layout from "@/components/Layout";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Mail, ShieldAlert, Clock, AlertTriangle } from "lucide-react";
+import { Mail, ShieldAlert, Clock, AlertTriangle, Download } from "lucide-react";
 
 type Attempt = {
   id: string;
@@ -75,6 +76,32 @@ const NewsletterAttempts = () => {
     return { total: rows.length, succeeded, captcha, rateLimited, other };
   }, [rows]);
 
+  const exportCsv = () => {
+    const header = ["created_at", "email_hash", "ip_hash", "succeeded", "reason"];
+    const escape = (v: string) => `"${v.replace(/"/g, '""')}"`;
+    const lines = [header.join(",")];
+    for (const r of rows) {
+      lines.push(
+        [
+          escape(new Date(r.created_at).toISOString()),
+          escape(hashId(r.email)),
+          escape(hashId(r.ip_address)),
+          escape(r.succeeded === null ? "" : String(r.succeeded)),
+          escape(r.reason ?? ""),
+        ].join(","),
+      );
+    }
+    const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `newsletter-attempts-${windowKey}-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-6 py-10 space-y-8">
@@ -89,15 +116,29 @@ const NewsletterAttempts = () => {
               Attempts, captcha failures and rate-limited events. Email and IP shown as hashed identifiers.
             </p>
           </div>
-          <div className="w-full md:w-48">
-            <Select value={windowKey} onValueChange={(v) => setWindowKey(v as WindowKey)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1h">Last hour</SelectItem>
-                <SelectItem value="24h">Last 24 hours</SelectItem>
-                <SelectItem value="7d">Last 7 days</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="flex items-center gap-2 w-full md:w-auto">
+            <div className="flex-1 md:w-48">
+              <Select value={windowKey} onValueChange={(v) => setWindowKey(v as WindowKey)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1h">Last hour</SelectItem>
+                  <SelectItem value="24h">Last 24 hours</SelectItem>
+                  <SelectItem value="7d">Last 7 days</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={exportCsv}
+              disabled={loading || rows.length === 0}
+              data-testid="newsletter-export-csv"
+              className="gap-2"
+            >
+              <Download className="w-4 h-4" />
+              Export CSV
+            </Button>
           </div>
         </motion.div>
 
