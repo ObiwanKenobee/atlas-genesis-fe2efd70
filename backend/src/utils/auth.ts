@@ -418,9 +418,14 @@ export const verifyMFAForLogin = async (userId: string, token: string): Promise<
 
   // Try backup codes
   if (mfa_backup_codes && await verifyBackupCode(mfa_backup_codes, token)) {
-    // Remove used backup code
-    const updatedCodes = mfa_backup_codes.filter(async (code: string) => !(await bcrypt.compare(token, code)));
-    await query('UPDATE users SET mfa_backup_codes = $1 WHERE id = $2', [updatedCodes, userId]);
+    // Remove the used backup code (async filter — cannot use Array.filter with async predicates)
+    const remaining: string[] = [];
+    for (const hashed of mfa_backup_codes) {
+      if (!(await bcrypt.compare(token, hashed))) {
+        remaining.push(hashed);
+      }
+    }
+    await query('UPDATE users SET mfa_backup_codes = $1 WHERE id = $2', [remaining, userId]);
     return true;
   }
 

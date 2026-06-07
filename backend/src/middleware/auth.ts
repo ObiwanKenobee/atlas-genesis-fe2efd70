@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { verifySecureAccessToken, checkPermission, checkTenantAccess, User, getCurrentTokenVersion, generateDeviceFingerprint } from '../utils/auth';
+import { verifySecureAccessToken, checkPermission, checkTenantAccess, User, getCurrentTokenVersion, generateDeviceFingerprint, verifyMFAForLogin } from '../utils/auth';
 import { query } from '../db';
 import { logSecurityEvent } from '../utils/logger';
 
@@ -172,7 +172,7 @@ export const requireEmailVerification = (req: AuthenticatedRequest, res: Respons
 };
 
 // MFA verification middleware
-export const requireMFA = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+export const requireMFA = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   if (!req.user) {
     return res.status(401).json({ code: 'unauthorized', message: 'Authentication required' });
   }
@@ -188,8 +188,7 @@ export const requireMFA = (req: AuthenticatedRequest, res: Response, next: NextF
     }
 
     // Verify MFA token
-    const { verifyMFAForLogin } = require('../utils/auth');
-    const isValidMFA = verifyMFAForLogin(req.user.id, mfaToken);
+    const isValidMFA = await verifyMFAForLogin(req.user.id, mfaToken);
     if (!isValidMFA) {
       logSecurityEvent('mfa_verification_failed', req.user.id, {
         path: req.path,

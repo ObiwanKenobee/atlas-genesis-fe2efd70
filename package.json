@@ -1,5 +1,5 @@
 {
-  "name": "vite_react_shadcn_ts",
+  "name": "atlas-sanctum-fe",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,6 +10,7 @@
     "dev:full": "concurrently \"npm run dev\" \"npm run dev:backend\"",
     "dev:backend": "cd scaffold-mvp/backend && npm run dev",
     "build": "vite build",
+    "build:prod": "vite build --mode production",
     "deploy:vercel": "npx --yes vercel --prod --confirm",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
@@ -30,10 +31,12 @@
   },
   "prepare": "husky install",
   "lint-staged": {
-    "src/**/*.{js,jsx,ts,tsx,json,css,md}": [
-      "prettier --write",
+    "src/**/*.{ts,tsx}": [
       "eslint --fix",
-      "git add"
+      "prettier --write"
+    ],
+    "src/**/*.{json,css,md}": [
+      "prettier --write"
     ]
   },
   "dependencies": {
@@ -163,7 +166,7 @@
   },
   "pnpm": {
     "overrides": {
-      "vite": "6.3.5"
+      "vite": "^5.4.19"
     }
   }
 }

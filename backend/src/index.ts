@@ -385,8 +385,16 @@ app.get('/health', async (req, res) => {
   }
 });
 
-// Expose Prometheus metrics
-app.get('/metrics', metrics.metricsEndpoint);
+// Expose Prometheus metrics — protected by internal token or IP allowlist
+const metricsAllowedIPs = (process.env.METRICS_ALLOWED_IPS || '127.0.0.1,::1').split(',').map(s => s.trim());
+const metricsToken = process.env.METRICS_AUTH_TOKEN;
+app.get('/metrics', (req, res, next) => {
+  const clientIP = req.ip || '';
+  const authHeader = req.headers.authorization;
+  if (metricsToken && authHeader === `Bearer ${metricsToken}`) return next();
+  if (metricsAllowedIPs.includes(clientIP)) return next();
+  return res.status(403).json({ error: 'Forbidden' });
+}, metrics.metricsEndpoint);
 
 // Expose feature flags for frontend/runtime (read-only, served from cache)
 app.get('/api/flags', (req: Request, res: Response) => {

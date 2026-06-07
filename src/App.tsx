@@ -109,6 +109,7 @@ import {
   Certifications
 } from './pages/InfrastructurePages';
 import Prototype from './pages/Prototype';
+import MythicArchitect from './pages/MythicArchitect';
 import { OnboardingProvider } from './hooks/useOnboarding.tsx';
 
 const SimplePage = ({ title, description }: { title: string; description: string }) => (
@@ -137,6 +138,7 @@ const App = () => {
           <AnimatePresence mode="wait">
             <Routes>
               <Route path="/prototype" element={<Prototype />} />
+              <Route path="/mythic-architect" element={<MythicArchitect />} />
               <Route path="/" element={<Index />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/auth" element={<Auth />} />

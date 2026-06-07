@@ -1,22 +1,21 @@
 # Build stage
-FROM node:18-alpine as build
+FROM node:20-alpine AS build
 
 WORKDIR /app
 
-# Copy package files
+# Install deps separately so this layer is cached unless package.json changes
 COPY package*.json ./
+RUN npm ci --ignore-scripts
 
-# Install dependencies
-RUN npm ci
-
-# Copy source code
+# Copy source and build
 COPY . .
-
-# Build the application
 RUN npm run build
 
 # Production stage
-FROM nginx:alpine
+FROM nginx:1.27-alpine AS production
+
+# Run as non-root
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 # Copy built assets from build stage
 COPY --from=build /app/dist /usr/share/nginx/html
@@ -24,8 +23,11 @@ COPY --from=build /app/dist /usr/share/nginx/html
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
 
-# Expose port
-EXPOSE 80
+# Ensure nginx can write its temp/pid files as non-root
+RUN chown -R appuser:appgroup /var/cache/nginx /var/run /var/log/nginx /usr/share/nginx/html
 
-# Start nginx
+USER appuser
+
+EXPOSE 8080
+
 CMD ["nginx", "-g", "daemon off;"]

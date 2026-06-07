@@ -44,27 +44,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [tokens, setTokens] = useState<Tokens | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Load saved user and tokens from localStorage on mount
+  // Load saved user profile from localStorage on mount; token lives in memory only
   useEffect(() => {
     const savedUser = localStorage.getItem('auth_user');
-    const savedTokens = localStorage.getItem('auth_tokens');
     
-    if (savedUser && savedTokens) {
+    if (savedUser) {
       try {
         setUser(JSON.parse(savedUser));
-        setTokens(JSON.parse(savedTokens));
-        apiService.setToken(JSON.parse(savedTokens).accessToken);
+        // No token restore — access token is in-memory only.
+        // The app will trigger a silent refresh via the httpOnly refresh cookie.
       } catch (error) {
-        console.error('Failed to parse saved auth data:', error);
+        console.error('Failed to parse saved user data:', error);
         localStorage.removeItem('auth_user');
-        localStorage.removeItem('auth_tokens');
       }
     }
     
     setLoading(false);
   }, []);
 
-  const signUp = async (email: string, password: string, displayName?: string, role?: string): Promise<{ error: Error | null }> => {
+  const signUp = async (email: string, password: string, displayName?: string, _role?: string): Promise<{ error: Error | null }> => {
     try {
       const response = await apiService.auth.signup(email, password, displayName);
       
@@ -80,47 +78,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signIn = async (email: string, password: string): Promise<{ error: Error | null }> => {
     try {
-      // Check if this is a demo login
-      if (email.toLowerCase().includes('demo') && password === 'demo123') {
-        const demoUser = {
-          id: `demo-${Date.now()}`,
-          email: email,
-          displayName: email.split('@')[0],
-          role: email.includes('admin') ? 'admin' : 'user',
-          tenantId: 'demo-tenant',
-          emailVerified: true,
-          mfaEnabled: false,
-          lastLogin: new Date().toISOString()
-        };
-        
-        const demoTokens = {
-          accessToken: `demo-access-token-${Date.now()}`,
-          refreshToken: `demo-refresh-token-${Date.now()}`,
-          expiresIn: 3600 // 1 hour
-        };
-        
-        setUser(demoUser);
-        setTokens(demoTokens);
-        localStorage.setItem('auth_user', JSON.stringify(demoUser));
-        localStorage.setItem('auth_tokens', JSON.stringify(demoTokens));
-        apiService.setToken(demoTokens.accessToken);
-        
-        return { error: null };
-      }
-
-      // Regular login
       const response = await apiService.auth.login(email, password);
       
       if (response.error) {
         return { error: new Error(response.error) };
       }
       
-      // Save user and tokens
       if (response.data) {
         setUser(response.data.user);
+        // Store only access token in memory; refresh token should be httpOnly cookie
         setTokens(response.data.tokens);
+        // Persist user profile (non-sensitive) for UX continuity across page reloads
         localStorage.setItem('auth_user', JSON.stringify(response.data.user));
-        localStorage.setItem('auth_tokens', JSON.stringify(response.data.tokens));
         apiService.setToken(response.data.tokens.accessToken);
       }
       
@@ -139,7 +108,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
     setTokens(null);
     localStorage.removeItem('auth_user');
-    localStorage.removeItem('auth_tokens');
     apiService.setToken('');
   };
 

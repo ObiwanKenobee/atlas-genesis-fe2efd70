@@ -326,6 +326,17 @@ interface RequestCacheEntry {
   count: number;
 }
 
+// Module-level bounded cache for single-instance replay prevention
+const MAX_CACHE_SIZE = 10_000;
+const memoryReplayCache = new Map<string, RequestCacheEntry>();
+const memoryCacheCleanupInterval = setInterval(() => {
+  const now = Date.now();
+  for (const [key, value] of memoryReplayCache.entries()) {
+    if (now - value.timestamp > REQUEST_CACHE_TTL) memoryReplayCache.delete(key);
+  }
+}, REQUEST_CACHE_TTL / 2);
+if (memoryCacheCleanupInterval.unref) memoryCacheCleanupInterval.unref();
+
 export const preventReplayAttacks = async (req: Request, res: Response, next: NextFunction) => {
   // Only apply to state-changing operations
   if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
@@ -382,11 +393,8 @@ export const preventReplayAttacks = async (req: Request, res: Response, next: Ne
         await redisClient.setex(signatureHash, Math.ceil(REQUEST_CACHE_TTL / 1000), JSON.stringify({ timestamp: now, count: 1 }));
       }
     } else {
-      // Fallback to memory cache for single-instance deployment
-      const memoryCache = (global as any).__requestCache || new Map();
-      (global as any).__requestCache = memoryCache;
-      
-      const cached = memoryCache.get(signatureHash);
+      // Fallback to module-level bounded cache for single-instance deployment
+      const cached = memoryReplayCache.get(signatureHash);
       
       if (cached) {
         if (now - cached.timestamp < REQUEST_CACHE_TTL) {
@@ -409,23 +417,15 @@ export const preventReplayAttacks = async (req: Request, res: Response, next: Ne
             });
           }
         } else {
-          // Reset if window expired
-          memoryCache.set(signatureHash, { timestamp: now, count: 1 });
+          memoryReplayCache.set(signatureHash, { timestamp: now, count: 1 });
         }
       } else {
-        memoryCache.set(signatureHash, { timestamp: now, count: 1 });
-      }
-      
-      // Periodic cleanup of memory cache
-      if (!memoryCache.cleanupInterval) {
-        memoryCache.cleanupInterval = setInterval(() => {
-          const cleanupNow = Date.now();
-          for (const [key, value] of memoryCache.entries()) {
-            if (cleanupNow - (value as RequestCacheEntry).timestamp > REQUEST_CACHE_TTL) {
-              memoryCache.delete(key);
-            }
-          }
-        }, REQUEST_CACHE_TTL / 2);
+        if (memoryReplayCache.size >= MAX_CACHE_SIZE) {
+          // Evict oldest entry to stay bounded
+          const firstKey = memoryReplayCache.keys().next().value;
+          if (firstKey) memoryReplayCache.delete(firstKey);
+        }
+        memoryReplayCache.set(signatureHash, { timestamp: now, count: 1 });
       }
     }
   } catch (error) {

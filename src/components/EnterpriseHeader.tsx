@@ -140,6 +140,13 @@ const EnterpriseHeader = () => {
                 description: "Probabilistic civilization infrastructure",
                 badge: "New",
               },
+              {
+                name: "Mythic Architect",
+                href: "/mythic-architect",
+                icon: <Layers className="w-5 h-5" />,
+                description: "1,000-year civilization blueprint",
+                badge: "New",
+              },
           ],
         },
         {

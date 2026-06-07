@@ -5,13 +5,17 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist"] },
+  { ignores: ["dist", "src/layers", "src/architecture", "src/sanctum-ai", "src/sanctum", "src/crypto"] },
   {
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    extends: [js.configs.recommended, ...tseslint.configs.recommendedTypeChecked],
     files: ["**/*.{ts,tsx}"],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
+      parserOptions: {
+        project: ["./tsconfig.app.json"],
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
     plugins: {
       "react-hooks": reactHooks,
@@ -20,9 +24,18 @@ export default tseslint.config(
     rules: {
       ...reactHooks.configs.recommended.rules,
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
-      "@typescript-eslint/no-unused-vars": "off",
-      // Temporarily relax explicit any checks to reduce noise during bulk fixes.
-      "@typescript-eslint/no-explicit-any": "off",
+      // Unused vars: warn on locals, error on args left in function signatures
+      "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
+      // Allow explicit any only when truly unavoidable (flag it as a warning, not silent)
+      "@typescript-eslint/no-explicit-any": "warn",
+      // Prevent floating promises (common async bug source)
+      "@typescript-eslint/no-floating-promises": "error",
+      // Catch misused promises in conditionals / event handlers
+      "@typescript-eslint/no-misused-promises": ["error", { checksVoidReturn: false }],
+      // Enforce consistent type imports for tree-shaking
+      "@typescript-eslint/consistent-type-imports": ["warn", { prefer: "type-imports" }],
+      // No non-null assertions that hide nullability bugs
+      "@typescript-eslint/no-non-null-assertion": "warn",
     },
   },
 );
