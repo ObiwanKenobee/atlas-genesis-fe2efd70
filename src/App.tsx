@@ -58,7 +58,6 @@ import AdminCommandCenter from './pages/admin/AdminCommandCenter';
 import FeatureFlagsAdmin from './pages/admin/FeatureFlags';
 import NewsletterAttempts from './pages/admin/NewsletterAttempts';
 import AdminProtectedRoute from './components/AdminProtectedRoute.tsx';
-import AdminRoleRoute from './components/AdminRoleRoute';
 import Careers from './pages/Careers';
 import NotFound from './pages/NotFound';
 import SegmentSelection from './pages/SegmentSelection';
@@ -139,8 +138,7 @@ const App = () => {
           <AnimatePresence mode="wait">
             <Routes>
               <Route path="/prototype" element={<Prototype />} />
-             /*
- <Route path="/mythic-architect" element={<MythicArchitect />} /> */
+              <Route path="/mythic-architect" element={<MythicArchitect />} />
               <Route path="/" element={<Index />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/auth" element={<Auth />} />
@@ -203,9 +201,9 @@ const App = () => {
                   </AdminProtectedRoute>
                 } />
                 <Route path="/admin/newsletter" element={
-                  <AdminRoleRoute>
+                  <AdminProtectedRoute>
                     <NewsletterAttempts />
-                  </AdminRoleRoute>
+                  </AdminProtectedRoute>
                 } />
               <Route path="/segment-selection" element={<SegmentSelection />} />
               <Route path="/onboarding" element={<Onboarding />} />
