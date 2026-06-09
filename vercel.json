@@ -1,7 +1,9 @@
 {
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/(.*)", "destination": "/" }
   ],
+  "cleanUrls": true,
+  "trailingSlash": false,
   "headers": [
     {
       "source": "/assets/(.*)",
@@ -21,7 +23,5 @@
         { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload" }
       ]
     }
-  ],
-  "cleanUrls": true,
-  "trailingSlash": false
+  ]
 }
