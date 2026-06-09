@@ -139,7 +139,8 @@ const App = () => {
           <AnimatePresence mode="wait">
             <Routes>
               <Route path="/prototype" element={<Prototype />} />
-              <Route path="/mythic-architect" element={<MythicArchitect />} />
+             /*
+ <Route path="/mythic-architect" element={<MythicArchitect />} /> */
               <Route path="/" element={<Index />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/auth" element={<Auth />} />
