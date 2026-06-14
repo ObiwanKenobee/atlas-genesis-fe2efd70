@@ -116,29 +116,27 @@ export class HashService implements IHashService {
   }
 
   private mapAlgorithm(algorithm: HashAlgorithm): string {
-    const mapping: Record<HashAlgorithm, string> = {
+    // Web Crypto API natively supports these algorithms
+    const nativeAlgorithms: Partial<Record<HashAlgorithm, string>> = {
       'SHA-256': 'SHA-256',
       'SHA-384': 'SHA-384',
       'SHA-512': 'SHA-512',
-      'SHA3-256': 'SHA-256',
-      'SHA3-384': 'SHA-384',
-      'SHA3-512': 'SHA-512',
-      'BLAKE2b': 'SHA-256',
-      'BLAKE2s': 'SHA-256',
-      'Keccak256': 'SHA-256',
-      'Poseidon': 'SHA-256',
-      'MiMC': 'SHA-256',
-      'Rescue': 'SHA-256',
-      'Pedersen': 'SHA-256',
     };
-    
-    return mapping[algorithm] || 'SHA-256';
+    // ZK-friendly and non-native algorithms require a WASM/native library.
+    // Mapping them silently to SHA-256 would produce incorrect hashes.
+    const unsupported: HashAlgorithm[] = [
+      'SHA3-256', 'SHA3-384', 'SHA3-512',
+      'BLAKE2b', 'BLAKE2s', 'Keccak256',
+      'Poseidon', 'MiMC', 'Rescue', 'Pedersen',
+    ];
+    if (unsupported.includes(algorithm)) {
+      throw new Error(
+        `Algorithm '${algorithm}' requires a native/WASM implementation and is not supported by the Web Crypto API. ` +
+        `Use a dedicated library (e.g. noble-hashes for BLAKE2/Keccak, circomlibjs for Poseidon).`
+      );
+    }
+    return nativeAlgorithms[algorithm] ?? 'SHA-256';
   }
-}
-
-// ============================================================================
-// HMAC SERVICE
-// ============================================================================
 
 export interface IHmacService {
   generateKey(algorithm: HashAlgorithm): Promise<Result<string, AtlasError>>;
@@ -216,23 +214,22 @@ export class HmacService implements IHmacService {
   }
 
   private mapAlgorithm(algorithm: HashAlgorithm): string {
-    const mapping: Record<HashAlgorithm, string> = {
+    const nativeAlgorithms: Partial<Record<HashAlgorithm, string>> = {
       'SHA-256': 'SHA-256',
       'SHA-384': 'SHA-384',
       'SHA-512': 'SHA-512',
-      'SHA3-256': 'SHA-256',
-      'SHA3-384': 'SHA-384',
-      'SHA3-512': 'SHA-512',
-      'BLAKE2b': 'SHA-256',
-      'BLAKE2s': 'SHA-256',
-      'Keccak256': 'SHA-256',
-      'Poseidon': 'SHA-256',
-      'MiMC': 'SHA-256',
-      'Rescue': 'SHA-256',
-      'Pedersen': 'SHA-256',
     };
-
-    return mapping[algorithm] || 'SHA-256';
+    const unsupported: HashAlgorithm[] = [
+      'SHA3-256', 'SHA3-384', 'SHA3-512',
+      'BLAKE2b', 'BLAKE2s', 'Keccak256',
+      'Poseidon', 'MiMC', 'Rescue', 'Pedersen',
+    ];
+    if (unsupported.includes(algorithm)) {
+      throw new Error(
+        `HMAC algorithm '${algorithm}' is not supported by Web Crypto API. Use a WASM-backed library.`
+      );
+    }
+    return nativeAlgorithms[algorithm] ?? 'SHA-256';
   }
 }
 

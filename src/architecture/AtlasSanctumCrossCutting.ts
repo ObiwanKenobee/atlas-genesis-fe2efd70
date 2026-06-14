@@ -305,7 +305,7 @@ export class RetryPolicy {
 // RESULT TYPE UTILITIES
 // ============================================================================
 
-export async function mapResult<T, U>(
+export function mapResult<T, U>(
   result: Result<T>,
   mapper: (value: T) => U
 ): Result<U> {
@@ -315,7 +315,7 @@ export async function mapResult<T, U>(
   return fail(result.error);
 }
 
-export async function flatMapResult<T, U>(
+export function flatMapResult<T, U>(
   result: Result<T>,
   mapper: (value: T) => Result<U>
 ): Result<U> {

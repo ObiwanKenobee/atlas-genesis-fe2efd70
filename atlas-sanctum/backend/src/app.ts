@@ -13,6 +13,8 @@ import {
 } from './middleware/integrationGateway';
 import type { AIConnector } from './connectors/AIConnector';
 import type { ObservabilityConnector } from './connectors/ObservabilityConnector';
+import type { BlockchainConnector } from './connectors/BlockchainConnector';
+import { wireIntegrationLayer } from './middleware/integrationWiring';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -35,6 +37,13 @@ const eventBus = buildEventBus();
 const obs = registry.get<ObservabilityConnector>('observability-connector');
 const ai = registry.get<AIConnector>('ai-connector');
 const orchestrator = ai ? new AgentOrchestrator(ai, eventBus, obs) : null;
+const blockchain = registry.get<BlockchainConnector>('blockchain-connector');
+
+// Wire the Trust Pipeline — connects trust-engine, oracle staking, covenant engine,
+// blockchain anchoring, agent dispatch, and event bus into one turning wheel.
+const integrationLayer = orchestrator && blockchain
+  ? wireIntegrationLayer({ eventBus, orchestrator, blockchain })
+  : null;
 
 // Middleware
 app.use(helmet());
@@ -111,6 +120,11 @@ app.get('/v1/integration/events/dead-letter', (_req, res) => {
   res.json({ items: eventBus.getDeadLetterQueue() });
 });
 
+// Trust Pipeline routes: /trust/*, /oracle/*, /governance/review, /health/pipeline
+if (integrationLayer) {
+  app.use('/api/v2', integrationLayer.router);
+}
+
 // API routes
 app.use('/', createAtlasRoutes(pool));
 
@@ -144,6 +158,15 @@ async function start() {
       console.log(`Atlas Sanctum API running on port ${PORT}`);
       console.log(`Health check: http://localhost:${PORT}/health`);
       console.log(`API base: http://localhost:${PORT}/v1`);
+      console.log(`Trust Pipeline: ${integrationLayer ? 'ACTIVE' : 'OFFLINE (missing AI or blockchain connector)'}`);
+      if (integrationLayer) {
+        console.log(`  POST /api/v2/trust/ingest        — evidence → trust score → chain anchor`);
+        console.log(`  POST /api/v2/trust/preview       — trust score preview (no side effects)`);
+        console.log(`  POST /api/v2/governance/review   — constitutional constraint check`);
+        console.log(`  POST /api/v2/oracle/register     — register oracle with stake`);
+        console.log(`  POST /api/v2/oracle/:id/slash    — slash oracle for fraud`);
+        console.log(`  GET  /api/v2/oracle/stakes       — list all oracle stakes`);
+      }
     });
   } catch (error) {
     console.error('Failed to start server:', error);

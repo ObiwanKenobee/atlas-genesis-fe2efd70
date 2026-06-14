@@ -18,7 +18,6 @@ import {
   Briefcase,
   GraduationCap,
   TreePine,
-  Factory,
   TrendingUp,
   Network,
   Heart,
@@ -26,8 +25,6 @@ import {
   DollarSign,
   FileText,
   BookOpen,
-  Lock,
-  Award,
   Layout,
   UsersRound,
   Crown,
@@ -41,6 +38,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CheckoutModal, PaymentStatus, SubscriptionStatus } from "@/components/pricing";
+import type { PlanDetails } from "@/components/pricing/CheckoutModal";
 import { useSubscription } from "@/hooks/useSubscription";
 
 // Subscription Plans
@@ -337,55 +335,46 @@ const FEATURES = [
 export default function Pricing() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [paymentMethod, setPaymentMethod] = useState<'fiat' | 'crypto'>('fiat');
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('yearly');
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const { activeSubscription, invoices, isLoadingSubscription, isLoadingInvoices } = useSubscription();
-  const [selectedPlan, setSelectedPlan] = useState<{
-    id: string;
-    name: string;
-    price: number;
-    billingPeriod: 'monthly' | 'yearly';
-    features: string[];
-  } | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<PlanDetails | null>(null);
 
   const handleSelectPlan = (plan: typeof SUBSCRIPTION_PLANS[0]) => {
-    if (!user) {
-      navigate("/auth");
-      return;
-    }
-    
     setSelectedPlan({
       id: plan.id,
       name: plan.name,
       price: billingPeriod === 'monthly' ? plan.monthlyPrice : plan.yearlyPrice,
       billingPeriod,
       features: plan.features,
+      segmentType: 'subscription',
     });
     setCheckoutOpen(true);
   };
 
-  const handleSelectSegment = (segmentId: string) => {
-    if (!user) {
-      navigate("/auth");
-      return;
-    }
-    // Navigate to relevant section based on segment
-    if (segmentId === "infrastructure" || segmentId === "governments") {
-      navigate("/outreach");
-    } else if (segmentId === "multi-sided-market" || segmentId === "enterprise-intelligence" || segmentId === "buyers" || segmentId === "enterprises") {
-      navigate("/marketplace");
-    } else if (segmentId === "outcome-based" || segmentId === "risk-reduction" || segmentId === "investors") {
-      navigate("/regenerative-finance");
-    } else if (segmentId === "capital-markets" || segmentId === "defi") {
-      navigate("/defi");
-    } else if (segmentId === "commons-stewardship" || segmentId === "intellectual-infrastructure" || segmentId === "producers" || segmentId === "communities" || segmentId === "ngos") {
-      navigate("/community");
-    } else if (segmentId === "cultural-institution") {
-      navigate("/education");
-    } else {
-      navigate("/marketplace");
-    }
+  const FREE_SEGMENTS = new Set(['commons-stewardship', 'intellectual-infrastructure', 'producers', 'communities', 'ngos', 'cultural-institution']);
+  const ENTERPRISE_SEGMENTS = new Set(['infrastructure', 'governments', 'enterprise-intelligence', 'enterprises', 'risk-reduction']);
+
+  const handleSelectSegment = (segment: typeof BUSINESS_MODEL_SEGMENTS[0] | typeof CUSTOMER_SEGMENTS[0], name: string, priceRange: string) => {
+    const isFree = FREE_SEGMENTS.has(segment.id) || priceRange === '$0' || priceRange.toLowerCase().includes('free');
+    const isEnterprise = ENTERPRISE_SEGMENTS.has(segment.id);
+    const isTransaction = segment.id === 'multi-sided-market' || segment.id === 'buyers' || segment.id === 'capital-markets' || segment.id === 'defi' || segment.id === 'investors';
+
+    const priceNum = (() => {
+      if (isFree) return 0;
+      const match = priceRange.match(/\$(\d[\d,]*)/);
+      return match ? parseInt(match[1].replace(',', '')) : 0;
+    })();
+
+    setSelectedPlan({
+      id: segment.id,
+      name,
+      price: priceNum,
+      billingPeriod: isEnterprise ? 'contract' : isTransaction ? 'transaction' : 'one-time',
+      features: [],
+      segmentType: isFree ? 'free' : isEnterprise ? 'enterprise' : isTransaction ? 'transaction' : 'subscription',
+    });
+    setCheckoutOpen(true);
   };
 
   return (
@@ -577,14 +566,11 @@ export default function Pricing() {
                           </p>
                         </div>
                         <Button
-                          onClick={() => handleSelectSegment(segment.id)}
-                          className={`w-full ${
-                            segment.priceRange.includes("Free") || segment.priceRange.includes("Minimal")
-                              ? "bg-primary hover:bg-primary/90"
-                              : "bg-muted hover:bg-muted/80 text-foreground"
-                          }`}
+                          onClick={() => handleSelectSegment(segment, segment.name, segment.priceRange)}
+                          className="w-full"
+                          variant={segment.priceRange.includes('Free') || segment.priceRange.includes('Minimal') ? 'default' : 'outline'}
                         >
-                          Learn More
+                          {segment.priceRange === '$0' || segment.priceRange.includes('Free') || segment.priceRange.includes('Minimal') ? 'Apply Free Access' : 'Get Started'}
                           <ArrowRight className="w-4 h-4 ml-2" />
                         </Button>
                       </CardContent>
@@ -651,14 +637,11 @@ export default function Pricing() {
                           </p>
                         </div>
                         <Button
-                          onClick={() => handleSelectSegment(segment.id)}
-                          className={`w-full ${
-                            segment.priceRange === "$0" || segment.priceRange.includes("Free")
-                              ? "bg-primary hover:bg-primary/90"
-                              : "bg-muted hover:bg-muted/80 text-foreground"
-                          }`}
+                          onClick={() => handleSelectSegment(segment, segment.name, segment.priceRange)}
+                          className="w-full"
+                          variant={segment.priceRange === '$0' || segment.priceRange.includes('Free') ? 'default' : 'outline'}
                         >
-                          Learn More
+                          {segment.priceRange === '$0' || segment.priceRange.includes('Free') ? 'Apply Free Access' : 'Get Started'}
                           <ArrowRight className="w-4 h-4 ml-2" />
                         </Button>
                       </CardContent>
@@ -675,102 +658,60 @@ export default function Pricing() {
       <section className="py-16 bg-muted/20 border-y border-border/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
-            <h2 className="text-2xl font-semibold text-foreground mb-3">
-              Secure Payment Options
-            </h2>
-            <p className="text-muted-foreground">
-              We accept multiple payment methods for your convenience
-            </p>
+            <h2 className="text-2xl font-semibold text-foreground mb-2">Global Payment Infrastructure</h2>
+            <p className="text-muted-foreground">From African mobile money to crypto rails — pay your way, anywhere on Earth</p>
           </div>
-          
-          {/* Payment Method Toggle */}
-          <div className="flex items-center justify-center gap-4 mb-12">
-            <Button
-              variant={paymentMethod === 'fiat' ? 'default' : 'outline'}
-              onClick={() => setPaymentMethod('fiat')}
-              className="flex items-center gap-2"
-            >
-              <CreditCard className="w-4 h-4" />
-              Fiat Payments
-            </Button>
-            <Button
-              variant={paymentMethod === 'crypto' ? 'default' : 'outline'}
-              onClick={() => setPaymentMethod('crypto')}
-              className="flex items-center gap-2"
-            >
-              <Network className="w-4 h-4" />
-              Crypto Payments
-            </Button>
-          </div>
-
-          {/* Payment Methods Grid */}
-          <div className="flex flex-wrap items-center justify-center gap-8">
-            {paymentMethod === 'fiat' ? (
-              <>
-                <div className="flex items-center gap-3 px-6 py-4 bg-card rounded-xl border border-border/50">
-                  <div className="w-10 h-10 rounded-lg bg-[#003087] flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">PP</span>
-                  </div>
-                  <div>
-                    <p className="font-medium text-foreground">PayPal</p>
-                    <p className="text-xs text-muted-foreground">Fast & secure</p>
-                  </div>
+          <div className="grid gap-8 md:grid-cols-3">
+            {[
+              {
+                label: '🌍 African Fintech', color: 'from-green-500/10 to-emerald-500/5', border: 'border-green-500/20',
+                methods: [
+                  { name: 'Paystack', tag: 'NG · GH · KE · ZA', sym: 'PS', bg: '#00C3F7' },
+                  { name: 'Flutterwave', tag: '30+ countries', sym: 'FW', bg: '#F5A623' },
+                  { name: 'M-Pesa', tag: 'KE · TZ · UG', sym: 'MP', bg: '#4CAF50' },
+                  { name: 'MTN MoMo', tag: '17 markets', sym: 'MM', bg: '#FFCC00' },
+                  { name: 'Airtel Money', tag: '14 countries', sym: 'AM', bg: '#FF0000' },
+                  { name: 'Chipper Cash', tag: 'Pan-African', sym: 'CC', bg: '#7B61FF' },
+                ],
+              },
+              {
+                label: '💳 Global Fiat', color: 'from-blue-500/10 to-indigo-500/5', border: 'border-blue-500/20',
+                methods: [
+                  { name: 'PayPal', tag: 'Global', sym: 'PP', bg: '#003087' },
+                  { name: 'Stripe', tag: 'Cards + Wallets', sym: 'ST', bg: '#635BFF' },
+                  { name: 'Credit / Debit', tag: 'Visa · MC · Amex', sym: '💳', bg: '#1A1F36' },
+                  { name: 'Bank Transfer', tag: 'SWIFT · SEPA · ACH', sym: '🏦', bg: '#2D7DD2' },
+                ],
+              },
+              {
+                label: '⛓️ Crypto / Web3', color: 'from-purple-500/10 to-violet-500/5', border: 'border-purple-500/20',
+                methods: [
+                  { name: 'USDC', tag: 'Stablecoin', sym: '$', bg: '#2775CA' },
+                  { name: 'USDT', tag: 'Tether', sym: '₮', bg: '#26A17B' },
+                  { name: 'Ethereum', tag: 'ETH / ERC-20', sym: 'Ξ', bg: '#627EEA' },
+                  { name: 'Cardano', tag: 'ADA', sym: '₳', bg: '#0033AD' },
+                  { name: 'Polygon', tag: 'MATIC', sym: '⬡', bg: '#8247E5' },
+                  { name: 'Bitcoin', tag: 'BTC · Lightning', sym: '₿', bg: '#F7931A' },
+                  { name: 'Coinbase Commerce', tag: 'Multi-coin', sym: 'CB', bg: '#0052FF' },
+                  { name: 'MetaMask', tag: 'Web3 Wallet', sym: '🦊', bg: '#E2761B' },
+                ],
+              },
+            ].map(group => (
+              <div key={group.label} className={`rounded-2xl border ${group.border} bg-gradient-to-br ${group.color} p-5`}>
+                <p className="font-semibold text-sm text-foreground mb-4">{group.label}</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {group.methods.map(m => (
+                    <div key={m.name} className="flex items-center gap-2 bg-background/60 rounded-xl px-3 py-2 border border-border/40">
+                      <div className="w-7 h-7 rounded-md flex items-center justify-center text-white text-xs font-bold shrink-0" style={{ backgroundColor: m.bg }}>{m.sym}</div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-medium text-foreground truncate">{m.name}</p>
+                        <p className="text-[10px] text-muted-foreground truncate">{m.tag}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex items-center gap-3 px-6 py-4 bg-card rounded-xl border border-border/50">
-                  <div className="w-10 h-10 rounded-lg bg-[#00C3F7] flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">PS</span>
-                  </div>
-                  <div>
-                    <p className="font-medium text-foreground">Paystack</p>
-                    <p className="text-xs text-muted-foreground">African payments</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 px-6 py-4 bg-card rounded-xl border border-border/50">
-                  <CreditCard className="w-10 h-10 text-muted-foreground" />
-                  <div>
-                    <p className="font-medium text-foreground">Credit Card</p>
-                    <p className="text-xs text-muted-foreground">Visa, Mastercard</p>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="flex items-center gap-3 px-6 py-4 bg-card rounded-xl border border-border/50">
-                  <div className="w-10 h-10 rounded-lg bg-[#627eea] flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">Ξ</span>
-                  </div>
-                  <div>
-                    <p className="font-medium text-foreground">Ethereum</p>
-                    <p className="text-xs text-muted-foreground">ETH & ERC20 tokens</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 px-6 py-4 bg-card rounded-xl border border-border/50">
-                  <div className="w-10 h-10 rounded-lg bg-[#f7931a] flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">₿</span>
-                  </div>
-                  <div>
-                    <p className="font-medium text-foreground">Bitcoin</p>
-                    <p className="text-xs text-muted-foreground">BTC payments</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 px-6 py-4 bg-card rounded-xl border border-border/50">
-                  <div className="w-10 h-10 rounded-lg bg-[#0052ff] flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">CB</span>
-                  </div>
-                  <div>
-                    <p className="font-medium text-foreground">Coinbase</p>
-                    <p className="text-xs text-muted-foreground">Crypto gateway</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 px-6 py-4 bg-card rounded-xl border border-border/50">
-                  <Network className="w-10 h-10 text-muted-foreground" />
-                  <div>
-                    <p className="font-medium text-foreground">MetaMask</p>
-                    <p className="text-xs text-muted-foreground">Web3 wallet</p>
-                  </div>
-                </div>
-              </>
-            )}
+              </div>
+            ))}
           </div>
         </div>
       </section>

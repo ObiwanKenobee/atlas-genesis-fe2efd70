@@ -4,6 +4,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"cosmossdk.io/log"
 	storetypes "cosmossdk.io/store/types"
@@ -281,8 +282,17 @@ func (app *SanctumApp) DefaultGenesis() map[string]interface{} {
 	}
 }
 
-// HomeDir returns the default home directory for the sanctumd binary.
+// HomeDir returns the validated home directory for the sanctumd binary.
 func HomeDir() string {
-	home, _ := os.UserHomeDir()
-	return filepath.Join(home, ".sanctumd")
+	home, err := os.UserHomeDir()
+	if err != nil || home == "" {
+		// Fall back to a safe fixed path rather than an empty/unvalidated one
+		return filepath.Clean("/tmp/.sanctumd")
+	}
+	// Resolve the full path and confirm it stays within the user home
+	resolved := filepath.Join(filepath.Clean(home), ".sanctumd")
+	if !strings.HasPrefix(resolved, filepath.Clean(home)) {
+		return filepath.Clean("/tmp/.sanctumd")
+	}
+	return resolved
 }

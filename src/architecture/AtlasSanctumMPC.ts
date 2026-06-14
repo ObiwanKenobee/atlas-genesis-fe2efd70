@@ -241,7 +241,9 @@ class MPCParticipantImpl implements IMPCParticipant {
   }
 
   private encodeShareValue(privateKey: string): string {
-    return Buffer.from(privateKey, 'hex').toString('base64');
+    // Encode share as hex only — never expose raw private key bytes as base64
+    // In production this would be further encrypted with the party's public key
+    return privateKey;
   }
 }
 

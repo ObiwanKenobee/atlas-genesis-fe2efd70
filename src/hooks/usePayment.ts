@@ -3,7 +3,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 
-export type PaymentProvider = 'paystack' | 'paypal' | 'card' | 'bank';
+export type PaymentProvider =
+  // African fintech
+  | 'paystack' | 'flutterwave' | 'mpesa' | 'mtn-momo' | 'airtel-money' | 'chipper'
+  // Global fiat
+  | 'paypal' | 'stripe' | 'card' | 'bank'
+  // Crypto
+  | 'eth' | 'btc' | 'usdc' | 'usdt' | 'cardano' | 'matic' | 'coinbase-commerce' | 'metamask';
 export type PaymentStatus = 'idle' | 'processing' | 'redirecting' | 'verifying' | 'completed' | 'failed';
 
 interface BillingDetails {

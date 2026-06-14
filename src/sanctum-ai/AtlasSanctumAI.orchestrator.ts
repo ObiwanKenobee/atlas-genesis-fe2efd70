@@ -178,7 +178,7 @@ export class AtlasSanctumAI {
     // Layer 8: Consolidate memory
     await this.layer8.consolidate(
       'orchestrator' as any,
-      JSON.stringify({ type: request.type, context: request.context }),
+      JSON.stringify({ type: request.type, context: this.sanitizeContext(request.context) }),
       'episodic',
     );
 
@@ -253,6 +253,14 @@ export class AtlasSanctumAI {
   }
 
   // ─── Helpers ────────────────────────────────────────────────────────────────
+
+  private sanitizeContext(context: Record<string, unknown>): Record<string, unknown> {
+    // Strip any non-serializable or prototype-polluting keys before persisting to memory
+    return JSON.parse(JSON.stringify(context, (key, value) => {
+      if (key.startsWith('__') || typeof value === 'function') return undefined;
+      return value;
+    }));
+  }
 
   private inferRoles(type: CivilizationalRequest['type']): AgentRole[] {
     const roleMap: Record<CivilizationalRequest['type'], AgentRole[]> = {
