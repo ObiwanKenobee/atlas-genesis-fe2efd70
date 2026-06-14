@@ -1,5 +1,6 @@
 import React from 'react'; // v18
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { Analytics } from "@vercel/analytics/next"
 import { AnimatePresence, motion } from 'framer-motion';
 import ApiStatus from './components/ApiStatus';
 import NewsletterBanner from './components/NewsletterBanner';
