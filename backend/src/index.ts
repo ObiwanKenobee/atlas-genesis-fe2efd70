@@ -6,6 +6,7 @@ import metrics from './metrics';
 import featureFlags, { warmCache, getAllFlagsSync } from './featureFlags';
 import adminFlagsRouter from './routes/adminFlags';
 import express, { Request, Response, NextFunction } from 'express';
+import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import connectRedis from 'connect-redis';
 import redisClient from './redisClient';
@@ -122,6 +123,9 @@ try {
 
 // Security headers (must be first)
 app.use(securityHeaders);
+
+// Cookie parsing (required for httpOnly refresh-token cookie)
+app.use(cookieParser(process.env.COOKIE_SECRET || undefined));
 
 // Enhanced CORS configuration with environment-specific origins
 const getAllowedOrigins = (): string[] => {
@@ -441,6 +445,7 @@ app.use('/api/v2/measurements', measurementsV2Router);
 app.use('/api/v3/measurements', measurementsV3Router);
 app.use('/api/v2/projects', projectsRouter);
 app.use('/api/v2/ai', aiRecommendationsRouter);
+app.use('/api/v2/governance', governanceRouter); // V2 alias — same router, consistent path
 app.use('/api/data-integration', dataIntegrationRouter);
 app.use('/api/cultural-knowledge', culturalKnowledgeRouter);
 app.use('/api/database', apiDatabaseRouter);

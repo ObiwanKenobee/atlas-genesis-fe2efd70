@@ -110,6 +110,7 @@ import {
   Certifications
 } from './pages/InfrastructurePages';
 import Prototype from './pages/Prototype';
+import DashboardHub from './pages/DashboardHub';
 import MythicArchitect from './pages/MythicArchitect';
 import { OnboardingProvider } from './hooks/useOnboarding.tsx';
 
@@ -139,6 +140,7 @@ const App = () => {
           <AnimatePresence mode="wait">
             <Routes>
               <Route path="/prototype" element={<Prototype />} />
+              <Route path="/hub" element={<DashboardHub />} />
               <Route path="/mythic-architect" element={<MythicArchitect />} />
               <Route path="/" element={<Index />} />
               <Route path="/dashboard" element={<Dashboard />} />

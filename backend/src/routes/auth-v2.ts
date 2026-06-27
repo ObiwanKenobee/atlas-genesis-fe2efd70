@@ -302,6 +302,15 @@ router.post('/login', validateWithZod(loginSchema), async (req: Request, res: Re
       // Ignore email errors
     }
 
+    // Refresh token goes in httpOnly cookie — never exposed to JS
+    res.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/api/v2/auth'
+    });
+
     res.json({
       user: {
         id: user.id,
@@ -314,8 +323,7 @@ router.post('/login', validateWithZod(loginSchema), async (req: Request, res: Re
       },
       tokens: {
         accessToken,
-        refreshToken,
-        expiresIn: 15 * 60 // 15 minutes
+        expiresIn: 15 * 60
       }
     });
   } catch (err: any) {
@@ -330,9 +338,9 @@ router.post('/login', validateWithZod(loginSchema), async (req: Request, res: Re
   }
 });
 
-// Refresh Token
+// Refresh Token — reads from httpOnly cookie, falls back to body for backwards compat
 router.post('/refresh', async (req: Request, res: Response) => {
-  const { refreshToken } = req.body;
+  const refreshToken = req.cookies?.refresh_token || req.body?.refreshToken;
 
   if (!refreshToken) {
     return res.status(422).json({ code: 'invalid', message: 'Refresh token required' });
@@ -364,18 +372,25 @@ router.post('/refresh', async (req: Request, res: Response) => {
       version: payload.version
     }, deviceFingerprint);
 
-    // Revoke old refresh token and create new one
+    // Revoke old refresh token and create new one (rotation)
     await revokeRefreshToken(refreshTokenData.token);
-    const newRefreshTokenData = await createRefreshToken(payload.userId, {
+    await createRefreshToken(payload.userId, {
       ip: req.ip,
       userAgent: req.get('User-Agent'),
       deviceFingerprint
     });
 
+    res.cookie('refresh_token', newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/api/v2/auth'
+    });
+
     res.json({
       tokens: {
         accessToken: newAccessToken,
-        refreshToken: newRefreshToken,
         expiresIn: 15 * 60
       }
     });
@@ -384,9 +399,9 @@ router.post('/refresh', async (req: Request, res: Response) => {
   }
 });
 
-// Logout
+// Logout — clears httpOnly cookie and revokes refresh token
 router.post('/logout', authenticate, async (req: AuthenticatedRequest, res: Response) => {
-  const { refreshToken } = req.body;
+  const refreshToken = req.cookies?.refresh_token || req.body?.refreshToken;
   const userId = req.user!.id;
 
   try {
@@ -394,9 +409,9 @@ router.post('/logout', authenticate, async (req: AuthenticatedRequest, res: Resp
       await revokeRefreshToken(refreshToken);
     }
 
-    // Invalidate all user sessions for security
     await invalidateAllUserSessions(userId);
 
+    res.clearCookie('refresh_token', { path: '/api/v2/auth' });
     res.json({ message: 'Logged out successfully' });
   } catch (err) {
     res.status(500).json({ code: 'server_error', message: 'Logout failed' });
