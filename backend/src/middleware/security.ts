@@ -65,54 +65,35 @@ export const createRateLimit = (config: RateLimitConfig) => {
 };
 
 // Tiered rate limiting based on user roles
+// Pre-creates all tier-specific limiters at startup — not per-request
 export const createTieredRateLimit = (baseConfig: RateLimitConfig) => {
+  const limiters = {
+    admin: createRateLimit({ ...baseConfig, max: Math.floor(baseConfig.max * 5) }),
+    moderator: createRateLimit({ ...baseConfig, max: Math.floor(baseConfig.max * 3) }),
+    premium: createRateLimit({ ...baseConfig, max: Math.floor(baseConfig.max * 1.5) }),
+    default: createRateLimit(baseConfig),
+  };
+
   return (req: Request, res: Response, next: NextFunction) => {
-    const user = (req as any).user;
-    const config = { ...baseConfig };
-
-    if (user?.role) {
-      switch (user.role) {
-        case 'admin':
-          // Admins get higher limits
-          config.max = Math.floor(config.max * 5);
-          config.windowMs = Math.floor(config.windowMs * 0.8); // Slightly shorter window
-          break;
-        case 'moderator':
-          // Moderators get higher limits
-          config.max = Math.floor(config.max * 3);
-          config.windowMs = Math.floor(config.windowMs * 0.9);
-          break;
-        case 'premium':
-          // Premium users get slightly higher limits
-          config.max = Math.floor(config.max * 1.5);
-          break;
-        default:
-          // Regular users get base limits
-          break;
-      }
-    }
-
-    const limiter = createRateLimit(config);
+    const role = (req as any).user?.role;
+    const limiter = (role && limiters[role as keyof typeof limiters]) || limiters.default;
     limiter(req, res, next);
   };
 };
 
-// Burst rate limiting for high-frequency operations
+// Burst rate limiting — pre-creates both limiters at startup
 export const createBurstRateLimit = (config: RateLimitConfig & { burstMax: number; burstWindowMs: number }) => {
   const normalLimiter = createRateLimit(config);
   const burstLimiter = createRateLimit({
     ...config,
     max: config.burstMax,
     windowMs: config.burstWindowMs,
-    message: 'Burst rate limit exceeded, please slow down.'
+    message: 'Burst rate limit exceeded, please slow down.',
   });
 
   return (req: Request, res: Response, next: NextFunction) => {
-    // Check burst limit first (stricter, shorter window)
     burstLimiter(req, res, (err?: any) => {
       if (err) return next(err);
-
-      // If burst limit passed, check normal limit
       normalLimiter(req, res, next);
     });
   };
@@ -147,23 +128,17 @@ export const marketplaceBurstRateLimit = createBurstRateLimit({
   message: 'Marketplace access rate limited due to high frequency requests.'
 });
 
-// API key rate limiting
-export const apiKeyRateLimit = (req: Request, res: Response, next: NextFunction) => {
-  const apiKey = req.headers['x-api-key'] as string;
+// API key rate limiting — pre-created limiter, keyed by the api key value
+const _apiKeyLimiter = createRateLimit({
+  windowMs: 60 * 1000,
+  max: 100,
+  keyGenerator: (req: Request) => `api_key:${req.headers['x-api-key'] || 'none'}`,
+  message: 'API key rate limit exceeded.',
+});
 
-  if (apiKey) {
-    // API keys get different limits based on their configuration
-    // For now, use a standard limit - in production this would check the key's rate limit from database
-    const limiter = createRateLimit({
-      windowMs: 60 * 1000, // 1 minute
-      max: 100, // 100 requests per minute for API keys
-      keyGenerator: () => `api_key:${apiKey}`,
-      message: 'API key rate limit exceeded.'
-    });
-    limiter(req, res, next);
-  } else {
-    next();
-  }
+export const apiKeyRateLimit = (req: Request, res: Response, next: NextFunction) => {
+  if (!req.headers['x-api-key']) return next();
+  _apiKeyLimiter(req, res, next);
 };
 
 // Rate limit monitoring and alerting
@@ -577,7 +552,7 @@ export const securityLogger = (req: Request, res: Response, next: NextFunction) 
   const logData = {
     method: req.method,
     url: req.url,
-    ip: req.ip || req.connection.remoteAddress,
+    ip: req.ip || req.socket?.remoteAddress || 'unknown',
     userAgent: req.get('User-Agent'),
     timestamp: new Date().toISOString(),
     headers: {

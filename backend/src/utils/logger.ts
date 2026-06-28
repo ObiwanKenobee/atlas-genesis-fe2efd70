@@ -127,7 +127,7 @@ export const requestLogger = (req: any, res: any, next: any) => {
       url: req.url,
       status: res.statusCode,
       duration,
-      ip: req.ip || req.connection.remoteAddress,
+      ip: req.ip || req.socket?.remoteAddress || 'unknown',
       userAgent: req.get('User-Agent'),
       userId: req.user?.id,
     };

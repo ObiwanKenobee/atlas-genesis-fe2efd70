@@ -1,4 +1,5 @@
 import { Pool, PoolConfig } from 'pg';
+import * as mockDbModule from './db.mock';
 
 // Database configuration with production-safe defaults
 interface DatabaseConfig {
@@ -50,9 +51,8 @@ let query: (text: string, params?: any[]) => Promise<any>;
 if (useMockDatabase) {
   // Use mock database for testing/development
   console.log('[db] Using mock database for testing/development');
-  const mockDb = require('./db.mock');
-  pool = mockDb.pool;
-  query = mockDb.query;
+  pool = mockDbModule.pool;
+  query = mockDbModule.query;
 } else {
   // Use PostgreSQL database
   const config = getDatabaseConfig();

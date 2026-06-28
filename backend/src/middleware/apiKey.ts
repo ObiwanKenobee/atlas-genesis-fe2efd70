@@ -69,7 +69,7 @@ export const validateApiKey = async (
 
     // Check IP whitelist if configured
     if (validation.keyData?.allowedIPs && validation.keyData.allowedIPs.length > 0) {
-      const clientIP = req.ip || req.connection.remoteAddress;
+      const clientIP = req.ip || req.socket?.remoteAddress || 'unknown';
       if (!validation.keyData.allowedIPs.includes(clientIP)) {
         res.status(403).json({
           error: 'IP address not allowed',

@@ -273,8 +273,13 @@ app.use('/api', autoValidateRequest({
   sanitize: true
 }));
 
-// CSRF protection for state-changing operations (skip for JWT-authenticated requests)
-app.use('/api', csrfProtection);
+// CSRF protection for state-changing operations (skip for JWT-authenticated requests
+// and for the auth endpoints that establish credentials)
+app.use('/api', (req: Request, res: Response, next: NextFunction) => {
+  const isAuthEstablishment = req.path.match(/^\/v2\/auth\/(signup|login|verify-email|forgot-password|reset-password|google|github|microsoft)/);
+  if (isAuthEstablishment) return next();
+  csrfProtection(req, res, next);
+});
 
 // Security logging
 app.use(securityLogger);
@@ -780,8 +785,9 @@ io.on('connection', (socket: Socket) => {
   });
 });
 
-// Export io instance for use in routes
+// Export app and io instance for use in routes and tests
 export { io };
+export default app;
 
 // Cleanup rate limiting maps periodically to prevent memory leaks
 setInterval(() => {

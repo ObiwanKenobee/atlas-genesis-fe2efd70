@@ -1,8 +1,8 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { query } from '../db';
-import { verifyAccessToken, verifyRole } from '../utils/auth';
 import { logSecurityEvent } from '../utils/logger';
 import { generalRateLimit, validateApiKey, sanitizeInput, securityHeaders } from '../middleware/security';
+import { authenticate, authorize } from '../middleware/auth';
 
 const router = Router();
 
@@ -42,7 +42,7 @@ router.get('/roles', async (req: Request, res: Response, next: NextFunction) => 
 });
 
 // POST /api/admin/roles - Create new role
-router.post('/roles', verifyAccessToken, verifyRole(['admin']), async (req: Request, res: Response, next: NextFunction) => {
+router.post('/roles', authenticate, authorize('admin'), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { name, description, level, permissions } = req.body;
 
@@ -101,7 +101,7 @@ router.get('/permissions', async (req: Request, res: Response, next: NextFunctio
 });
 
 // POST /api/admin/permissions - Create permission
-router.post('/permissions', verifyAccessToken, verifyRole(['admin']), async (req: Request, res: Response, next: NextFunction) => {
+router.post('/permissions', authenticate, authorize('admin'), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { name, resource, action, description } = req.body;
 
@@ -153,7 +153,7 @@ router.get('/users/:userId/roles', async (req: Request, res: Response, next: Nex
 });
 
 // POST /api/admin/users/:userId/roles - Assign role to user
-router.post('/users/:userId/roles', verifyAccessToken, verifyRole(['admin']), async (req: Request, res: Response, next: NextFunction) => {
+router.post('/users/:userId/roles', authenticate, authorize('admin'), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { userId } = req.params;
     const { role_id } = req.body;
@@ -310,7 +310,7 @@ router.get('/users/:id', async (req: Request, res: Response, next: NextFunction)
 });
 
 // PATCH /api/admin/users/:id/status - Update user status
-router.patch('/users/:id/status', verifyAccessToken, verifyRole(['admin']), async (req: Request, res: Response, next: NextFunction) => {
+router.patch('/users/:id/status', authenticate, authorize('admin'), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
     const { status, reason } = req.body;
@@ -401,7 +401,7 @@ router.get('/files', async (req: Request, res: Response, next: NextFunction) => 
 });
 
 // POST /api/admin/files - Upload file
-router.post('/files', verifyAccessToken, async (req: Request, res: Response, next: NextFunction) => {
+router.post('/files', authenticate, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = (req as any).user?.id;
     const { filename, file_type, folder, size, mime_type, url, metadata } = req.body;
@@ -436,7 +436,7 @@ router.post('/files', verifyAccessToken, async (req: Request, res: Response, nex
 });
 
 // DELETE /api/admin/files/:id - Delete file
-router.delete('/files/:id', verifyAccessToken, async (req: Request, res: Response, next: NextFunction) => {
+router.delete('/files/:id', authenticate, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
     const userId = (req as any).user?.id;
@@ -709,7 +709,7 @@ router.get('/activity', async (req: Request, res: Response, next: NextFunction) 
 });
 
 // POST /api/admin/activity - Create activity log
-router.post('/activity', verifyAccessToken, async (req: Request, res: Response, next: NextFunction) => {
+router.post('/activity', authenticate, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = (req as any).user?.id;
     const { entity_type, entity_id, action, details } = req.body;

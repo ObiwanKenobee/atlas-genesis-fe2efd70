@@ -465,10 +465,9 @@ export const generateSecureAccessToken = (
   payload: Omit<TokenPayload, 'type' | 'iat' | 'exp' | 'iss' | 'aud'>,
   deviceFingerprint?: string
 ): string => {
-  const tokenPayload: TokenPayload = {
+  const tokenPayload: Omit<TokenPayload, 'iss' | 'aud'> = {
     ...payload,
     type: 'access',
-    iss: JWT_ISSUER,
     deviceFingerprint
   };
   return jwt.sign(tokenPayload, JWT_ACCESS_SECRET as string, {
@@ -483,10 +482,9 @@ export const generateSecureRefreshToken = (
   deviceFingerprint?: string
 ): string => {
   const familyId = generateTokenFamilyId();
-  const tokenPayload: TokenPayload = {
+  const tokenPayload: Omit<TokenPayload, 'iss' | 'aud'> = {
     ...payload,
     type: 'refresh',
-    iss: JWT_ISSUER,
     familyId,
     deviceFingerprint
   };

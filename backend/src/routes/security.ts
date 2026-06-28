@@ -23,7 +23,7 @@ router.post('/csp-report', express.json({ type: 'application/csp-report' }), (re
     statusCode: violation['status-code'],
     referrer: violation['referrer'],
     userAgent: req.get('User-Agent'),
-    ip: req.ip || req.connection.remoteAddress
+    ip: req.ip || req.socket?.remoteAddress || 'unknown'
   }, 'medium');
 
   // Respond with 204 No Content as per CSP spec
@@ -52,7 +52,7 @@ router.get('/headers-check', (req, res) => {
     logSecurityEvent('security_headers_missing', null, {
       missingHeaders: missing,
       userAgent: req.get('User-Agent'),
-      ip: req.ip || req.connection.remoteAddress
+      ip: req.ip || req.socket?.remoteAddress || 'unknown'
     }, 'high');
   }
 

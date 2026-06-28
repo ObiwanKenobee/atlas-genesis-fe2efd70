@@ -1,13 +1,13 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { query } from '../../db';
-import { verifyAccessToken } from '../../utils/auth';
-import { logSecurityEvent } from '../../utils/logger';
+import { query } from '../db';
+import { verifyAccessToken } from '../utils/auth';
+import { logSecurityEvent } from '../utils/logger';
 import { 
   generalRateLimit, 
   validateApiKey, 
   sanitizeInput,
   securityHeaders 
-} from '../../middleware/security';
+} from '../middleware/security';
 
 // Optional auth middleware - allows both authenticated and anonymous requests
 const optionalAuth = (req: Request, res: Response, next: NextFunction) => {
