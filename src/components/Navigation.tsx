@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Leaf, LogIn, ShoppingBag, Briefcase, LayoutDashboard, Crown, Award, Zap, Shield, TrendingUp, Globe, Heart, Network, Grid3X3, Calculator, Users, Trophy, Settings, FileText, BarChart3, Cog, Factory, Sprout, BookOpen, Building2, Zap as Lightning, TreePine, GraduationCap, CreditCard, Receipt, Wallet, Award as Certificate } from "lucide-react";
+import { Menu, X, Leaf, LogIn, ShoppingBag, Briefcase, LayoutDashboard, Crown, Award, Zap, Shield, TrendingUp, Globe, Heart, Network, Grid3X3, Calculator, Users, Trophy, Settings, FileText, BarChart3, Cog, Factory, Sprout, BookOpen, Building2, Zap as Lightning, TreePine, GraduationCap, CreditCard, Receipt, Wallet, Award as Certificate, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { useNavigateWithTransition } from "@/hooks/useNavigateWithTransition";
 
 const Navigation = () => {
   const { user } = useSupabaseAuth();

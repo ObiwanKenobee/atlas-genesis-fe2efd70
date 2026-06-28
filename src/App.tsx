@@ -1,7 +1,8 @@
 import React from 'react'; // v18
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Analytics } from "@vercel/analytics/next"
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
+import PageTransition from './components/PageTransition';
 import ApiStatus from './components/ApiStatus';
 import NewsletterBanner from './components/NewsletterBanner';
 import Layout from './components/Layout';
@@ -128,167 +129,140 @@ const SimplePage = ({ title, description }: { title: string; description: string
   </Layout>
 );
 
+/**
+ * AnimatedRoutes — lives inside BrowserRouter so useLocation() is available.
+ * AnimatePresence must receive a key that changes on navigation (pathname).
+ * The key lives on PageTransition, which wraps every page's content.
+ */
+const AnimatedRoutes = () => {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait" initial={false}>
+      {/* Key on the Routes element so AnimatePresence sees a new child on every route change */}
+      <Routes location={location} key={location.pathname}>
+        <Route path="/prototype" element={<PageTransition><Prototype /></PageTransition>} />
+        <Route path="/hub" element={<PageTransition><DashboardHub /></PageTransition>} />
+        <Route path="/mythic-architect" element={<PageTransition><MythicArchitect /></PageTransition>} />
+        <Route path="/" element={<PageTransition><Index /></PageTransition>} />
+        <Route path="/dashboard" element={<PageTransition><Dashboard /></PageTransition>} />
+        <Route path="/auth" element={<PageTransition variant="scale"><Auth /></PageTransition>} />
+        <Route path="/marketplace" element={<PageTransition><Marketplace /></PageTransition>} />
+        <Route path="/explore-verified-projects" element={<PageTransition><ExploreVerifiedProjects /></PageTransition>} />
+        <Route path="/portfolio" element={<PageTransition><Portfolio /></PageTransition>} />
+        <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
+        <Route path="/bioregions" element={<PageTransition variant="slideRight"><Bioregions /></PageTransition>} />
+        <Route path="/measurements" element={<PageTransition><Measurements /></PageTransition>} />
+        <Route path="/valuation" element={<PageTransition variant="slideRight"><Valuation /></PageTransition>} />
+        <Route path="/governance" element={<PageTransition><Governance /></PageTransition>} />
+        <Route path="/regenerative-agriculture" element={<PageTransition variant="slideRight"><RegenerativeAgriculture /></PageTransition>} />
+        <Route path="/health" element={<PageTransition><Health /></PageTransition>} />
+        <Route path="/security" element={<PageTransition variant="fade"><Security /></PageTransition>} />
+        <Route path="/adoption" element={<PageTransition variant="fade"><Adoption /></PageTransition>} />
+        <Route path="/outreach" element={<PageTransition><Outreach /></PageTransition>} />
+        <Route path="/help-center" element={<PageTransition><HelpCenter /></PageTransition>} />
+        <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
+        <Route path="/pricing" element={<PageTransition><SubscriptionPlans /></PageTransition>} />
+        <Route path="/payment" element={<PageTransition><Payment /></PageTransition>} />
+        <Route path="/payment/:reference" element={<PageTransition><Payment /></PageTransition>} />
+        <Route path="/regenerative-finance" element={<PageTransition><RegenerativeFinance /></PageTransition>} />
+        <Route path="/regenerative-finance/:id" element={<PageTransition><RegenerativeFinance /></PageTransition>} />
+        <Route path="/defi" element={<PageTransition><DeFi /></PageTransition>} />
+        <Route path="/defi/:id" element={<PageTransition><DeFi /></PageTransition>} />
+        <Route path="/community" element={<PageTransition><Community /></PageTransition>} />
+        <Route path="/community/:id" element={<PageTransition><Community /></PageTransition>} />
+        <Route path="/education" element={<PageTransition><Education /></PageTransition>} />
+        <Route path="/education/:id" element={<PageTransition><Education /></PageTransition>} />
+        <Route path="/business-model" element={<PageTransition><BusinessModel /></PageTransition>} />
+        <Route path="/critical-innovations" element={<PageTransition><CriticalInnovations /></PageTransition>} />
+        <Route path="/azure-strategy" element={<PageTransition><AzureProductionStrategy /></PageTransition>} />
+        <Route path="/ethical-governance" element={<PageTransition><EthicalGovernance /></PageTransition>} />
+        <Route path="/regenerative-value-exchange" element={<PageTransition><RegenerativeValueExchange /></PageTransition>} />
+        <Route path="/data-metrics-engine" element={<PageTransition><DataMetricsEngine /></PageTransition>} />
+        <Route path="/cultural-knowledge-impact" element={<PageTransition><CulturalKnowledgeImpact /></PageTransition>} />
+        <Route path="/global-impact-economy" element={<PageTransition><GlobalImpactEconomy /></PageTransition>} />
+        <Route path="/end-to-end-experience" element={<PageTransition><EndToEndExperience /></PageTransition>} />
+        <Route path="/engineering-architecture" element={<PageTransition><EngineeringArchitecture /></PageTransition>} />
+        <Route path="/rvx-innovations" element={<PageTransition><RVXInnovations /></PageTransition>} />
+        <Route path="/dashboard-with-sidebar" element={<PageTransition><DashboardWithSidebar /></PageTransition>} />
+        <Route path="/status" element={<PageTransition><Status /></PageTransition>} />
+        <Route path="/demo" element={<PageTransition><Demo /></PageTransition>} />
+        <Route path="/project/:id" element={<PageTransition variant="slideRight"><ProjectDetail /></PageTransition>} />
+        <Route path="/transactions" element={<PageTransition><TransactionHistory /></PageTransition>} />
+        <Route path="/calculator" element={<PageTransition><CarbonCalculator /></PageTransition>} />
+        <Route path="/leaderboard" element={<PageTransition><Leaderboard /></PageTransition>} />
+        <Route path="/cardano-layer" element={<PageTransition><CardanoLayer /></PageTransition>} />
+        <Route path="/architecture" element={<PageTransition><EngineeringArchitecture /></PageTransition>} />
+        <Route path="/dashboards" element={<PageTransition><Dashboard /></PageTransition>} />
+        <Route path="/careers" element={<PageTransition><Careers /></PageTransition>} />
+        <Route path="/admin" element={<AdminProtectedRoute><PageTransition variant="fade"><AdminCommandCenter /></PageTransition></AdminProtectedRoute>} />
+        <Route path="/admin/flags" element={<AdminProtectedRoute><PageTransition variant="fade"><FeatureFlagsAdmin /></PageTransition></AdminProtectedRoute>} />
+        <Route path="/admin/newsletter" element={<AdminProtectedRoute><PageTransition variant="fade"><NewsletterAttempts /></PageTransition></AdminProtectedRoute>} />
+        <Route path="/segment-selection" element={<PageTransition variant="scale"><SegmentSelection /></PageTransition>} />
+        <Route path="/onboarding" element={<PageTransition variant="scale"><Onboarding /></PageTransition>} />
+        <Route path="/dashboard-overview" element={<PageTransition><DashboardOverview /></PageTransition>} />
+        <Route path="/reports-analytics" element={<PageTransition><ReportsAnalytics /></PageTransition>} />
+        <Route path="/settings" element={<PageTransition><Settings /></PageTransition>} />
+        <Route path="/privacy-policy" element={<PageTransition variant="fade"><PrivacyPolicy /></PageTransition>} />
+        <Route path="/terms-of-service" element={<PageTransition variant="fade"><TermsOfService /></PageTransition>} />
+        <Route path="/my-transactions" element={<PageTransition><Transactions /></PageTransition>} />
+        <Route path="/about" element={<PageTransition><About /></PageTransition>} />
+        <Route path="/cookie-policy" element={<PageTransition variant="fade"><CookiePolicy /></PageTransition>} />
+        <Route path="/accessibility" element={<PageTransition variant="fade"><Accessibility /></PageTransition>} />
+        <Route path="/media-kit" element={<PageTransition><MediaKit /></PageTransition>} />
+        <Route path="/help" element={<PageTransition><HelpCenter /></PageTransition>} />
+        <Route path="/help/documentation" element={<PageTransition><APIDocumentation /></PageTransition>} />
+        <Route path="/dashboard/donor" element={<ProtectedRoute requiredDashboard="donor"><PageTransition><DonorDashboard /></PageTransition></ProtectedRoute>} />
+        <Route path="/dashboard/field-agent" element={<ProtectedRoute requiredDashboard="field-agent"><PageTransition><FieldAgentDashboard /></PageTransition></ProtectedRoute>} />
+        <Route path="/dashboard/administrator" element={<ProtectedRoute requiredDashboard="administrator"><PageTransition><AdministratorDashboard /></PageTransition></ProtectedRoute>} />
+        <Route path="/dashboard/community" element={<ProtectedRoute requiredDashboard="community"><PageTransition><CommunityDashboard /></PageTransition></ProtectedRoute>} />
+        <Route path="/dashboard/enterprise" element={<ProtectedRoute requiredDashboard="enterprise"><PageTransition><EnterpriseDashboard /></PageTransition></ProtectedRoute>} />
+        <Route path="/dashboard/government" element={<ProtectedRoute requiredDashboard="government"><PageTransition><GovernmentDashboard /></PageTransition></ProtectedRoute>} />
+        <Route path="/dashboard/defi" element={<ProtectedRoute requiredDashboard="defi"><PageTransition><DeFiDashboard /></PageTransition></ProtectedRoute>} />
+        <Route path="/dashboard/ngo" element={<ProtectedRoute requiredDashboard="ngo"><PageTransition><NGODashboard /></PageTransition></ProtectedRoute>} />
+        <Route path="/billing" element={<ProtectedRoute requiredRole="enterprise"><PageTransition><BillingDashboard /></PageTransition></ProtectedRoute>} />
+        <Route path="/invoices" element={<ProtectedRoute requiredRole="enterprise"><PageTransition><InvoicesManagement /></PageTransition></ProtectedRoute>} />
+        <Route path="/payment-methods" element={<ProtectedRoute requiredRole="enterprise"><PageTransition><PaymentMethods /></PageTransition></ProtectedRoute>} />
+        <Route path="/api-analytics" element={<ProtectedRoute requiredRole="enterprise"><PageTransition><APIAnalyticsDashboard /></PageTransition></ProtectedRoute>} />
+        <Route path="/api-keys" element={<ProtectedRoute requiredRole="enterprise"><PageTransition><APIKeyManagement /></PageTransition></ProtectedRoute>} />
+        <Route path="/mfa-setup" element={<ProtectedRoute><PageTransition variant="scale"><MFASetup /></PageTransition></ProtectedRoute>} />
+        <Route path="/checkout" element={<PageTransition variant="scale"><Checkout /></PageTransition>} />
+        <Route path="/customer-portal" element={<PageTransition><CustomerPortal /></PageTransition>} />
+        <Route path="/carbon-offsetting" element={<PageTransition variant="slideRight"><CarbonOffsetting /></PageTransition>} />
+        <Route path="/impact-investment" element={<PageTransition variant="slideRight"><ImpactInvestment /></PageTransition>} />
+        <Route path="/regulatory-compliance" element={<PageTransition variant="slideRight"><RegulatoryCompliance /></PageTransition>} />
+        <Route path="/enterprise-solutions" element={<PageTransition variant="slideRight"><EnterpriseSolutions /></PageTransition>} />
+        <Route path="/smb-solutions" element={<PageTransition variant="slideRight"><SMBSolutions /></PageTransition>} />
+        <Route path="/agriculture-solutions" element={<PageTransition variant="slideRight"><AgricultureSolutions /></PageTransition>} />
+        <Route path="/renewable-energy" element={<PageTransition variant="slideRight"><RenewableEnergy /></PageTransition>} />
+        <Route path="/education-hub" element={<PageTransition><EducationHub /></PageTransition>} />
+        <Route path="/certifications" element={<PageTransition><Certifications /></PageTransition>} />
+        <Route path="/demo-login" element={<PageTransition variant="scale"><DemoLogin /></PageTransition>} />
+        <Route path="/ai-insights" element={<PageTransition><AIInsights /></PageTransition>} />
+        <Route path="/carbon-marketplace" element={<PageTransition><CarbonCreditMarketplace /></PageTransition>} />
+        <Route path="/impact-challenges" element={<PageTransition><GamificationHub /></PageTransition>} />
+        <Route path="/blockchain-verification" element={<PageTransition><BlockchainVerification /></PageTransition>} />
+        <Route path="/decentralized-governance" element={<PageTransition><DecentralizedGovernanceDashboard /></PageTransition>} />
+        <Route path="*" element={<PageTransition variant="fade"><NotFound /></PageTransition>} />
+      </Routes>
+    </AnimatePresence>
+  );
+};
+
 const App = () => {
   return (
     <OnboardingProvider>
       <EnhancedAuthProvider>
         <AuthProvider>
           <SupabaseAuthProvider>
-          <SentryErrorBoundary fallback={<AuthFallback />}>
-            <BrowserRouter>
-          <RouteErrorBoundary>
-          <AnimatePresence mode="wait">
-            <Routes>
-              <Route path="/prototype" element={<Prototype />} />
-              <Route path="/hub" element={<DashboardHub />} />
-              <Route path="/mythic-architect" element={<MythicArchitect />} />
-              <Route path="/" element={<Index />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/marketplace" element={<Marketplace />} />
-              <Route path="/explore-verified-projects" element={<ExploreVerifiedProjects />} />
-              <Route path="/portfolio" element={<Portfolio />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/bioregions" element={<Bioregions />} />
-              <Route path="/measurements" element={<Measurements />} />
-              <Route path="/valuation" element={<Valuation />} />
-              <Route path="/governance" element={<Governance />} />
-              <Route path="/regenerative-agriculture" element={<RegenerativeAgriculture />} />
-              <Route path="/health" element={<Health />} />
-              <Route path="/security" element={<Security />} />
-              <Route path="/adoption" element={<Adoption />} />
-              <Route path="/outreach" element={<Outreach />} />
-              <Route path="/help-center" element={<HelpCenter />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/pricing" element={<Pricing />} />
-              <Route path="/payment" element={<Payment />} />
-              <Route path="/payment/:reference" element={<Payment />} />
-              <Route path="/regenerative-finance" element={<RegenerativeFinance />} />
-              <Route path="/regenerative-finance/:id" element={<RegenerativeFinance />} />
-              <Route path="/defi" element={<DeFi />} />
-              <Route path="/defi/:id" element={<DeFi />} />
-              <Route path="/community" element={<Community />} />
-              <Route path="/community/:id" element={<Community />} />
-              <Route path="/education" element={<Education />} />
-              <Route path="/education/:id" element={<Education />} />
-              <Route path="/business-model" element={<BusinessModel />} />
-              <Route path="/critical-innovations" element={<CriticalInnovations />} />
-              <Route path="/azure-strategy" element={<AzureProductionStrategy />} />
-              <Route path="/ethical-governance" element={<EthicalGovernance />} />
-              <Route path="/regenerative-value-exchange" element={<RegenerativeValueExchange />} />
-              <Route path="/data-metrics-engine" element={<DataMetricsEngine />} />
-              <Route path="/cultural-knowledge-impact" element={<CulturalKnowledgeImpact />} />
-              <Route path="/global-impact-economy" element={<GlobalImpactEconomy />} />
-              <Route path="/end-to-end-experience" element={<EndToEndExperience />} />
-              <Route path="/engineering-architecture" element={<EngineeringArchitecture />} />
-              <Route path="/rvx-innovations" element={<RVXInnovations />} />
-              <Route path="/dashboard-with-sidebar" element={<DashboardWithSidebar />} />
-              <Route path="/status" element={<Status />} />
-              <Route path="/demo" element={<Demo />} />
-              <Route path="/project/:id" element={<ProjectDetail />} />
-              <Route path="/transactions" element={<TransactionHistory />} />
-               <Route path="/calculator" element={<CarbonCalculator />} />
-               <Route path="/leaderboard" element={<Leaderboard />} />
-               <Route path="/cardano-layer" element={<CardanoLayer />} />
-              <Route path="/architecture" element={<EngineeringArchitecture />} />
-              <Route path="/dashboards" element={<Dashboard />} />
-              <Route path="/careers" element={<Careers />} />
-              <Route path="/admin" element={
-                  <AdminProtectedRoute>
-                    <AdminCommandCenter />
-                  </AdminProtectedRoute>
-                } />
-                <Route path="/admin/flags" element={
-                  <AdminProtectedRoute>
-                    <FeatureFlagsAdmin />
-                  </AdminProtectedRoute>
-                } />
-                <Route path="/admin/newsletter" element={
-                  <AdminProtectedRoute>
-                    <NewsletterAttempts />
-                  </AdminProtectedRoute>
-                } />
-              <Route path="/segment-selection" element={<SegmentSelection />} />
-              <Route path="/onboarding" element={<Onboarding />} />
-              <Route path="/dashboard-overview" element={<DashboardOverview />} />
-              <Route path="/reports-analytics" element={<ReportsAnalytics />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="/terms-of-service" element={<TermsOfService />} />
-              <Route path="/my-transactions" element={<Transactions />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/cookie-policy" element={<CookiePolicy />} />
-              <Route path="/accessibility" element={<Accessibility />} />
-              <Route path="/media-kit" element={<MediaKit />} />
-              <Route path="/help" element={<HelpCenter />} />
-              <Route path="/help/documentation" element={<APIDocumentation />} />
-              <Route path="/dashboard/donor" element={
-                <ProtectedRoute requiredDashboard="donor"><DonorDashboard /></ProtectedRoute>
-              } />
-              <Route path="/dashboard/field-agent" element={
-                <ProtectedRoute requiredDashboard="field-agent"><FieldAgentDashboard /></ProtectedRoute>
-              } />
-              <Route path="/dashboard/administrator" element={
-                <ProtectedRoute requiredDashboard="administrator"><AdministratorDashboard /></ProtectedRoute>
-              } />
-              <Route path="/dashboard/community" element={
-                <ProtectedRoute requiredDashboard="community"><CommunityDashboard /></ProtectedRoute>
-              } />
-              <Route path="/dashboard/enterprise" element={
-                <ProtectedRoute requiredDashboard="enterprise"><EnterpriseDashboard /></ProtectedRoute>
-              } />
-              <Route path="/dashboard/government" element={
-                <ProtectedRoute requiredDashboard="government"><GovernmentDashboard /></ProtectedRoute>
-              } />
-              <Route path="/dashboard/defi" element={
-                <ProtectedRoute requiredDashboard="defi"><DeFiDashboard /></ProtectedRoute>
-              } />
-              <Route path="/dashboard/ngo" element={
-                <ProtectedRoute requiredDashboard="ngo"><NGODashboard /></ProtectedRoute>
-              } />
-              <Route path="/billing" element={
-                <ProtectedRoute requiredRole="enterprise"><BillingDashboard /></ProtectedRoute>
-              } />
-              <Route path="/invoices" element={
-                <ProtectedRoute requiredRole="enterprise"><InvoicesManagement /></ProtectedRoute>
-              } />
-              <Route path="/payment-methods" element={
-                <ProtectedRoute requiredRole="enterprise"><PaymentMethods /></ProtectedRoute>
-              } />
-              <Route path="/api-analytics" element={
-                <ProtectedRoute requiredRole="enterprise"><APIAnalyticsDashboard /></ProtectedRoute>
-              } />
-              <Route path="/api-keys" element={
-                <ProtectedRoute requiredRole="enterprise"><APIKeyManagement /></ProtectedRoute>
-              } />
-              <Route path="/mfa-setup" element={
-                <ProtectedRoute><MFASetup /></ProtectedRoute>
-              } />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/customer-portal" element={<CustomerPortal />} />
-              <Route path="/pricing" element={<SubscriptionPlans />} />
-              <Route path="/carbon-offsetting" element={<CarbonOffsetting />} />
-              <Route path="/impact-investment" element={<ImpactInvestment />} />
-              <Route path="/regulatory-compliance" element={<RegulatoryCompliance />} />
-              <Route path="/enterprise-solutions" element={<EnterpriseSolutions />} />
-              <Route path="/smb-solutions" element={<SMBSolutions />} />
-              <Route path="/agriculture-solutions" element={<AgricultureSolutions />} />
-              <Route path="/renewable-energy" element={<RenewableEnergy />} />
-              <Route path="/education-hub" element={<EducationHub />} />
-              <Route path="/certifications" element={<Certifications />} />
-              <Route path="/demo-login" element={<DemoLogin />} />
-              <Route path="/ai-insights" element={<AIInsights />} />
-              <Route path="/carbon-marketplace" element={<CarbonCreditMarketplace />} />
-              <Route path="/impact-challenges" element={<GamificationHub />} />
-              <Route path="/blockchain-verification" element={<BlockchainVerification />} />
-              <Route path="/decentralized-governance" element={<DecentralizedGovernanceDashboard />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </AnimatePresence>
-          </RouteErrorBoundary>
-          <BackToTop />
-            </BrowserRouter>
-          </SentryErrorBoundary>
+            <SentryErrorBoundary fallback={<AuthFallback />}>
+              <BrowserRouter>
+                <RouteErrorBoundary>
+                  <AnimatedRoutes />
+                  <BackToTop />
+                </RouteErrorBoundary>
+              </BrowserRouter>
+            </SentryErrorBoundary>
           </SupabaseAuthProvider>
         </AuthProvider>
       </EnhancedAuthProvider>
