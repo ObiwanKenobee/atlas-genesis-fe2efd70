@@ -13,8 +13,11 @@ const ApiStatus = ({ apiUrl, showLabel = false }: ApiStatusProps) => {
 
   useEffect(() => {
     const checkApiHealth = async () => {
-      const baseUrl = apiUrl || import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
-      const healthUrl = baseUrl.replace('/api', '/health');
+      // Use /api/health (proxied by Vite in dev, absolute URL in production)
+      const base = apiUrl
+        ? apiUrl.replace(/\/api$/, '')
+        : (import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace(/\/api$/, '') : '');
+      const healthUrl = base ? `${base}/health` : '/health';
 
       try {
         const startTime = Date.now();
@@ -37,7 +40,7 @@ const ApiStatus = ({ apiUrl, showLabel = false }: ApiStatusProps) => {
     };
 
     checkApiHealth();
-    const interval = setInterval(checkApiHealth, 30000); // Check every 30 seconds
+    const interval = setInterval(checkApiHealth, 30000);
 
     return () => clearInterval(interval);
   }, [apiUrl]);

@@ -78,6 +78,7 @@ import measurementsV2Router from './routes/measurements-v2';
 import measurementsV3Router from './routes/measurements-v3';
 import projectsRouter from './routes/projects';
 import aiRecommendationsRouter from './routes/aiRecommendations';
+import sanctumPlanesRouter from './routes/planes/sanctum';
 
 const app = express();
 
@@ -456,6 +457,9 @@ app.use('/api/cultural-knowledge', culturalKnowledgeRouter);
 app.use('/api/database', apiDatabaseRouter);
 app.use('/api/global-impact-economy', globalImpactEconomyRouter);
 app.use('/api/governance/models', modelGovernanceRouter);
+
+// ── Atlas Sanctum COS — Five Planes API (v3) ──────────────────────────────────
+app.use('/api/v3/sanctum', sanctumPlanesRouter);
 
 // Root endpoint with API documentation
 app.get('/', (req, res) => {

@@ -1,5 +1,9 @@
 // Frontend API Service Layer
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+// In dev, use a relative path so requests go through the Vite proxy (vite.config.ts → localhost:4000).
+// In production, VITE_API_URL must be set to the deployed backend URL.
+const API_BASE_URL = import.meta.env.VITE_API_URL
+  ? import.meta.env.VITE_API_URL
+  : '/api';
 const API_V2_BASE_URL = `${API_BASE_URL}/v2`;
 
 interface APIResponse<T> {
@@ -45,8 +49,8 @@ class ApiService {
     for (let attempt = 0; attempt <= retries; attempt++) {
       try {
         // Validate URL format
-        if (!url.startsWith('http://') && !url.startsWith('https://')) {
-          throw new Error('Invalid URL: must start with http:// or https://');
+        if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('/')) {
+          throw new Error('Invalid URL: must start with http://, https://, or /');
         }
 
         const response = await fetch(url, {

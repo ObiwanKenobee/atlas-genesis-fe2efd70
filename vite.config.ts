@@ -13,10 +13,16 @@ export default defineConfig(({ mode }) => ({
         changeOrigin: true,
         configure: (proxy) => {
           proxy.on('error', (_err: Error, _req: IncomingMessage, res: ServerResponse) => {
-            res.writeHead(503, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ error: 'Backend unavailable', code: 'ECONNREFUSED' }));
+            if (!res.headersSent) {
+              res.writeHead(503, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ error: 'Backend unavailable', code: 'ECONNREFUSED' }));
+            }
           });
         },
+      },
+      "/health": {
+        target: "http://localhost:4000",
+        changeOrigin: true,
       },
     },
   },

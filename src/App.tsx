@@ -113,7 +113,7 @@ import {
 import Prototype from './pages/Prototype';
 import DashboardHub from './pages/DashboardHub';
 import MythicArchitect from './pages/MythicArchitect';
-import { OnboardingProvider } from './hooks/useOnboarding.tsx';
+import { OnboardingProvider } from '@/context/OnboardingContext';
 
 const SimplePage = ({ title, description }: { title: string; description: string }) => (
   <Layout>

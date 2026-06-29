@@ -17,7 +17,7 @@ function env(key: string, fallback = ''): string {
 }
 
 // ─── REST / Express backend ───────────────────────────────────────────────────
-const API_BASE   = env('VITE_API_URL', 'http://localhost:3001/api');
+const API_BASE   = env('VITE_API_URL', '/api');
 const API_V2     = `${API_BASE}/v2`;
 
 // ─── AI / FastAPI backend ─────────────────────────────────────────────────────
