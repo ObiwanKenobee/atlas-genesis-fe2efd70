@@ -68,12 +68,7 @@ router.post('/proposals/:id/vote', async (req, res) => {
 
           await emailService.sendGovernanceVoteConfirmation(
             voter.email,
-            voter.display_name || voter.email,
-            {
-              proposalTitle: proposal.title,
-              choice: choice,
-              weight: weight || 1
-            }
+            proposal.title
           );
         }
       } catch (emailError) {

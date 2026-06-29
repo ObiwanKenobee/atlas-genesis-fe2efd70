@@ -617,14 +617,14 @@ class EnvironmentalMonitoringService {
     `, [
       data.sensorId,
       data.stationId,
-      data.moistureContent || null,
+      data.moisture_content || null,
       data.moistureDepthCm || 15,
       data.nitrogenPpm || null,
       data.phosphorusPpm || null,
       data.potassiumPpm || null,
-      data.phLevel || null,
-      data.organicMatterPercentage || null,
-      data.microbialBiomassC || null,
+      data.ph_level || null,
+      data.organic_matter_percentage || null,
+      data.microbial_biomass_c || null,
       data.respirationRate || null,
       data.enzymeActivity || null,
       data.soilTemperature || null,
@@ -642,10 +642,10 @@ class EnvironmentalMonitoringService {
     let score = 100;
     
     // Penalize for out-of-range values
-    if (data.phLevel && (data.phLevel < 5.5 || data.phLevel > 7.5)) score -= 15;
-    if (data.organicMatterPercentage && data.organicMatterPercentage < 2) score -= 20;
-    if (data.microbialBiomassC && data.microbialBiomassC < 100) score -= 15;
-    if (data.moistureContent && (data.moistureContent < 10 || data.moistureContent > 60)) score -= 10;
+    if (data.ph_level && (data.ph_level < 5.5 || data.ph_level > 7.5)) score -= 15;
+    if (data.organic_matter_percentage && data.organic_matter_percentage < 2) score -= 20;
+    if (data.microbial_biomass_c && data.microbial_biomass_c < 100) score -= 15;
+    if (data.moisture_content && (data.moisture_content < 10 || data.moisture_content > 60)) score -= 10;
     
     return Math.max(0, Math.min(100, score));
   }

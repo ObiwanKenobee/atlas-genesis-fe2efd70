@@ -505,8 +505,8 @@ router.get('/invoices/statistics', authenticate, async (req: any, res) => {
 
     const stats = await invoiceService.getInvoiceStatistics(
       req.user.tenantId || req.user.organizationId,
-      start,
-      end
+      start.toISOString(),
+      end.toISOString()
     );
     res.json({
       success: true,

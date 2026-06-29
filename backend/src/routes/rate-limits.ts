@@ -371,7 +371,7 @@ router.get(
       const userId = Array.isArray(req.params.userId) ? req.params.userId[0] : req.params.userId;
       
       // Allow users to view their own limits or admins to view any
-      if (req.user?.id !== userId && !req.user?.roles?.includes('admin')) {
+      if (req.user?.id !== userId && req.user?.role !== 'admin') {
         return res.status(403).json({
           success: false,
           error: 'Access denied'

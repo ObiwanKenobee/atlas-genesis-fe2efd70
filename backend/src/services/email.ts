@@ -361,6 +361,78 @@ class EmailService {
   clearSentEmails() {
     sentEmails.length = 0;
   }
+
+  // ─── Additional methods referenced by route files ─────────────────────────
+
+  async sendWelcomeEmail(email: string, userName: string): Promise<{ success: boolean }> {
+    return this.sendEmail({
+      to: email,
+      subject: 'Welcome to Atlas Sanctum 🌿',
+      html: `<p>Hi ${userName}, welcome to Atlas Sanctum! Your account is ready.</p>`,
+    });
+  }
+
+  async sendEmailVerification(email: string, token: string): Promise<{ success: boolean }> {
+    const url = `${process.env.FRONTEND_URL}/auth/verify?token=${token}`;
+    return this.sendEmail({
+      to: email,
+      subject: 'Verify your Atlas Sanctum email',
+      html: `<p>Click <a href="${url}">here</a> to verify your email address.</p>`,
+    });
+  }
+
+  async sendLoginNotification(email: string, userName: string, ip: string): Promise<{ success: boolean }> {
+    return this.sendEmail({
+      to: email,
+      subject: 'New login to your Atlas Sanctum account',
+      html: `<p>Hi ${userName}, a new login was detected from IP ${ip}.</p>`,
+    });
+  }
+
+  async sendPasswordResetEmail(email: string, token: string): Promise<{ success: boolean }> {
+    const url = `${process.env.FRONTEND_URL}/auth/reset-password?token=${token}`;
+    return this.sendEmail({
+      to: email,
+      subject: 'Reset your Atlas Sanctum password',
+      html: `<p>Click <a href="${url}">here</a> to reset your password. This link expires in 1 hour.</p>`,
+    });
+  }
+
+  async sendGovernanceVoteConfirmation(email: string, proposalTitle: string): Promise<{ success: boolean }> {
+    return this.sendEmail({
+      to: email,
+      subject: `Vote confirmed: ${proposalTitle}`,
+      html: `<p>Your vote on governance proposal "${proposalTitle}" has been recorded.</p>`,
+    });
+  }
+
+  async sendMarketplacePurchaseNotification(email: string, quantity: number, amount: number): Promise<{ success: boolean }> {
+    return this.sendEmail({
+      to: email,
+      subject: 'Purchase confirmed — Atlas Sanctum',
+      html: `<p>You purchased ${quantity} credits for $${amount.toFixed(2)}. Thank you!</p>`,
+    });
+  }
+
+  async sendMarketplaceSaleNotification(email: string, quantity: number, amount: number): Promise<{ success: boolean }> {
+    return this.sendEmail({
+      to: email,
+      subject: 'Your listing sold — Atlas Sanctum',
+      html: `<p>Your listing of ${quantity} credits sold for $${amount.toFixed(2)}.</p>`,
+    });
+  }
+
+  async sendPaymentConfirmation(
+    email: string,
+    userName: string,
+    details: { amount: number; reference: string; description: string }
+  ): Promise<{ success: boolean }> {
+    return this.sendEmail({
+      to: email,
+      subject: 'Payment confirmed — Atlas Sanctum',
+      html: `<p>Hi ${userName}, payment of $${details.amount.toFixed(2)} (ref: ${details.reference}) for "${details.description}" was successful.</p>`,
+    });
+  }
 }
 
 export const emailService = new EmailService();

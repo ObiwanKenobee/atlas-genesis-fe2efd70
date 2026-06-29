@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import environmentalMonitoringService from '../services/EnvironmentalMonitoringService';
 import { cacheWithRedis, invalidateCache } from '../redisClient';
 import { logger } from '../utils/logger';
+import { query } from '../db';
 
 const router = express.Router();
 

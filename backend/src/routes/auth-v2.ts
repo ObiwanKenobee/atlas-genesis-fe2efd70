@@ -101,7 +101,7 @@ router.post('/signup', validateWithZod(userCreateSchema), async (req: Request, r
       try {
         const safeDisplayName = user.display_name || 'User';
         await emailService.sendWelcomeEmail(user.email, safeDisplayName);
-        await emailService.sendEmailVerification(user.email, safeDisplayName, verificationToken);
+        await emailService.sendEmailVerification(user.email, verificationToken);
       } catch (emailError) {
         console.error('Failed to send welcome/verification email:', emailError);
         // Don't fail registration if email fails
@@ -294,10 +294,8 @@ router.post('/login', validateWithZod(loginSchema), async (req: Request, res: Re
 
     // Send login notification (async, don't wait)
     try {
-      emailService.sendLoginNotification(user.email, user.display_name || user.email, {
-        ip: req.ip,
-        userAgent: req.get('User-Agent')
-      }).catch(err => console.error('Failed to send login notification:', err));
+      emailService.sendLoginNotification(user.email, user.display_name || user.email, req.ip || 'unknown')
+        .catch(err => console.error('Failed to send login notification:', err));
     } catch (err) {
       // Ignore email errors
     }
@@ -574,7 +572,7 @@ router.post('/resend-verification', authenticate, async (req: AuthenticatedReque
     
     const verificationToken = await createEmailVerificationToken(user.id);
     const safeDisplayName = user.displayName || 'User';
-    await emailService.sendEmailVerification(user.email, safeDisplayName, verificationToken);
+    await emailService.sendEmailVerification(user.email, verificationToken);
 
     res.json({ message: 'Verification email sent' });
   } catch (err) {
@@ -596,7 +594,7 @@ router.post('/forgot-password', async (req: Request, res: Response) => {
     if (result.rowCount > 0) {
       const user = result.rows[0];
       const resetToken = await createPasswordResetToken(user.id);
-      await emailService.sendPasswordResetEmail(user.email, user.display_name || user.email, resetToken);
+      await emailService.sendPasswordResetEmail(user.email, resetToken);
     }
 
     // Always return success to prevent email enumeration

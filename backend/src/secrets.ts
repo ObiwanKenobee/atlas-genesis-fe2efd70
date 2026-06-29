@@ -76,3 +76,5 @@ export async function loadSecrets(names: string[]): Promise<Record<string, Maybe
 
   return results;
 }
+
+export default { getSecret, loadSecrets };

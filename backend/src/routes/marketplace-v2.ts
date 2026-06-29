@@ -186,13 +186,8 @@ router.post('/riums/:id/purchase', async (req: Request, res: Response) => {
         const buyer = buyerResult.rows[0];
         await emailService.sendMarketplacePurchaseNotification(
           buyer.email,
-          buyer.display_name || buyer.email,
-          {
-            itemName: `RIU #${id}`,
-            quantity: quantity,
-            totalAmount: totalPrice || quantity * riu.price,
-            transactionId: txResult.rows[0].id
-          }
+          quantity,
+          totalPrice || quantity * riu.price
         );
       }
     } catch (emailError) {
@@ -209,14 +204,8 @@ router.post('/riums/:id/purchase', async (req: Request, res: Response) => {
 
         await emailService.sendMarketplaceSaleNotification(
           seller.email,
-          seller.display_name || seller.email,
-          {
-            itemName: `RIU #${id}`,
-            quantity: quantity,
-            amount: totalPrice || quantity * riu.price,
-            buyerName: buyerName,
-            transactionId: txResult.rows[0].id
-          }
+          quantity,
+          totalPrice || quantity * riu.price
         );
       }
     } catch (emailError) {

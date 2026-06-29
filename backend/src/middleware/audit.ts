@@ -106,7 +106,7 @@ export const auditMiddleware = (options: AuditMiddlewareOptions) => {
             severity,
             ipAddress: req.ip || (req as any).connection?.remoteAddress,
             userAgent: req.get('User-Agent'),
-            sessionId: (req as any).sessionID || (req.session as any)?.id
+            sessionId: (req as any).sessionID || (req as any).session?.id
           }
         );
       } catch (error) {

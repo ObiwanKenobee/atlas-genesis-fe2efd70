@@ -1,5 +1,5 @@
 import express from 'express';
-import { PaymentService, PaymentMethod } from '../services/payment';
+import { PaymentService, SupportedPaymentMethod } from '../services/payment';
 import { query } from '../db';
 import { emailService } from '../services/email';
 import { authenticate } from '../middleware/auth';
@@ -41,7 +41,7 @@ router.post('/initialize', authenticate, async (req: any, res) => {
         currency: currency,
       },
       callback_url: `${process.env.FRONTEND_URL}/payment/callback`,
-      paymentMethod: paymentMethod as PaymentMethod,
+      paymentMethod: paymentMethod as SupportedPaymentMethod,
       currency: currency,
     });
 
@@ -81,7 +81,7 @@ router.get('/verify/:reference', authenticate, async (req: any, res) => {
     }
 
     // Verify with selected payment method
-    const verificationResult = await PaymentService.verifyPayment(reference, paymentMethod as PaymentMethod);
+    const verificationResult = await PaymentService.verifyPayment(reference, paymentMethod as SupportedPaymentMethod);
     if (!verificationResult.success) {
       return res.status(500).json(verificationResult);
     }
@@ -99,7 +99,7 @@ router.get('/verify/:reference', authenticate, async (req: any, res) => {
 
     // Update order status based on payment status
     const status = paymentData.status === 'success' ? 'completed' : 'failed';
-    const updateResult = await PaymentService.updateOrderStatus(orderId, status, reference, paymentMethod as PaymentMethod);
+    const updateResult = await PaymentService.updateOrderStatus(orderId, status, reference, paymentMethod as SupportedPaymentMethod);
 
     if (!updateResult.success) {
       return res.status(500).json(updateResult);

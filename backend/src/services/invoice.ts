@@ -288,6 +288,61 @@ class InvoiceService {
     const year = new Date().getFullYear();
     return `INV-${year}-${String(maxNumber + 1).padStart(3, '0')}`;
   }
+
+  // ─── Methods referenced by billing route ────────────────────────────────────
+
+  async getOrganizationInvoices(organizationId: string, filters?: any) {
+    // Return all invoices for org; extend with real DB query when schema is set
+    return Array.from(invoices.values()).filter((inv: any) => inv.organization_id === organizationId);
+  }
+
+  async getInvoiceItems(invoiceId: string) {
+    const inv = await this.getInvoiceWithItems(invoiceId);
+    return inv?.items ?? [];
+  }
+
+  async downloadInvoicePDF(invoiceId: string): Promise<string | null> {
+    return this.generateInvoicePDF(invoiceId);
+  }
+
+  async sendInvoiceEmail(invoiceId: string): Promise<{ success: boolean }> {
+    const inv = await this.getInvoice(invoiceId);
+    if (!inv) return { success: false };
+    const { emailService } = await import('./email');
+    return emailService.sendInvoiceEmail(inv.billing_email, inv.invoice_number, '', `${inv.invoice_number}.pdf`);
+  }
+
+  async getInvoiceStatistics(organizationId: string, startDate?: string, endDate?: string) {
+    const all = Array.from(invoices.values()) as any[];
+    const filtered = all.filter(i =>
+      i.organization_id === organizationId &&
+      (!startDate || i.created_at >= startDate) &&
+      (!endDate || i.created_at <= endDate)
+    );
+    const paid = filtered.filter(i => i.status === 'paid');
+    return {
+      total: filtered.length,
+      totalAmount: filtered.reduce((s: number, i: any) => s + (i.total || 0), 0),
+      paid: paid.length,
+      paidAmount: paid.reduce((s: number, i: any) => s + (i.total || 0), 0),
+      outstanding: filtered.filter(i => i.status !== 'paid').length,
+    };
+  }
+
+  async getInvoiceSettings(organizationId: string) {
+    return {
+      organizationId,
+      currency: 'USD',
+      taxRate: 0,
+      paymentTerms: 30,
+      notes: '',
+    };
+  }
+
+  async updateInvoiceSettings(organizationId: string, settings: any) {
+    // Persist in DB when schema is ready
+    return { ...settings, organizationId, updatedAt: new Date().toISOString() };
+  }
 }
 
 export const invoiceService = new InvoiceService();

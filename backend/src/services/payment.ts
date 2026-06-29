@@ -7,6 +7,7 @@
 
 import Stripe from 'stripe';
 import { query } from '../db';
+import crypto from 'crypto';
 
 // Initialize Stripe lazily — only when a real key is present
 function getStripe(): Stripe {
@@ -14,10 +15,215 @@ function getStripe(): Stripe {
   if (!key || key.startsWith('your_') || key.startsWith('sk_test_your')) {
     throw new Error('Stripe is not configured. Set STRIPE_SECRET_KEY in .env');
   }
-  return new Stripe(key, { apiVersion: '2024-11-20.acacia' });
+  return new Stripe(key, { apiVersion: '2026-01-28.clover' });
 }
 
-export interface PaymentMethod {
+// ─── Static helper types used by route files ──────────────────────────────────
+
+export type SupportedPaymentMethod =
+  | 'paystack' | 'paypal' | 'stripe' | 'card' | 'bank'
+  | 'coinbase-commerce' | 'metamask' | 'eth' | 'btc' | 'usdc'
+  | 'usdt' | 'cardano' | 'matic' | 'flutterwave';
+
+export interface InitializePaymentOptions {
+  amount: number;
+  email: string;
+  reference: string;
+  metadata?: Record<string, any>;
+  callback_url?: string;
+  paymentMethod?: SupportedPaymentMethod;
+  currency?: string;
+}
+
+export interface OrderRecord {
+  id: string;
+  listing_id: string;
+  buyer_id: string;
+  quantity: number;
+  price_amount: number;
+  status: string;
+  payment_reference?: string;
+  payment_method?: string;
+  created_at: string;
+}
+
+// ─── Static marketplace helpers ───────────────────────────────────────────────
+
+async function createOrder(
+  listingId: string,
+  buyerId: string,
+  quantity: number,
+  amount: number
+): Promise<{ success: boolean; order?: OrderRecord; error?: string }> {
+  try {
+    const result = await query(
+      `INSERT INTO orders (listing_id, buyer_id, quantity, price_amount, status, created_at)
+       VALUES ($1, $2, $3, $4, 'created', NOW()) RETURNING *`,
+      [listingId, buyerId, quantity, amount]
+    );
+    return { success: true, order: result.rows[0] };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
+async function initializePayment(
+  opts: InitializePaymentOptions
+): Promise<{ success: boolean; data?: any; paymentMethod?: string; error?: string }> {
+  const method = opts.paymentMethod || 'paystack';
+  try {
+    if (method === 'paystack' || method === 'card' || method === 'bank') {
+      const key = process.env.PAYSTACK_SECRET_KEY;
+      if (!key) throw new Error('PAYSTACK_SECRET_KEY not configured');
+      const amountKobo = Math.round(opts.amount * 100);
+      const res = await fetch('https://api.paystack.co/transaction/initialize', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: opts.email,
+          amount: amountKobo,
+          currency: opts.currency === 'USD' ? 'USD' : 'NGN',
+          reference: opts.reference,
+          callback_url: opts.callback_url,
+          metadata: opts.metadata,
+          channels: ['card', 'bank', 'ussd', 'bank_transfer'],
+        }),
+      });
+      const data = await res.json() as any;
+      if (!data.status) throw new Error(data.message || 'Paystack init failed');
+      return { success: true, data: data.data, paymentMethod: 'paystack' };
+    }
+
+    if (method === 'stripe') {
+      const stripe = getStripe();
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [{
+          price_data: {
+            currency: (opts.currency || 'usd').toLowerCase(),
+            unit_amount: Math.round(opts.amount * 100),
+            product_data: { name: 'Carbon Credits' },
+          },
+          quantity: 1,
+        }],
+        mode: 'payment',
+        success_url: opts.callback_url || `${process.env.FRONTEND_URL}/pricing?payment=success`,
+        cancel_url: `${process.env.FRONTEND_URL}/pricing?payment=cancelled`,
+        customer_email: opts.email,
+        metadata: opts.metadata as Record<string, string>,
+      });
+      return { success: true, data: { authorization_url: session.url, reference: session.id }, paymentMethod: 'stripe' };
+    }
+
+    if (method === 'paypal') {
+      const clientId = process.env.PAYPAL_CLIENT_ID;
+      const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
+      if (!clientId || !clientSecret) throw new Error('PayPal credentials not configured');
+      const auth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
+      const tokenRes = await fetch('https://api-m.paypal.com/v1/oauth2/token', {
+        method: 'POST',
+        headers: { Authorization: `Basic ${auth}`, 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'grant_type=client_credentials',
+      });
+      const tokenData = await tokenRes.json() as any;
+      const orderRes = await fetch('https://api-m.paypal.com/v2/checkout/orders', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${tokenData.access_token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          intent: 'CAPTURE',
+          purchase_units: [{
+            reference_id: opts.reference,
+            amount: { currency_code: opts.currency || 'USD', value: opts.amount.toFixed(2) },
+            custom_id: JSON.stringify(opts.metadata || {}),
+          }],
+          application_context: {
+            return_url: opts.callback_url || `${process.env.FRONTEND_URL}/pricing?payment=success`,
+            cancel_url: `${process.env.FRONTEND_URL}/pricing?payment=cancelled`,
+            user_action: 'PAY_NOW',
+          },
+        }),
+      });
+      const orderData = await orderRes.json() as any;
+      if (!orderRes.ok) throw new Error(orderData.message || 'PayPal order failed');
+      const approvalLink = orderData.links?.find((l: any) => l.rel === 'approve');
+      return { success: true, data: { authorization_url: approvalLink?.href, reference: orderData.id }, paymentMethod: 'paypal' };
+    }
+
+    // Crypto/wallet — return pending, handled on-chain
+    return {
+      success: true,
+      data: { reference: opts.reference, status: 'pending', message: 'Complete payment on-chain' },
+      paymentMethod: method,
+    };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
+async function updateOrderStatus(
+  orderId: string,
+  status: string,
+  reference?: string,
+  method?: string
+): Promise<{ success: boolean; order?: OrderRecord; error?: string }> {
+  try {
+    const result = await query(
+      `UPDATE orders SET status = $1, payment_reference = COALESCE($2, payment_reference),
+       payment_method = COALESCE($3, payment_method), updated_at = NOW()
+       WHERE id = $4 RETURNING *`,
+      [status, reference || null, method || null, orderId]
+    );
+    return { success: true, order: result.rows[0] };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
+async function getOrderById(orderId: string): Promise<{ success: boolean; order?: OrderRecord; error?: string }> {
+  try {
+    const result = await query('SELECT * FROM orders WHERE id = $1', [orderId]);
+    return { success: true, order: result.rows[0] || null };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
+async function verifyPayment(
+  reference: string,
+  method: SupportedPaymentMethod = 'paystack'
+): Promise<{ success: boolean; data?: any; paymentMethod?: string; error?: string }> {
+  try {
+    if (method === 'paystack' || method === 'card' || method === 'bank') {
+      const key = process.env.PAYSTACK_SECRET_KEY;
+      if (!key) throw new Error('PAYSTACK_SECRET_KEY not configured');
+      const res = await fetch(`https://api.paystack.co/transaction/verify/${reference}`, {
+        headers: { Authorization: `Bearer ${key}` },
+      });
+      const data = await res.json() as any;
+      if (!data.status) throw new Error(data.message || 'Verification failed');
+      return { success: true, data: { ...data.data, status: data.data.status === 'success' ? 'success' : 'failed' }, paymentMethod: 'paystack' };
+    }
+
+    if (method === 'stripe') {
+      const stripe = getStripe();
+      const session = await stripe.checkout.sessions.retrieve(reference);
+      return {
+        success: true,
+        data: { status: session.payment_status === 'paid' ? 'success' : 'failed', metadata: session.metadata },
+        paymentMethod: 'stripe',
+      };
+    }
+
+    return { success: false, error: `Verification not supported for ${method}` };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
+// Expose as static-style namespace for existing route imports
+export const PaymentService = { createOrder, initializePayment, updateOrderStatus, getOrderById, verifyPayment };
+
+export interface PaymentMethodRecord {
   id: string;
   userId: string;
   organizationId: string;
@@ -33,7 +239,7 @@ export interface PaymentMethod {
   createdAt: Date;
 }
 
-export interface Payment {
+export interface PaymentRecord {
   id: string;
   userId: string;
   organizationId: string;
@@ -48,7 +254,7 @@ export interface Payment {
   updatedAt: Date;
 }
 
-export class PaymentService {
+export class PaymentServiceClass {
   /**
    * Create payment method
    */
@@ -56,8 +262,8 @@ export class PaymentService {
     userId: string,
     organizationId: string,
     paymentMethodId: string
-  ): Promise<PaymentMethod> {
-    // Get payment method details from Stripe
+  ): Promise<PaymentMethodRecord> {
+    const stripe = getStripe();
     const stripePaymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
 
     // Get or create customer
@@ -118,7 +324,7 @@ export class PaymentService {
   /**
    * Get payment methods for user
    */
-  async getUserPaymentMethods(userId: string): Promise<PaymentMethod[]> {
+  async getUserPaymentMethods(userId: string): Promise<PaymentMethodRecord[]> {
     const result = await query(
       `SELECT * FROM payment_methods WHERE user_id = $1 ORDER BY is_default DESC, created_at DESC`,
       [userId]
@@ -132,7 +338,7 @@ export class PaymentService {
    */
   async getOrganizationPaymentMethods(
     organizationId: string
-  ): Promise<PaymentMethod[]> {
+  ): Promise<PaymentMethodRecord[]> {
     const result = await query(
       `SELECT * FROM payment_methods WHERE organization_id = $1 ORDER BY is_default DESC, created_at DESC`,
       [organizationId]
@@ -159,6 +365,7 @@ export class PaymentService {
       throw new Error('Customer not found');
     }
 
+    const stripe = getStripe();
     // Update in Stripe
     await stripe.customers.update(customerId, {
       invoice_settings: {
@@ -182,6 +389,7 @@ export class PaymentService {
     userId: string,
     paymentMethodId: string
   ): Promise<void> {
+    const stripe = getStripe();
     // Get customer ID
     const customerResult = await query(
       `SELECT stripe_customer_id FROM users WHERE id = $1`,
@@ -193,7 +401,6 @@ export class PaymentService {
       throw new Error('Customer not found');
     }
 
-    // Detach from Stripe
     await stripe.paymentMethods.detach(paymentMethodId);
 
     // Delete from database
@@ -212,7 +419,8 @@ export class PaymentService {
     invoiceId: string,
     amount: number,
     currency: string = 'usd'
-  ): Promise<Payment> {
+  ): Promise<PaymentRecord> {
+    const stripe = getStripe();
     // Get customer ID
     const customerResult = await query(
       `SELECT stripe_customer_id FROM users WHERE id = $1`,
@@ -261,7 +469,8 @@ export class PaymentService {
    */
   async confirmPaymentIntent(
     paymentIntentId: string
-  ): Promise<Payment> {
+  ): Promise<PaymentRecord> {
+    const stripe = getStripe();
     // Retrieve payment intent
     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
 
@@ -280,7 +489,7 @@ export class PaymentService {
   /**
    * Get payment by ID
    */
-  async getPayment(paymentId: string): Promise<Payment | null> {
+  async getPayment(paymentId: string): Promise<PaymentRecord | null> {
     const result = await query(
       `SELECT * FROM payments WHERE id = $1`,
       [paymentId]
@@ -296,7 +505,7 @@ export class PaymentService {
     userId: string,
     limit: number = 20,
     offset: number = 0
-  ): Promise<Payment[]> {
+  ): Promise<PaymentRecord[]> {
     const result = await query(
       `SELECT * FROM payments 
        WHERE user_id = $1 
@@ -315,7 +524,7 @@ export class PaymentService {
     organizationId: string,
     limit: number = 20,
     offset: number = 0
-  ): Promise<Payment[]> {
+  ): Promise<PaymentRecord[]> {
     const result = await query(
       `SELECT * FROM payments 
        WHERE organization_id = $1 
@@ -458,4 +667,4 @@ export class PaymentService {
 }
 
 // Export singleton instance
-export const paymentService = new PaymentService();
+export const paymentService = new PaymentServiceClass();

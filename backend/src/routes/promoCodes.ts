@@ -49,8 +49,8 @@ router.post('/validate', authenticate, async (req: any, res) => {
       promoCode: {
         code: result.promoCode.code,
         description: result.promoCode.description,
-        discountType: result.promoCode.discount_type,
-        discountValue: result.promoCode.discount_value,
+        discountType: result.promoCode.discountType,
+        discountValue: result.promoCode.discountValue,
       },
     });
   } catch (error) {
@@ -101,8 +101,8 @@ router.post('/apply', authenticate, async (req: any, res) => {
       discountAmount: validationResult.discountAmount,
       appliedCode: {
         code: validationResult.promoCode.code,
-        discountType: validationResult.promoCode.discount_type,
-        discountValue: validationResult.promoCode.discount_value,
+        discountType: validationResult.promoCode.discountType,
+        discountValue: validationResult.promoCode.discountValue,
       },
     });
   } catch (error) {
@@ -127,8 +127,8 @@ router.get('/', async (req, res) => {
       data: result.promoCodes.map((promo: any) => ({
         code: promo.code,
         description: promo.description,
-        discountType: promo.discount_type,
-        discountValue: promo.discount_value,
+        discountType: promo.discountType,
+        discountValue: promo.discountValue,
         isActive: promo.is_active,
       })),
     });
@@ -199,8 +199,8 @@ router.post('/', authenticate, requirePermission('promocodes:create'), async (re
         id: result.promoCode.id,
         code: result.promoCode.code,
         description: result.promoCode.description,
-        discountType: result.promoCode.discount_type,
-        discountValue: result.promoCode.discount_value,
+        discountType: result.promoCode.discountType,
+        discountValue: result.promoCode.discountValue,
         isActive: result.promoCode.is_active,
       },
     });
