@@ -195,9 +195,7 @@ export function CheckoutModal({ isOpen, onClose, plan }: CheckoutModalProps) {
     const result = await initiatePayment({
       provider: paymentMethod,
       amount: total,
-      currency: ['mpesa', 'mtn-momo', 'airtel-money', 'paystack', 'flutterwave', 'chipper'].includes(paymentMethod)
-        ? 'USD' : ['eth', 'btc', 'usdc', 'usdt', 'cardano', 'matic'].includes(paymentMethod)
-        ? 'CRYPTO' : 'USD',
+      currency: 'USD',
       metadata: {
         planId: plan.id, planName: plan.name, billingPeriod: plan.billingPeriod,
         promoCode: appliedPromo?.code, discountAmount: appliedPromo?.discountAmount,

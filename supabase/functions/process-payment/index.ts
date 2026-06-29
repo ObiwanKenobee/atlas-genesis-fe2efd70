@@ -7,7 +7,7 @@ const corsHeaders = {
 };
 
 interface PaymentRequest {
-  provider: 'paystack' | 'paypal' | 'card' | 'bank';
+  provider: 'paystack' | 'paypal' | 'card' | 'bank' | 'stripe' | 'coinbase-commerce' | 'metamask' | 'eth' | 'btc' | 'usdc' | 'usdt' | 'cardano' | 'matic' | 'flutterwave' | 'mpesa' | 'mtn-momo' | 'airtel-money' | 'chipper';
   amount: number;
   currency: string;
   email: string;
@@ -179,6 +179,100 @@ async function processPayPal(request: PaymentRequest, origin: string): Promise<P
   };
 }
 
+async function processStripe(request: PaymentRequest, origin: string): Promise<PaymentResponse> {
+  const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY');
+  if (!stripeSecretKey) {
+    throw new Error('Stripe secret key not configured');
+  }
+
+  const amountInCents = Math.round(request.amount * 100);
+  const description = request.metadata.planName
+    ? `${request.metadata.planName} - ${request.metadata.billingPeriod}`
+    : 'Carbon Credits Purchase';
+
+  const sessionRes = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${stripeSecretKey}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({
+      'payment_method_types[]': 'card',
+      'line_items[0][price_data][currency]': (request.currency || 'USD').toLowerCase(),
+      'line_items[0][price_data][unit_amount]': amountInCents.toString(),
+      'line_items[0][price_data][product_data][name]': description,
+      'line_items[0][quantity]': '1',
+      'mode': 'payment',
+      'success_url': request.callbackUrl || `${origin}/pricing?payment=success&session_id={CHECKOUT_SESSION_ID}`,
+      'cancel_url': `${origin}/pricing?payment=cancelled`,
+      'customer_email': request.email,
+      'metadata[userId]': request.userId,
+      'metadata[planId]': request.metadata.planId || '',
+      'metadata[quantity]': String(request.metadata.quantity || 1),
+      'metadata[projectId]': request.metadata.projectId || '',
+    }),
+  });
+
+  const sessionData = await sessionRes.json();
+  if (!sessionRes.ok) {
+    throw new Error(sessionData.error?.message || 'Failed to create Stripe session');
+  }
+
+  return {
+    success: true,
+    provider: 'stripe',
+    paymentId: sessionData.id,
+    redirectUrl: sessionData.url,
+    reference: sessionData.id,
+    status: 'redirect',
+    message: 'Redirecting to Stripe',
+  };
+}
+
+async function processCoinbaseCommerce(request: PaymentRequest, origin: string): Promise<PaymentResponse> {
+  const coinbaseApiKey = Deno.env.get('COINBASE_COMMERCE_API_KEY');
+  if (!coinbaseApiKey) {
+    throw new Error('Coinbase Commerce API key not configured');
+  }
+
+  const description = request.metadata.planName
+    ? `${request.metadata.planName} - ${request.metadata.billingPeriod}`
+    : 'Carbon Credits Purchase';
+
+  const chargeRes = await fetch('https://api.commerce.coinbase.com/charges', {
+    method: 'POST',
+    headers: {
+      'X-CC-Api-Key': coinbaseApiKey,
+      'X-CC-Version': '2018-03-22',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      name: description,
+      description,
+      pricing_type: 'fixed_price',
+      local_price: { amount: request.amount.toFixed(2), currency: request.currency || 'USD' },
+      metadata: { userId: request.userId, ...request.metadata },
+      redirect_url: request.callbackUrl || `${origin}/pricing?payment=success`,
+      cancel_url: `${origin}/pricing?payment=cancelled`,
+    }),
+  });
+
+  const chargeData = await chargeRes.json();
+  if (!chargeRes.ok) {
+    throw new Error(chargeData.error?.message || 'Failed to create Coinbase Commerce charge');
+  }
+
+  return {
+    success: true,
+    provider: 'coinbase-commerce',
+    paymentId: chargeData.data.id,
+    redirectUrl: chargeData.data.hosted_url,
+    reference: chargeData.data.code,
+    status: 'redirect',
+    message: 'Redirecting to Coinbase Commerce',
+  };
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -214,18 +308,39 @@ serve(async (req) => {
     // Process payment based on provider
     switch (request.provider) {
       case 'paystack':
+      case 'card':
+      case 'bank':
+      case 'flutterwave':
+      case 'mpesa':
+      case 'mtn-momo':
+      case 'airtel-money':
+      case 'chipper':
         paymentResponse = await processPaystack(request, origin);
         break;
       case 'paypal':
         paymentResponse = await processPayPal(request, origin);
         break;
-      case 'card':
-        // For card payments, default to Paystack
-        paymentResponse = await processPaystack(request, origin);
+      case 'stripe':
+        paymentResponse = await processStripe(request, origin);
         break;
-      case 'bank':
-        // For bank transfers, use Paystack with bank channel
-        paymentResponse = await processPaystack(request, origin);
+      case 'coinbase-commerce':
+        paymentResponse = await processCoinbaseCommerce(request, origin);
+        break;
+      // Crypto wallets — return instructions for client-side handling
+      case 'metamask':
+      case 'eth':
+      case 'btc':
+      case 'usdc':
+      case 'usdt':
+      case 'cardano':
+      case 'matic':
+        paymentResponse = {
+          success: true,
+          provider: request.provider,
+          status: 'pending',
+          message: 'Crypto payment initiated — complete on-chain to confirm.',
+          reference: `CRYPTO-${Date.now()}`,
+        };
         break;
       default:
         throw new Error(`Unsupported payment provider: ${request.provider}`);

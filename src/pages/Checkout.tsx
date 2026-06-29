@@ -46,6 +46,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useEnhancedAuth } from '@/hooks/useEnhancedAuth';
+import { supabase } from '@/integrations/supabase/client';
 
 // Credit types available for purchase
 const CREDIT_TYPES = [
@@ -275,15 +276,39 @@ export default function Checkout() {
     }
   };
 
-  // Process payment
   const handleProcessPayment = async () => {
     setIsProcessing(true);
 
     try {
-      // Simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const provider = paymentMethod === 'fiat'
+        ? (fiatProvider as any)
+        : cryptoCurrency === 'wallet'
+          ? 'metamask'
+          : cryptoCurrency;
 
-      // Generate order ID
+      const { data, error: invokeError } = await supabase.functions.invoke('process-payment', {
+        body: {
+          provider,
+          amount: total,
+          currency: 'USD',
+          email: user?.email,
+          userId: user?.id,
+          metadata: {
+            creditType: selectedCreditType.id,
+            quantity,
+          },
+          callbackUrl: `${window.location.origin}/checkout?payment=success`,
+        },
+      });
+
+      if (invokeError) throw new Error(invokeError.message);
+
+      if (data?.redirectUrl) {
+        window.location.href = data.redirectUrl;
+        return; // page will redirect
+      }
+
+      // Providers that confirm inline (crypto wallets)
       const newOrderId = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
       setOrderId(newOrderId);
 
@@ -292,11 +317,11 @@ export default function Checkout() {
         description: 'Your credits have been added to your portfolio',
       });
 
-      setCurrentStep(3); // Move to confirmation
+      setCurrentStep(3);
     } catch (error) {
       toast({
         title: 'Payment failed',
-        description: 'Please try again or use a different payment method',
+        description: error instanceof Error ? error.message : 'Please try again or use a different payment method',
         variant: 'destructive',
       });
     } finally {

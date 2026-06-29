@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useEnhancedAuth } from "@/hooks/useEnhancedAuth";
+import { usePayment } from "@/hooks/usePayment";
 
 type PaymentMethod = 'paystack' | 'stripe' | 'coinbase' | 'wallet';
 
@@ -56,18 +57,37 @@ export default function Payment() {
     }
   }, [projectId, amount, quantity, paymentMethod]);
 
+  const { initiatePayment, status: paymentStatus } = usePayment();
+
   const handleProcessPayment = async () => {
     setIsProcessing(true);
     setError(null);
 
     try {
-      // Simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      if (paymentMethod === 'wallet') {
+        // MetaMask / Web3 — handled client-side
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        setIsVerified(true);
+        return;
+      }
 
-      setIsVerified(true);
+      const result = await initiatePayment({
+        provider: paymentMethod as any,
+        amount,
+        currency: 'USD',
+        metadata: {
+          projectId: projectId || undefined,
+          quantity,
+        },
+        callbackUrl: `${window.location.origin}/payment?payment=success&projectId=${projectId}&quantity=${quantity}`,
+      });
+
+      if (!result?.success) {
+        throw new Error(result?.error || 'Payment initialization failed');
+      }
+      // Redirect handled inside initiatePayment when redirectUrl is present
     } catch (error: any) {
-      setError('Failed to process payment');
-      console.error('Payment error:', error);
+      setError(error.message || 'Failed to process payment');
     } finally {
       setIsProcessing(false);
     }

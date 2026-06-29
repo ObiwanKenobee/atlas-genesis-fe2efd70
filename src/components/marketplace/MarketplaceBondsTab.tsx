@@ -1,7 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { CheckoutModal } from "@/components/pricing/CheckoutModal";
+import type { PlanDetails } from "@/components/pricing/CheckoutModal";
+
+const BONDS = [
+  { id: '5yr-regen', name: '5-Year Regen Bond', coupon: '3.8%', denominations: '$1M–$100M', billingPeriod: 'contract' as const, price: 1000000 },
+  { id: '10yr-regen', name: '10-Year Regen Bond', coupon: '5.2%', denominations: '$5M–$500M', billingPeriod: 'contract' as const, price: 5000000 },
+  { id: 'perpetual-regen', name: 'Perpetual Regen Bond', coupon: '6.5%', denominations: 'Unlimited', billingPeriod: 'contract' as const, price: 0 },
+  { id: 'green-impact', name: 'Green Impact Bond', coupon: '4.5%', denominations: 'Proceeds fund new projects', billingPeriod: 'contract' as const, price: 0 },
+];
 
 export const MarketplaceBondsTab: React.FC = () => {
+  const [selectedBond, setSelectedBond] = useState<PlanDetails | null>(null);
+
   return (
     <div className="space-y-6">
       <Card>
@@ -19,37 +31,39 @@ export const MarketplaceBondsTab: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div className="p-4 border rounded-lg">
-                <p className="font-semibold text-sm mb-2">5-Year Regen Bond</p>
-                <p className="text-3xl font-bold text-emerald-600">3.8%</p>
-                <p className="text-xs text-muted-foreground">Annual coupon</p>
-                <p className="text-xs text-slate-700 mt-2">$1M-$100M denominations</p>
-              </div>
-
-              <div className="p-4 border rounded-lg">
-                <p className="font-semibold text-sm mb-2">10-Year Regen Bond</p>
-                <p className="text-3xl font-bold text-emerald-600">5.2%</p>
-                <p className="text-xs text-muted-foreground">Annual coupon</p>
-                <p className="text-xs text-slate-700 mt-2">$5M-$500M denominations</p>
-              </div>
-
-              <div className="p-4 border rounded-lg">
-                <p className="font-semibold text-sm mb-2">Perpetual Regen Bond</p>
-                <p className="text-3xl font-bold text-emerald-600">6.5%</p>
-                <p className="text-xs text-muted-foreground">Annual coupon</p>
-                <p className="text-xs text-slate-700 mt-2">Unlimited denominations</p>
-              </div>
-
-              <div className="p-4 border rounded-lg">
-                <p className="font-semibold text-sm mb-2">Green Impact Bond</p>
-                <p className="text-3xl font-bold text-emerald-600">4.5%</p>
-                <p className="text-xs text-muted-foreground">Annual coupon</p>
-                <p className="text-xs text-slate-700 mt-2">Proceeds fund new projects</p>
-              </div>
+              {BONDS.map(bond => (
+                <div key={bond.id} className="p-4 border rounded-lg">
+                  <p className="font-semibold text-sm mb-2">{bond.name}</p>
+                  <p className="text-3xl font-bold text-emerald-600">{bond.coupon}</p>
+                  <p className="text-xs text-muted-foreground">Annual coupon</p>
+                  <p className="text-xs text-slate-700 mt-2">{bond.denominations}</p>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="mt-3 w-full"
+                    onClick={() => setSelectedBond({
+                      id: bond.id,
+                      name: bond.name,
+                      price: bond.price,
+                      billingPeriod: bond.billingPeriod,
+                      features: [`${bond.coupon} annual coupon`, bond.denominations],
+                      segmentType: 'enterprise',
+                    })}
+                  >
+                    Request Bond
+                  </Button>
+                </div>
+              ))}
             </div>
           </div>
         </CardContent>
       </Card>
+
+      <CheckoutModal
+        isOpen={!!selectedBond}
+        onClose={() => setSelectedBond(null)}
+        plan={selectedBond}
+      />
     </div>
   );
 };
