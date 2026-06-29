@@ -13,11 +13,19 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
-    // Proxy API calls to backend in dev — avoids CORS and env var juggling
     proxy: {
       "/api": {
-        target: "http://localhost:3001",
+        target: "http://localhost:4000",
         changeOrigin: true,
+        configure: (proxy) => {
+          proxy.on('error', (err, req, res) => {
+            // Backend not running — return a clean 503 instead of crashing the dev server
+            if ('statusCode' in res && typeof (res as any).statusCode === 'number') {
+              (res as any).writeHead(503, { 'Content-Type': 'application/json' });
+              (res as any).end(JSON.stringify({ error: 'Backend unavailable', code: 'ECONNREFUSED' }));
+            }
+          });
+        },
       },
     },
   },
