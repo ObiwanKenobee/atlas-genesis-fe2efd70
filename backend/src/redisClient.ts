@@ -11,33 +11,28 @@ const redisOptions = {
   enableOfflineQueue: false,
   maxRetriesPerRequest: 0,
   retryStrategy: (times: number) => {
-    // Give up after 3 attempts; don't spam logs in dev
     if (times >= 3) return null;
     return Math.min(times * 200, 2000);
   },
 };
 
-export const redis = redisUrl
-  ? new Redis(redisUrl, redisOptions)
-  : new Redis({ ...redisOptions, host: '127.0.0.1', port: 6379 });
+export const redis = redisUrl ? new Redis(redisUrl, redisOptions) : null;
 
 let redisAvailable = false;
 
-if (redisUrl) {
+if (redis) {
   redis.connect().catch(() => { /* handled below */ });
+
+  redis.on('ready', () => {
+    redisAvailable = true;
+    console.log('[redis] Connected');
+  });
+
+  redis.on('error', (err) => {
+    if (redisAvailable) console.error('[redis] Error', err.message);
+    redisAvailable = false;
+  });
 }
-
-redis.on('ready', () => {
-  redisAvailable = true;
-  console.log('[redis] Connected');
-});
-
-redis.on('error', (err) => {
-  if (redisAvailable) {
-    console.error('[redis] Error', err.message);
-  }
-  redisAvailable = false;
-});
 
 /**
  * Cache data with Redis
@@ -47,7 +42,7 @@ export async function cacheWithRedis<T>(
   ttlSeconds: number,
   fetchFn: () => Promise<T>
 ): Promise<T> {
-  if (!redisAvailable) return fetchFn();
+  if (!redisAvailable || !redis) return fetchFn();
   try {
     const cached = await redis.get(key);
     if (cached) return JSON.parse(cached);
@@ -60,7 +55,7 @@ export async function cacheWithRedis<T>(
 }
 
 export async function invalidateCache(pattern: string): Promise<void> {
-  if (!redisAvailable) return;
+  if (!redisAvailable || !redis) return;
   try {
     const keys = await redis.keys(pattern);
     if (keys.length > 0) await redis.del(...keys);

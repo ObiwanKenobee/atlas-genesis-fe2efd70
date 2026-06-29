@@ -1,44 +1,58 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  Leaf,
-  Mail,
-  Phone,
-  MapPin,
-  Facebook,
-  Twitter,
-  Linkedin,
-  Github,
-  Instagram,
-  Send,
-  ArrowRight,
-  Globe,
-  Shield,
-  BookOpen,
-  Users,
-  Zap,
-  Heart,
-  Lock,
-  Map,
-  Sprout,
-  TrendingUp,
+  Leaf, Mail, Phone, MapPin, Facebook, Twitter, Linkedin, Github,
+  Instagram, Send, ArrowRight, Globe, Shield, BookOpen, Users,
+  Zap, Heart, Lock, Map, Sprout, TrendingUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ApiStatus from "@/components/ApiStatus";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const Footer = () => {
   const [email, setEmail] = useState("");
   const [subscribeStatus, setSubscribeStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [ussdMode, setUssdMode] = useState(false);
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!EMAIL_RE.test(email.trim().toLowerCase())) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
     setSubscribeStatus("loading");
-    setTimeout(() => {
-      setSubscribeStatus("success");
-      setEmail("");
+    try {
+      const { data, error } = await supabase.functions.invoke("newsletter-subscribe", {
+        body: { email: email.trim().toLowerCase(), subscription_type: "general" },
+      });
+      const payload = (data ?? {}) as { success?: boolean; already_subscribed?: boolean; error?: string };
+      if (error || payload.error) {
+        if (payload.error === "rate_limited") {
+          toast.error("Too many attempts. Please wait a moment and try again.");
+        } else {
+          toast.error("Something went wrong. Please try again.");
+        }
+        setSubscribeStatus("error");
+        setTimeout(() => setSubscribeStatus("idle"), 3000);
+      } else if (payload.already_subscribed) {
+        toast.info("You're already subscribed!");
+        setSubscribeStatus("success");
+        setEmail("");
+        setTimeout(() => setSubscribeStatus("idle"), 3000);
+      } else {
+        toast.success("Welcome to our newsletter!");
+        setSubscribeStatus("success");
+        setEmail("");
+        setTimeout(() => setSubscribeStatus("idle"), 3000);
+      }
+    } catch {
+      toast.error("Network error. Please try again.");
+      setSubscribeStatus("error");
       setTimeout(() => setSubscribeStatus("idle"), 3000);
-    }, 1000);
+    }
   };
 
   const featureLinks = [

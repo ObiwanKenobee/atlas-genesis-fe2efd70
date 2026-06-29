@@ -1,15 +1,9 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
+import type { IncomingMessage, ServerResponse } from "http";
 
 export default defineConfig(({ mode }) => ({
-  test: {
-    globals: true,
-    environment: "jsdom",
-    setupFiles: ["./src/test/setup.ts"],
-    include: ["src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
-  },
-
   server: {
     host: "::",
     port: 8080,
@@ -18,12 +12,9 @@ export default defineConfig(({ mode }) => ({
         target: "http://localhost:4000",
         changeOrigin: true,
         configure: (proxy) => {
-          proxy.on('error', (err, req, res) => {
-            // Backend not running — return a clean 503 instead of crashing the dev server
-            if ('statusCode' in res && typeof (res as any).statusCode === 'number') {
-              (res as any).writeHead(503, { 'Content-Type': 'application/json' });
-              (res as any).end(JSON.stringify({ error: 'Backend unavailable', code: 'ECONNREFUSED' }));
-            }
+          proxy.on('error', (_err: Error, _req: IncomingMessage, res: ServerResponse) => {
+            res.writeHead(503, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Backend unavailable', code: 'ECONNREFUSED' }));
           });
         },
       },

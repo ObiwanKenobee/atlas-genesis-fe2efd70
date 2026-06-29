@@ -94,13 +94,26 @@ Deno.serve(async (req) => {
 
   // Atomic cooldown: claim_newsletter_slot inserts-or-rejects in a single
   // statement so parallel requests for the same email/IP cannot both pass.
-  const { data: claimed, error: rlError } = await supabase.rpc(
-    "claim_newsletter_slot",
-    { _email: email, _ip: ip, _window_seconds: WINDOW_SECONDS },
-  );
-  if (rlError) {
-    console.error("rate limit rpc error", rlError);
-    return json(500, { error: "rate_limit_check_failed" });
+  // Falls back gracefully if the RPC hasn't been deployed yet.
+  let claimed: boolean | null = true; // default allow if RPC unavailable
+  try {
+    const { data: claimData, error: rlError } = await supabase.rpc(
+      "claim_newsletter_slot",
+      { _email: email, _ip: ip, _window_seconds: WINDOW_SECONDS },
+    );
+    if (rlError) {
+      // If the function doesn't exist yet (42883 = undefined_function), skip rate limiting
+      if ((rlError as any).code === '42883' || rlError.message?.includes('does not exist')) {
+        console.warn("claim_newsletter_slot RPC not available, skipping rate limit check");
+      } else {
+        console.error("rate limit rpc error", rlError);
+        return json(500, { error: "rate_limit_check_failed" });
+      }
+    } else {
+      claimed = claimData as boolean;
+    }
+  } catch (e) {
+    console.warn("rate limit check threw, skipping:", e);
   }
   if (claimed === false) {
     return json(429, { error: "rate_limited", retry_after_seconds: WINDOW_SECONDS });
@@ -110,25 +123,22 @@ Deno.serve(async (req) => {
   if (body.captchaProvider && body.captchaToken) {
     const v = await verifyCaptcha(body.captchaProvider, body.captchaToken, ip);
     if (!v.ok) {
-      await supabase.from("newsletter_subscription_attempts").insert({
-        email,
-        ip_address: ip,
-        succeeded: false,
-        reason: `captcha:${v.reason}`,
-      });
+      try {
+        await supabase.from("newsletter_subscription_attempts").insert({
+          email, ip_address: ip, succeeded: false, reason: `captcha:${v.reason}`,
+        });
+      } catch { /* table may not exist yet */ }
       return json(400, { error: "captcha_failed", reason: v.reason });
     }
   } else if (
     Deno.env.get("TURNSTILE_SECRET_KEY") ||
     Deno.env.get("HCAPTCHA_SECRET_KEY")
   ) {
-    // A captcha is configured but no token provided — reject.
-    await supabase.from("newsletter_subscription_attempts").insert({
-      email,
-      ip_address: ip,
-      succeeded: false,
-      reason: "captcha:missing",
-    });
+    try {
+      await supabase.from("newsletter_subscription_attempts").insert({
+        email, ip_address: ip, succeeded: false, reason: "captcha:missing",
+      });
+    } catch { /* table may not exist yet */ }
     return json(400, { error: "captcha_required" });
   }
 
@@ -162,6 +172,8 @@ Deno.serve(async (req) => {
     ip_address: ip,
     succeeded,
     reason,
+  }).then(({ error: e }) => {
+    if (e) console.warn("Could not log attempt (table may not exist):", e.message);
   });
 
   return json(status, respBody);
