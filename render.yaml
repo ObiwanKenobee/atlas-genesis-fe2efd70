@@ -4,14 +4,16 @@ services:
     runtime: node
     region: oregon
     rootDir: backend
-    buildCommand: npm install && npm run build
-    startCommand: npm start
+    buildCommand: bash build.sh
+    startCommand: node dist/index.js
     plan: free
     autoDeploy: true
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
+      - key: NODE_VERSION
+        value: 20.19.6
       - key: PORT
         value: 4000
       - key: DATABASE_URL
