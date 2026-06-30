@@ -1,11 +1,11 @@
 import process from 'process';
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-import { ConsoleSpanExporter, BatchSpanProcessor } from '@opentelemetry/sdk-trace-base';
+import { ConsoleSpanExporter } from '@opentelemetry/sdk-trace-base';
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
 import { ExpressInstrumentation } from '@opentelemetry/instrumentation-express';
 import { Resource } from '@opentelemetry/resources';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 
 // Use OTLP exporter if endpoint configured, otherwise console exporter (safe default)
 const exporter = process.env.OTEL_EXPORTER_OTLP_ENDPOINT
@@ -14,7 +14,7 @@ const exporter = process.env.OTEL_EXPORTER_OTLP_ENDPOINT
 
 const sdk = new NodeSDK({
   resource: new Resource({
-    [SemanticResourceAttributes.SERVICE_NAME]: process.env.SERVICE_NAME || 'atlas-backend'
+    [ATTR_SERVICE_NAME]: process.env.SERVICE_NAME || 'atlas-backend'
   }),
   traceExporter: exporter,
   instrumentations: [new HttpInstrumentation(), new ExpressInstrumentation()],
