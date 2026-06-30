@@ -247,7 +247,7 @@ export default function CustomerPortal() {
     firstName: 'John',
     lastName: 'Doe',
     email: 'john.doe@example.com',
-    phone: '+1 (555) 123-4567',
+    phone: '+254759895739',
     company: 'Acme Sustainability Corp',
     role: 'Sustainability Director',
     address: '123 Green Street',

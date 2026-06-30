@@ -653,7 +653,7 @@ const Careers = () => {
                           name="phone"
                           value={applicationForm.phone}
                           onChange={handleFormChange}
-                          placeholder="+1 (555) 123-4567"
+                          placeholder="+254759895739"
                           className={formErrors.phone ? 'border-destructive' : ''}
                         />
                         {formErrors.phone && (

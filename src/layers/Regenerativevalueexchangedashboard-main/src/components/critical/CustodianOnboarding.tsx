@@ -300,7 +300,7 @@ export function CustodianOnboarding() {
                     type="tel"
                     value={formData.contactPhone}
                     onChange={(e) => setFormData({ ...formData, contactPhone: e.target.value })}
-                    placeholder="+1 (555) 123-4567"
+                    placeholder="+254759895739"
                     className="w-full bg-emerald-900/20 border border-emerald-500/20 rounded-lg px-4 py-3 text-white placeholder:text-emerald-300/30 focus:outline-none focus:border-emerald-500/40"
                   />
                 </div>
