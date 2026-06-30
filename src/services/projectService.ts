@@ -19,6 +19,32 @@ import {
 // API Configuration
 const API_BASE = import.meta.env.VITE_API_URL || '/api/v2';
 
+// Pick up the current Bearer token (JWT or Supabase) at call-time
+function getAuthHeaders(): Record<string, string> {
+  // 1. In-memory JWT token set by useAuth
+  const inMemory = typeof window !== 'undefined'
+    ? (window as any).__atlasAccessToken as string | undefined
+    : undefined;
+  if (inMemory) return { Authorization: `Bearer ${inMemory}` };
+
+  // 2. Supabase session persisted in localStorage
+  try {
+    const sbKey = Object.keys(localStorage).find(
+      (k) => k.startsWith('sb-') && k.endsWith('-auth-token')
+    );
+    if (sbKey) {
+      const raw = localStorage.getItem(sbKey);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const token = parsed?.access_token || parsed?.currentSession?.access_token;
+        if (token) return { Authorization: `Bearer ${token}` };
+      }
+    }
+  } catch { /* ignore */ }
+
+  return {};
+}
+
 // Extended project interface for frontend
 export interface Project extends Omit<CarbonProject, 'id'> {
   id: string;
@@ -216,7 +242,10 @@ class ProjectService {
         if (filter.offset) params.append('offset', filter.offset.toString());
       }
 
-      const response = await fetch(`${API_BASE}/projects?${params}`);
+      const response = await fetch(`${API_BASE}/projects?${params}`, {
+        headers: getAuthHeaders(),
+        credentials: 'include',
+      });
       if (!response.ok) throw new Error('Failed to fetch projects');
 
       const data = await response.json();
@@ -234,7 +263,10 @@ class ProjectService {
     if (cached) return cached;
 
     try {
-      const response = await fetch(`${API_BASE}/projects/${projectId}`);
+      const response = await fetch(`${API_BASE}/projects/${projectId}`, {
+        headers: getAuthHeaders(),
+        credentials: 'include',
+      });
       if (!response.ok) {
         if (response.status === 404) return null;
         throw new Error('Failed to fetch project');
@@ -253,9 +285,8 @@ class ProjectService {
     try {
       const response = await fetch(`${API_BASE}/projects`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+        credentials: 'include',
         body: JSON.stringify(input),
       });
 
@@ -274,9 +305,8 @@ class ProjectService {
     try {
       const response = await fetch(`${API_BASE}/projects/${projectId}`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+        credentials: 'include',
         body: JSON.stringify(input),
       });
 
@@ -296,6 +326,8 @@ class ProjectService {
     try {
       const response = await fetch(`${API_BASE}/projects/${projectId}`, {
         method: 'DELETE',
+        headers: getAuthHeaders(),
+        credentials: 'include',
       });
 
       if (!response.ok) throw new Error('Failed to delete project');
@@ -318,6 +350,8 @@ class ProjectService {
 
       const response = await fetch(`${API_BASE}/projects/${projectId}/media`, {
         method: 'POST',
+        headers: getAuthHeaders(),
+        credentials: 'include',
         body: formData,
       });
 
@@ -340,6 +374,8 @@ class ProjectService {
     try {
       const response = await fetch(`${API_BASE}/projects/${projectId}/media/${mediaId}`, {
         method: 'DELETE',
+        headers: getAuthHeaders(),
+        credentials: 'include',
       });
 
       return response.ok;

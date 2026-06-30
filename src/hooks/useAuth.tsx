@@ -1,5 +1,6 @@
 import { useState, useEffect, createContext, useContext } from 'react';
 import { apiService } from '@/lib/api/client';
+import { setGlobalAccessToken } from '@/lib/api/apiClient';
 
 interface User {
   id: string;
@@ -63,6 +64,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const newToken = data?.tokens?.accessToken;
           if (newToken) {
             apiService.setToken(newToken);
+            setGlobalAccessToken(newToken);
             setTokens(data.tokens);
 
             // Fetch fresh user profile with the new access token
@@ -126,11 +128,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (response.data) {
         setUser(response.data.user);
-        // Store only access token in memory; refresh token should be httpOnly cookie
         setTokens(response.data.tokens);
-        // Persist user profile (non-sensitive) for UX continuity across page reloads
         localStorage.setItem('auth_user', JSON.stringify(response.data.user));
         apiService.setToken(response.data.tokens.accessToken);
+        setGlobalAccessToken(response.data.tokens.accessToken);
       }
       
       return { error: null };
@@ -149,6 +150,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setTokens(null);
     localStorage.removeItem('auth_user');
     apiService.setToken('');
+    setGlobalAccessToken(null);
   };
 
   const refreshToken = async (): Promise<{ error: Error | null }> => {
@@ -171,6 +173,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setTokens(response.data.tokens);
         localStorage.setItem('auth_tokens', JSON.stringify(response.data.tokens));
         apiService.setToken(response.data.tokens.accessToken);
+        setGlobalAccessToken(response.data.tokens.accessToken);
       }
       
       return { error: null };
