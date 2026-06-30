@@ -3,8 +3,9 @@ services:
     name: atlas-genesis-backend
     runtime: node
     region: oregon
-    buildCommand: cd backend && npm install && npm run build
-    startCommand: cd backend && npm start
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: npm start
     plan: free
     autoDeploy: true
     healthCheckPath: /health
