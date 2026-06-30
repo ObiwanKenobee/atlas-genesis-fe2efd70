@@ -21,7 +21,7 @@ export async function checkReadiness(): Promise<{ ok: boolean; details: any }> {
 
   // Check Redis (if configured)
   try {
-    if (process.env.REDIS_URL) {
+    if (process.env.REDIS_URL && redis) {
       const res = await withTimeout(redis.ping(), 1500);
       details.redis = res === 'PONG' || res === 'OK' || !!res;
     } else {

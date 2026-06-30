@@ -237,7 +237,22 @@ class ApiService {
 
     getTransactionHistory: (userId?: string, page?: number) =>
       this.request<PaginatedResponse<any>>(
-        `${API_V2_BASE_URL}/marketplace/transactions?userId=${userId || ''}&page=${page || 1}`
+        `${API_V2_BASE_URL}/marketplace/transactions?${userId ? `userId=${userId}&` : ''}page=${page || 1}`
+      ),
+
+    deleteRIUListing: (riuId: string) =>
+      this.request<any>(
+        `${API_V2_BASE_URL}/marketplace/riums/${riuId}`,
+        { method: 'DELETE' }
+      ),
+
+    updateRIUListing: (riuId: string, data: { price?: number; quantity?: number }) =>
+      this.request<any>(
+        `${API_V2_BASE_URL}/marketplace/riums/${riuId}`,
+        {
+          method: 'PATCH',
+          body: JSON.stringify(data),
+        }
       ),
   };
 
@@ -289,6 +304,12 @@ class ApiService {
           body: JSON.stringify({ rejectionReason: reason }),
         }
       ),
+
+    deleteProject: (id: string) =>
+      this.request<any>(
+        `${API_V2_BASE_URL}/projects/${id}`,
+        { method: 'DELETE' }
+      ),
   };
 
   // Measurements API
@@ -326,7 +347,58 @@ class ApiService {
       ),
   };
 
-   // Payments API
+  // User profile API (scoped to authenticated user)
+  user = {
+    getProfile: () =>
+      this.request<any>(`${API_V2_BASE_URL}/auth/me`),
+
+    updateProfile: (data: any) =>
+      this.request<any>(
+        `${API_V2_BASE_URL}/auth/profile`,
+        {
+          method: 'PUT',
+          body: JSON.stringify(data),
+        }
+      ),
+
+    getTransactions: (page = 1, size = 20) =>
+      this.request<PaginatedResponse<any>>(
+        `${API_V2_BASE_URL}/marketplace/transactions?page=${page}&size=${size}`
+      ),
+
+    getHoldings: (page = 1, size = 20) =>
+      this.request<PaginatedResponse<any>>(
+        `${API_V2_BASE_URL}/marketplace/holdings?page=${page}&size=${size}`
+      ),
+
+    getProjects: (page = 1, size = 20) =>
+      this.request<PaginatedResponse<any>>(
+        `${API_V2_BASE_URL}/projects?page=${page}&size=${size}&ownedByMe=true`
+      ),
+
+    changePassword: (currentPassword: string, newPassword: string) =>
+      this.request<any>(
+        `${API_V2_BASE_URL}/auth/change-password`,
+        {
+          method: 'PUT',
+          body: JSON.stringify({ currentPassword, newPassword }),
+        }
+      ),
+
+    getEmailPreferences: () =>
+      this.request<any>(`${API_V2_BASE_URL}/auth/email-preferences`),
+
+    updateEmailPreferences: (prefs: { marketing: boolean; transactional: boolean; notifications: boolean }) =>
+      this.request<any>(
+        `${API_V2_BASE_URL}/auth/email-preferences`,
+        {
+          method: 'PUT',
+          body: JSON.stringify(prefs),
+        }
+      ),
+  };
+
+  // Payments API
   payments = {
     initializePayment: (data: { listingId: string; quantity: number; buyerId: string; email: string; amount: number; paymentMethod?: string; currency?: string }) =>
       this.request<any>(

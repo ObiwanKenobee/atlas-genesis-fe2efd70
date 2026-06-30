@@ -44,22 +44,62 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [tokens, setTokens] = useState<Tokens | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Load saved user profile from localStorage on mount; token lives in memory only
+  // On mount: attempt silent token refresh via the httpOnly refresh cookie,
+  // then restore user profile from localStorage for UX continuity.
   useEffect(() => {
-    const savedUser = localStorage.getItem('auth_user');
-    
-    if (savedUser) {
+    const restoreSession = async () => {
+      const savedUser = localStorage.getItem('auth_user');
+
       try {
-        setUser(JSON.parse(savedUser));
-        // No token restore — access token is in-memory only.
-        // The app will trigger a silent refresh via the httpOnly refresh cookie.
-      } catch (error) {
-        console.error('Failed to parse saved user data:', error);
-        localStorage.removeItem('auth_user');
+        // Attempt silent refresh — the httpOnly cookie is sent automatically
+        const resp = await fetch('/api/v2/auth/refresh', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+        if (resp.ok) {
+          const data = await resp.json();
+          const newToken = data?.tokens?.accessToken;
+          if (newToken) {
+            apiService.setToken(newToken);
+            setTokens(data.tokens);
+
+            // Fetch fresh user profile with the new access token
+            try {
+              const meResp = await fetch('/api/v2/auth/me', {
+                credentials: 'include',
+                headers: { Authorization: `Bearer ${newToken}` },
+              });
+              if (meResp.ok) {
+                const freshUser = await meResp.json();
+                setUser(freshUser);
+                localStorage.setItem('auth_user', JSON.stringify(freshUser));
+                setLoading(false);
+                return;
+              }
+            } catch {
+              // fall through to cached user below
+            }
+          }
+        }
+      } catch {
+        // Refresh endpoint unreachable (backend offline) — fall back to cache
       }
-    }
-    
-    setLoading(false);
+
+      // Fall back: restore cached user so UI is not blank, but mark no live token
+      if (savedUser) {
+        try {
+          setUser(JSON.parse(savedUser));
+        } catch {
+          localStorage.removeItem('auth_user');
+        }
+      }
+
+      setLoading(false);
+    };
+
+    restoreSession();
   }, []);
 
   const signUp = async (email: string, password: string, displayName?: string, _role?: string): Promise<{ error: Error | null }> => {

@@ -6,8 +6,8 @@
  * Pattern: Service Locator (acceptable at composition root)
  */
 
-import { query as dbQuery } from '../../db';
-import redisClient from '../../redisClient';
+import { query as dbQuery } from '../db';
+import redisClient from '../redisClient';
 import { createEventBus } from './events/eventBus';
 import { getIntelligencePlane } from './planes/intelligence';
 import { getTrustPlane } from './planes/trust';

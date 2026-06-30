@@ -98,7 +98,7 @@ function getSessionSecret(): string {
 
 // Redis-backed sessions when REDIS_URL is configured
 try {
-  if (process.env.REDIS_URL) {
+  if (process.env.REDIS_URL && redisClient) {
     const RedisStore = require('connect-redis').default;
     const redisStore = new (RedisStore as new (config: any) => any)({
       client: redisClient
