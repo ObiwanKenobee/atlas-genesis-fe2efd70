@@ -6,7 +6,33 @@ import tseslint from "typescript-eslint";
 import unusedImports from "eslint-plugin-unused-imports";
 
 export default tseslint.config(
-  { ignores: ["dist", "src/layers", "src/architecture", "src/sanctum-ai", "src/sanctum", "src/crypto"] },
+  {
+    ignores: [
+      "dist",
+      "build",
+      "node_modules",
+      "src/layers",
+      "src/architecture",
+      "src/sanctum-ai",
+      "src/sanctum",
+      "src/crypto",
+      "src/backend",
+      "src/services/ai",
+      "EthosDAO",
+      "atlas-sanctum",
+      "atlas-sanctum-earth2studio",
+      "scaffold-mvp",
+      "backend",
+      "chain",
+      "plaas",
+      "ai-services-backup",
+      "scripts",
+      "cypress",
+      "e2e",
+      "**/*.config.{js,ts,mjs,cjs}",
+      "**/*.d.ts",
+    ],
+  },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommendedTypeChecked],
     files: ["**/*.{ts,tsx}"],
