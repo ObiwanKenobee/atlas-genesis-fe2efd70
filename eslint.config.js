@@ -84,6 +84,11 @@ export default tseslint.config(
       "@typescript-eslint/no-base-to-string": "warn",
       "@typescript-eslint/no-misused-promises": ["warn", { checksVoidReturn: false }],
       "@typescript-eslint/no-floating-promises": "warn",
+      "@typescript-eslint/ban-ts-comment": "warn",
+      "@typescript-eslint/no-empty-object-type": "warn",
+      "@typescript-eslint/await-thenable": "warn",
+      "no-shadow-restricted-names": "warn",
+      "react-hooks/rules-of-hooks": "warn",
     },
   },
 );
