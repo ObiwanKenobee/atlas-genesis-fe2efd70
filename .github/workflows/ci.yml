@@ -26,6 +26,24 @@ jobs:
       - name: ESLint
         run: npm run lint
 
+      - name: ESLint warning baseline (no regressions)
+        run: npm run lint:baseline
+
+      - name: ESLint grouped-by-rule report
+        if: always()
+        run: npm run lint:report
+
+      - name: Upload ESLint report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eslint-report-${{ github.run_id }}
+          path: |
+            eslint-report.md
+            eslint-report.json
+          if-no-files-found: ignore
+          retention-days: 14
+
       - name: TypeScript typecheck
         run: npm run typecheck
 
