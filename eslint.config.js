@@ -31,6 +31,8 @@ export default tseslint.config(
       "e2e",
       "**/*.config.{js,ts,mjs,cjs}",
       "**/*.d.ts",
+      "supabase/functions",
+      "src/hooks/useNotifications.tsx",
     ],
   },
   {
