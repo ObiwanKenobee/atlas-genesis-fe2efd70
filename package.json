@@ -138,6 +138,7 @@
     "eslint": "^9.32.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
+    "eslint-plugin-unused-imports": "^4.4.1",
     "globals": "^15.15.0",
     "husky": "^8.0.3",
     "jest-axe": "^10.0.0",
