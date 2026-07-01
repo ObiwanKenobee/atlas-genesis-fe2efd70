@@ -1,7 +1,7 @@
-import React, { useEffect, useState, ReactNode } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import type { ReactNode } from 'react';
+import React, { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAdmin } from '../contexts/AdminContext';
-import Layout from './Layout';
 
 interface AdminProtectedRouteProps {
   children: ReactNode;

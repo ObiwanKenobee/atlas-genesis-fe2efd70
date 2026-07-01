@@ -8,7 +8,6 @@ import { Label } from "@/components/ui/label";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { toast } from "sonner";
 import { loginSchema, registerSchema } from "@/lib/validation/auth";
-import { z } from "zod";
 
 type AuthMode = 'login' | 'register' | 'forgot' | 'reset';
 

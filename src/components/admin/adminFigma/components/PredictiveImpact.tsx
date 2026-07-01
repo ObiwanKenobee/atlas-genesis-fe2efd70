@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { TrendingUp, AlertTriangle, Sparkles, Target, Zap, Brain, ArrowUpRight, ArrowDownRight, Info } from 'lucide-react';
+import React, { useState } from 'react';
+import { AlertTriangle, Sparkles, Target, Zap, Brain, ArrowUpRight, ArrowDownRight, Info } from 'lucide-react';
 
 interface Prediction {
   metric: string;

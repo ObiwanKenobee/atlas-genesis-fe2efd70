@@ -6,9 +6,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Shield, Hash, Vote, FileCheck, Globe, Lock, CheckCircle,
-  Clock, ArrowRight, ExternalLink, Copy, Zap, Users,
-  TrendingUp, Activity, Award, Scale, MessageSquare, ChevronRight
+  Shield, Hash, Vote, FileCheck, Globe, CheckCircle,
+  Clock, ExternalLink, Users, Award, Scale, MessageSquare, ChevronRight
 } from 'lucide-react';
 
 // Types

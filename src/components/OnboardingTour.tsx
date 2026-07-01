@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronRight, ChevronLeft, Sparkles, SkipForward } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { useOnboardingTour, TOUR_STEPS } from '@/hooks/useOnboardingTour';
+import { useOnboardingTour } from '@/hooks/useOnboardingTour';
 
 export function OnboardingTour() {
   const {

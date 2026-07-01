@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Sprout,
@@ -8,17 +8,8 @@ import {
   Waves,
   TrendingUp,
   Target,
-  Clock,
-  CheckCircle,
-  AlertTriangle,
-  BarChart3,
-  PieChart,
   Activity,
-  Globe,
-  Zap,
-  Award,
-  Users,
-  MapPin
+  Globe
 } from 'lucide-react';
 
 interface RegenerationProject {

@@ -9,8 +9,7 @@ import {
   ChevronRight,
   ChevronDown,
   Network,
-  Sparkles,
-  Calculator
+  Sparkles
 } from "lucide-react";
 
 const layers = [

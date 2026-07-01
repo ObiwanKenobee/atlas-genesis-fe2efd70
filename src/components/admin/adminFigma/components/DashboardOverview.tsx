@@ -13,8 +13,6 @@ import {
 import {
   AreaChart,
   Area,
-  LineChart,
-  Line,
   BarChart,
   Bar,
   XAxis,
@@ -26,8 +24,7 @@ import {
   PolarGrid,
   PolarAngleAxis,
   PolarRadiusAxis,
-  Radar,
-  Legend
+  Radar
 } from 'recharts';
 import { SystemNetworkGraph } from './SystemNetworkGraph';
 import { AIReasoningTree } from './AIReasoningTree';

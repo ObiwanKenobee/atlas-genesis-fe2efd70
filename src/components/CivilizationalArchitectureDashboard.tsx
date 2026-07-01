@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
-  Globe, Network, Shield, Brain, Zap, Layers, 
-  Satellite, Database, Lock, TrendingUp, Users, 
-  Cpu, Wifi, Eye, Target, Sparkles
+  Globe, Network, Shield, Brain, Layers, 
+  Satellite, TrendingUp, Users, Sparkles
 } from 'lucide-react';
 
 interface ArchitecturalLayer {

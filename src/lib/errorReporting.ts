@@ -47,7 +47,7 @@ export function initErrorReporting() {
 }
 
 export function setErrorUser(user: { id?: string; email?: string } | null) {
-  if (SENTRY_DSN) Sentry.setUser(user as any);
+  if (SENTRY_DSN) Sentry.setUser(user);
   currentUser = user;
 }
 
@@ -56,7 +56,7 @@ let currentAuthState: Record<string, unknown> | null = null;
 
 export function setErrorAuthState(state: Record<string, unknown> | null) {
   currentAuthState = state;
-  if (SENTRY_DSN) Sentry.setContext("auth", state as any);
+  if (SENTRY_DSN) Sentry.setContext("auth", state);
   // Drop a breadcrumb on every auth state transition so subsequent errors
   // carry the history of how we got here (loading → authenticated → role change).
   Sentry.addBreadcrumb({

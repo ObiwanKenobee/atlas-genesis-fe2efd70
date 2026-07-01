@@ -22,7 +22,6 @@ import {
   Leaf,
   DollarSign,
   Target,
-  PieChart as PieChartIcon,
   Activity,
   Calendar,
 } from 'lucide-react';

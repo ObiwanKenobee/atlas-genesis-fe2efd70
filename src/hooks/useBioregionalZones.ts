@@ -19,7 +19,7 @@ export interface BioregionalZone {
   updated_at: string;
 }
 
-export const useBioregionalZones = (zoneIds?: string[] | undefined) => {
+export const useBioregionalZones = (zoneIds?: string[]  ) => {
   const query = useQuery<BioregionalZone[]>({
     queryKey: ["bioregional-zones", zoneIds],
     queryFn: async () => {

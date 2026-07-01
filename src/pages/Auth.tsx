@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
-  Leaf, Mail, Lock, User, ArrowRight, Sparkles, Github, Chrome, 
+  Leaf, Mail, Lock, User, ArrowRight, Sparkles, 
   Users, Shield, Building2, Globe, TrendingUp, Factory, Award,
   ChevronRight, LogIn, UserPlus, CheckCircle2, Info, AlertCircle
 } from "lucide-react";
@@ -13,11 +13,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 import { useEnhancedAuth } from "@/hooks/useEnhancedAuth";
-import { DEMO_USERS, DASHBOARD_ROUTES, DashboardType } from "@/types/auth";
+import { DEMO_USERS, DASHBOARD_ROUTES } from "@/types/auth";
 import { toast } from "sonner";
 import { loginSchema, registerSchema } from "@/lib/validation";
-import { sanitizeEmail } from "@/lib/utils/sanitization";
-import { errorHandler } from "@/lib/errorHandling";
 import { securityManager } from "@/lib/security";
 import { analytics } from "@/lib/analytics";
 import { usePerformanceOptimization } from "@/hooks/usePerformanceOptimization";
@@ -105,7 +103,7 @@ const Auth = () => {
         toast.success('Demo login successful!');
         const demoUser = DEMO_USERS.find(u => u.id === demoUserId);
         if (demoUser && demoUser.dashboardAccess.length > 0) {
-          const primaryDashboard = demoUser.dashboardAccess[0] as DashboardType;
+          const primaryDashboard = demoUser.dashboardAccess[0];
           const route = DASHBOARD_ROUTES[primaryDashboard] || '/dashboard';
           navigate(route);
         }

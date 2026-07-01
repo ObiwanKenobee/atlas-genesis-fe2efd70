@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { CarbonProject, CreditHolding, Transaction, ProjectType } from '@/types/marketplace';
+import type { CarbonProject, CreditHolding, Transaction, ProjectType } from '@/types/marketplace';
 import { useSupabaseAuth } from './useSupabaseAuth';
 import { toast } from 'sonner';
 

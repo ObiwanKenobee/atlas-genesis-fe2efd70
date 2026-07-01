@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 
 const impactMetrics = [
   { value: "12.4M", unit: "Hectares", label: "Land Restored", change: "+23%" },

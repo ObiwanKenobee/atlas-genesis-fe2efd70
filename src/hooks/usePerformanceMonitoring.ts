@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
-import { onCLS, onFCP, onINP, onLCP, onTTFB, Metric } from 'web-vitals';
+import type { Metric } from 'web-vitals';
+import { onCLS, onFCP, onINP, onLCP, onTTFB } from 'web-vitals';
 import { trackPerformanceMetric } from '@/lib/analytics';
 
 // Types for performance metrics

@@ -9,18 +9,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import {
   Shield,
   AlertTriangle,
-  TrendingUp,
-  Clock,
   Activity,
-  Users,
-  FileText,
   Zap,
   CheckCircle,
-  XCircle,
-  RefreshCw,
-  BarChart3,
-  PieChart,
-  LineChart
+  RefreshCw
 } from 'lucide-react';
 
 interface SecurityMetrics {

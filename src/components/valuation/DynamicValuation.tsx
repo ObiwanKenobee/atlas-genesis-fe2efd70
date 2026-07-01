@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   DollarSign,
@@ -10,13 +10,9 @@ import {
   Clock,
   Calculator,
   Zap,
-  Award,
   AlertTriangle,
   CheckCircle,
-  Activity,
-  Globe,
-  Users,
-  Building2
+  Activity
 } from 'lucide-react';
 
 interface ValuationModel {

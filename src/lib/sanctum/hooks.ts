@@ -12,7 +12,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  authApi, marketplaceApi, projectsApi, measurementsApi, paymentsApi,
+  authApi, marketplaceApi, projectsApi, measurementsApi,
 } from './api-client';
 import {
   aiSystemApi, aiEcologyApi, aiCarbonApi, aiGovernanceApi,

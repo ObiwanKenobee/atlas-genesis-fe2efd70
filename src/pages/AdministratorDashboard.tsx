@@ -14,21 +14,18 @@ import {
   CheckCircle,
   XCircle,
   Clock,
-  ArrowUpRight,
   Settings,
   FileText,
   Globe,
   Zap,
   BarChart3,
   UserPlus,
-  MoreHorizontal,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { DashboardMetricCard, DashboardChart, DashboardTable, type TableColumn } from '@/components/dashboard/shared';
-import Header from '@/components/EnterpriseHeader';
 import WorkspaceLayout from '@/components/WorkspaceLayout';
 import { useAuth } from '@/hooks/useAuth';
 import { useEnhancedAuth } from '@/hooks/useEnhancedAuth';

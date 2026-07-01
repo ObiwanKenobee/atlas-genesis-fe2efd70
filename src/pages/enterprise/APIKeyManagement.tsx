@@ -9,7 +9,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Key,
   Plus,
-  Copy,
   Eye,
   EyeOff,
   Trash2,
@@ -17,25 +16,15 @@ import {
   Clock,
   Activity,
   BarChart3,
-  Download,
   RefreshCw,
   AlertTriangle,
-  CheckCircle,
-  XCircle,
-  Calendar,
-  Globe,
   Lock,
-  Unlock,
-  Settings,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 
 interface APIKey {

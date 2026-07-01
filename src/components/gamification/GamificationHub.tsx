@@ -7,10 +7,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Trophy, Star, Target, Users, Zap, Award, Medal,
-  TrendingUp, Calendar, Clock, ChevronRight, Flame,
-  Shield, Heart, Globe, Leaf, Droplets, Sun,
-  Search, Filter, Crown, Rocket, Gift, Lock
+  Trophy, Target, Users, Zap, Award, Medal, Calendar, Clock, ChevronRight, Flame, Heart,
+  Search, Crown, Rocket, Gift, Lock
 } from 'lucide-react';
 
 // Types

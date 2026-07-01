@@ -6,8 +6,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  LineChart,
-  Line,
   AreaChart,
   Area,
   BarChart,
@@ -32,7 +30,6 @@ import {
   ArrowRight,
   RefreshCw,
   ChevronDown,
-  ChevronUp,
   Zap,
   Leaf,
   Droplets,

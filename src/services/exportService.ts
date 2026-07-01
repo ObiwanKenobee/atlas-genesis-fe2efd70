@@ -1,5 +1,5 @@
 // Export Service for PDF, CSV, and Excel generation
-import { ReportConfig, ExportResult, AnalyticsFilter } from '../types/analytics';
+import type { ReportConfig, ExportResult, AnalyticsFilter } from '../types/analytics';
 
 interface ExportData {
   headers: string[];

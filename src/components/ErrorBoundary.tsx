@@ -3,7 +3,8 @@
  * React error boundary with graceful degradation and retry support
  */
 
-import React, { Component, ErrorInfo, ReactNode, Suspense, lazy } from 'react';
+import type { ErrorInfo, ReactNode} from 'react';
+import React, { Component, Suspense } from 'react';
 import { RefreshCw, AlertTriangle, Home, Bug } from 'lucide-react';
 
 // ============================================================================

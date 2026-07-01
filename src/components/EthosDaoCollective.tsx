@@ -4,16 +4,11 @@ import {
   Hexagon,
   LayoutDashboard,
   Scale,
-  RefreshCw,
   ChartBar,
   BookOpen,
   Globe,
   Settings,
-  LogOut,
   Users,
-  Cpu,
-  Layers,
-  TrendingUp,
   Target,
   Award,
   Zap,
@@ -23,9 +18,7 @@ import {
   Wind,
   Sun,
   ArrowUpRight,
-  Shield,
-  Brain,
-  Code2
+  Brain
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';

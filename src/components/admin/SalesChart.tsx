@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { useAllTransactions } from "@/hooks/useAdmin";
 import { format, subDays, startOfDay, eachDayOfInterval } from "date-fns";
 

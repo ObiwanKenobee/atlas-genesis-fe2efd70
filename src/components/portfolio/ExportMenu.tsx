@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Download, FileText, FileSpreadsheet, FileJson, Printer, ChevronDown } from 'lucide-react';
+import { Download, FileSpreadsheet, FileJson, Printer, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,

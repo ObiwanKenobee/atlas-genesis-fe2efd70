@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Minus, Plus, Leaf, ShieldCheck, CreditCard, Wallet, Network } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Minus, Plus, Leaf, ShieldCheck, CreditCard, Network } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -11,9 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { CarbonProject } from '@/types/marketplace';
-import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
-import { apiService } from '@/lib/api/client';
+import type { CarbonProject } from '@/types/marketplace';
 import { toast } from 'sonner';
 
 interface PurchaseModalProps {

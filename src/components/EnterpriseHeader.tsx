@@ -40,7 +40,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { NotificationCenter } from "@/components/NotificationCenter";
-import ApiStatus from "@/components/ApiStatus";
 
 interface DropdownItem {
   name: string;

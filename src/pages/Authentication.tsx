@@ -1,6 +1,6 @@
 import React from "react";
 import { AuthenticationPortal } from "@/components/auth/AuthenticationPortal";
-import { User } from "@/types/auth";
+import type { User } from "@/types/auth";
 
 const AuthenticationPage: React.FC = () => {
   const handleComplete = (user: Partial<User>) => {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ProbabilisticValueUnit, CivilizationScenario, RiskHeatmap } from '../cardano/CardanoLayerArchitecture';
-import { getOracleState, updateOracle, calculatePVU, getScenarios, getRiskHeatmap } from '../backend/cardano';
+import type { ProbabilisticValueUnit, CivilizationScenario, RiskHeatmap } from '../cardano/CardanoLayerArchitecture';
+import { getOracleState, updateOracle, calculatePVU } from '../backend/cardano';
 
 const CardanoLayerPage: React.FC = () => {
   const [oracleStatus, setOracleStatus] = useState<string>('inactive');

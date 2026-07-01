@@ -26,7 +26,7 @@ import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { CarbonProject } from '@/types/marketplace';
+import type { CarbonProject } from '@/types/marketplace';
 
 const priceAlertSchema = z.object({
   projectId: z.string().uuid('Please select a project'),

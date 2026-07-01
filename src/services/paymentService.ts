@@ -4,17 +4,14 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import {
-  PaymentIntent,
+import type {
   PaymentMethodInfo,
   Subscription,
   SubscriptionPlan,
   Invoice,
   Transaction,
   TaxInfo,
-  CheckoutSession,
   Refund,
-  PaymentContextType,
   Currency,
   PlanType,
   TransactionFilter,
@@ -22,8 +19,9 @@ import {
   TransactionPage,
   InvoicePage,
   CreatePaymentIntentResponse,
-  CreateCheckoutSessionResponse,
-} from '../types/payments';
+  CreateCheckoutSessionResponse} from '../types/payments';
+
+
 
 // API Configuration
 const API_BASE = import.meta.env.VITE_API_URL || '/api/v2';

@@ -304,7 +304,7 @@ export const useAuth = (): AuthContextType => {
       forgotPassword: noop,
       resetPassword: noop,
       updateProfile: noop,
-    } as AuthContextType;
+    };
   }
   return context;
 };

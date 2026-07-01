@@ -5,7 +5,7 @@
 
 import { useState, useCallback } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { Download, FileText, Calendar, Filter, Plus, Trash2, Save, Eye, Printer, Share2, Layout, BarChart3, PieChart as PieChartIcon, TrendingUp } from 'lucide-react';
+import { Download, FileText, Calendar, Trash2, Eye, Layout, BarChart3, PieChart as PieChartIcon, TrendingUp } from 'lucide-react';
 
 type WidgetType = 'metric' | 'bar' | 'line' | 'pie' | 'table';
 

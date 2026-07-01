@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { 
-  ArrowLeft, Leaf, Download, FileText, 
+  ArrowLeft, Leaf, FileText, 
   CheckCircle, XCircle, Clock, RefreshCw,
   Wallet, TrendingUp, Globe
 } from "lucide-react";

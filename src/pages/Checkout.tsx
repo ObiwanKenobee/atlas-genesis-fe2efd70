@@ -16,7 +16,6 @@ import {
   ChevronLeft,
   Shield,
   Lock,
-  Globe,
   TreePine,
   Leaf,
   Droplets,
@@ -26,13 +25,9 @@ import {
   ArrowRight,
   Building2,
   User,
-  MapPin,
-  Mail,
-  Phone,
   FileText,
   Download,
   RefreshCw,
-  AlertCircle,
   Sparkles,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';

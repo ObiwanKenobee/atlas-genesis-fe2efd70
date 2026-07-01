@@ -9,11 +9,10 @@ import {
   ToastNotification,
   LoadingSpinner
 } from './Interactions';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
   TrendingUp, Leaf, Users, Zap, Globe, Shield, 
-  ShoppingCart, BarChart3, Target, Award 
+  ShoppingCart, BarChart3, Target 
 } from 'lucide-react';
 
 // Enhanced Marketplace Card with Interactions

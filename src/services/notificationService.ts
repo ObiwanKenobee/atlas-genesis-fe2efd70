@@ -4,26 +4,20 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import {
+import type {
   Notification,
-  NotificationChannel,
   NotificationCategory,
-  NotificationPriority,
-  NotificationStatus,
   NotificationPreferences,
   NotificationTemplate,
-  NotificationSubscription,
   NotificationBatchRequest,
   NotificationAnalytics,
   NotificationFilter,
   NotificationPage,
   ToastNotification,
   SendNotificationResponse,
-  InAppNotification,
-  PushNotification,
-  EmailNotification,
-  SMSNotification,
-} from '../types/notifications';
+  InAppNotification} from '../types/notifications';
+
+
 
 // API Configuration
 const API_BASE = import.meta.env.VITE_API_URL || '/api/v2';
@@ -319,7 +313,7 @@ class NotificationService {
         status: 'pending',
         metadata: { templateId, variables },
         createdAt: new Date().toISOString(),
-      } as PushNotification;
+      };
     } else if (template.emailTemplate && template.channels.includes('email')) {
       notification = {
         id: uuidv4(),
@@ -337,7 +331,7 @@ class NotificationService {
         status: 'pending',
         metadata: { templateId, variables },
         createdAt: new Date().toISOString(),
-      } as EmailNotification;
+      };
     } else if (template.smsTemplate && template.channels.includes('sms')) {
       notification = {
         id: uuidv4(),
@@ -351,7 +345,7 @@ class NotificationService {
         status: 'pending',
         metadata: { templateId, variables },
         createdAt: new Date().toISOString(),
-      } as SMSNotification;
+      };
     } else if (template.inAppTemplate && template.channels.includes('in_app')) {
       notification = {
         id: uuidv4(),
@@ -368,7 +362,7 @@ class NotificationService {
         status: 'pending',
         metadata: { templateId, variables },
         createdAt: new Date().toISOString(),
-      } as InAppNotification;
+      };
     } else {
       throw new Error('No valid channel found in template');
     }

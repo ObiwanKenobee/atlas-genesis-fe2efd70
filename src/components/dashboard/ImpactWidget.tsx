@@ -3,8 +3,7 @@ import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { 
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, 
+import { XAxis, YAxis, CartesianGrid, Tooltip, 
   ResponsiveContainer, Area, AreaChart 
 } from 'recharts';
 import { TrendingUp, Leaf, Globe, Award, Target } from 'lucide-react';

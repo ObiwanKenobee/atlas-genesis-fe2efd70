@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ProjectCategoryCard } from './ProjectCategoryCard';
-import { CarbonProject, ProjectType, PROJECT_TYPE_LABELS } from '@/types/marketplace';
+import type { CarbonProject, ProjectType} from '@/types/marketplace';
 import { Globe, Zap, BarChart3, Award, Leaf } from 'lucide-react';
 
 interface RegenerativeMarketplaceShowcaseProps {

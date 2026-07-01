@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { UserRole, ConsentOption, ConsentState } from "@/types/auth";
+import type { UserRole, ConsentState } from "@/types/auth";
 import { getConsentOptions, validateConsent } from "@/utils/authUtils";
 
 interface EthicalConsentScreenProps {

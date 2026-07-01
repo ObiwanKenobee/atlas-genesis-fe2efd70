@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Atom, Brain, Rocket, Clock, Zap, Globe, Users, Activity } from 'lucide-react';
+import { Atom, Brain, Rocket, Clock, Zap, Users, Activity } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { quantumPlanetaryIntelligence } from '@/lib/quantum/QuantumPlanetaryIntelligence';

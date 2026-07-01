@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trophy, Star, Award, Target, TrendingUp, Users, Zap } from 'lucide-react';
+import { Trophy, Award, Target, TrendingUp, Users, Zap } from 'lucide-react';
 
 interface LeaderboardEntry {
   rank: number;

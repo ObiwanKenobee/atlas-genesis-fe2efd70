@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Glasses, Play, Users, Heart, Share2, MessageCircle } from 'lucide-react';
+import { Glasses, Play, Users, Heart, Share2 } from 'lucide-react';
 
 interface VirtualTour {
   id: string;

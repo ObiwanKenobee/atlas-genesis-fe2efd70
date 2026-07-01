@@ -1,6 +1,6 @@
 import React from 'react';
 import { Brain, CheckCircle, AlertTriangle, Activity, Shield } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const ethicalMetrics = [
   { time: '00:00', alignment: 88, transparency: 91, fairness: 86 },

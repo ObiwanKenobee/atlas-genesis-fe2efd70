@@ -1,12 +1,9 @@
 import React from 'react';
-import { Wallet, TrendingUp, DollarSign, PieChart, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { Wallet, TrendingUp, DollarSign, PieChart, ArrowUpRight } from 'lucide-react';
 import {
   AreaChart,
   Area,
-  LineChart,
   Line,
-  BarChart,
-  Bar,
   XAxis,
   YAxis,
   CartesianGrid,

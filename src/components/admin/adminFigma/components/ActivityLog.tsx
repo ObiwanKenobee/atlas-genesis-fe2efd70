@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Activity, Filter, Download, Calendar, User, Database, Settings, Shield, DollarSign, FileText } from 'lucide-react';
+import { Activity, Filter, Download, User, Database, Settings, Shield, DollarSign, FileText } from 'lucide-react';
 
 interface LogEntry {
   id: string;

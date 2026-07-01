@@ -10,7 +10,6 @@
  * reputation. An economy emerges from incentives, not central coordination.
  */
 
-import type { TrustScore } from '../trust/trust-engine';
 
 // ─── Agent identity ───────────────────────────────────────────────────────────
 

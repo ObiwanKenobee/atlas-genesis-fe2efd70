@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, Lock, CheckCircle, ExternalLink, Search, Filter, Download } from 'lucide-react';
+import { Shield, Lock, CheckCircle, ExternalLink, Search, Download } from 'lucide-react';
 
 interface AuditEvent {
   id: string;

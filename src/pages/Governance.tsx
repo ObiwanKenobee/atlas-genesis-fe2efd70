@@ -3,7 +3,6 @@ import EnterpriseHeader from "@/components/EnterpriseHeader";
 import PageHero from "@/components/PageHero";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
 import { Heart, Users, Shield, Gavel, Lightbulb, Lock } from "lucide-react";
 
 const Governance = () => {

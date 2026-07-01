@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, UserPlus, Search, Filter, MoreVertical, Shield, Mail, Calendar, CheckCircle, XCircle, Edit, Trash2 } from 'lucide-react';
+import { Users, UserPlus, Search, MoreVertical, Shield, CheckCircle, XCircle, Edit, Trash2 } from 'lucide-react';
 
 interface User {
   id: string;

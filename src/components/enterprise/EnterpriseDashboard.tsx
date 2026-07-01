@@ -1,22 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Shield,
-  Lock,
   Users,
   Building2,
   TrendingUp,
   AlertTriangle,
   CheckCircle,
-  XCircle,
-  Clock,
-  Database,
   Network,
-  Key,
   FileText,
   Settings,
   Activity,
-  Globe,
   Zap
 } from 'lucide-react';
 

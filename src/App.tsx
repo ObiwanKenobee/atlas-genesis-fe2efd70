@@ -1,10 +1,7 @@
 import React from 'react'; // v18
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
-import { Analytics } from "@vercel/analytics/next"
 import { AnimatePresence } from 'framer-motion';
 import PageTransition from './components/PageTransition';
-import ApiStatus from './components/ApiStatus';
-import NewsletterBanner from './components/NewsletterBanner';
 import Layout from './components/Layout';
 import BackToTop from './components/BackToTop';
 import Index from './pages/Index';
@@ -47,7 +44,6 @@ import Adoption from './pages/Adoption';
 import Outreach from './pages/Outreach';
 import HelpCenter from './pages/HelpCenter';
 import Contact from './pages/Contact';
-import Pricing from './pages/Pricing';
 import Payment from './pages/Payment';
 import RegenerativeFinance from './pages/RegenerativeFinance';
 import DeFi from './pages/DeFi';

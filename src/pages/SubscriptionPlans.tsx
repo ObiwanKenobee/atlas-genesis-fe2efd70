@@ -12,27 +12,18 @@ import {
   Check,
   X,
   Sparkles,
-  Zap,
   Shield,
-  Globe,
-  Users,
-  BarChart3,
   Clock,
-  FileText,
   ChevronRight,
-  CreditCard,
-  Building2,
   Phone,
   Mail,
   HelpCircle,
-  ArrowRight,
   Star,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useEnhancedAuth } from '@/hooks/useEnhancedAuth';

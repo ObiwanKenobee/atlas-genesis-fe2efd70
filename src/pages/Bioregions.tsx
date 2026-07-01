@@ -6,8 +6,7 @@ import PageHero from "@/components/PageHero";
 import { useBioregionalZones } from "@/hooks/useBioregionalZones";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BioregionalZone } from "@/types/marketplace";
-import { Globe, Zap, Heart, Scale } from "lucide-react";
+import type { BioregionalZone } from "@/types/marketplace";
 
 const Bioregions = () => {
   // Sample zone IDs - in a real app these would be dynamic

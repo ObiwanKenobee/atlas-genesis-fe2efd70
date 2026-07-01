@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { ValuationModel, ImpactBreakdown } from "@/types/marketplace";
+import type { ValuationModel, ImpactBreakdown } from "@/types/marketplace";
 
 // Mock valuation model generator
 const generateMockValuation = (projectId: string): ValuationModel => {

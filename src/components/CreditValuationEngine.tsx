@@ -1,9 +1,9 @@
 import React, { useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart, Bar, LineChart, Line, ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { ValuationModel, ImpactBreakdown } from "@/types/marketplace";
-import { Zap, TrendingUp, Shield, AlertTriangle, DollarSign } from "lucide-react";
+import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import type { ValuationModel, ImpactBreakdown } from "@/types/marketplace";
+import { Zap, TrendingUp, AlertTriangle, DollarSign } from "lucide-react";
 
 interface CreditValuationEngineProps {
   valuation: ValuationModel | null;

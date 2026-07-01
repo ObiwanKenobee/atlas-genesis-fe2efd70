@@ -1,4 +1,4 @@
-import { RegenerativeMetrics } from '@/types/marketplace';
+import type { RegenerativeMetrics } from '@/types/marketplace';
 
 /**
  * IoT Sensor Data Simulator

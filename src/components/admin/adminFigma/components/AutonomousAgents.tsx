@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Brain, Zap, Activity, AlertCircle, CheckCircle, Clock, Settings } from 'lucide-react';
+import React, { useState } from 'react';
+import { Brain, Zap, AlertCircle, CheckCircle, Clock, Settings } from 'lucide-react';
 
 interface Agent {
   id: string;

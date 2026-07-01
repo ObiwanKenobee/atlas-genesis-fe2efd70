@@ -405,7 +405,7 @@ const Settings = () => {
                           <Input
                             id={field}
                             name={field}
-                            type={showPasswords[showKey as keyof typeof showPasswords] ? "text" : "password"}
+                            type={showPasswords[showKey] ? "text" : "password"}
                             value={passwordData[field]}
                             onChange={handlePasswordChange}
                             placeholder={`Enter ${labels[field].toLowerCase()}`}
@@ -416,12 +416,12 @@ const Settings = () => {
                             onClick={() =>
                               setShowPasswords((prev) => ({
                                 ...prev,
-                                [showKey]: !prev[showKey as keyof typeof prev],
+                                [showKey]: !prev[showKey],
                               }))
                             }
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                           >
-                            {showPasswords[showKey as keyof typeof showPasswords] ? (
+                            {showPasswords[showKey] ? (
                               <EyeOff className="w-4 h-4" />
                             ) : (
                               <Eye className="w-4 h-4" />

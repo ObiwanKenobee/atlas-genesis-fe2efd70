@@ -19,7 +19,7 @@ import {
   Activity,
   X,
 } from 'lucide-react';
-import {
+import type {
   DashboardWidget,
   ChartConfig,
   ReportConfig,

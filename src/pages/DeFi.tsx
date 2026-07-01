@@ -3,13 +3,10 @@ import { motion } from 'framer-motion';
 import {
   Network,
   Zap,
-  Shield,
-  TrendingUp,
   Users,
   FileText,
   CheckCircle,
   ArrowRight,
-  Globe,
   Wallet,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';

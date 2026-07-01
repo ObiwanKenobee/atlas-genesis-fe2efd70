@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { socketService, SocketEventData, NotificationData, PriceUpdateData, GovernanceUpdateData, MarketplaceActivityData, DashboardUpdateData } from '@/lib/api/socket';
+import type { NotificationData, PriceUpdateData, GovernanceUpdateData, MarketplaceActivityData, DashboardUpdateData } from '@/lib/api/socket';
+import { socketService } from '@/lib/api/socket';
 import { useAuth } from './useAuth';
 
 interface UseSocketOptions {

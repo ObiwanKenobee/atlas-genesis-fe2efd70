@@ -14,7 +14,7 @@ import {
   CartesianGrid,
   Tooltip,
 } from 'recharts';
-import { CarbonProject } from '@/types/marketplace';
+import type { CarbonProject } from '@/types/marketplace';
 
 interface ComparisonChartProps {
   projects: CarbonProject[];

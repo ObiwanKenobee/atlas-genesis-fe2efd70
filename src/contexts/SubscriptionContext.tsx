@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 export type SubscriptionStatus = 'none' | 'trialing' | 'active' | 'past_due' | 'canceled' | 'unpaid';
 export type SubscriptionTier = 'starter' | 'professional' | 'enterprise' | 'none';

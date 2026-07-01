@@ -1,14 +1,12 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ChevronRight, Home, Menu } from 'lucide-react';
+import { ChevronRight, Home } from 'lucide-react';
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/DashboardSidebar';
-import { Button } from '@/components/ui/button';
 import { NotificationCenter } from '@/components/NotificationCenter';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { RealtimeToastProvider } from '@/components/RealtimeToast';
-import { cn } from '@/lib/utils';
 
 interface BreadcrumbItem {
   label: string;

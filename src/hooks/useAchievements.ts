@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
-import { Achievement } from '@/components/achievements/AchievementBadge';
+import type { Achievement } from '@/components/achievements/AchievementBadge';
 
 // Define all possible achievements
 const ACHIEVEMENT_DEFINITIONS: Omit<Achievement, 'progress' | 'unlocked' | 'unlockedAt'>[] = [

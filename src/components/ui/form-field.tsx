@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { z } from 'zod';
+import type { z } from 'zod';
 import { useFieldValidation } from '@/hooks/useValidation';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';

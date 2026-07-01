@@ -6,8 +6,8 @@
 
 import { useState, useEffect } from 'react';
 import { useInvestments } from '../hooks/useInvestments';
-import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { Leaf, Droplets, Wind, Users, TrendingUp, Calendar, Award, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { Leaf, Droplets, Wind, Users, TrendingUp, Award, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 
 // Color palette
 const COLORS = {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Award, MapPin, Check, ChevronRight, BarChart3, Radar, TrendingUp, DollarSign, Leaf, Shield } from 'lucide-react';
 import {
   Dialog,
@@ -11,7 +11,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CarbonProject, PROJECT_TYPE_LABELS, PROJECT_TYPE_ICONS } from '@/types/marketplace';
+import type { CarbonProject} from '@/types/marketplace';
+import { PROJECT_TYPE_LABELS, PROJECT_TYPE_ICONS } from '@/types/marketplace';
 import { Link } from 'react-router-dom';
 import { ComparisonChart } from './ComparisonChart';
 import { ComparisonPDFExport } from './ComparisonPDFExport';

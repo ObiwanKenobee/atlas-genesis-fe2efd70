@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { usePerformanceMonitoring, PerformanceMetrics } from '@/hooks/usePerformanceMonitoring';
+import type { PerformanceMetrics } from '@/hooks/usePerformanceMonitoring';
+import { usePerformanceMonitoring } from '@/hooks/usePerformanceMonitoring';
 import { Activity, TrendingUp, AlertTriangle, CheckCircle, RefreshCw } from 'lucide-react';
 
 interface MetricCardProps {

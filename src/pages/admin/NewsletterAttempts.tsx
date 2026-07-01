@@ -51,7 +51,7 @@ const NewsletterAttempts = () => {
         .limit(500);
       if (cancelled) return;
       if (error) setError(error.message);
-      else setRows((data ?? []) as Attempt[]);
+      else setRows((data ?? []));
       setLoading(false);
     };
     load();

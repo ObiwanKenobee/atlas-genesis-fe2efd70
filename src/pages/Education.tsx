@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import {
   BookOpen,
   GraduationCap,
-  Globe,
   Users,
   FileText,
   CheckCircle,

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, AlertTriangle, Lock, Unlock, Globe, Server, Eye, Activity } from 'lucide-react';
+import { Shield, AlertTriangle, Lock, Globe, Server, Eye, Activity } from 'lucide-react';
 
 export function SecurityMonitor() {
   const [timeRange, setTimeRange] = useState('24h');

@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
-import { Shield, Lock, AlertTriangle } from 'lucide-react';
+import { Lock, AlertTriangle } from 'lucide-react';
 import AdminApp from '@/components/admin/adminFigma/app/App';
 
 /**

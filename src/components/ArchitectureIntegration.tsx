@@ -1,8 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Network, Shield, Brain, Satellite, Database, 
-  Zap, Globe, Users, TrendingUp, Layers
+  Network, Shield, Brain, Satellite, TrendingUp, Layers
 } from 'lucide-react';
 
 // Integration with existing Atlas Sanctum platform

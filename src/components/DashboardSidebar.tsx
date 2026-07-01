@@ -16,7 +16,6 @@ import {
   Shield,
   Users,
   FileText,
-  Bell,
   Wallet,
   TrendingUp,
   MapPin,
@@ -41,12 +40,10 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarTrigger,
   useSidebar,
 } from '@/components/ui/sidebar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
 
 interface NavItem {
   title: string;

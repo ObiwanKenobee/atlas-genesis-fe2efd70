@@ -4,13 +4,12 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import {
-  CarbonProject,
+import type {
   CreditHolding,
-  Transaction,
-  ProjectType,
-} from '../types/marketplace';
-import { Project } from './projectService';
+  ProjectType} from '../types/marketplace';
+
+
+import type { Project } from './projectService';
 
 // ==================== Constants ====================
 

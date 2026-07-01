@@ -6,7 +6,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import { CarbonProject } from '@/types/marketplace';
+import type { CarbonProject } from '@/types/marketplace';
 import { useUserHoldings, usePurchaseCredits, useRetireCredits } from './useMarketplace';
 
 export interface InvestmentWizardState {

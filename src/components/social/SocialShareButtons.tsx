@@ -10,7 +10,7 @@ import {
 import { toast } from 'sonner';
 import { 
   Share2, Twitter, Facebook, Linkedin, Link2, 
-  CheckCircle2, Download, Mail 
+  CheckCircle2, Mail 
 } from 'lucide-react';
 
 interface SocialShareButtonsProps {
