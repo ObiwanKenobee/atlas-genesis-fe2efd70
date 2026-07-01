@@ -119,7 +119,7 @@ const TransactionsTable = () => {
                   <TableCell tabIndex={0}>
                     <div className="flex items-center gap-2">
                       <span className="text-lg">
-                        {PROJECT_TYPE_ICONS[transaction.carbon_projects?.project_type as keyof typeof PROJECT_TYPE_ICONS] || '🌍'}
+                        {PROJECT_TYPE_ICONS[transaction.carbon_projects?.project_type] || '🌍'}
                       </span>
                       <span className="text-sm font-medium text-foreground truncate max-w-[150px]">
                         {transaction.carbon_projects?.title || 'Unknown Project'}

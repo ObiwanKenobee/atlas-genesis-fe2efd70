@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useOnboarding } from '@/hooks/useOnboarding';
-import { USER_SEGMENTS, UserSegment } from '@/types/userSegments';
+import type { UserSegment } from '@/types/userSegments';
+import { USER_SEGMENTS } from '@/types/userSegments';
 
 export default function SegmentSelection() {
   const navigate = useNavigate();

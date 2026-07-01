@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Coins, TrendingUp, Star, Share2, Download, ExternalLink, Zap } from 'lucide-react';
+import { Coins, Star, Share2, ExternalLink, Zap } from 'lucide-react';
 
 interface DynamicNFT {
   tokenId: string;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
-import { AlertTriangle, Activity, Leaf, Thermometer, Droplets, Cloud, MapPin, TrendingUp, TrendingDown, Bell, CheckCircle, Clock, Download, Share2, Filter, RefreshCw, Eye, Zap, Trees, Bug } from 'lucide-react';
+import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { AlertTriangle, Activity, Leaf, Thermometer, Droplets, Cloud, TrendingUp, TrendingDown, Bell, CheckCircle, Clock, Download, RefreshCw, Eye, Trees, Bug } from 'lucide-react';
 
 // ============================================
 // Type Definitions

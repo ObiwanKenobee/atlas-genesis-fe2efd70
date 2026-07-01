@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   CreditCard,
   Plus,
@@ -13,19 +13,12 @@ import {
   CheckCircle,
   RefreshCw,
   Shield,
-  Lock,
-  Eye,
-  EyeOff,
-  Calendar,
   AlertTriangle,
-  ExternalLink,
-  MoreVertical,
-  Edit,
   Star,
   Building2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

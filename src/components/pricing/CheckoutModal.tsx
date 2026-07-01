@@ -1,21 +1,19 @@
 // @ts-nocheck
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  X, Shield, Lock, CheckCircle, Building2, Loader2,
-  ChevronRight, ChevronLeft, Sparkles, Tag, AlertCircle,
-  CreditCard, Wallet, Smartphone, Globe2, Coins,
+import { Shield, Lock, CheckCircle, Building2, Loader2,
+  ChevronRight, ChevronLeft, Sparkles, AlertCircle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { usePayment, PaymentProvider } from '@/hooks/usePayment';
+import type { PaymentProvider } from '@/hooks/usePayment';
+import { usePayment } from '@/hooks/usePayment';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 

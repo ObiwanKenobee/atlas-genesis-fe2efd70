@@ -1,4 +1,4 @@
-import { MeasurementData, RegenerativeMetrics, ValuationModel } from '@/types/marketplace';
+import type { MeasurementData, RegenerativeMetrics, ValuationModel } from '@/types/marketplace';
 
 /**
  * Generate realistic satellite measurement data

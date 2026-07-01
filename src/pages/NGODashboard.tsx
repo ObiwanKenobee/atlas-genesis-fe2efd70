@@ -3,10 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Heart,
-  TrendingUp,
   Users,
   CheckCircle,
-  Clock,
   Plus,
   FileText,
   ArrowUpRight,
@@ -18,11 +16,10 @@ import {
   Calendar,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { DashboardMetricCard, DashboardChart, DashboardTable, type TableColumn } from '@/components/dashboard/shared';
-import Header from '@/components/EnterpriseHeader';
+import { DashboardMetricCard, DashboardTable, type TableColumn } from '@/components/dashboard/shared';
 import WorkspaceLayout from '@/components/WorkspaceLayout';
 import { useAuth } from '@/hooks/useAuth';
 import { useEnhancedAuth } from '@/hooks/useEnhancedAuth';

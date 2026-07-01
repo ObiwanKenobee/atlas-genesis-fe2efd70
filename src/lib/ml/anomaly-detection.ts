@@ -1,4 +1,4 @@
-import { MeasurementData, RegenerativeMetrics } from '@/types/marketplace';
+import type { MeasurementData, RegenerativeMetrics } from '@/types/marketplace';
 
 /**
  * Anomaly Detection Engine

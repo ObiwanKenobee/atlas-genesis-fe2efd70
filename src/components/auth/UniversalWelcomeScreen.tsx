@@ -1,7 +1,6 @@
-import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { UserRole } from "@/types/auth";
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { UserRole } from "@/types/auth";
 
 interface RoleOption {
   value: UserRole;

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { MeasurementData, MeasurementSummary } from "@/types/marketplace";
+import type { MeasurementData, MeasurementSummary } from "@/types/marketplace";
 
 // Generate mock measurement data
 const generateMockMeasurements = (projectId: string, days: number = 30): MeasurementData[] => {

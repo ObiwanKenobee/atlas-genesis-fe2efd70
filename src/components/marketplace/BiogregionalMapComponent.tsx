@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Info, MapPin } from 'lucide-react';
+import { Info } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useBioregionalZones } from '@/hooks/useBioregionalZones';
-import { BioregionalZone } from '@/types/marketplace';
+import type { BioregionalZone } from '@/types/marketplace';
 
 interface BiogregionalMapComponentProps {
   projectId?: string;

@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react';
-import { Download, FileText, FileSpreadsheet, FileImage, FileCode, Clock, CheckCircle, AlertCircle, Loader2, Search, Filter, RefreshCw } from 'lucide-react';
+import { Download, FileText, FileSpreadsheet, FileImage, FileCode, Clock, CheckCircle, AlertCircle, Loader2, Search, RefreshCw } from 'lucide-react';
 
 type ExportFormat = 'pdf' | 'excel' | 'csv' | 'png' | 'json';
 type ExportStatus = 'pending' | 'processing' | 'completed' | 'failed';

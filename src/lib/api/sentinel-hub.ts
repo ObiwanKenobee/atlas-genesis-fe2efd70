@@ -1,4 +1,4 @@
-import { MeasurementData } from '@/types/marketplace';
+import type { MeasurementData } from '@/types/marketplace';
 import { generateMeasurementData, detectAnomalies } from '@/lib/mocks/measurement-generator';
 
 /**

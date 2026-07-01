@@ -10,19 +10,14 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Users,
   UserPlus,
   Search,
-  Filter,
-  MoreHorizontal,
   Edit,
   Shield,
   ShieldCheck,
   ShieldX,
-  Mail,
-  Calendar,
   AlertCircle,
   CheckCircle,
   Loader2

@@ -6,7 +6,6 @@ import {
   CheckCheck,
   Trash2,
   TrendingUp,
-  ShoppingBag,
   AlertCircle,
   Info,
   CheckCircle2,
@@ -21,7 +20,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useNotifications, Notification, NotificationType } from "@/hooks/useNotifications";
+import type { NotificationType } from "@/hooks/useNotifications";
+import { useNotifications } from "@/hooks/useNotifications";
 import { formatDistanceToNow } from "date-fns";
 import { Link } from "react-router-dom";
 

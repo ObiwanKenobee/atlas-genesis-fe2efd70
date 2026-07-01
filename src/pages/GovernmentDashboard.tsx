@@ -5,26 +5,22 @@ import {
   Building,
   TrendingUp,
   Target,
-  BarChart3,
-  Users,
   CheckCircle,
   AlertTriangle,
   Globe,
   Zap,
   FileText,
   ArrowUpRight,
-  Settings,
   Shield,
   Activity,
   Calendar,
-  Plus,
   Database,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { DashboardMetricCard, DashboardChart, type TableColumn } from '@/components/dashboard/shared';
+import { DashboardMetricCard, DashboardChart } from '@/components/dashboard/shared';
 import WorkspaceLayout from '@/components/WorkspaceLayout';
 import { useAuth } from '@/hooks/useAuth';
 import { useEnhancedAuth } from '@/hooks/useEnhancedAuth';

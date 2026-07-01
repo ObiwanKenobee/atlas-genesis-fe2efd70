@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Vote,
@@ -6,21 +6,10 @@ import {
   FileText,
   CheckCircle,
   XCircle,
-  Clock,
   AlertTriangle,
   TrendingUp,
-  Shield,
-  MessageSquare,
-  Target,
-  Award,
   BarChart3,
-  PieChart,
-  Activity,
-  Globe,
-  Zap,
-  Lock,
-  Eye,
-  EyeOff
+  PieChart
 } from 'lucide-react';
 
 interface Proposal {

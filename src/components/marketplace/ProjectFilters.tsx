@@ -1,7 +1,8 @@
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { ProjectType, PROJECT_TYPE_LABELS, PROJECT_TYPE_ICONS } from '@/types/marketplace';
+import type { ProjectType} from '@/types/marketplace';
+import { PROJECT_TYPE_LABELS, PROJECT_TYPE_ICONS } from '@/types/marketplace';
 
 interface ProjectFiltersProps {
   search: string;

@@ -23,7 +23,6 @@ import {
   ChevronRight,
   Sparkles,
   LogOut,
-  X,
   Info,
   CheckCircle2,
   AlertCircle,
@@ -34,7 +33,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useEnhancedAuth } from '@/hooks/useEnhancedAuth';
-import { DEMO_USERS, DASHBOARD_CONFIGS } from '@/types/auth';
+import { DEMO_USERS } from '@/types/auth';
 import { toast } from 'sonner';
 
 type AuthMode = 'demo' | 'login' | 'register';

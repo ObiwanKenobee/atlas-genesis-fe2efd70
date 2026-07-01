@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   CreditCard,
   DollarSign,
@@ -14,27 +14,17 @@ import {
   AlertTriangle,
   CheckCircle,
   XCircle,
-  TrendingUp,
-  TrendingDown,
   RefreshCw,
   Download,
   Settings,
   Bell,
-  Calendar,
   Activity,
   Zap,
-  ChevronRight,
-  ChevronDown,
-  Plus,
-  Minus,
   Eye,
-  EyeOff,
-  Trash2,
-  ExternalLink,
   HardDrive,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';

@@ -29,8 +29,8 @@ export function useFeatureFlag(key: string): boolean {
 
   useEffect(() => {
     const handler = () => setValue(isFeatureEnabled(key));
-    window.addEventListener('featureFlagsUpdated', handler as EventListener);
-    return () => window.removeEventListener('featureFlagsUpdated', handler as EventListener);
+    window.addEventListener('featureFlagsUpdated', handler);
+    return () => window.removeEventListener('featureFlagsUpdated', handler);
   }, [key]);
 
   return value;

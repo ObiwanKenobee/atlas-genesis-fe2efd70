@@ -4,7 +4,7 @@ import { AuthenticationMethods } from "./AuthenticationMethods";
 import { EthicalConsentScreen } from "./EthicalConsentScreen";
 import { RoleSpecificOnboarding } from "./RoleSpecificOnboarding";
 import { FirstDayExperience } from "./FirstDayExperience";
-import { User, UserRole, ConsentState, AuthenticationData } from "@/types/auth";
+import type { User, UserRole, ConsentState, AuthenticationData } from "@/types/auth";
 import { createTemporaryUser } from "@/utils/authUtils";
 
 type PortalStep = 'welcome' | 'auth-methods' | 'consent' | 'onboarding' | 'first-day' | 'complete';

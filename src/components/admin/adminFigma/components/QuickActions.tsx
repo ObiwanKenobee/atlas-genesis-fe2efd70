@@ -8,7 +8,6 @@ import {
   Settings,
   GitBranch,
   Shield,
-  DollarSign,
   BarChart3,
 } from 'lucide-react';
 

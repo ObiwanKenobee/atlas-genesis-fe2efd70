@@ -5,11 +5,7 @@ import {
   Coins,
   Trophy,
   Link2,
-  TrendingUp,
   Sparkles,
-  Users,
-  Shield,
-  Zap,
   ChevronRight,
   X,
 } from 'lucide-react';

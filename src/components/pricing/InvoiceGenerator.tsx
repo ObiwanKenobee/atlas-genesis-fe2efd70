@@ -1,5 +1,5 @@
 import React from 'react';
-import { Invoice } from '@/hooks/useSubscription';
+import type { Invoice } from '@/hooks/useSubscription';
 
 interface InvoiceGeneratorProps {
   invoice: Invoice;

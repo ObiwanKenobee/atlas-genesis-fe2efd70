@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { ShieldAlert } from "lucide-react";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";

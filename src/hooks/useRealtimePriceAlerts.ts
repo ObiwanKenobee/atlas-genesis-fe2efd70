@@ -7,8 +7,7 @@
  import { supabase } from '@/integrations/supabase/client';
  import { useSupabaseAuth } from './useSupabaseAuth';
  import { usePriceAlerts } from './usePriceAlerts';
- import { toast } from 'sonner';
- import { RealtimeChannel } from '@supabase/supabase-js';
+ import type { RealtimeChannel } from '@supabase/supabase-js';
  
  type ConnectionStatus = 'connecting' | 'connected' | 'disconnected' | 'error';
  

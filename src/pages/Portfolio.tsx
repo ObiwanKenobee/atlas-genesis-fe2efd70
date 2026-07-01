@@ -20,7 +20,8 @@ import {
 } from '@/components/ui/table';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { useUserHoldings, useUserTransactions } from '@/hooks/useMarketplace';
-import { PROJECT_TYPE_ICONS, CreditHolding } from '@/types/marketplace';
+import type { CreditHolding } from '@/types/marketplace';
+import { PROJECT_TYPE_ICONS } from '@/types/marketplace';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import PortfolioAnalyticsDashboard from '@/components/PortfolioAnalyticsDashboard';

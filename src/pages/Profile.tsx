@@ -13,7 +13,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import EmailVerificationStatus from "@/components/profile/EmailVerificationStatus";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, User, Mail, Shield, Calendar, CheckCircle, AlertCircle, Bell, Building2, Save, Trophy } from "lucide-react";
+import { Loader2, User, Mail, Calendar, CheckCircle, AlertCircle, Bell, Building2, Save } from "lucide-react";
 import Header from "@/components/EnterpriseHeader";
 import Footer from "@/components/Footer";
 import { toast } from "sonner";

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { Zap, Shield, TrendingUp, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -12,8 +12,6 @@ import {
   useValuationConfidenceInterval,
   usePriceProjection,
 } from '@/hooks/useValuationModel';
-import { ValuationModel as ValuationModelType } from '@/types/marketplace';
-import { ValuationModel } from '@/types/marketplace';
 
 interface ValuationEngineWidgetProps {
   projectId: string;

@@ -5,48 +5,30 @@
  * account management, subscription management, and support.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   User,
-  Mail,
-  Phone,
-  Building2,
-  MapPin,
   CreditCard,
-  Bell,
   Shield,
   Download,
-  Upload,
   Edit,
   Save,
-  X,
   ChevronRight,
-  ChevronDown,
-  Calendar,
   FileText,
   Receipt,
   TrendingUp,
-  TrendingDown,
-  AlertCircle,
   CheckCircle,
-  Clock,
   Plus,
   Settings,
   Key,
   Eye,
   EyeOff,
-  ToggleLeft,
-  ToggleRight,
   RefreshCw,
-  ExternalLink,
-  History,
   DollarSign,
   Package,
   Users,
-  Globe,
-  Lock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -54,9 +36,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   Select,
   SelectContent,

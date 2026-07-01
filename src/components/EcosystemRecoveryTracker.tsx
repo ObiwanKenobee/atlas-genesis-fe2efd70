@@ -1,9 +1,9 @@
 import React, { useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from "recharts";
-import { RegenerativeMetrics } from "@/types/marketplace";
-import { Leaf, Zap, Droplet, Bug, TrendingUp } from "lucide-react";
+import { Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from "recharts";
+import type { RegenerativeMetrics } from "@/types/marketplace";
+import { Leaf, Zap, Droplet, TrendingUp } from "lucide-react";
 
 interface RegenerativeMetricsTrend {
   microbiome_trend_30d: number | null;

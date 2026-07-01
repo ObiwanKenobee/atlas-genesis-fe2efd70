@@ -13,7 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Award, Leaf, AlertTriangle, Download, CheckCircle2, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
-import { CreditHolding } from '@/types/marketplace';
+import type { CreditHolding } from '@/types/marketplace';
 import { SocialShareButtons } from '@/components/social/SocialShareButtons';
 
 interface RetirementModalProps {

@@ -13,7 +13,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight, ArrowLeft, Leaf, Award, CreditCard, Check, ShoppingCart } from 'lucide-react';
 import { useProjects } from '@/hooks/useMarketplace';
-import { PROJECT_TYPE_ICONS, PROJECT_TYPE_LABELS, CarbonProject } from '@/types/marketplace';
+import type { CarbonProject } from '@/types/marketplace';
+import { PROJECT_TYPE_ICONS, PROJECT_TYPE_LABELS } from '@/types/marketplace';
 
 export default function InvestmentFlow() {
   const navigate = useNavigate();

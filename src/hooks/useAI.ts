@@ -5,7 +5,7 @@
  * TODO: Restore AI service integration
  */
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 
 // Placeholder types
 export interface NLPAnalysis {

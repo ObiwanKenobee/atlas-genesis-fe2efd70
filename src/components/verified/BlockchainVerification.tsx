@@ -1,22 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   CheckCircle,
-  XCircle,
   Clock,
   Shield,
-  Lock,
   Key,
   Hash,
   Link,
-  AlertTriangle,
   CheckSquare,
   FileText,
   Database,
   Network,
   Zap,
-  Eye,
-  EyeOff
+  Eye
 } from 'lucide-react';
 
 interface VerificationRecord {

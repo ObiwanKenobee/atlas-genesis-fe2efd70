@@ -5,15 +5,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  LineChart, Line, AreaChart, Area, BarChart, Bar,
+import { Line, AreaChart, Area, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   Legend, PieChart, Pie, Cell
 } from 'recharts';
 import {
   TrendingUp, TrendingDown, Wallet, Clock, Shield,
   Leaf, Globe, Landmark, CreditCard, BarChart3, Activity,
-  Search, Coins, Zap
+  Search, Coins
 } from 'lucide-react';
 
 // Types

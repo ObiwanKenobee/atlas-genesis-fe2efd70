@@ -1,19 +1,18 @@
-import React, { useEffect, useState, Suspense } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { InteractiveDashboard, InteractiveFeatureGrid } from '@/components/EnhancedPlatformComponents';
-import { InnovationsHub, InnovationsWidget } from '@/components/InnovationsHub';
+import { InnovationsHub } from '@/components/InnovationsHub';
 import { PageTransition, InteractiveButton } from '@/components/Interactions';
 import {
   Leaf, LogOut, User, BarChart3, ShoppingCart, Briefcase,
   TrendingUp, Activity, Bell, Settings, Globe, TreePine,
-  ChevronRight, Shield, Wallet, ArrowUpRight, Plus, HelpCircle,
+  ChevronRight, Shield, Wallet, ArrowUpRight, HelpCircle,
   Calculator, Trophy
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import QuickActions from "@/components/dashboard/QuickActions";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { ImpactWidget } from "@/components/dashboard/ImpactWidget";
@@ -190,7 +189,7 @@ const Dashboard = () => {
             .eq("user_id", user.id);
 
           if (holdingsData) {
-            setHoldings(holdingsData as CreditHolding[]);
+            setHoldings(holdingsData);
             const credits = holdingsData.reduce((sum, h) => sum + h.quantity, 0);
             const value = holdingsData.reduce((sum, h) => sum + h.quantity * h.purchase_price, 0);
             setTotalCredits(credits);

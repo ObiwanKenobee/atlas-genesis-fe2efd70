@@ -4,10 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   Check,
   ArrowRight,
-  Zap,
   Shield,
   Globe,
-  Users,
   Leaf,
   BarChart3,
   Building2,

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { useInView } from 'framer-motion';
-import { Zap, TrendingUp, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { Zap, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 
 // ============================================================================
 // MICRO INTERACTIONS

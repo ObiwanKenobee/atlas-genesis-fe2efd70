@@ -2,14 +2,13 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, TrendingUp, Users, ShoppingCart } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { CarbonProject, ProjectType, PROJECT_TYPE_LABELS, PROJECT_TYPE_ICONS } from '@/types/marketplace';
+import type { CarbonProject, ProjectType} from '@/types/marketplace';
+import { PROJECT_TYPE_LABELS, PROJECT_TYPE_ICONS } from '@/types/marketplace';
 import { PurchaseModal } from './PurchaseModal';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
-import { toast } from 'sonner';
 
 interface ProjectCategoryCategoryCardProps {
   type: ProjectType;

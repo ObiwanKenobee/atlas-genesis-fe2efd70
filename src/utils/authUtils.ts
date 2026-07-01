@@ -1,4 +1,4 @@
-import { User, UserRole, ConsentOption, ConsentState, AuthenticationMethod, RoleSpecificData } from "@/types/auth";
+import type { User, UserRole, ConsentOption, ConsentState, AuthenticationMethod, RoleSpecificData } from "@/types/auth";
 
 // Role-specific authentication methods
 export const getAuthenticationMethods = (role: UserRole): AuthenticationMethod[] => {

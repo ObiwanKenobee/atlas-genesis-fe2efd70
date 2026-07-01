@@ -4,17 +4,16 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import {
+import type {
   ProjectType,
   ProjectStatus,
   ClimateClassification,
   GeoPoint,
-  MeasurementData,
-  RegenerativeMetrics,
   CarbonProject,
   CreditHolding,
-  Transaction,
-} from '../types/marketplace';
+  Transaction} from '../types/marketplace';
+
+
 
 // API Configuration
 const API_BASE = import.meta.env.VITE_API_URL || '/api/v2';

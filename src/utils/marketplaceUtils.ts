@@ -1,4 +1,4 @@
-import { CarbonProject, ProjectType } from "@/types/marketplace";
+import type { CarbonProject, ProjectType } from "@/types/marketplace";
 
 export type SortBy = "newest" | "trending" | "price";
 export type FilterType = "all" | ProjectType;

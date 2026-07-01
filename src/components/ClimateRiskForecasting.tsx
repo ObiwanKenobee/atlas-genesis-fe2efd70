@@ -1,8 +1,8 @@
 // @ts-nocheck
 import React, { useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ComposedChart } from "recharts";
-import { AlertTriangle, TrendingDown, TrendingUp, Cloud, Info, AlertOctagon, CheckCircle } from "lucide-react";
+import { Line, AreaChart, Area, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ComposedChart } from "recharts";
+import { AlertTriangle, TrendingUp, Cloud, Info, AlertOctagon, CheckCircle } from "lucide-react";
 import { useClimateRiskWithUncertainty } from "@/architecture/AtlasProbabilisticReasoning";
 import { Badge } from "@/components/ui/badge";
 

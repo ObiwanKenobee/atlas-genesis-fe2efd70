@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Brain,
-  Cpu,
   TrendingUp,
   Target,
   Lightbulb,
@@ -11,9 +10,6 @@ import {
   PieChart,
   Activity,
   Clock,
-  Users,
-  Globe,
-  Eye,
   Sparkles,
   ArrowUp,
   ArrowDown,

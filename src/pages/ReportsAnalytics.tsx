@@ -9,12 +9,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   BarChart3,
   TrendingUp,
-  TrendingDown,
   DollarSign,
   Activity,
   Calendar,
   Download,
-  Filter,
   PieChart,
   LineChart
 } from "lucide-react";

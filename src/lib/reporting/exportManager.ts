@@ -1,4 +1,3 @@
-import { CarbonProject } from '@/types/marketplace';
 
 export interface ExportOptions {
   format: 'csv' | 'json' | 'pdf';

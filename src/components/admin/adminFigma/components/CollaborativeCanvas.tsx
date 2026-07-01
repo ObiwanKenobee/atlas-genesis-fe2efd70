@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { Users, Video, MessageSquare, Download, Share2, Clock, MousePointer, Undo, Redo } from 'lucide-react';
 
 interface Participant {
@@ -139,7 +139,7 @@ export function CollaborativeCanvas() {
     const y = e.clientY - rect.top;
 
     const newElement: DrawElement = {
-      type: tool as any,
+      type: tool,
       x,
       y,
       width: tool === 'sticky' ? 200 : tool === 'rect' ? 150 : undefined,

@@ -6,7 +6,6 @@
  * the Supabase-based SupabaseAuthProvider.
  */
 
-import { useState, useEffect, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authApi, marketplaceApi, setGlobalAccessToken } from '@/lib/api/apiClient';
 import { supabase } from '@/integrations/supabase/client';
@@ -88,7 +87,7 @@ export function useCurrentUser() {
             segment: u.segment ?? undefined,
             onboardingCompleted: u.onboardingCompleted ?? u.onboarding_completed ?? false,
             createdAt: u.createdAt ?? u.created_at ?? undefined,
-          } as PlatformUser;
+          };
         }
       } catch {
         // JWT backend unreachable – fall through to Supabase

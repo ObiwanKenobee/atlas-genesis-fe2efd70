@@ -1,7 +1,7 @@
-import { useState, useRef } from 'react';
-import { Download, FileText, Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { FileText, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { CarbonProject, PROJECT_TYPE_LABELS } from '@/types/marketplace';
+import type { CarbonProject} from '@/types/marketplace';
 import { useToast } from '@/hooks/use-toast';
 
 interface ComparisonPDFExportProps {

@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from 'react';
 import confetti from 'canvas-confetti';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Star, Sparkles } from 'lucide-react';
-import { Achievement } from './AchievementBadge';
+import type { Achievement } from './AchievementBadge';
 import { cn } from '@/lib/utils';
 
 interface AchievementNotificationProps {

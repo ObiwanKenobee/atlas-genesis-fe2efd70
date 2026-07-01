@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, Lock, Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react';
+import { Shield, Lock, EyeOff, CheckCircle, AlertCircle } from 'lucide-react';
 
 interface ZKProof {
   id: string;

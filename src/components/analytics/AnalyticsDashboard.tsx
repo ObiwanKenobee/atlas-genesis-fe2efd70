@@ -22,19 +22,13 @@ import {
 import {
   Download,
   RefreshCw,
-  Calendar,
   Filter,
   MoreVertical,
-  Plus,
-  Save,
-  Share2,
-  FileText,
-  Clock,
   TrendingUp,
   TrendingDown,
   Minus,
 } from 'lucide-react';
-import {
+import type {
   DashboardTemplate,
   DashboardWidget,
   ChartConfig,

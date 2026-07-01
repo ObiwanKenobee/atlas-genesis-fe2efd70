@@ -5,7 +5,6 @@ import { useRegenerativeMetrics } from "@/hooks/useRegenerativeMetrics";
 import { useBioregionalZones } from "@/hooks/useBioregionalZones";
 import { useValuationModel } from "@/hooks/useValuationModel";
 import PlanetaryMeasurementDashboard from "@/components/PlanetaryMeasurementDashboard";
-import PageHero from "@/components/PageHero";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Satellite, Leaf, TrendingUp, Shield, Activity } from "lucide-react";

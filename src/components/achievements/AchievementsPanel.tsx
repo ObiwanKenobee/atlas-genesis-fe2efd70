@@ -1,12 +1,11 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Award, Filter, Trophy } from 'lucide-react';
+import { Award, Trophy } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
-import { AchievementBadge, Achievement } from './AchievementBadge';
+import { AchievementBadge } from './AchievementBadge';
 import { useAchievements } from '@/hooks/useAchievements';
 
 export function AchievementsPanel() {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Zap, Globe, Activity, TrendingDown, Server, MapPin } from 'lucide-react';
+import { Zap, Globe, TrendingDown, Server, MapPin } from 'lucide-react';
 
 interface EdgeNode {
   id: string;

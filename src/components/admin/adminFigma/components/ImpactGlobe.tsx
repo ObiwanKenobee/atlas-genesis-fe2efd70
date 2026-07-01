@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Globe, Layers, MapPin, TrendingUp, Zap, Eye } from 'lucide-react';
+import { Globe, Layers, TrendingUp, Zap, Eye } from 'lucide-react';
 
 interface ImpactPoint {
   lat: number;

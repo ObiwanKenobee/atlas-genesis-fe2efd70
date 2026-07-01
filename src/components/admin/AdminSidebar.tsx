@@ -4,8 +4,7 @@ import {
   LayoutDashboard, 
   FolderTree, 
   Receipt, 
-  BarChart3, 
-  Settings,
+  BarChart3,
   Leaf,
   ArrowLeft
 } from "lucide-react";

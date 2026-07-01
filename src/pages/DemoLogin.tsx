@@ -10,19 +10,14 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
   Users,
   Leaf,
   Shield,
   Building2,
   Globe,
-  Zap,
   TrendingUp,
   Factory,
-  Sprout,
-  Briefcase,
   GraduationCap,
   Award,
   ChevronRight,

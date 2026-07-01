@@ -3,7 +3,7 @@ import PageLayout from '@/components/PageLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Leaf, TrendingUp, Shield, Building, Factory, Sprout, Zap, BookOpen, Award, HelpCircle, Phone } from 'lucide-react';
+import { Leaf, TrendingUp, Shield, Building, Factory, Sprout, Zap, BookOpen, Award, Phone } from 'lucide-react';
 
 // Carbon Offsetting Page
 export const CarbonOffsetting = () => (

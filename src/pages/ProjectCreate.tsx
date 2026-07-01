@@ -5,21 +5,21 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
 import { useDropzone } from 'react-dropzone';
-import {
+import type {
   ProjectType,
-  ClimateClassification,
+  ClimateClassification} from '../types/marketplace';
+import {
   PROJECT_TYPE_LABELS,
   CLIMATE_LABELS,
 } from '../types/marketplace';
-import projectService, {
+import type {
   ProjectCreateInput,
   ProjectMedia,
 } from '../services/projectService';
+import projectService from '../services/projectService';
 import notificationService from '../services/notificationService';
 
 // Validation Schemas
@@ -218,7 +218,7 @@ export default function ProjectCreate() {
             {STEPS.map((step, index) => (
               <button
                 key={step.id}
-                onClick={() => index <= currentStepIndex && goToStep(step.id as StepId)}
+                onClick={() => index <= currentStepIndex && goToStep(step.id)}
                 className={`flex items-center ${
                   index <= currentStepIndex ? 'cursor-pointer' : 'cursor-not-allowed'
                 }`}

@@ -1,6 +1,6 @@
 import { useMemo, useCallback, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { CarbonProject } from '@/types/marketplace';
+import type { CarbonProject } from '@/types/marketplace';
 
 export interface PortfolioMetrics {
   totalValue: number;

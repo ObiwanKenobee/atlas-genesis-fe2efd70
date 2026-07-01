@@ -1,6 +1,7 @@
 import { useState, useEffect, createContext } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { UserSegment, UserSegmentConfig, USER_SEGMENTS, OnboardingStep } from '@/types/userSegments';
+import type { UserSegment, UserSegmentConfig, OnboardingStep } from '@/types/userSegments';
+import { USER_SEGMENTS } from '@/types/userSegments';
 
 interface OnboardingState {
   currentStep: number;

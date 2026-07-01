@@ -3,7 +3,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Crown, Calendar, CreditCard, AlertCircle, Loader2 } from 'lucide-react';
-import { Subscription, useSubscription } from '@/hooks/useSubscription';
+import type { Subscription} from '@/hooks/useSubscription';
+import { useSubscription } from '@/hooks/useSubscription';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 

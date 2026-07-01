@@ -9,7 +9,6 @@ import {
   Zap,
   Bell,
   ArrowUpRight,
-  Check,
   Plus,
   Minus,
   X,

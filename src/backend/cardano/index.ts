@@ -1,4 +1,5 @@
-import { CardanoLayer, ProbabilisticValueUnit, SimulationParameters, SimulationResult, CivilizationScenario, RegenerationMarket, AdaptiveGovernanceCurve } from '../../cardano/CardanoLayerArchitecture';
+import type { ProbabilisticValueUnit, SimulationParameters, SimulationResult, CivilizationScenario, RegenerationMarket, AdaptiveGovernanceCurve } from '../../cardano/CardanoLayerArchitecture';
+import { CardanoLayer } from '../../cardano/CardanoLayerArchitecture';
 
 // Initialize the Cardano Layer
 let cardanoLayer: CardanoLayer | null = null;

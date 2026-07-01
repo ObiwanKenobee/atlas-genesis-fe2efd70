@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
-import { CarbonProject, Transaction } from "@/types/marketplace";
+import type { CarbonProject, Transaction } from "@/types/marketplace";
 
 export const useIsAdmin = () => {
   const { user } = useSupabaseAuth();
@@ -19,7 +19,7 @@ export const useIsAdmin = () => {
         return false;
       }
       
-      return data as boolean;
+      return data;
     },
     enabled: !!user,
   });

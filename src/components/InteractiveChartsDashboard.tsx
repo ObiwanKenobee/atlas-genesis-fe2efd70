@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import {
-  LineChart,
   Line,
   AreaChart,
   Area,
@@ -18,8 +17,6 @@ import {
   Legend,
 } from 'recharts';
 import {
-  TrendingUp,
-  TrendingDown,
   Leaf,
   Wallet,
   Activity,
@@ -28,9 +25,7 @@ import {
   ArrowDownRight,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,

@@ -18,8 +18,9 @@ import { MarketplaceRiusTab } from "@/components/marketplace/MarketplaceRiusTab"
 import { MarketplaceBuyersTab } from "@/components/marketplace/MarketplaceBuyersTab";
 import { MarketplaceBondsTab } from "@/components/marketplace/MarketplaceBondsTab";
 import { MarketplaceApisTab } from "@/components/marketplace/MarketplaceApisTab";
-import { filterAndSortProjects, formatFilterName, SortBy, FilterType } from "@/utils/marketplaceUtils";
-import { CarbonProject } from "@/types/marketplace";
+import type { SortBy, FilterType } from "@/utils/marketplaceUtils";
+import { filterAndSortProjects, formatFilterName } from "@/utils/marketplaceUtils";
+import type { CarbonProject } from "@/types/marketplace";
 import { ProjectComparisonModal } from "@/components/marketplace/ProjectComparisonModal";
 import { PriceAlertForm } from "@/components/marketplace/PriceAlertForm";
 import { motion, AnimatePresence } from "framer-motion";

@@ -5,15 +5,13 @@
  * Provides comprehensive visibility into all system actions.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   Search,
   Filter,
   Download,
-  Calendar,
   User,
-  Shield,
   AlertTriangle,
   CheckCircle,
   XCircle,

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, Plus, Edit, Trash2, Users, Lock, Check } from 'lucide-react';
+import { Shield, Plus, Edit, Trash2, Users, Lock } from 'lucide-react';
 
 interface Role {
   id: string;

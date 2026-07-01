@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BioregionalZone } from "@/types/marketplace";
+import type { BioregionalZone } from "@/types/marketplace";
 import { MapPin, Shield, AlertTriangle, Globe, BarChart3 } from "lucide-react";
 
 interface BioregionalMapProps {

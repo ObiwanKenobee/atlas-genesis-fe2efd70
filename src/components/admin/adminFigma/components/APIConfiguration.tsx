@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Key, Plus, Copy, Eye, EyeOff, Trash2, RefreshCw, Calendar, Lock } from 'lucide-react';
+import { Key, Plus, Copy, Eye, EyeOff, Trash2, RefreshCw, Lock } from 'lucide-react';
 
 interface APIKey {
   id: string;
