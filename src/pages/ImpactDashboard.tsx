@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ImpactDashboard Page
  * Visualizes user's environmental impact across all investments

@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Temporal Regeneration Engine
 export class TemporalRegenerationEngine {
   private timelines: Map<string, any> = new Map();

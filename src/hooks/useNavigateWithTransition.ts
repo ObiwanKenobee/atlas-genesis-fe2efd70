@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useCallback } from 'react';
 

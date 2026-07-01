@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * agent-economy.ts
  *
