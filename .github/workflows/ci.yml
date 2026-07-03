@@ -44,6 +44,40 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
 
+      - name: ESLint trend (append snapshot + regenerate table)
+        if: always()
+        env:
+          TREND_COMMIT: ${{ github.sha }}
+          TREND_REF: ${{ github.ref_name }}
+        run: npm run lint:trend
+
+      - name: ESLint no-unsafe-* prioritized checklist
+        if: always()
+        run: npm run lint:checklist
+
+      - name: Upload ESLint trend + checklist
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eslint-trend-${{ github.run_id }}
+          path: |
+            eslint-trend.csv
+            eslint-trend.md
+            eslint-unsafe-checklist.md
+          if-no-files-found: ignore
+          retention-days: 30
+
+      - name: ESLint PR delta comment
+        if: github.event_name == 'pull_request' && always()
+        run: npm run lint:pr-comment
+
+      - name: Post PR comment with warning deltas
+        if: github.event_name == 'pull_request' && always()
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: eslint-warning-deltas
+          path: eslint-pr-comment.md
+
       - name: TypeScript typecheck
         run: npm run typecheck
 
