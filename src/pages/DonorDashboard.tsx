@@ -2,21 +2,23 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  Heart,
-  DollarSign,
-  TreePine,
-  Globe,
-  Calendar,
-  Download,
-  ArrowUpRight,
-  Award,
-  Target,
-  Users,
+  Heart, DollarSign, TreePine, Globe, Calendar, Download, ArrowUpRight,
+  Award, Target, Users, Search, Filter, Receipt, ShieldCheck, Repeat,
+  Sparkles, TrendingUp, FileText, Share2, Trophy,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { toast } from 'sonner';
+import {
+  ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid,
+  Tooltip as RTooltip, PieChart, Pie, Cell, Legend, BarChart, Bar,
+} from 'recharts';
 import { DashboardMetricCard, DashboardChart, DashboardTable, type TableColumn } from '@/components/dashboard/shared';
 import WorkspaceLayout from '@/components/WorkspaceLayout';
 import { useAuth } from '@/hooks/useAuth';
@@ -27,13 +29,17 @@ interface Donation {
   date: string;
   amount: number;
   project: string;
+  category: 'Forestry' | 'Ocean' | 'Agriculture' | 'Water' | 'Community';
   impact: string;
   status: 'completed' | 'pending' | 'processing';
+  txHash?: string;
+  taxDeductible?: boolean;
 }
 
 interface ImpactMetric {
   category: string;
   value: number;
+  goal: number;
   unit: string;
   change: number;
 }
@@ -42,112 +48,124 @@ const DonorDashboard = () => {
   const { user, loading } = useAuth();
   const { user: enhancedUser, loading: enhancedLoading } = useEnhancedAuth();
   const navigate = useNavigate();
-  
-  // Use enhanced auth for demo mode, fallback to regular auth
   const currentUser = enhancedUser || user;
   const isLoading = enhancedLoading || loading;
+
   const [donations, setDonations] = useState<Donation[]>([]);
   const [impactMetrics, setImpactMetrics] = useState<ImpactMetric[]>([]);
   const [totalDonated, setTotalDonated] = useState(0);
   const [totalImpact, setTotalImpact] = useState(0);
   const [projectsSupported, setProjectsSupported] = useState(0);
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
 
   useEffect(() => {
     if (!isLoading && !currentUser) {
       navigate('/auth');
       return;
     }
-
-    // Mock data for demo
     const mockDonations: Donation[] = [
-      {
-        id: '1',
-        date: '2025-01-28',
-        amount: 5000,
-        project: 'Amazon Rainforest Protection',
-        impact: '1250 tons CO2',
-        status: 'completed',
-      },
-      {
-        id: '2',
-        date: '2025-01-25',
-        amount: 2500,
-        project: 'Ocean Restoration Initiative',
-        impact: '500 tons CO2',
-        status: 'completed',
-      },
-      {
-        id: '3',
-        date: '2025-01-20',
-        amount: 10000,
-        project: 'Reforestation Project Kenya',
-        impact: '2500 tons CO2',
-        status: 'completed',
-      },
-      {
-        id: '4',
-        date: '2025-01-15',
-        amount: 7500,
-        project: 'Sustainable Agriculture Program',
-        impact: '1875 tons CO2',
-        status: 'completed',
-      },
-      {
-        id: '5',
-        date: '2025-01-10',
-        amount: 3000,
-        project: 'Clean Water Initiative',
-        impact: '750 tons CO2',
-        status: 'processing',
-      },
+      { id: '1', date: '2025-01-28', amount: 5000, project: 'Amazon Rainforest Protection', category: 'Forestry', impact: '1250 tons CO2', status: 'completed', txHash: '0x8f2a…c41b', taxDeductible: true },
+      { id: '2', date: '2025-01-25', amount: 2500, project: 'Ocean Restoration Initiative', category: 'Ocean', impact: '500 tons CO2', status: 'completed', txHash: '0x14de…9a02', taxDeductible: true },
+      { id: '3', date: '2025-01-20', amount: 10000, project: 'Reforestation Project Kenya', category: 'Forestry', impact: '2500 tons CO2', status: 'completed', txHash: '0x77bc…31ef', taxDeductible: true },
+      { id: '4', date: '2025-01-15', amount: 7500, project: 'Sustainable Agriculture Program', category: 'Agriculture', impact: '1875 tons CO2', status: 'completed', txHash: '0x2a91…d5b7', taxDeductible: true },
+      { id: '5', date: '2025-01-10', amount: 3000, project: 'Clean Water Initiative', category: 'Water', impact: '750 tons CO2', status: 'processing', taxDeductible: false },
     ];
-
     const mockImpactMetrics: ImpactMetric[] = [
-      { category: 'Carbon Offset', value: 6875, unit: 'tons', change: 12.5 },
-      { category: 'Trees Planted', value: 137500, unit: 'trees', change: 8.3 },
-      { category: 'Lives Impacted', value: 25000, unit: 'people', change: 15.2 },
-      { category: 'Hectares Protected', value: 12500, unit: 'ha', change: 10.1 },
+      { category: 'Carbon Offset', value: 6875, goal: 10000, unit: 'tons', change: 12.5 },
+      { category: 'Trees Planted', value: 137500, goal: 200000, unit: 'trees', change: 8.3 },
+      { category: 'Lives Impacted', value: 25000, goal: 40000, unit: 'people', change: 15.2 },
+      { category: 'Hectares Protected', value: 12500, goal: 20000, unit: 'ha', change: 10.1 },
     ];
-
     setDonations(mockDonations);
     setImpactMetrics(mockImpactMetrics);
     setTotalDonated(28000);
     setTotalImpact(6875);
     setProjectsSupported(5);
-  }, [user, loading, navigate]);
+  }, [currentUser, isLoading, navigate]);
+
+  const timelineData = [
+    { month: 'Aug', donated: 1500, impact: 375 },
+    { month: 'Sep', donated: 2200, impact: 550 },
+    { month: 'Oct', donated: 3800, impact: 950 },
+    { month: 'Nov', donated: 4500, impact: 1125 },
+    { month: 'Dec', donated: 6000, impact: 1500 },
+    { month: 'Jan', donated: 10000, impact: 2500 },
+  ];
+
+  const categoryData = [
+    { name: 'Forestry', value: 15000, color: 'hsl(152, 76%, 40%)' },
+    { name: 'Ocean', value: 2500, color: 'hsl(199, 89%, 48%)' },
+    { name: 'Agriculture', value: 7500, color: 'hsl(43, 96%, 56%)' },
+    { name: 'Water', value: 3000, color: 'hsl(217, 91%, 60%)' },
+  ];
+
+  const filteredDonations = donations.filter((d) => {
+    const matchesSearch = !search || d.project.toLowerCase().includes(search.toLowerCase()) || d.category.toLowerCase().includes(search.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || d.status === statusFilter;
+    const matchesCat = categoryFilter === 'all' || d.category === categoryFilter;
+    return matchesSearch && matchesStatus && matchesCat;
+  });
+
+  const exportCSV = () => {
+    const headers = ['Date', 'Project', 'Category', 'Amount (USD)', 'Impact', 'Status', 'Tax Deductible', 'Tx Hash'];
+    const rows = donations.map((d) =>
+      [d.date, d.project, d.category, d.amount, d.impact, d.status, d.taxDeductible ? 'Yes' : 'No', d.txHash ?? '']
+        .map((v) => `"${String(v).replace(/"/g, '""')}"`).join(',')
+    );
+    const csv = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `donations-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success('Donation report exported');
+  };
+
+  const taxDeductibleTotal = donations
+    .filter((d) => d.taxDeductible && d.status === 'completed')
+    .reduce((sum, d) => sum + d.amount, 0);
 
   const donationColumns: TableColumn<Donation>[] = [
+    { key: 'date', title: 'Date', render: (v) => new Date(v as string).toLocaleDateString() },
     {
-      key: 'date',
-      title: 'Date',
-      render: (value) => new Date(value).toLocaleDateString(),
+      key: 'project', title: 'Project',
+      render: (v, row) => (
+        <div className="flex flex-col">
+          <span className="font-medium">{v}</span>
+          <span className="text-xs text-muted-foreground">{row.category}</span>
+        </div>
+      ),
+    },
+    { key: 'amount', title: 'Amount', render: (v) => <span className="font-semibold tabular-nums">${(v as number).toLocaleString()}</span> },
+    { key: 'impact', title: 'Impact' },
+    {
+      key: 'txHash', title: 'Verification',
+      render: (v) => {
+        const hash = v as string | undefined;
+        return hash ? (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="inline-flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 font-mono">
+                  <ShieldCheck className="w-3.5 h-3.5" />{hash}
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>On-chain verified donation</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        ) : <span className="text-xs text-muted-foreground">Pending</span>;
+      },
     },
     {
-      key: 'project',
-      title: 'Project',
-    },
-    {
-      key: 'amount',
-      title: 'Amount',
-      render: (value) => `$${value.toLocaleString()}`,
-    },
-    {
-      key: 'impact',
-      title: 'Impact',
-    },
-    {
-      key: 'status',
-      title: 'Status',
-      render: (value) => (
-        <Badge
-          variant={value === 'completed' ? 'default' : 'secondary'}
-          className={
-            value === 'completed'
-              ? 'bg-emerald-500/10 text-emerald-500'
-              : 'bg-amber-500/10 text-amber-500'
-          }
-        >
-          {value}
+      key: 'status', title: 'Status',
+      render: (v) => (
+        <Badge variant={v === 'completed' ? 'default' : 'secondary'}
+          className={v === 'completed' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-amber-500/10 text-amber-500'}>
+          {v}
         </Badge>
       ),
     },
@@ -157,11 +175,8 @@ const DonorDashboard = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-            className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full mx-auto mb-4"
-          />
+          <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+            className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full mx-auto mb-4" />
           <p className="text-muted-foreground">Loading dashboard...</p>
         </div>
       </div>
@@ -169,246 +184,346 @@ const DonorDashboard = () => {
   }
 
   return (
-    <WorkspaceLayout
-      title="Donor Dashboard"
-      subtitle="Track your donations and measure your regenerative impact"
-      userType="donor"
-    >
+    <WorkspaceLayout title="Donor Dashboard" subtitle="Track your donations and measure your regenerative impact" userType="donor">
       <div className="space-y-8">
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <DashboardMetricCard
-              title="Total Donated"
-              value={`$${totalDonated.toLocaleString()}`}
-              change={15.2}
-              icon={DollarSign}
-              iconColor="text-emerald-500"
-              trend="up"
-              description="Lifetime contribution to regenerative projects"
-            />
-            <DashboardMetricCard
-              title="Total Impact"
-              value={`${totalImpact.toLocaleString()} tons`}
-              change={12.5}
-              icon={TreePine}
-              iconColor="text-green-500"
-              trend="up"
-              description="CO2 offset through your donations"
-            />
-            <DashboardMetricCard
-              title="Projects Supported"
-              value={projectsSupported}
-              change={8.3}
-              icon={Target}
-              iconColor="text-blue-500"
-              trend="up"
-              description="Number of regenerative projects funded"
-            />
-            <DashboardMetricCard
-              title="Impact Score"
-              value="94.2"
-              change={5.1}
-              icon={Award}
-              iconColor="text-purple-500"
-              trend="up"
-              description="Your overall impact rating"
-            />
-          </div>
+          <DashboardMetricCard title="Total Donated" value={`$${totalDonated.toLocaleString()}`} change={15.2} icon={DollarSign} iconColor="text-emerald-500" trend="up" description="Lifetime contribution to regenerative projects" />
+          <DashboardMetricCard title="Total Impact" value={`${totalImpact.toLocaleString()} tons`} change={12.5} icon={TreePine} iconColor="text-green-500" trend="up" description="CO2 offset through your donations" />
+          <DashboardMetricCard title="Projects Supported" value={projectsSupported} change={8.3} icon={Target} iconColor="text-blue-500" trend="up" description="Number of regenerative projects funded" />
+          <DashboardMetricCard title="Impact Score" value="94.2" change={5.1} icon={Award} iconColor="text-purple-500" trend="up" description="Your overall impact rating" />
+        </div>
 
-          {/* Impact Breakdown */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <DashboardChart
-              title="Impact Breakdown"
-              icon={Heart}
-              iconColor="text-emerald-500"
-              description="Your regenerative impact across different categories"
-            >
-              <div className="space-y-4">
-                {impactMetrics.map((metric, index) => (
-                  <div key={index} className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">{metric.category}</span>
-                      <span className="text-sm text-muted-foreground">
-                        {metric.value.toLocaleString()} {metric.unit}
-                      </span>
-                    </div>
-                    <Progress value={75} className="h-2" />
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span>Progress toward goal</span>
-                      <span className={metric.change > 0 ? 'text-emerald-500' : 'text-red-500'}>
-                        {metric.change > 0 ? '+' : ''}{metric.change}%
-                      </span>
-                    </div>
+        {/* Donor Tier & Tax Summary */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <Card className="lg:col-span-2 overflow-hidden border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 via-transparent to-blue-500/5">
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between gap-4 flex-wrap">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500 to-blue-500 flex items-center justify-center shadow-lg">
+                    <Trophy className="w-7 h-7 text-white" />
                   </div>
-                ))}
+                  <div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="text-xl font-bold">Platinum Regenerator</h3>
+                      <Badge className="bg-emerald-500/15 text-emerald-600 border-emerald-500/30">Tier 4</Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground">$22,000 to Diamond tier · 5% bonus impact score</p>
+                  </div>
+                </div>
+                <Button variant="outline" size="sm" className="gap-1.5">
+                  <Share2 className="w-4 h-4" /> Share Impact
+                </Button>
+              </div>
+              <div className="mt-5">
+                <Progress value={56} className="h-2" />
+                <div className="flex items-center justify-between text-xs text-muted-foreground mt-2">
+                  <span>$28,000 lifetime</span>
+                  <span>Diamond at $50,000</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-amber-500/20 bg-gradient-to-br from-amber-500/5 to-transparent">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                  <Receipt className="w-5 h-5 text-amber-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Tax-Deductible (2025)</p>
+                  <p className="text-2xl font-bold tabular-nums">${taxDeductibleTotal.toLocaleString()}</p>
+                </div>
+              </div>
+              <Button variant="outline" size="sm" className="w-full gap-1.5" onClick={exportCSV}>
+                <FileText className="w-4 h-4" /> Download 501(c)(3) Receipt
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Analytics Tabs */}
+        <Tabs defaultValue="timeline" className="w-full">
+          <TabsList className="grid w-full max-w-md grid-cols-3">
+            <TabsTrigger value="timeline" className="gap-1.5"><TrendingUp className="w-4 h-4" />Timeline</TabsTrigger>
+            <TabsTrigger value="categories" className="gap-1.5"><Sparkles className="w-4 h-4" />Categories</TabsTrigger>
+            <TabsTrigger value="goals" className="gap-1.5"><Target className="w-4 h-4" />Goals</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="timeline" className="mt-6">
+            <DashboardChart title="Donations & Impact Over Time" icon={TrendingUp} iconColor="text-emerald-500" description="Monthly contributions and tons of CO2 offset">
+              <ResponsiveContainer width="100%" height={320}>
+                <AreaChart data={timelineData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="gDon" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="hsl(152,76%,40%)" stopOpacity={0.4} />
+                      <stop offset="100%" stopColor="hsl(152,76%,40%)" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="gImp" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="hsl(217,91%,60%)" stopOpacity={0.35} />
+                      <stop offset="100%" stopColor="hsl(217,91%,60%)" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                  <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                  <RTooltip contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }} />
+                  <Area type="monotone" dataKey="donated" name="Donated ($)" stroke="hsl(152,76%,40%)" strokeWidth={2} fill="url(#gDon)" />
+                  <Area type="monotone" dataKey="impact" name="CO2 Offset (tons)" stroke="hsl(217,91%,60%)" strokeWidth={2} fill="url(#gImp)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </DashboardChart>
+          </TabsContent>
+
+          <TabsContent value="categories" className="mt-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <DashboardChart title="Allocation by Category" icon={Sparkles} iconColor="text-emerald-500" description="How your donations are distributed">
+                <ResponsiveContainer width="100%" height={320}>
+                  <PieChart>
+                    <Pie data={categoryData} dataKey="value" nameKey="name" innerRadius={70} outerRadius={110} paddingAngle={3}>
+                      {categoryData.map((e, i) => <Cell key={i} fill={e.color} />)}
+                    </Pie>
+                    <RTooltip formatter={(v: number) => `$${v.toLocaleString()}`}
+                      contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8 }} />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </DashboardChart>
+              <DashboardChart title="Impact per Category" icon={TreePine} iconColor="text-emerald-500" description="CO2 offset by category (tons)">
+                <ResponsiveContainer width="100%" height={320}>
+                  <BarChart data={categoryData.map((c) => ({ name: c.name, tons: Math.round(c.value / 4), color: c.color }))}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                    <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                    <RTooltip contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8 }} />
+                    <Bar dataKey="tons" radius={[8, 8, 0, 0]}>
+                      {categoryData.map((c, i) => <Cell key={i} fill={c.color} />)}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </DashboardChart>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="goals" className="mt-6">
+            <DashboardChart title="2025 Impact Goals" icon={Target} iconColor="text-emerald-500" description="Progress toward annual regenerative targets">
+              <div className="space-y-5">
+                {impactMetrics.map((m) => {
+                  const pct = Math.min(100, Math.round((m.value / m.goal) * 100));
+                  return (
+                    <div key={m.category} className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="font-medium">{m.category}</span>
+                        <span className="text-muted-foreground tabular-nums">
+                          {m.value.toLocaleString()} / {m.goal.toLocaleString()} {m.unit}
+                        </span>
+                      </div>
+                      <Progress value={pct} className="h-2.5" />
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>{pct}% of goal</span>
+                        <span className="text-emerald-500">+{m.change}% this quarter</span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </DashboardChart>
+          </TabsContent>
+        </Tabs>
 
-            <DashboardChart
-              title="Recent Activity"
-              icon={Calendar}
-              iconColor="text-blue-500"
-              description="Your donation history over time"
-            >
-              <div className="space-y-4">
-                {donations.slice(0, 5).map((donation) => (
-                  <div
-                    key={donation.id}
-                    className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                        <Heart className="w-5 h-5 text-emerald-500" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">{donation.project}</p>
-                        <p className="text-xs text-muted-foreground">{donation.date}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-semibold">${donation.amount.toLocaleString()}</p>
-                      <p className="text-xs text-muted-foreground">{donation.impact}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </DashboardChart>
-          </div>
-
-          {/* Donation History */}
-          <DashboardTable
-            title="Donation History"
-            icon={DollarSign}
-            iconColor="text-emerald-500"
-            columns={donationColumns}
-            data={donations}
-            onRowClick={(donation) => console.log('View donation:', donation.id)}
-            emptyMessage="No donations yet. Start making an impact today!"
-          />
-
-          {/* Quick Actions */}
-          <div className="mt-8">
-            <h2 className="text-2xl font-bold text-foreground mb-4">Quick Actions</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Button
-                asChild
-                size="lg"
-                className="gap-2 h-auto py-6 flex-col"
-              >
-                <a href="/marketplace" className="flex items-center gap-2">
-                  <Heart className="w-6 h-6" />
-                  <span>Make a Donation</span>
-                </a>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="gap-2 h-auto py-6 flex-col"
-              >
-                <a href="/portfolio" className="flex items-center gap-2">
-                  <Target className="w-6 h-6" />
-                  <span>View Portfolio</span>
-                </a>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="gap-2 h-auto py-6 flex-col"
-              >
-                <a href="#" className="flex items-center gap-2">
-                  <Download className="w-6 h-6" />
-                  <span>Download Report</span>
-                </a>
-              </Button>
+        {/* Recurring donations */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-xl font-bold">Recurring Commitments</h2>
+              <p className="text-sm text-muted-foreground">Automated monthly donations to your favorite projects</p>
             </div>
+            <Button variant="outline" size="sm" className="gap-1.5">
+              <Repeat className="w-4 h-4" /> Add Recurring
+            </Button>
           </div>
-
-          {/* Impact Stories */}
-          <div className="mt-8">
-            <h2 className="text-2xl font-bold text-foreground mb-4">Your Impact Stories</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                      <TreePine className="w-6 h-6 text-emerald-500" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">Amazon Rainforest</h3>
-                      <p className="text-sm text-muted-foreground">Brazil</p>
-                    </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {[
+              { name: 'Amazon Rainforest', amount: 500, next: 'Feb 1, 2025' },
+              { name: 'Ocean Restoration', amount: 250, next: 'Feb 5, 2025' },
+              { name: 'Kenya Reforestation', amount: 1000, next: 'Feb 15, 2025' },
+            ].map((r) => (
+              <Card key={r.name} className="hover:shadow-lg transition-shadow">
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between mb-3">
+                    <Badge variant="outline" className="gap-1"><Repeat className="w-3 h-3" /> Monthly</Badge>
+                    <span className="text-xs text-muted-foreground">Next: {r.next}</span>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Your donation helped protect 1,250 hectares of pristine rainforest,
-                    preserving biodiversity and sequestering carbon.
+                  <h4 className="font-semibold mb-1">{r.name}</h4>
+                  <p className="text-2xl font-bold tabular-nums">
+                    ${r.amount}<span className="text-sm text-muted-foreground font-normal">/mo</span>
                   </p>
-                  <div className="flex items-center justify-between">
-                    <Badge className="bg-emerald-500/10 text-emerald-500">
-                      Active
-                    </Badge>
-                    <Button variant="ghost" size="sm" className="gap-1">
-                      View Details <ArrowUpRight className="w-4 h-4" />
-                    </Button>
+                  <div className="flex gap-2 mt-3">
+                    <Button variant="outline" size="sm" className="flex-1">Manage</Button>
+                    <Button variant="ghost" size="sm" className="flex-1">Pause</Button>
                   </div>
                 </CardContent>
               </Card>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                      <Globe className="w-6 h-6 text-blue-500" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">Ocean Restoration</h3>
-                      <p className="text-sm text-muted-foreground">Pacific Ocean</p>
-                    </div>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Supporting coral reef restoration and marine ecosystem recovery
-                    through sustainable fishing practices.
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <Badge className="bg-blue-500/10 text-blue-500">
-                      Active
-                    </Badge>
-                    <Button variant="ghost" size="sm" className="gap-1">
-                      View Details <ArrowUpRight className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                      <Users className="w-6 h-6 text-purple-500" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">Community Support</h3>
-                      <p className="text-sm text-muted-foreground">Kenya</p>
-                    </div>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Empowering local communities with sustainable agriculture
-                    training and resources.
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <Badge className="bg-purple-500/10 text-purple-500">
-                      Active
-                    </Badge>
-                    <Button variant="ghost" size="sm" className="gap-1">
-                      View Details <ArrowUpRight className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            ))}
           </div>
         </div>
-      </WorkspaceLayout>
-    );
-  };
 
-  export default DonorDashboard;
+        {/* Impact Breakdown & Recent Activity */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <DashboardChart title="Impact Breakdown" icon={Heart} iconColor="text-emerald-500" description="Your regenerative impact across different categories">
+            <div className="space-y-4">
+              {impactMetrics.map((metric, index) => (
+                <div key={index} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">{metric.category}</span>
+                    <span className="text-sm text-muted-foreground tabular-nums">
+                      {metric.value.toLocaleString()} {metric.unit}
+                    </span>
+                  </div>
+                  <Progress value={Math.round((metric.value / metric.goal) * 100)} className="h-2" />
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span>Progress toward goal</span>
+                    <span className={metric.change > 0 ? 'text-emerald-500' : 'text-red-500'}>
+                      {metric.change > 0 ? '+' : ''}{metric.change}%
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </DashboardChart>
+
+          <DashboardChart title="Recent Activity" icon={Calendar} iconColor="text-blue-500" description="Your donation history over time">
+            <div className="space-y-4">
+              {donations.slice(0, 5).map((donation) => (
+                <div key={donation.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                      <Heart className="w-5 h-5 text-emerald-500" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">{donation.project}</p>
+                      <p className="text-xs text-muted-foreground">{donation.date} · {donation.category}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-semibold tabular-nums">${donation.amount.toLocaleString()}</p>
+                    <p className="text-xs text-muted-foreground">{donation.impact}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </DashboardChart>
+        </div>
+
+        {/* Donation History with filters */}
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+              <div className="flex items-center gap-2">
+                <DollarSign className="w-5 h-5 text-emerald-500" />
+                <h3 className="text-base font-semibold">Donation History</h3>
+                <Badge variant="secondary" className="ml-1">{filteredDonations.length}</Badge>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <div className="relative">
+                  <Search className="w-4 h-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  <Input placeholder="Search projects…" value={search} onChange={(e) => setSearch(e.target.value)} className="pl-8 h-9 w-[200px]" />
+                </div>
+                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <SelectTrigger className="h-9 w-[140px]">
+                    <Filter className="w-3.5 h-3.5 mr-1" />
+                    <SelectValue placeholder="Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All categories</SelectItem>
+                    <SelectItem value="Forestry">Forestry</SelectItem>
+                    <SelectItem value="Ocean">Ocean</SelectItem>
+                    <SelectItem value="Agriculture">Agriculture</SelectItem>
+                    <SelectItem value="Water">Water</SelectItem>
+                    <SelectItem value="Community">Community</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="h-9 w-[130px]"><SelectValue placeholder="Status" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All statuses</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="processing">Processing</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button variant="outline" size="sm" className="h-9 gap-1.5" onClick={exportCSV}>
+                  <Download className="w-4 h-4" /> Export CSV
+                </Button>
+              </div>
+            </div>
+            <DashboardTable
+              title=""
+              columns={donationColumns}
+              data={filteredDonations}
+              onRowClick={(donation) => toast.info(`Opening ${donation.project}`)}
+              emptyMessage="No donations match your filters."
+            />
+          </CardContent>
+        </Card>
+
+        {/* Quick Actions */}
+        <div>
+          <h2 className="text-2xl font-bold text-foreground mb-4">Quick Actions</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Button asChild size="lg" className="gap-2 h-auto py-6 flex-col">
+              <a href="/marketplace"><Heart className="w-6 h-6" /><span>Make a Donation</span></a>
+            </Button>
+            <Button asChild variant="outline" size="lg" className="gap-2 h-auto py-6 flex-col">
+              <a href="/portfolio"><Target className="w-6 h-6" /><span>View Portfolio</span></a>
+            </Button>
+            <Button variant="outline" size="lg" className="gap-2 h-auto py-6 flex-col" onClick={exportCSV}>
+              <Download className="w-6 h-6" /><span>Download Report</span>
+            </Button>
+          </div>
+        </div>
+
+        {/* Impact Stories */}
+        <div>
+          <h2 className="text-2xl font-bold text-foreground mb-4">Your Impact Stories</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { title: 'Amazon Rainforest', location: 'Brazil', icon: TreePine, color: 'emerald',
+                text: 'Your donation helped protect 1,250 hectares of pristine rainforest, preserving biodiversity and sequestering carbon.' },
+              { title: 'Ocean Restoration', location: 'Pacific Ocean', icon: Globe, color: 'blue',
+                text: 'Supporting coral reef restoration and marine ecosystem recovery through sustainable fishing practices.' },
+              { title: 'Community Support', location: 'Kenya', icon: Users, color: 'purple',
+                text: 'Empowering local communities with sustainable agriculture training and resources.' },
+            ].map((s) => {
+              const Icon = s.icon;
+              return (
+                <Card key={s.title} className="hover:shadow-lg transition-shadow cursor-pointer group">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className={`w-12 h-12 rounded-lg bg-${s.color}-500/10 flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                        <Icon className={`w-6 h-6 text-${s.color}-500`} />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold">{s.title}</h3>
+                        <p className="text-sm text-muted-foreground">{s.location}</p>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4">{s.text}</p>
+                    <div className="flex items-center justify-between">
+                      <Badge className={`bg-${s.color}-500/10 text-${s.color}-500`}>Active</Badge>
+                      <Button variant="ghost" size="sm" className="gap-1">
+                        View Details <ArrowUpRight className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </WorkspaceLayout>
+  );
+};
+
+export default DonorDashboard;
