@@ -130,7 +130,7 @@ const DonorDashboard = () => {
     .reduce((sum, d) => sum + d.amount, 0);
 
   const donationColumns: TableColumn<Donation>[] = [
-    { key: 'date', title: 'Date', render: (v) => new Date(v).toLocaleDateString() },
+    { key: 'date', title: 'Date', render: (v) => new Date(v as string).toLocaleDateString() },
     {
       key: 'project', title: 'Project',
       render: (v, row) => (
