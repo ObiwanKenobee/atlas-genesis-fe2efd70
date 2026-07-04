@@ -140,22 +140,25 @@ const DonorDashboard = () => {
         </div>
       ),
     },
-    { key: 'amount', title: 'Amount', render: (v) => <span className="font-semibold tabular-nums">${v.toLocaleString()}</span> },
+    { key: 'amount', title: 'Amount', render: (v) => <span className="font-semibold tabular-nums">${(v as number).toLocaleString()}</span> },
     { key: 'impact', title: 'Impact' },
     {
       key: 'txHash', title: 'Verification',
-      render: (v) => v ? (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="inline-flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 font-mono">
-                <ShieldCheck className="w-3.5 h-3.5" />{v}
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>On-chain verified donation</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      ) : <span className="text-xs text-muted-foreground">Pending</span>,
+      render: (v) => {
+        const hash = v as string | undefined;
+        return hash ? (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="inline-flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 font-mono">
+                  <ShieldCheck className="w-3.5 h-3.5" />{hash}
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>On-chain verified donation</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        ) : <span className="text-xs text-muted-foreground">Pending</span>;
+      },
     },
     {
       key: 'status', title: 'Status',
