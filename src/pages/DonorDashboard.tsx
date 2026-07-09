@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Heart, DollarSign, TreePine, Globe, Calendar, Download, ArrowUpRight,
   Award, Target, Users, Search, Filter, Receipt, ShieldCheck, Repeat,
-  Sparkles, TrendingUp, FileText, Share2, Trophy,
+  Sparkles, TrendingUp, FileText, Share2, Trophy, Plus, ExternalLink,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -23,17 +23,23 @@ import { DashboardMetricCard, DashboardChart, DashboardTable, type TableColumn }
 import WorkspaceLayout from '@/components/WorkspaceLayout';
 import { useAuth } from '@/hooks/useAuth';
 import { useEnhancedAuth } from '@/hooks/useEnhancedAuth';
+import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { DonationFormDialog } from '@/components/donor/DonationFormDialog';
+import { generateImpactReport, type ReportDonation } from '@/lib/donor/impactReport';
 
 interface Donation {
   id: string;
   date: string;
   amount: number;
   project: string;
+  projectId?: string;
   category: 'Forestry' | 'Ocean' | 'Agriculture' | 'Water' | 'Community';
   impact: string;
   status: 'completed' | 'pending' | 'processing';
   txHash?: string;
   taxDeductible?: boolean;
+  verified?: boolean;
 }
 
 interface ImpactMetric {
@@ -47,6 +53,7 @@ interface ImpactMetric {
 const DonorDashboard = () => {
   const { user, loading } = useAuth();
   const { user: enhancedUser, loading: enhancedLoading } = useEnhancedAuth();
+  const { user: supaUser } = useSupabaseAuth();
   const navigate = useNavigate();
   const currentUser = enhancedUser || user;
   const isLoading = enhancedLoading || loading;
@@ -59,31 +66,68 @@ const DonorDashboard = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [donateOpen, setDonateOpen] = useState(false);
+  const [reportRange, setReportRange] = useState<'30d' | '90d' | 'ytd' | 'all'>('ytd');
+
+  const projectTypeToCategory = (t: string): Donation['category'] => {
+    const map: Record<string, Donation['category']> = {
+      forestry: 'Forestry', reforestation: 'Forestry', afforestation: 'Forestry',
+      ocean: 'Ocean', blue_carbon: 'Ocean',
+      agriculture: 'Agriculture', soil: 'Agriculture', regenerative_agriculture: 'Agriculture',
+      water: 'Water',
+      community: 'Community',
+    };
+    return map[t?.toLowerCase?.()] ?? 'Forestry';
+  };
+
+  const loadDonations = async (uid: string) => {
+    const { data, error } = await supabase
+      .from('transactions')
+      .select('id, created_at, completed_at, total_amount, quantity, status, project_id, carbon_projects(title, project_type, co2_offset_per_credit)')
+      .eq('user_id', uid)
+      .order('created_at', { ascending: false });
+    if (error) { console.error(error); return; }
+    const rows: Donation[] = (data ?? []).map((t: any) => {
+      const proj = t.carbon_projects;
+      const offset = (t.quantity ?? 0) * (proj?.co2_offset_per_credit ?? 0);
+      return {
+        id: t.id,
+        date: (t.completed_at ?? t.created_at ?? new Date().toISOString()).slice(0, 10),
+        amount: Number(t.total_amount ?? 0),
+        project: proj?.title ?? 'Regenerative Project',
+        projectId: t.project_id,
+        category: projectTypeToCategory(proj?.project_type ?? ''),
+        impact: `${offset.toFixed(2)} tons CO₂`,
+        status: (t.status === 'completed' ? 'completed' : t.status === 'pending' ? 'pending' : 'processing') as Donation['status'],
+        txHash: `atl_${String(t.id).replace(/-/g, '').slice(0, 12)}`,
+        taxDeductible: t.status === 'completed',
+        verified: t.status === 'completed',
+      };
+    });
+    setDonations(rows);
+    const totalAmt = rows.reduce((s, r) => s + (r.status === 'completed' ? r.amount : 0), 0);
+    const totalOff = rows.reduce((s, r) => s + parseFloat(r.impact) || 0, 0);
+    setTotalDonated(totalAmt);
+    setTotalImpact(Math.round(totalOff));
+    setProjectsSupported(new Set(rows.map((r) => r.projectId)).size);
+  };
 
   useEffect(() => {
     if (!isLoading && !currentUser) {
       navigate('/auth');
       return;
     }
-    const mockDonations: Donation[] = [
-      { id: '1', date: '2025-01-28', amount: 5000, project: 'Amazon Rainforest Protection', category: 'Forestry', impact: '1250 tons CO2', status: 'completed', txHash: '0x8f2a…c41b', taxDeductible: true },
-      { id: '2', date: '2025-01-25', amount: 2500, project: 'Ocean Restoration Initiative', category: 'Ocean', impact: '500 tons CO2', status: 'completed', txHash: '0x14de…9a02', taxDeductible: true },
-      { id: '3', date: '2025-01-20', amount: 10000, project: 'Reforestation Project Kenya', category: 'Forestry', impact: '2500 tons CO2', status: 'completed', txHash: '0x77bc…31ef', taxDeductible: true },
-      { id: '4', date: '2025-01-15', amount: 7500, project: 'Sustainable Agriculture Program', category: 'Agriculture', impact: '1875 tons CO2', status: 'completed', txHash: '0x2a91…d5b7', taxDeductible: true },
-      { id: '5', date: '2025-01-10', amount: 3000, project: 'Clean Water Initiative', category: 'Water', impact: '750 tons CO2', status: 'processing', taxDeductible: false },
-    ];
     const mockImpactMetrics: ImpactMetric[] = [
       { category: 'Carbon Offset', value: 6875, goal: 10000, unit: 'tons', change: 12.5 },
       { category: 'Trees Planted', value: 137500, goal: 200000, unit: 'trees', change: 8.3 },
       { category: 'Lives Impacted', value: 25000, goal: 40000, unit: 'people', change: 15.2 },
       { category: 'Hectares Protected', value: 12500, goal: 20000, unit: 'ha', change: 10.1 },
     ];
-    setDonations(mockDonations);
     setImpactMetrics(mockImpactMetrics);
-    setTotalDonated(28000);
-    setTotalImpact(6875);
-    setProjectsSupported(5);
-  }, [currentUser, isLoading, navigate]);
+    if (supaUser?.id) {
+      loadDonations(supaUser.id);
+    }
+  }, [currentUser, isLoading, navigate, supaUser?.id]);
 
   const timelineData = [
     { month: 'Aug', donated: 1500, impact: 375 },
@@ -129,24 +173,73 @@ const DonorDashboard = () => {
     .filter((d) => d.taxDeductible && d.status === 'completed')
     .reduce((sum, d) => sum + d.amount, 0);
 
+  const rangeStart = useMemo(() => {
+    const d = new Date();
+    if (reportRange === '30d') d.setDate(d.getDate() - 30);
+    else if (reportRange === '90d') d.setDate(d.getDate() - 90);
+    else if (reportRange === 'ytd') { d.setMonth(0); d.setDate(1); }
+    else return new Date(0);
+    return d;
+  }, [reportRange]);
+
+  const donationsInRange = useMemo(
+    () => donations.filter((d) => new Date(d.date) >= rangeStart),
+    [donations, rangeStart],
+  );
+
+  const downloadImpactReport = () => {
+    const rows: ReportDonation[] = donationsInRange.map((d) => ({
+      date: d.date, project: d.project, category: d.category,
+      amount: d.amount, impact: d.impact, status: d.status,
+      txHash: d.txHash, taxDeductible: d.taxDeductible,
+    }));
+    const totals = {
+      donated: rows.filter((r) => r.status === 'completed').reduce((s, r) => s + r.amount, 0),
+      offsetTons: Math.round(rows.reduce((s, r) => s + (parseFloat(r.impact) || 0), 0)),
+      projects: new Set(donationsInRange.map((d) => d.projectId)).size,
+    };
+    const doc = generateImpactReport({
+      donorName: currentUser?.displayName || supaUser?.email?.split('@')[0] || 'Donor',
+      donorEmail: supaUser?.email,
+      from: rangeStart, to: new Date(),
+      donations: rows, totals,
+    });
+    doc.save(`atlas-impact-report-${new Date().toISOString().slice(0, 10)}.pdf`);
+    toast.success('Impact report downloaded');
+  };
+
   const donationColumns: TableColumn<Donation>[] = [
     { key: 'date', title: 'Date', render: (v) => new Date(v as string).toLocaleDateString() },
     {
       key: 'project', title: 'Project',
       render: (v, row) => (
-        <div className="flex flex-col">
-          <span className="font-medium">{v}</span>
-          <span className="text-xs text-muted-foreground">{row.category}</span>
-        </div>
+        row.projectId ? (
+          <Link to={`/project/${row.projectId}`} className="flex flex-col group" onClick={(e) => e.stopPropagation()}>
+            <span className="font-medium group-hover:text-emerald-600 inline-flex items-center gap-1">
+              {v as string} <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100" />
+            </span>
+            <span className="text-xs text-muted-foreground">{row.category}</span>
+          </Link>
+        ) : (
+          <div className="flex flex-col">
+            <span className="font-medium">{v as string}</span>
+            <span className="text-xs text-muted-foreground">{row.category}</span>
+          </div>
+        )
       ),
     },
     { key: 'amount', title: 'Amount', render: (v) => <span className="font-semibold tabular-nums">${(v as number).toLocaleString()}</span> },
     { key: 'impact', title: 'Impact' },
     {
       key: 'txHash', title: 'Verification',
-      render: (v) => {
+      render: (v, row) => {
         const hash = v as string | undefined;
-        return hash ? (
+        if (!hash || !row.verified) {
+          return <span className="text-xs text-amber-600 inline-flex items-center gap-1">
+            <Repeat className="w-3.5 h-3.5 animate-spin" /> Awaiting attestation
+          </span>;
+        }
+        return (
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -154,10 +247,10 @@ const DonorDashboard = () => {
                   <ShieldCheck className="w-3.5 h-3.5" />{hash}
                 </div>
               </TooltipTrigger>
-              <TooltipContent>On-chain verified donation</TooltipContent>
+              <TooltipContent>Attested donation · reference {hash}</TooltipContent>
             </Tooltip>
           </TooltipProvider>
-        ) : <span className="text-xs text-muted-foreground">Pending</span>;
+        );
       },
     },
     {
