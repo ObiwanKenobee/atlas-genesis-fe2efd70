@@ -279,6 +279,25 @@ const DonorDashboard = () => {
   return (
     <WorkspaceLayout title="Donor Dashboard" subtitle="Track your donations and measure your regenerative impact" userType="donor">
       <div className="space-y-8">
+        {/* Primary Actions */}
+        <div className="flex flex-wrap items-center gap-2 justify-end">
+          <Select value={reportRange} onValueChange={(v) => setReportRange(v as typeof reportRange)}>
+            <SelectTrigger className="h-9 w-[160px]"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="30d">Last 30 days</SelectItem>
+              <SelectItem value="90d">Last 90 days</SelectItem>
+              <SelectItem value="ytd">Year to date</SelectItem>
+              <SelectItem value="all">All time</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button variant="outline" size="sm" className="h-9 gap-1.5" onClick={downloadImpactReport}>
+            <FileText className="w-4 h-4" /> Impact Report PDF
+          </Button>
+          <Button size="sm" className="h-9 gap-1.5" onClick={() => setDonateOpen(true)}>
+            <Plus className="w-4 h-4" /> New Donation
+          </Button>
+        </div>
+
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <DashboardMetricCard title="Total Donated" value={`$${totalDonated.toLocaleString()}`} change={15.2} icon={DollarSign} iconColor="text-emerald-500" trend="up" description="Lifetime contribution to regenerative projects" />
@@ -615,6 +634,12 @@ const DonorDashboard = () => {
           </div>
         </div>
       </div>
+      <DonationFormDialog
+        open={donateOpen}
+        onOpenChange={setDonateOpen}
+        userId={supaUser?.id ?? null}
+        onSuccess={() => supaUser?.id && loadDonations(supaUser.id)}
+      />
     </WorkspaceLayout>
   );
 };
