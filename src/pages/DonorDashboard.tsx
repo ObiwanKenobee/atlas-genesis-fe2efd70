@@ -27,6 +27,7 @@ import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { DonationFormDialog } from '@/components/donor/DonationFormDialog';
 import { generateImpactReport, type ReportDonation } from '@/lib/donor/impactReport';
+import { RecurringSubscriptions } from '@/components/donor/RecurringSubscriptions';
 
 interface Donation {
   id: string;
@@ -68,6 +69,7 @@ const DonorDashboard = () => {
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [donateOpen, setDonateOpen] = useState(false);
   const [reportRange, setReportRange] = useState<'30d' | '90d' | 'ytd' | 'all'>('ytd');
+  const [subsRefresh, setSubsRefresh] = useState(0);
 
   const projectTypeToCategory = (t: string): Donation['category'] => {
     const map: Record<string, Donation['category']> = {
@@ -128,6 +130,15 @@ const DonorDashboard = () => {
       loadDonations(supaUser.id);
     }
   }, [currentUser, isLoading, navigate, supaUser?.id]);
+
+  // Periodic verification sync — refresh transactions every 30s
+  useEffect(() => {
+    if (!supaUser?.id) return;
+    const interval = setInterval(() => {
+      loadDonations(supaUser.id);
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [supaUser?.id]);
 
   const timelineData = [
     { month: 'Aug', donated: 1500, impact: 375 },
@@ -443,42 +454,8 @@ const DonorDashboard = () => {
           </TabsContent>
         </Tabs>
 
-        {/* Recurring donations */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-xl font-bold">Recurring Commitments</h2>
-              <p className="text-sm text-muted-foreground">Automated monthly donations to your favorite projects</p>
-            </div>
-            <Button variant="outline" size="sm" className="gap-1.5">
-              <Repeat className="w-4 h-4" /> Add Recurring
-            </Button>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {[
-              { name: 'Amazon Rainforest', amount: 500, next: 'Feb 1, 2025' },
-              { name: 'Ocean Restoration', amount: 250, next: 'Feb 5, 2025' },
-              { name: 'Kenya Reforestation', amount: 1000, next: 'Feb 15, 2025' },
-            ].map((r) => (
-              <Card key={r.name} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-5">
-                  <div className="flex items-center justify-between mb-3">
-                    <Badge variant="outline" className="gap-1"><Repeat className="w-3 h-3" /> Monthly</Badge>
-                    <span className="text-xs text-muted-foreground">Next: {r.next}</span>
-                  </div>
-                  <h4 className="font-semibold mb-1">{r.name}</h4>
-                  <p className="text-2xl font-bold tabular-nums">
-                    ${r.amount}<span className="text-sm text-muted-foreground font-normal">/mo</span>
-                  </p>
-                  <div className="flex gap-2 mt-3">
-                    <Button variant="outline" size="sm" className="flex-1">Manage</Button>
-                    <Button variant="ghost" size="sm" className="flex-1">Pause</Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
+        {/* Recurring donations — live from Supabase */}
+        <RecurringSubscriptions userId={supaUser?.id ?? null} refreshKey={subsRefresh} />
 
         {/* Impact Breakdown & Recent Activity */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -638,7 +615,10 @@ const DonorDashboard = () => {
         open={donateOpen}
         onOpenChange={setDonateOpen}
         userId={supaUser?.id ?? null}
-        onSuccess={() => supaUser?.id && loadDonations(supaUser.id)}
+        onSuccess={() => {
+          if (supaUser?.id) loadDonations(supaUser.id);
+          setSubsRefresh((n) => n + 1);
+        }}
       />
     </WorkspaceLayout>
   );

@@ -17,6 +17,7 @@ import { useProject } from '@/hooks/useMarketplace';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { PurchaseModal } from '@/components/marketplace/PurchaseModal';
+import { DonorContributions } from '@/components/donor/DonorContributions';
 import { PROJECT_TYPE_LABELS, PROJECT_TYPE_ICONS } from '@/types/marketplace';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
@@ -404,6 +405,17 @@ const ProjectDetail = () => {
                 </CardContent>
               </Card>
             </motion.div>
+
+            {id && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.15 }}
+                className="mt-6"
+              >
+                <DonorContributions projectId={id} userId={user?.id ?? null} />
+              </motion.div>
+            )}
           </div>
         </div>
       </main>
