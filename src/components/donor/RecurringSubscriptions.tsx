@@ -48,7 +48,7 @@ export const RecurringSubscriptions = ({ userId, refreshKey }: Props) => {
 
   useEffect(() => { load(); }, [load, refreshKey]);
 
-  const patch = async (id: string, changes: Record<string, unknown>, successMsg: string) => {
+  const patch = async (id: string, changes: Partial<{ status: string; canceled_at: string | null; amount: number }>, successMsg: string) => {
     setBusyId(id);
     const { error } = await supabase.from('subscriptions').update(changes).eq('id', id);
     setBusyId(null);
