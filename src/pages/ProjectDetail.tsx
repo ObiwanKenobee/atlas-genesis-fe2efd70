@@ -17,6 +17,7 @@ import { useProject } from '@/hooks/useMarketplace';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { PurchaseModal } from '@/components/marketplace/PurchaseModal';
+import { DonorContributions } from '@/components/donor/DonorContributions';
 import { PROJECT_TYPE_LABELS, PROJECT_TYPE_ICONS } from '@/types/marketplace';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
