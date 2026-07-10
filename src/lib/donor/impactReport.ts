@@ -18,6 +18,12 @@ export interface ImpactReportInput {
   to: Date;
   donations: ReportDonation[];
   totals: { donated: number; offsetTons: number; projects: number };
+  /**
+   * Optional base URL for on-chain verification links.
+   * The transaction hash / reference is appended to this URL.
+   * Example: "https://polygonscan.com/tx/"
+   */
+  explorerUrlBase?: string;
 }
 
 const brand = { primary: [16, 143, 90] as const, dark: [17, 24, 39] as const, muted: [107, 114, 128] as const };
@@ -28,6 +34,7 @@ export function generateImpactReport(input: ImpactReportInput): jsPDF {
   const pageH = doc.internal.pageSize.getHeight();
   const M = 48;
   let y = M;
+  const explorer = input.explorerUrlBase ?? 'https://polygonscan.com/tx/';
 
   // Header band
   doc.setFillColor(...brand.primary);
@@ -76,11 +83,12 @@ export function generateImpactReport(input: ImpactReportInput): jsPDF {
 
   const cols = [
     { key: 'date', label: 'Date', w: 70 },
-    { key: 'project', label: 'Project', w: 180 },
-    { key: 'category', label: 'Category', w: 70 },
+    { key: 'project', label: 'Project', w: 150 },
+    { key: 'category', label: 'Category', w: 60 },
     { key: 'amount', label: 'Amount', w: 70 },
-    { key: 'impact', label: 'Impact', w: 90 },
-    { key: 'status', label: 'Status', w: 60 },
+    { key: 'impact', label: 'Impact', w: 80 },
+    { key: 'status', label: 'Status', w: 55 },
+    { key: 'verify', label: 'Verify', w: 80 },
   ];
 
   doc.setFillColor(...brand.primary); doc.setTextColor(255, 255, 255);
@@ -97,15 +105,84 @@ export function generateImpactReport(input: ImpactReportInput): jsPDF {
     let cx = M + 8;
     const row = [
       new Date(d.date).toLocaleDateString(),
-      d.project.length > 32 ? d.project.slice(0, 30) + '…' : d.project,
+      d.project.length > 26 ? d.project.slice(0, 24) + '…' : d.project,
       d.category,
       `$${d.amount.toLocaleString()}`,
       d.impact,
       d.status,
     ];
     row.forEach((v, idx) => { doc.text(String(v), cx, y + 14); cx += cols[idx].w; });
+    // Verify column with clickable on-chain link
+    if (d.txHash) {
+      const short = d.txHash.length > 12 ? d.txHash.slice(0, 10) + '…' : d.txHash;
+      const url = /^0x[a-fA-F0-9]{6,}$/.test(d.txHash) ? `${explorer}${d.txHash}` : `${explorer}${d.txHash}`;
+      doc.setTextColor(...brand.primary);
+      doc.textWithLink(short, cx, y + 14, { url });
+      doc.setTextColor(...brand.dark);
+    } else {
+      doc.setTextColor(...brand.muted);
+      doc.text('pending', cx, y + 14);
+      doc.setTextColor(...brand.dark);
+    }
     y += 20;
   });
+
+  // Breakdown by initiative
+  if (y > pageH - 200) { doc.addPage(); y = M; } else { y += 20; }
+  doc.setTextColor(...brand.dark); doc.setFont('helvetica', 'bold'); doc.setFontSize(13);
+  doc.text('Breakdown by Initiative', M, y); y += 16;
+
+  const byInit = new Map<string, { amount: number; offset: number; count: number; category: string }>();
+  for (const d of input.donations) {
+    if (d.status !== 'completed') continue;
+    const entry = byInit.get(d.project) ?? { amount: 0, offset: 0, count: 0, category: d.category };
+    entry.amount += d.amount;
+    entry.offset += parseFloat(d.impact) || 0;
+    entry.count += 1;
+    byInit.set(d.project, entry);
+  }
+
+  const bCols = [
+    { label: 'Initiative', w: 220 },
+    { label: 'Category', w: 90 },
+    { label: 'Donations', w: 70 },
+    { label: 'Total', w: 80 },
+    { label: 'CO₂ (tons)', w: 60 },
+  ];
+  doc.setFillColor(...brand.primary); doc.setTextColor(255, 255, 255);
+  doc.rect(M, y, pageW - M * 2, 22, 'F');
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
+  let bx = M + 8;
+  bCols.forEach((c) => { doc.text(c.label, bx, y + 15); bx += c.w; });
+  y += 22;
+
+  doc.setFont('helvetica', 'normal'); doc.setTextColor(...brand.dark); doc.setFontSize(10);
+  const initiatives = [...byInit.entries()].sort((a, b) => b[1].amount - a[1].amount);
+  initiatives.forEach(([name, agg], i) => {
+    if (y > pageH - 60) { doc.addPage(); y = M; }
+    if (i % 2 === 0) { doc.setFillColor(249, 250, 251); doc.rect(M, y, pageW - M * 2, 20, 'F'); }
+    let cx = M + 8;
+    const display = name.length > 40 ? name.slice(0, 38) + '…' : name;
+    const cells = [display, agg.category, String(agg.count), `$${agg.amount.toLocaleString()}`, agg.offset.toFixed(2)];
+    cells.forEach((v, idx) => { doc.text(String(v), cx, y + 14); cx += bCols[idx].w; });
+    y += 20;
+  });
+
+  if (initiatives.length === 0) {
+    doc.setTextColor(...brand.muted);
+    doc.text('No completed donations in this range.', M, y + 14);
+    doc.setTextColor(...brand.dark);
+    y += 20;
+  }
+
+  // Verification note
+  y += 16;
+  if (y > pageH - 60) { doc.addPage(); y = M; }
+  doc.setFontSize(9); doc.setTextColor(...brand.muted);
+  doc.text(
+    'Verify column links open the on-chain attestation for each donation on the public block explorer.',
+    M, y,
+  );
 
   // Footer on every page
   const pageCount = doc.getNumberOfPages();
