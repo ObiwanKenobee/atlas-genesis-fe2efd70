@@ -615,7 +615,10 @@ const DonorDashboard = () => {
         open={donateOpen}
         onOpenChange={setDonateOpen}
         userId={supaUser?.id ?? null}
-        onSuccess={() => supaUser?.id && loadDonations(supaUser.id)}
+        onSuccess={() => {
+          if (supaUser?.id) loadDonations(supaUser.id);
+          setSubsRefresh((n) => n + 1);
+        }}
       />
     </WorkspaceLayout>
   );
