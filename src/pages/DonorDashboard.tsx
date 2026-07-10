@@ -27,6 +27,7 @@ import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { DonationFormDialog } from '@/components/donor/DonationFormDialog';
 import { generateImpactReport, type ReportDonation } from '@/lib/donor/impactReport';
+import { RecurringSubscriptions } from '@/components/donor/RecurringSubscriptions';
 
 interface Donation {
   id: string;
@@ -68,6 +69,7 @@ const DonorDashboard = () => {
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [donateOpen, setDonateOpen] = useState(false);
   const [reportRange, setReportRange] = useState<'30d' | '90d' | 'ytd' | 'all'>('ytd');
+  const [subsRefresh, setSubsRefresh] = useState(0);
 
   const projectTypeToCategory = (t: string): Donation['category'] => {
     const map: Record<string, Donation['category']> = {
@@ -128,6 +130,15 @@ const DonorDashboard = () => {
       loadDonations(supaUser.id);
     }
   }, [currentUser, isLoading, navigate, supaUser?.id]);
+
+  // Periodic verification sync — refresh transactions every 30s
+  useEffect(() => {
+    if (!supaUser?.id) return;
+    const interval = setInterval(() => {
+      loadDonations(supaUser.id);
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [supaUser?.id]);
 
   const timelineData = [
     { month: 'Aug', donated: 1500, impact: 375 },
