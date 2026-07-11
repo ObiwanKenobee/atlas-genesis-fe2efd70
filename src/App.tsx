@@ -30,6 +30,7 @@ import Portfolio from './pages/Portfolio';
 import Profile from './pages/Profile';
 import Marketplace from './pages/Marketplace';
 import ProjectDetail from './pages/ProjectDetail';
+import RequireAuth from './components/RequireAuth';
 import TransactionHistory from './pages/TransactionHistory';
 import Status from './pages/Status';
 import Demo from './pages/Demo';
@@ -183,7 +184,7 @@ const AnimatedRoutes = () => {
         <Route path="/dashboard-with-sidebar" element={<PageTransition><DashboardWithSidebar /></PageTransition>} />
         <Route path="/status" element={<PageTransition><Status /></PageTransition>} />
         <Route path="/demo" element={<PageTransition><Demo /></PageTransition>} />
-        <Route path="/project/:id" element={<PageTransition variant="slideRight"><ProjectDetail /></PageTransition>} />
+        <Route path="/project/:id" element={<RequireAuth><PageTransition variant="slideRight"><ProjectDetail /></PageTransition></RequireAuth>} />
         <Route path="/transactions" element={<PageTransition><TransactionHistory /></PageTransition>} />
         <Route path="/calculator" element={<PageTransition><CarbonCalculator /></PageTransition>} />
         <Route path="/leaderboard" element={<PageTransition><Leaderboard /></PageTransition>} />
