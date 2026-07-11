@@ -6,7 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
-import { Repeat, Loader2, PauseCircle, PlayCircle, Pencil, XCircle } from 'lucide-react';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Repeat, Loader2, PauseCircle, PlayCircle, Pencil, XCircle, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface SubRow {
@@ -31,7 +35,9 @@ export const RecurringSubscriptions = ({ userId, refreshKey }: Props) => {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<SubRow | null>(null);
   const [nextAmount, setNextAmount] = useState<number>(0);
-  const [busyId, setBusyId] = useState<string | null>(null);
+  const [busy, setBusy] = useState<Record<string, 'cancel' | 'pause' | 'resume' | 'edit' | null>>({});
+  const [rowError, setRowError] = useState<Record<string, string | null>>({});
+  const [confirming, setConfirming] = useState<{ sub: SubRow; action: 'cancel' | 'pause' | 'resume' } | null>(null);
 
   const load = useCallback(async () => {
     if (!userId) { setSubs([]); setLoading(false); return; }
@@ -48,24 +54,57 @@ export const RecurringSubscriptions = ({ userId, refreshKey }: Props) => {
 
   useEffect(() => { load(); }, [load, refreshKey]);
 
-  const patch = async (id: string, changes: Partial<{ status: string; canceled_at: string | null; amount: number }>, successMsg: string) => {
-    setBusyId(id);
+  /** Optimistic update: mutate row locally, roll back on error. */
+  const applyOptimistic = async (
+    id: string,
+    action: 'cancel' | 'pause' | 'resume' | 'edit',
+    changes: Partial<{ status: string; canceled_at: string | null; amount: number }>,
+    successMsg: string,
+  ) => {
+    const prev = subs;
+    setBusy((b) => ({ ...b, [id]: action }));
+    setRowError((e) => ({ ...e, [id]: null }));
+    setSubs((rows) => rows.map((r) => (r.id === id ? { ...r, ...changes } as SubRow : r)));
     const { error } = await supabase.from('subscriptions').update(changes).eq('id', id);
-    setBusyId(null);
-    if (error) { toast.error(error.message); return; }
+    setBusy((b) => ({ ...b, [id]: null }));
+    if (error) {
+      setSubs(prev); // rollback
+      setRowError((e) => ({ ...e, [id]: error.message }));
+      toast.error(`Couldn't ${action}: ${error.message}`);
+      return false;
+    }
     toast.success(successMsg);
-    load();
+    return true;
   };
 
-  const cancel = (s: SubRow) =>
-    patch(s.id, { status: 'canceled', canceled_at: new Date().toISOString() }, 'Recurring donation canceled');
-  const pause = (s: SubRow) => patch(s.id, { status: 'paused' }, 'Recurring donation paused');
-  const resume = (s: SubRow) => patch(s.id, { status: 'active', canceled_at: null }, 'Recurring donation resumed');
+  const runConfirmed = async () => {
+    if (!confirming) return;
+    const { sub, action } = confirming;
+    setConfirming(null);
+    if (action === 'cancel') {
+      await applyOptimistic(sub.id, 'cancel',
+        { status: 'canceled', canceled_at: new Date().toISOString() },
+        'Recurring donation canceled');
+    } else if (action === 'pause') {
+      await applyOptimistic(sub.id, 'pause', { status: 'paused' }, 'Recurring donation paused');
+    } else {
+      await applyOptimistic(sub.id, 'resume',
+        { status: 'active', canceled_at: null },
+        'Recurring donation resumed');
+    }
+  };
+
   const saveAmount = async () => {
     if (!editing) return;
     if (!nextAmount || nextAmount < 1) { toast.error('Amount must be at least $1'); return; }
-    await patch(editing.id, { amount: nextAmount }, `Updated to $${nextAmount}/mo`);
-    setEditing(null);
+    const ok = await applyOptimistic(editing.id, 'edit', { amount: nextAmount }, `Updated to $${nextAmount}/mo`);
+    if (ok) setEditing(null);
+  };
+
+  const CONFIRM_COPY: Record<'cancel' | 'pause' | 'resume', { title: string; desc: string; cta: string }> = {
+    cancel: { title: 'Cancel this recurring donation?', desc: 'You will stop being charged. You can start a new one anytime.', cta: 'Yes, cancel' },
+    pause:  { title: 'Pause this recurring donation?',  desc: 'Billing is paused until you resume it.', cta: 'Pause' },
+    resume: { title: 'Resume this recurring donation?', desc: 'Billing will restart on the next cycle.', cta: 'Resume' },
   };
 
   return (
@@ -90,6 +129,8 @@ export const RecurringSubscriptions = ({ userId, refreshKey }: Props) => {
           {subs.map((s) => {
             const canceled = s.status === 'canceled';
             const paused = s.status === 'paused';
+            const rowBusy = busy[s.id];
+            const err = rowError[s.id];
             return (
               <Card key={s.id} className={canceled ? 'opacity-70' : 'hover:shadow-lg transition-shadow'}>
                 <CardContent className="p-5">
@@ -117,27 +158,35 @@ export const RecurringSubscriptions = ({ userId, refreshKey }: Props) => {
                   </p>
                   <div className="flex flex-wrap gap-2 mt-4">
                     {!canceled && (
-                      <Button variant="outline" size="sm" className="gap-1" disabled={busyId === s.id}
+                      <Button variant="outline" size="sm" className="gap-1" disabled={!!rowBusy}
                         onClick={() => { setEditing(s); setNextAmount(Number(s.amount)); }}>
-                        <Pencil className="w-3.5 h-3.5" /> Edit
+                        {rowBusy === 'edit' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Pencil className="w-3.5 h-3.5" />} Edit
                       </Button>
                     )}
                     {!canceled && !paused && (
-                      <Button variant="ghost" size="sm" className="gap-1" disabled={busyId === s.id} onClick={() => pause(s)}>
-                        <PauseCircle className="w-3.5 h-3.5" /> Pause
+                      <Button variant="ghost" size="sm" className="gap-1" disabled={!!rowBusy}
+                        onClick={() => setConfirming({ sub: s, action: 'pause' })}>
+                        {rowBusy === 'pause' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <PauseCircle className="w-3.5 h-3.5" />} Pause
                       </Button>
                     )}
                     {paused && (
-                      <Button variant="ghost" size="sm" className="gap-1" disabled={busyId === s.id} onClick={() => resume(s)}>
-                        <PlayCircle className="w-3.5 h-3.5" /> Resume
+                      <Button variant="ghost" size="sm" className="gap-1" disabled={!!rowBusy}
+                        onClick={() => setConfirming({ sub: s, action: 'resume' })}>
+                        {rowBusy === 'resume' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <PlayCircle className="w-3.5 h-3.5" />} Resume
                       </Button>
                     )}
                     {!canceled && (
-                      <Button variant="ghost" size="sm" className="gap-1 text-red-500 hover:text-red-600" disabled={busyId === s.id} onClick={() => cancel(s)}>
-                        <XCircle className="w-3.5 h-3.5" /> Cancel
+                      <Button variant="ghost" size="sm" className="gap-1 text-red-500 hover:text-red-600" disabled={!!rowBusy}
+                        onClick={() => setConfirming({ sub: s, action: 'cancel' })}>
+                        {rowBusy === 'cancel' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <XCircle className="w-3.5 h-3.5" />} Cancel
                       </Button>
                     )}
                   </div>
+                  {err && (
+                    <p className="mt-3 text-xs text-red-600 inline-flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" /> {err}
+                    </p>
+                  )}
                 </CardContent>
               </Card>
             );
@@ -157,12 +206,39 @@ export const RecurringSubscriptions = ({ userId, refreshKey }: Props) => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditing(null)}>Cancel</Button>
-            <Button onClick={saveAmount} disabled={busyId === editing?.id}>
-              {busyId === editing?.id && <Loader2 className="w-4 h-4 animate-spin mr-1" />} Save
+            <Button onClick={saveAmount} disabled={!!(editing && busy[editing.id])}>
+              {editing && busy[editing.id] === 'edit' && <Loader2 className="w-4 h-4 animate-spin mr-1" />} Save
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!confirming} onOpenChange={(o) => !o && setConfirming(null)}>
+        <AlertDialogContent>
+          {confirming && (
+            <>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{CONFIRM_COPY[confirming.action].title}</AlertDialogTitle>
+                <AlertDialogDescription>
+                  {CONFIRM_COPY[confirming.action].desc}
+                  <span className="block mt-2 font-medium text-foreground">
+                    {confirming.sub.plan_name} · ${Number(confirming.sub.amount).toLocaleString()}/mo
+                  </span>
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Keep as is</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={runConfirmed}
+                  className={confirming.action === 'cancel' ? 'bg-red-500 hover:bg-red-600' : ''}
+                >
+                  {CONFIRM_COPY[confirming.action].cta}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </>
+          )}
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
