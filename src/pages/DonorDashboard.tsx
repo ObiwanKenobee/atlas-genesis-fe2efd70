@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -28,6 +28,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { DonationFormDialog } from '@/components/donor/DonationFormDialog';
 import { generateImpactReport, type ReportDonation } from '@/lib/donor/impactReport';
 import { RecurringSubscriptions } from '@/components/donor/RecurringSubscriptions';
+import { useVerificationSync } from '@/hooks/useVerificationSync';
+import { SyncStatusBadge } from '@/components/donor/SyncStatusBadge';
 
 interface Donation {
   id: string;
@@ -82,13 +84,13 @@ const DonorDashboard = () => {
     return map[t?.toLowerCase?.()] ?? 'Forestry';
   };
 
-  const loadDonations = async (uid: string) => {
+  const loadDonations = useCallback(async (uid: string) => {
     const { data, error } = await supabase
       .from('transactions')
       .select('id, created_at, completed_at, total_amount, quantity, status, project_id, carbon_projects(title, project_type, co2_offset_per_credit)')
       .eq('user_id', uid)
       .order('created_at', { ascending: false });
-    if (error) { console.error(error); return; }
+    if (error) { console.error(error); throw new Error(error.message); }
     const rows: Donation[] = (data ?? []).map((t: any) => {
       const proj = t.carbon_projects;
       const offset = (t.quantity ?? 0) * (proj?.co2_offset_per_credit ?? 0);
@@ -112,7 +114,7 @@ const DonorDashboard = () => {
     setTotalDonated(totalAmt);
     setTotalImpact(Math.round(totalOff));
     setProjectsSupported(new Set(rows.map((r) => r.projectId)).size);
-  };
+  }, []);
 
   useEffect(() => {
     if (!isLoading && !currentUser) {
@@ -126,19 +128,15 @@ const DonorDashboard = () => {
       { category: 'Hectares Protected', value: 12500, goal: 20000, unit: 'ha', change: 10.1 },
     ];
     setImpactMetrics(mockImpactMetrics);
-    if (supaUser?.id) {
-      loadDonations(supaUser.id);
-    }
-  }, [currentUser, isLoading, navigate, supaUser?.id]);
+  }, [currentUser, isLoading, navigate]);
 
-  // Periodic verification sync — refresh transactions every 30s
-  useEffect(() => {
-    if (!supaUser?.id) return;
-    const interval = setInterval(() => {
-      loadDonations(supaUser.id);
-    }, 30000);
-    return () => clearInterval(interval);
-  }, [supaUser?.id]);
+  // Verification sync — realtime push + polling fallback + retries/backoff
+  const fetchDonations = useCallback(async () => {
+    if (supaUser?.id) await loadDonations(supaUser.id);
+  }, [supaUser?.id, loadDonations]);
+  const sync = useVerificationSync({
+    fetcher: fetchDonations, userId: supaUser?.id ?? null, table: 'transactions',
+  });
 
   const timelineData = [
     { month: 'Aug', donated: 1500, impact: 375 },
@@ -292,6 +290,12 @@ const DonorDashboard = () => {
       <div className="space-y-8">
         {/* Primary Actions */}
         <div className="flex flex-wrap items-center gap-2 justify-end">
+          <SyncStatusBadge
+            status={sync.status}
+            lastSyncedAt={sync.lastSyncedAt}
+            error={sync.error}
+            onRetry={sync.refresh}
+          />
           <Select value={reportRange} onValueChange={(v) => setReportRange(v as typeof reportRange)}>
             <SelectTrigger className="h-9 w-[160px]"><SelectValue /></SelectTrigger>
             <SelectContent>
