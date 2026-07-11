@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ShieldCheck, Heart, Repeat, LogIn } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useVerificationSync } from '@/hooks/useVerificationSync';
+import { SyncStatusBadge } from './SyncStatusBadge';
 
 interface Row {
   id: string;
@@ -25,33 +27,37 @@ export const DonorContributions = ({ projectId, userId }: Props) => {
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    let cancelled = false;
-    const load = async () => {
-      if (!userId) { setRows([]); setLoading(false); return; }
-      setLoading(true);
-      const { data } = await supabase
-        .from('transactions')
-        .select('id, created_at, completed_at, total_amount, quantity, status, transaction_type')
-        .eq('user_id', userId)
-        .eq('project_id', projectId)
-        .order('created_at', { ascending: false })
-        .limit(50);
-      if (!cancelled) { setRows((data ?? []) as Row[]); setLoading(false); }
-    };
-    load();
-    const interval = setInterval(load, 30000); // periodic verification sync
-    return () => { cancelled = true; clearInterval(interval); };
+  const fetcher = useCallback(async () => {
+    if (!userId) { setRows([]); setLoading(false); return; }
+    const { data, error } = await supabase
+      .from('transactions')
+      .select('id, created_at, completed_at, total_amount, quantity, status, transaction_type')
+      .eq('user_id', userId)
+      .eq('project_id', projectId)
+      .order('created_at', { ascending: false })
+      .limit(50);
+    if (error) throw new Error(error.message);
+    setRows((data ?? []) as Row[]);
+    setLoading(false);
   }, [projectId, userId]);
+
+  const { status, lastSyncedAt, error, refresh } = useVerificationSync({
+    fetcher, userId, table: 'transactions',
+  });
 
   const total = rows.filter((r) => r.status === 'completed').reduce((s, r) => s + Number(r.total_amount || 0), 0);
 
   return (
     <Card className="bg-card-gradient border-border/50">
       <CardHeader>
-        <CardTitle className="text-foreground flex items-center gap-2">
-          <Heart className="w-5 h-5 text-emerald-500" /> Your Contributions
-        </CardTitle>
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <CardTitle className="text-foreground flex items-center gap-2">
+            <Heart className="w-5 h-5 text-emerald-500" /> Your Contributions
+          </CardTitle>
+          {userId && (
+            <SyncStatusBadge status={status} lastSyncedAt={lastSyncedAt} error={error} onRetry={refresh} compact />
+          )}
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         {!userId ? (
