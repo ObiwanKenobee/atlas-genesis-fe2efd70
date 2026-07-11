@@ -20,10 +20,13 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
 const URL = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
-const A_EMAIL = process.env.RLS_TEST_USER_A_EMAIL;
-const A_PASS  = process.env.RLS_TEST_USER_A_PASSWORD;
-const B_EMAIL = process.env.RLS_TEST_USER_B_EMAIL;
-const B_PASS  = process.env.RLS_TEST_USER_B_PASSWORD;
+// Use globalThis to avoid depending on @types/node in this test env.
+const _env = (globalThis as unknown as { process?: { env?: Record<string, string | undefined> } })
+  .process?.env ?? {};
+const A_EMAIL = _env.RLS_TEST_USER_A_EMAIL;
+const A_PASS  = _env.RLS_TEST_USER_A_PASSWORD;
+const B_EMAIL = _env.RLS_TEST_USER_B_EMAIL;
+const B_PASS  = _env.RLS_TEST_USER_B_PASSWORD;
 
 const runReal = !!(URL && KEY && A_EMAIL && A_PASS && B_EMAIL && B_PASS);
 const d = runReal ? describe : describe.skip;
