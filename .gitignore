@@ -350,6 +350,58 @@ scratch/
 
 
 # =============================================================================
+# DASHBOARDS — Operational / enterprise / duplicate dashboards
+# =============================================================================
+
+# Hash-suffixed duplicates (no unique value)
+src/dashboards/atlas-command-8ddb1553/
+src/dashboards/atlas-command-center-2c46f48c/
+src/dashboards/atlas-command-center-d775e7d7/
+src/dashboards/atlas-compass-2263dc64/
+src/dashboards/atlas-regenerate-926ad19e/
+src/dashboards/atlas-watch-73fc2d82/
+
+# Enterprise / admin internals
+src/dashboards/Enterpriseworkspacedashboard/
+src/dashboards/Professionaladmintemplatedesign/
+src/dashboards/Regenerativevalueexchangedashboard/
+
+# Operational command & security monitoring (internal ops)
+src/dashboards/sanctum-nexus-core/
+src/dashboards/citadel-command-center/
+src/dashboards/sentinel-command/
+src/dashboards/sentinel-hub/
+src/dashboards/atlas-oversight-console/
+src/dashboards/europe-os-command/
+src/dashboards/atlas-signal-guard/
+
+# .env files inside dashboard sub-projects
+src/dashboards/**/.env
+src/dashboards/**/.env.*
+!src/dashboards/**/.env.example
+
+
+# =============================================================================
+# LAYERS — Admin template exposes internal data model
+# =============================================================================
+
+src/layers/Professionaladmintemplatedesign-main/
+
+# .env files inside layer sub-projects
+src/layers/**/.env
+src/layers/**/.env.*
+!src/layers/**/.env.example
+
+
+# =============================================================================
+# AI LAYER — Deployment topology is operational intelligence
+# =============================================================================
+
+# Keep all of src/sanctum-ai/ OPEN except deployment internals
+src/sanctum-ai/deployment/DeploymentRoadmap.ts
+
+
+# =============================================================================
 # GENERATED / EPHEMERAL ARTIFACTS — Not authored, not useful in history
 # =============================================================================
 
@@ -424,18 +476,26 @@ index-cdn.html
 #
 # CLOSED (gitignored):
 #
-#   .env / .env.*              — All secrets and credentials
-#   *.tfstate / .terraform/    — Terraform state (real resource IDs)
-#   terraform.tfvars           — Infrastructure variable values
-#   *secret*.yaml              — Kubernetes secrets
-#   backend/logs/              — Application logs (may contain PII)
-#   screenshots/               — Dev snapshots
-#   eslint-report.*            — Generated CI reports
-#   earth2studio-project/      — Broken install artifacts
-#   azure-*.json               — Azure deployment configs with endpoints
-#   pentest/ / security-audit/ — Vulnerability details
-#   indigenous-knowledge/sacred/ — Sovereign cultural data (FPIC)
-#   research/internal/         — Unpublished research
-#   contracts/ / agreements/   — Partner agreements
+#   .env / .env.*                          — All secrets and credentials
+#   *.tfstate / .terraform/                — Terraform state (real resource IDs)
+#   terraform.tfvars                       — Infrastructure variable values
+#   *secret*.yaml                          — Kubernetes secrets
+#   backend/logs/                          — Application logs (may contain PII)
+#   screenshots/                           — Dev snapshots
+#   eslint-report.*                        — Generated CI reports
+#   earth2studio-project/                  — Broken install artifacts
+#   azure-*.json                           — Azure deployment configs with endpoints
+#   pentest/ / security-audit/             — Vulnerability details
+#   indigenous-knowledge/sacred/           — Sovereign cultural data (FPIC)
+#   research/internal/                     — Unpublished research
+#   contracts/ / agreements/               — Partner agreements
+#   src/dashboards/*-8ddb1553/ etc.        — Hash-suffixed dashboard duplicates
+#   src/dashboards/Enterpriseworkspace*/   — Enterprise admin internals
+#   src/dashboards/sanctum-nexus-core/     — Operational nexus
+#   src/dashboards/citadel-command-center/ — Internal ops
+#   src/dashboards/sentinel-*/             — Security monitoring internals
+#   src/dashboards/europe-os-command/      — Regional operational command
+#   src/layers/Professionaladmintemplatedesign-main/ — Exposes DB schema
+#   src/sanctum-ai/deployment/DeploymentRoadmap.ts  — Infrastructure topology
 #
 # =============================================================================
