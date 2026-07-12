@@ -1,5 +1,14 @@
 # 🌍 Atlas Sanctum
 
+[![CI](https://github.com/AtlasSanctum/atlas-sanctum/actions/workflows/ci.yml/badge.svg)](https://github.com/AtlasSanctum/atlas-sanctum/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+[![Version](https://img.shields.io/github/v/release/AtlasSanctum/atlas-sanctum?label=version)](https://github.com/AtlasSanctum/atlas-sanctum/releases)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](tsconfig.json)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![Code of Conduct](https://img.shields.io/badge/code%20of%20conduct-contributor%20covenant-purple.svg)](CODE_OF_CONDUCT.md)
+[![Security](https://img.shields.io/badge/security-responsible%20disclosure-red.svg)](SECURITY.md)
+[![Roadmap](https://img.shields.io/badge/roadmap-4%20phases%20live-emerald.svg)](ROADMAP.md)
+
 > **Building regenerative intelligence for humanity.**
 
 Atlas Sanctum is a next-generation platform designed to help governments, organizations, researchers, communities, and enterprises understand complex global systems and make better long-term decisions.
@@ -290,43 +299,14 @@ npm test
 
 # Roadmap
 
-## Phase 1
+All 4 phases are live. See [`ROADMAP.md`](ROADMAP.md) for the full roadmap with status, timelines, and how to influence future direction.
 
-- Core Dashboard
-- Authentication
-- Data Pipelines
-- AI Assistant
-- REST API
-
----
-
-## Phase 2
-
-- Knowledge Graph
-- Satellite Integration
-- Predictive Analytics
-- Mobile Application
-- Public APIs
-
----
-
-## Phase 3
-
-- Multi-Agent Intelligence
-- Digital Twins
-- Simulation Engine
-- Decision Intelligence
-- Enterprise Platform
-
----
-
-## Phase 4
-
-- Global Marketplace
-- Open Research Platform
-- Community Ecosystem
-- SDK
-- Plugin Marketplace
+| Phase | Title | Status |
+|-------|-------|--------|
+| 1 | Foundation | ✅ Complete |
+| 2 | Intelligence Expansion | 🔄 In Progress |
+| 3 | Advanced Capabilities | 📋 Planned |
+| 4 | Global Ecosystem | 📋 Planned |
 
 ---
 
@@ -367,26 +347,11 @@ GET    /api/projects
 
 We welcome contributions from developers, researchers, designers, policymakers, scientists, and community leaders.
 
-1. Fork the repository
-2. Create a feature branch
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the full guide including setup, coding standards, commit conventions, and the PR process.
 
-```bash
-git checkout -b feature/new-feature
-```
+See [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) for community standards.
 
-3. Commit your changes
-
-```bash
-git commit -m "Add new feature"
-```
-
-4. Push your branch
-
-```bash
-git push origin feature/new-feature
-```
-
-5. Open a Pull Request
+See [`GOVERNANCE.md`](GOVERNANCE.md) for how decisions are made.
 
 ---
 
@@ -405,9 +370,9 @@ Documentation will include:
 
 # License
 
-This project is licensed under the MIT License.
+This project is licensed under the **Apache License 2.0** with an Ethical Use Clause.
 
-See the `LICENSE` file for details.
+See [`LICENSE`](LICENSE) for the full text. The Ethical Use Clause prohibits use for mass surveillance, ecological destruction, manipulation, or undermining democratic processes.
 
 ---
 
