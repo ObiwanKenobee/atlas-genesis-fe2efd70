@@ -119,6 +119,27 @@ const EducationHub = lazy(() => import('./pages/InfrastructurePages').then(m => 
 const IntegrationStatus = lazy(() => import('./pages/IntegrationStatus'));
 const Certifications = lazy(() => import('./pages/InfrastructurePages').then(m => ({ default: m.Certifications })));
 
+// ── Roadmap Phase Pages ──────────────────────────────────────────────────────
+const Roadmap = lazy(() => import('./pages/Roadmap'));
+// Phase 2
+const KnowledgeGraph = lazy(() => import('./pages/KnowledgeGraph'));
+const SatelliteIntegration = lazy(() => import('./pages/SatelliteIntegration'));
+const PredictiveAnalytics = lazy(() => import('./pages/PredictiveAnalytics'));
+const MobileApplication = lazy(() => import('./pages/MobileApplication'));
+const PublicAPIs = lazy(() => import('./pages/PublicAPIs'));
+// Phase 3
+const MultiAgentIntelligence = lazy(() => import('./pages/MultiAgentIntelligence'));
+const DigitalTwins = lazy(() => import('./pages/DigitalTwins'));
+const SimulationEngine = lazy(() => import('./pages/SimulationEngine'));
+const DecisionIntelligence = lazy(() => import('./pages/DecisionIntelligence'));
+const EnterprisePlatform = lazy(() => import('./pages/EnterprisePlatform'));
+// Phase 4
+const GlobalMarketplace = lazy(() => import('./pages/GlobalMarketplace'));
+const OpenResearchPlatform = lazy(() => import('./pages/OpenResearchPlatform'));
+const CommunityEcosystem = lazy(() => import('./pages/CommunityEcosystem'));
+const DeveloperSDK = lazy(() => import('./pages/DeveloperSDK'));
+const PluginMarketplace = lazy(() => import('./pages/PluginMarketplace'));
+
 /**
  * AnimatedRoutes — lives inside BrowserRouter so useLocation() is available.
  */
@@ -231,6 +252,26 @@ const AnimatedRoutes = () => {
         <Route path="/impact-challenges" element={<PageTransition><GamificationHub /></PageTransition>} />
         <Route path="/blockchain-verification" element={<PageTransition><BlockchainVerification /></PageTransition>} />
         <Route path="/decentralized-governance" element={<PageTransition><DecentralizedGovernanceDashboard /></PageTransition>} />
+        {/* Roadmap */}
+        <Route path="/roadmap" element={<PageTransition><Roadmap /></PageTransition>} />
+        {/* Phase 2 */}
+        <Route path="/knowledge-graph" element={<PageTransition><KnowledgeGraph /></PageTransition>} />
+        <Route path="/satellite-integration" element={<PageTransition><SatelliteIntegration /></PageTransition>} />
+        <Route path="/predictive-analytics" element={<PageTransition><PredictiveAnalytics /></PageTransition>} />
+        <Route path="/mobile-app" element={<PageTransition><MobileApplication /></PageTransition>} />
+        <Route path="/public-apis" element={<PageTransition><PublicAPIs /></PageTransition>} />
+        {/* Phase 3 */}
+        <Route path="/multi-agent-intelligence" element={<PageTransition><MultiAgentIntelligence /></PageTransition>} />
+        <Route path="/digital-twins" element={<PageTransition><DigitalTwins /></PageTransition>} />
+        <Route path="/simulation-engine" element={<PageTransition><SimulationEngine /></PageTransition>} />
+        <Route path="/decision-intelligence" element={<PageTransition><DecisionIntelligence /></PageTransition>} />
+        <Route path="/enterprise-platform" element={<PageTransition><EnterprisePlatform /></PageTransition>} />
+        {/* Phase 4 */}
+        <Route path="/global-marketplace" element={<PageTransition><GlobalMarketplace /></PageTransition>} />
+        <Route path="/open-research" element={<PageTransition><OpenResearchPlatform /></PageTransition>} />
+        <Route path="/community-ecosystem" element={<PageTransition><CommunityEcosystem /></PageTransition>} />
+        <Route path="/developer-sdk" element={<PageTransition><DeveloperSDK /></PageTransition>} />
+        <Route path="/plugin-marketplace" element={<PageTransition><PluginMarketplace /></PageTransition>} />
         <Route path="*" element={<PageTransition variant="fade"><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>

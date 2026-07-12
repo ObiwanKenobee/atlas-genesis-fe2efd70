@@ -2,7 +2,7 @@
 import { useState, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Leaf, LogIn, ShoppingBag, Briefcase, LayoutDashboard, Crown, Award, Zap, Shield, TrendingUp, Globe, Heart, Network, Grid3X3, Calculator, Users, Trophy, Settings, FileText, BarChart3, Cog, Factory, Sprout, BookOpen, Building2, Zap as Lightning, TreePine, GraduationCap, CreditCard, Receipt, Wallet, Award as Certificate } from "lucide-react";
+import { Menu, X, Leaf, LogIn, ShoppingBag, Briefcase, LayoutDashboard, Crown, Award, Zap, Shield, TrendingUp, Globe, Heart, Network, Grid3X3, Calculator, Users, Trophy, Settings, FileText, BarChart3, Cog, Factory, Sprout, BookOpen, Building2, Zap as Lightning, TreePine, GraduationCap, CreditCard, Receipt, Wallet, Award as Certificate, ChevronDown, Puzzle, Smartphone, Bot, Layers, Map, FlaskConical, Lightbulb, Code2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
@@ -64,11 +64,40 @@ const Navigation = () => {
         { name: "Renewable Energy", href: "/renewable-energy", icon: Lightning },
       ]
     },
-    { 
-      name: "Resources", 
-      href: "#", 
+    {
+      name: "Intelligence",
+      href: "#",
+      icon: Bot,
+      children: [
+        { name: "Knowledge Graph", href: "/knowledge-graph", icon: Network },
+        { name: "Satellite Integration", href: "/satellite-integration", icon: Map },
+        { name: "Predictive Analytics", href: "/predictive-analytics", icon: TrendingUp },
+        { name: "Multi-Agent AI", href: "/multi-agent-intelligence", icon: Bot },
+        { name: "Digital Twins", href: "/digital-twins", icon: Layers },
+        { name: "Simulation Engine", href: "/simulation-engine", icon: FlaskConical },
+        { name: "Decision Intelligence", href: "/decision-intelligence", icon: Lightbulb },
+      ]
+    },
+    {
+      name: "Ecosystem",
+      href: "#",
+      icon: Globe,
+      children: [
+        { name: "Global Marketplace", href: "/global-marketplace", icon: ShoppingBag },
+        { name: "Open Research", href: "/open-research", icon: BookOpen },
+        { name: "Community Ecosystem", href: "/community-ecosystem", icon: Users },
+        { name: "Developer SDK", href: "/developer-sdk", icon: Code2 },
+        { name: "Plugin Marketplace", href: "/plugin-marketplace", icon: Puzzle },
+        { name: "Public APIs", href: "/public-apis", icon: Zap },
+        { name: "Mobile App", href: "/mobile-app", icon: Smartphone },
+      ]
+    },
+    {
+      name: "Resources",
+      href: "#",
       icon: BookOpen,
       children: [
+        { name: "Roadmap", href: "/roadmap", icon: TrendingUp },
         { name: "Education Hub", href: "/education-hub", icon: GraduationCap },
         { name: "Certifications", href: "/certifications", icon: Certificate },
         { name: "Privacy Policy", href: "/privacy-policy", icon: Shield },
