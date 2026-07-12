@@ -501,3 +501,76 @@ index-cdn.html
 #   src/sanctum-ai/deployment/DeploymentRoadmap.ts  — Infrastructure topology
 #
 # =============================================================================
+
+
+# =============================================================================
+# INFRASTRUCTURE TOPOLOGY — Real resource IDs, bucket names, endpoints
+# =============================================================================
+
+# Terraform main configs (contain real S3 state bucket, DynamoDB table, resource IDs)
+# variables.tf is safe (declarations only) — main.tf is not
+infrastructure/terraform/main.tf
+infrastructure/aws-org/terraform/main.tf
+infrastructure/phase1/terraform/main.tf
+infrastructure/phase2/terraform/main.tf
+infrastructure/phase3/terraform/main.tf
+infrastructure/phase4/terraform/main.tf
+infrastructure/phase5/terraform/main.tf
+infrastructure/phase6/terraform/main.tf
+
+# Render deployment manifest (real service names, URLs, DB credentials)
+render.yaml
+
+# EthosDAO production config (hardcoded real API/WS endpoints)
+EthosDAO/src/app/config/production.config.ts
+
+# Deployment orchestration scripts
+infrastructure/deploy-all-phases.sh
+infrastructure/phase1/scripts/deploy-phase1.sh
+
+
+# =============================================================================
+# OPERATIONAL RUNBOOKS — Internal ops procedures
+# =============================================================================
+
+RUNBOOK.md
+AZURE_DEPLOYMENT_GUIDE.md
+CLOUD_INFRASTRUCTURE.md
+BILLING_SETUP_GUIDE.md
+POST_LAUNCH_OPERATIONS_GUIDE.md
+PRODUCTION_READINESS_CHECKLIST.md
+FULL_STACK_ENGINEERING_REVIEW.md
+docs/AI_SERVICES_RUNBOOK.md
+
+
+# =============================================================================
+# ANTI-MANIPULATION ENGINE — Exposing detection logic aids evasion
+# =============================================================================
+
+atlas-sanctum/ANTI_MANIPULATION_ENGINE.md
+atlas-sanctum/ANTI_MANIPULATION_BUILD_COMPLETE.md
+atlas-sanctum/ANTI_MANIPULATION_IMPLEMENTATION_SUMMARY.md
+atlas-sanctum/ANTI_MANIPULATION_INTEGRATION_GUIDE.md
+atlas-sanctum/DEMO_SCRIPT.md
+atlas-sanctum/QUICK_START.sh
+
+
+# =============================================================================
+# DEV ARTIFACT SCRIPTS — One-off utilities, not source
+# =============================================================================
+
+demonstrate-complete-evolution.js
+demonstrate-sanctum.js
+update-navigation.js
+update-navigation.mjs
+fix-permissions.cjs
+delete_node_modules.py
+
+
+# =============================================================================
+# PYTHON PYCACHE — Compiled bytecode, never source
+# =============================================================================
+
+**/__pycache__/
+*.pyc
+*.pyo
