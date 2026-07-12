@@ -18,6 +18,12 @@
 !.env.example
 !.env.*.example
 
+# Deep nested catch-all — no .env anywhere in the tree
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.*.example
+
 # Key files
 *.pem
 *.key
