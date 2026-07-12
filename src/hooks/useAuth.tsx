@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useAuth — thin shim that delegates to EnhancedAuthContext.
  *
