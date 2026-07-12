@@ -7,6 +7,7 @@ import { ShieldCheck, Heart, Repeat, LogIn } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useVerificationSync } from '@/hooks/useVerificationSync';
 import { SyncStatusBadge } from './SyncStatusBadge';
+import { VerificationTimeline } from './VerificationTimeline';
 
 interface Row {
   id: string;
@@ -41,7 +42,7 @@ export const DonorContributions = ({ projectId, userId }: Props) => {
     setLoading(false);
   }, [projectId, userId]);
 
-  const { status, lastSyncedAt, error, refresh } = useVerificationSync({
+  const { status, lastSyncedAt, error, refresh, events } = useVerificationSync({
     fetcher, userId, table: 'transactions',
   });
 
@@ -106,6 +107,7 @@ export const DonorContributions = ({ projectId, userId }: Props) => {
                 );
               })}
             </div>
+            <VerificationTimeline events={events} title="On-chain verification activity" />
           </>
         )}
       </CardContent>

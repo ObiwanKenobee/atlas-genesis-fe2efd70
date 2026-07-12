@@ -35,6 +35,7 @@ const wrapError = (e: { code: string; message: string } | null): Error | null =>
 
 export const useAuth = (): LegacyAuthContextType => {
   const auth = useEnhancedAuth();
+  const notImplemented = async () => ({ error: new Error('Not available on this auth path') });
 
   return {
     user: auth.user,
@@ -64,127 +65,10 @@ export const useAuth = (): LegacyAuthContextType => {
       return { error: wrapError(error) };
     },
 
-  const verifyEmail = async (token: string): Promise<{ error: Error | null }> => {
-    try {
-      const response = await apiService.auth.verifyEmail(token);
-      
-      if (response.error) {
-        return { error: new Error(response.error) };
-      }
-      
-      return { error: null };
-    } catch (error) {
-      return { error: error instanceof Error ? error : new Error('Email verification failed') };
-    }
+    verifyEmail: notImplemented,
+    resendVerification: notImplemented,
+    forgotPassword: notImplemented,
+    resetPassword: notImplemented,
+    updateProfile: notImplemented,
   };
-
-  const resendVerification = async (): Promise<{ error: Error | null }> => {
-    try {
-      const response = await apiService.auth.resendVerification();
-      
-      if (response.error) {
-        return { error: new Error(response.error) };
-      }
-      
-      return { error: null };
-    } catch (error) {
-      return { error: error instanceof Error ? error : new Error('Failed to resend verification email') };
-    }
-  };
-
-  const forgotPassword = async (email: string): Promise<{ error: Error | null }> => {
-    try {
-      const response = await apiService.auth.forgotPassword(email);
-      
-      if (response.error) {
-        return { error: new Error(response.error) };
-      }
-      
-      return { error: null };
-    } catch (error) {
-      return { error: error instanceof Error ? error : new Error('Failed to send password reset email') };
-    }
-  };
-
-  const resetPassword = async (token: string, newPassword: string): Promise<{ error: Error | null }> => {
-    try {
-      const response = await apiService.auth.resetPassword(token, newPassword);
-      
-      if (response.error) {
-        return { error: new Error(response.error) };
-      }
-      
-      return { error: null };
-    } catch (error) {
-      return { error: error instanceof Error ? error : new Error('Password reset failed') };
-    }
-  };
-
-  const updateProfile = async (data: Partial<User>): Promise<{ error: Error | null }> => {
-    try {
-      if (!user) {
-        return { error: new Error('User not authenticated') };
-      }
-
-      const response = await apiService.auth.updateProfile(data);
-      
-      if (response.error) {
-        return { error: new Error(response.error) };
-      }
-      
-      // Update local user state
-      const updatedUser = { ...user, ...data };
-      setUser(updatedUser);
-      localStorage.setItem('auth_user', JSON.stringify(updatedUser));
-      
-      return { error: null };
-    } catch (error) {
-      return { error: error instanceof Error ? error : new Error('Profile update failed') };
-    }
-  };
-
-  const value: AuthContextType = {
-    user,
-    tokens,
-    session: null,
-    loading,
-    signUp,
-    signIn,
-    demoSignIn,
-    signOut,
-    refreshToken,
-    verifyEmail,
-    resendVerification,
-    forgotPassword,
-    resetPassword,
-    updateProfile
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
-
-export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    // Fallback: AuthProvider not mounted (app uses EnhancedAuthProvider).
-    // Return a safe no-op context so legacy consumers don't crash.
-    const noop = async () => ({ error: null });
-    return {
-      user: null,
-      tokens: null,
-      session: null,
-      loading: false,
-      signUp: noop,
-      signIn: noop,
-      demoSignIn: noop,
-      signOut: async () => {},
-      refreshToken: noop,
-      verifyEmail: noop,
-      resendVerification: noop,
-      forgotPassword: noop,
-      resetPassword: noop,
-      updateProfile: noop,
-    } as AuthContextType;
-  }
-  return context;
 };
