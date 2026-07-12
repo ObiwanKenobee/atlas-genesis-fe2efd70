@@ -5,7 +5,7 @@
  */
 
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useEnhancedAuth } from '@/hooks/useEnhancedAuth';
 import { getRedirectPathForRole } from '@/utils/authGuards';
 import type { DashboardType, UserRole } from '@/types/auth';
@@ -25,6 +25,8 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 }) => {
   const { user, loading, isDemoMode, canAccessDashboard, switchDashboard } = useEnhancedAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const nextParam = `?next=${encodeURIComponent(location.pathname + location.search)}`;
 
   useEffect(() => {
     if (loading) return;
@@ -32,7 +34,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     // Redirect to auth if not authenticated
     // Allow demo mode users to access protected routes
     if (!user && !isDemoMode) {
-      navigate('/auth');
+      navigate(`/auth${nextParam}`, { replace: true });
       return;
     }
 
@@ -42,7 +44,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       if (!isDemoMode) {
         // If user is admin, they can access everything
         if (user?.role !== 'administrator' && user?.role !== 'super_admin') {
-          navigate('/auth');
+          navigate(`/auth${nextParam}`, { replace: true });
           return;
         }
       }
