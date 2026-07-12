@@ -386,6 +386,8 @@ src/dashboards/**/.env.*
 # =============================================================================
 
 src/layers/Professionaladmintemplatedesign-main/
+src/layers/Regenerativevalueexchangedashboard-main/
+src/layers/Globalimpacteconomyworkspace-main/
 
 # .env files inside layer sub-projects
 src/layers/**/.env
