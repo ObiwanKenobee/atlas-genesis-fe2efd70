@@ -95,7 +95,7 @@ describe('RecurringSubscriptions — optimistic rollback', () => {
     fireEvent.click(screen.getByRole('button', { name: /Edit/i }));
 
     const dialog = await screen.findByRole('dialog');
-    const input = within(dialog).getByLabelText(/Monthly amount/i) as HTMLInputElement;
+    const input = within(dialog).getByDisplayValue('25') as HTMLInputElement;
     fireEvent.change(input, { target: { value: '99' } });
     fireEvent.click(within(dialog).getByRole('button', { name: /^Save$/ }));
 
