@@ -73,7 +73,7 @@ jobs:
 
       - name: Post PR comment with warning deltas
         if: github.event_name == 'pull_request' && always()
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@v3
         with:
           header: eslint-warning-deltas
           path: eslint-pr-comment.md
