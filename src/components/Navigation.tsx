@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Leaf, LogIn, ShoppingBag, Briefcase, LayoutDashboard, Crown, Award, Zap, Shield, TrendingUp, Globe, Heart, Network, Grid3X3, Calculator, Users, Trophy, Settings, FileText, BarChart3, Cog, Factory, Sprout, BookOpen, Building2, Zap as Lightning, TreePine, GraduationCap, CreditCard, Receipt, Wallet, Award as Certificate } from "lucide-react";
@@ -11,10 +11,18 @@ const Navigation = () => {
   const { user } = useSupabaseAuth();
   const { isAdmin } = useAdminAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const location = useLocation();
+  const dropdownRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   // Check if user has completed onboarding
   const hasCompletedOnboarding = (user as any)?.onboardingCompleted || false;
+
+  const toggleDropdown = (name: string) => {
+    setOpenDropdown(prev => (prev === name ? null : name));
+  };
+
+  const closeDropdown = () => setOpenDropdown(null);
 
   const navLinks = [
     { name: "Marketplace", href: "/marketplace", icon: ShoppingBag },
@@ -133,35 +141,54 @@ const Navigation = () => {
             >
               {navLinks.map((link) => {
                 if (link.children) {
+                  const isDropdownOpen = openDropdown === link.name;
                   return (
-                    <div key={link.name} className="relative group">
+                    <div
+                      key={link.name}
+                      className="relative"
+                      ref={el => { dropdownRefs.current[link.name] = el; }}
+                    >
                       <button
                         className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary rounded-md px-2 py-1 transition-colors duration-300 font-medium whitespace-nowrap hover:bg-muted/50"
+                        aria-haspopup="true"
+                        aria-expanded={isDropdownOpen}
                         aria-label={link.name}
+                        onClick={() => toggleDropdown(link.name)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Escape') closeDropdown();
+                        }}
                       >
                         <link.icon className="w-4 h-4" aria-hidden="true" />
                         {link.name}
+                        <ChevronDown className={`w-3 h-3 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
                       </button>
                       {/* Dropdown Menu */}
-                      <div className="absolute left-0 top-full mt-2 w-48 bg-card rounded-md shadow-lg border border-border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-                        <div className="py-2">
-                          {link.children.map((child) => (
-                            <Link
-                              key={child.name}
-                              to={child.href}
-                              className={`flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors ${
-                                location.pathname === child.href 
-                                  ? "text-foreground bg-primary/10" 
-                                  : ""
-                              }`}
-                              aria-label={child.name}
-                            >
-                              <child.icon className="w-4 h-4" aria-hidden="true" />
-                              {child.name}
-                            </Link>
-                          ))}
+                      {isDropdownOpen && (
+                        <div
+                          className="absolute left-0 top-full mt-2 w-48 bg-card rounded-md shadow-lg border border-border z-50"
+                          role="menu"
+                        >
+                          <div className="py-2">
+                            {link.children.map((child) => (
+                              <Link
+                                key={child.name}
+                                to={child.href}
+                                role="menuitem"
+                                className={`flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors focus:outline-none focus:bg-muted/50 ${
+                                  location.pathname === child.href
+                                    ? "text-foreground bg-primary/10"
+                                    : ""
+                                }`}
+                                aria-label={child.name}
+                                onClick={closeDropdown}
+                              >
+                                <child.icon className="w-4 h-4" aria-hidden="true" />
+                                {child.name}
+                              </Link>
+                            ))}
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                   );
                 }

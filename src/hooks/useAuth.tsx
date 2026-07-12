@@ -1,29 +1,16 @@
-import { useState, useEffect, createContext, useContext } from 'react';
-import { apiService } from '@/lib/api/client';
-import { setGlobalAccessToken } from '@/lib/api/apiClient';
+/**
+ * useAuth — thin shim that delegates to EnhancedAuthContext.
+ *
+ * All components that import useAuth/AuthProvider continue to work unchanged.
+ * EnhancedAuthProvider (in App.tsx) is the single auth source of truth.
+ */
+import React, { createContext, useContext } from 'react';
+import { useEnhancedAuth } from '@/contexts/EnhancedAuthContext';
+import type { User } from '@/types/auth';
 
-interface User {
-  id: string;
-  email: string;
-  displayName: string;
-  role: string;
-  tenantId?: string;
-  emailVerified: boolean;
-  mfaEnabled: boolean;
-  lastLogin?: string;
-  segment?: string;
-  onboardingCompleted?: boolean;
-}
-
-interface Tokens {
-  accessToken: string;
-  refreshToken: string;
-  expiresIn: number;
-}
-
-interface AuthContextType {
+interface LegacyAuthContextType {
   user: User | null;
-  tokens: Tokens | null;
+  tokens: { accessToken: string; refreshToken: string; expiresIn: number } | null;
   session: Record<string, unknown> | null;
   loading: boolean;
   signUp: (email: string, password: string, displayName?: string, role?: string) => Promise<{ error: Error | null }>;
@@ -38,151 +25,44 @@ interface AuthContextType {
   updateProfile: (data: Partial<User>) => Promise<{ error: Error | null }>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// Kept only so legacy `<AuthProvider>` JSX in tests/storybooks doesn't break.
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <>{children}</>
+);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [tokens, setTokens] = useState<Tokens | null>(null);
-  const [loading, setLoading] = useState(true);
+const wrapError = (e: { code: string; message: string } | null): Error | null =>
+  e ? new Error(e.message) : null;
 
-  // On mount: attempt silent token refresh via the httpOnly refresh cookie,
-  // then restore user profile from localStorage for UX continuity.
-  useEffect(() => {
-    const restoreSession = async () => {
-      const savedUser = localStorage.getItem('auth_user');
+export const useAuth = (): LegacyAuthContextType => {
+  const auth = useEnhancedAuth();
 
-      try {
-        // Attempt silent refresh — the httpOnly cookie is sent automatically
-        const resp = await fetch('/api/v2/auth/refresh', {
-          method: 'POST',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-        });
+  return {
+    user: auth.user,
+    tokens: auth.tokens,
+    session: null,
+    loading: auth.loading,
 
-        if (resp.ok) {
-          const data = await resp.json();
-          const newToken = data?.tokens?.accessToken;
-          if (newToken) {
-            apiService.setToken(newToken);
-            setGlobalAccessToken(newToken);
-            setTokens(data.tokens);
+    signUp: async (email, password, displayName, role) => {
+      const { error } = await auth.signUp({ email, password, fullName: displayName ?? '', role: role as any });
+      return { error: wrapError(error) };
+    },
 
-            // Fetch fresh user profile with the new access token
-            try {
-              const meResp = await fetch('/api/v2/auth/me', {
-                credentials: 'include',
-                headers: { Authorization: `Bearer ${newToken}` },
-              });
-              if (meResp.ok) {
-                const freshUser = await meResp.json();
-                setUser(freshUser);
-                localStorage.setItem('auth_user', JSON.stringify(freshUser));
-                setLoading(false);
-                return;
-              }
-            } catch {
-              // fall through to cached user below
-            }
-          }
-        }
-      } catch {
-        // Refresh endpoint unreachable (backend offline) — fall back to cache
-      }
+    signIn: async (email, password) => {
+      const { error } = await auth.signIn({ email, password });
+      return { error: wrapError(error) };
+    },
 
-      // Fall back: restore cached user so UI is not blank, but mark no live token
-      if (savedUser) {
-        try {
-          setUser(JSON.parse(savedUser));
-        } catch {
-          localStorage.removeItem('auth_user');
-        }
-      }
+    demoSignIn: async (role) => {
+      const { error } = await auth.demoSignInByRole(role === 'admin' ? 'administrator' : 'donor');
+      return { error: wrapError(error) };
+    },
 
-      setLoading(false);
-    };
+    signOut: auth.signOut,
 
-    restoreSession();
-  }, []);
-
-  const signUp = async (email: string, password: string, displayName?: string, _role?: string): Promise<{ error: Error | null }> => {
-    try {
-      const response = await apiService.auth.signup(email, password, displayName);
-      
-      if (response.error) {
-        return { error: new Error(response.error) };
-      }
-      
-      return { error: null };
-    } catch (error) {
-      return { error: error instanceof Error ? error : new Error('Sign up failed') };
-    }
-  };
-
-  const signIn = async (email: string, password: string): Promise<{ error: Error | null }> => {
-    try {
-      const response = await apiService.auth.login(email, password);
-      
-      if (response.error) {
-        return { error: new Error(response.error) };
-      }
-      
-      if (response.data) {
-        setUser(response.data.user);
-        setTokens(response.data.tokens);
-        localStorage.setItem('auth_user', JSON.stringify(response.data.user));
-        apiService.setToken(response.data.tokens.accessToken);
-        setGlobalAccessToken(response.data.tokens.accessToken);
-      }
-      
-      return { error: null };
-    } catch (error) {
-      return { error: error instanceof Error ? error : new Error('Sign in failed') };
-    }
-  };
-
-  const demoSignIn = async (role: 'user' | 'admin'): Promise<{ error: Error | null }> => {
-    const demoEmail = role === 'admin' ? 'admin@demo.com' : 'user@demo.com';
-    return signIn(demoEmail, 'demo123');
-  };
-
-  const signOut = async (): Promise<void> => {
-    setUser(null);
-    setTokens(null);
-    localStorage.removeItem('auth_user');
-    apiService.setToken('');
-    setGlobalAccessToken(null);
-  };
-
-  const refreshToken = async (): Promise<{ error: Error | null }> => {
-    if (!tokens?.refreshToken) {
-      return { error: new Error('No refresh token available') };
-    }
-
-    try {
-      const response = await apiService.auth.refreshToken(tokens.refreshToken);
-      
-      if (response.error) {
-        // If refresh token is invalid, sign out the user
-        if (response.error.includes('Invalid') || response.error.includes('expired')) {
-          signOut();
-        }
-        return { error: new Error(response.error) };
-      }
-      
-      if (response.data) {
-        setTokens(response.data.tokens);
-        localStorage.setItem('auth_tokens', JSON.stringify(response.data.tokens));
-        apiService.setToken(response.data.tokens.accessToken);
-        setGlobalAccessToken(response.data.tokens.accessToken);
-      }
-      
-      return { error: null };
-    } catch (error) {
-      // If refresh fails, sign out the user
-      signOut();
-      return { error: error instanceof Error ? error : new Error('Token refresh failed') };
-    }
-  };
+    refreshToken: async () => {
+      const { error } = await auth.refreshToken();
+      return { error: wrapError(error) };
+    },
 
   const verifyEmail = async (token: string): Promise<{ error: Error | null }> => {
     try {
@@ -304,7 +184,7 @@ export const useAuth = (): AuthContextType => {
       forgotPassword: noop,
       resetPassword: noop,
       updateProfile: noop,
-    };
+    } as AuthContextType;
   }
   return context;
 };

@@ -24,12 +24,21 @@ import type { CarbonProject } from "@/types/marketplace";
 import { ProjectComparisonModal } from "@/components/marketplace/ProjectComparisonModal";
 import { PriceAlertForm } from "@/components/marketplace/PriceAlertForm";
 import { motion, AnimatePresence } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import { apiService } from "@/lib/api/client";
 
 const Marketplace = () => {
   const [selectedFilter, setSelectedFilter] = useState<FilterType>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [sortBy, setSortBy] = useState<SortBy>("trending");
   const { data: projects = [], isLoading } = useProjects();
+
+  // Live market stats from API
+  const { data: marketStats } = useQuery({
+    queryKey: ['riu-market'],
+    queryFn: () => apiService.marketplace.getRIUMarket(),
+    refetchInterval: 30_000,
+  });
   
   // Compare projects state
   const [isCompareMode, setIsCompareMode] = useState(false);
@@ -315,7 +324,7 @@ const Marketplace = () => {
           </Card>
         )}
 
-        {/* Key Metrics */}
+        {/* Key Metrics — sourced from live API */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
           <Card className="border-l-4 border-l-emerald-500">
             <CardHeader className="pb-2 sm:pb-3">
@@ -325,7 +334,9 @@ const Marketplace = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-xl sm:text-2xl font-bold">24.5M</p>
+              <p className="text-xl sm:text-2xl font-bold">
+                {marketStats?.circulationM != null ? `${marketStats.circulationM}M` : '—'}
+              </p>
               <p className="text-xs text-muted-foreground">Regenerative Impact Units</p>
             </CardContent>
           </Card>
@@ -338,7 +349,11 @@ const Marketplace = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-xl sm:text-2xl font-bold">$1.84B</p>
+              <p className="text-xl sm:text-2xl font-bold">
+                {marketStats?.tradingVolume != null
+                  ? `$${(marketStats.tradingVolume / 1_000_000).toFixed(2)}M`
+                  : '—'}
+              </p>
               <p className="text-xs text-muted-foreground">Total trading value (YTD)</p>
             </CardContent>
           </Card>
@@ -347,12 +362,14 @@ const Marketplace = () => {
             <CardHeader className="pb-2 sm:pb-3">
               <CardTitle className="text-xs sm:text-sm flex items-center gap-2">
                 <Users className="h-4 w-4" />
-                Active Participants
+                Active Listings
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-xl sm:text-2xl font-bold">25K+</p>
-              <p className="text-xs text-muted-foreground">Across all tiers</p>
+              <p className="text-xl sm:text-2xl font-bold">
+                {marketStats?.totalRIUs != null ? marketStats.totalRIUs.toLocaleString() : '—'}
+              </p>
+              <p className="text-xs text-muted-foreground">Open RIU listings</p>
             </CardContent>
           </Card>
 
@@ -360,12 +377,16 @@ const Marketplace = () => {
             <CardHeader className="pb-2 sm:pb-3">
               <CardTitle className="text-xs sm:text-sm flex items-center gap-2">
                 <DollarSign className="h-4 w-4" />
-                Current Price
+                Avg Price
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-xl sm:text-2xl font-bold">$82.10</p>
-              <p className="text-xs text-emerald-600">+19.9% YTD</p>
+              <p className="text-xl sm:text-2xl font-bold">
+                {marketStats?.currentPrice != null ? `$${marketStats.currentPrice.toFixed(2)}` : '—'}
+              </p>
+              {marketStats?.ytdChange != null && (
+                <p className="text-xs text-emerald-600">+{marketStats.ytdChange}% YTD</p>
+              )}
             </CardContent>
           </Card>
         </div>

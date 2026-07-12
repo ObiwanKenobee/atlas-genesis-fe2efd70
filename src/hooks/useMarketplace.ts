@@ -92,40 +92,14 @@ export function usePurchaseCredits() {
     mutationFn: async ({ projectId, quantity, pricePerCredit }: { projectId: string; quantity: number; pricePerCredit: number }) => {
       if (!user) throw new Error('Must be logged in to purchase credits');
 
-      const totalAmount = quantity * pricePerCredit;
-
-      // Create transaction
-      const { data: transaction, error: txError } = await supabase
-        .from('transactions')
-        .insert({
-          user_id: user.id,
-          project_id: projectId,
-          quantity,
-          price_per_credit: pricePerCredit,
-          total_amount: totalAmount,
-          status: 'completed',
-          transaction_type: 'purchase',
-          payment_method: 'demo',
-          completed_at: new Date().toISOString(),
-        })
-        .select()
-        .single();
-
-      if (txError) throw txError;
-
-      // Add to holdings
-      const { error: holdingError } = await supabase
-        .from('credit_holdings')
-        .insert({
-          user_id: user.id,
-          project_id: projectId,
-          quantity,
-          purchase_price: pricePerCredit,
-        });
-
-      if (holdingError) throw holdingError;
-
-      return transaction;
+      // Payment must be verified server-side before credits are issued.
+      // This mutation should only be called after a successful payment webhook
+      // has been processed by the backend (Paystack/PayPal verify endpoint).
+      // Direct Supabase inserts here are intentionally removed to prevent
+      // free credit acquisition.
+      throw new Error(
+        'Direct purchase is not supported. Use the payment flow at /payment to purchase credits.'
+      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['carbon-projects'] });

@@ -67,6 +67,7 @@ import apiDatabaseRouter from './routes/apiDatabase';
 import globalImpactEconomyRouter from './routes/globalImpactEconomy';
 import rateLimitsRouter from './routes/rate-limits';
 import modelGovernanceRouter from './routes/modelGovernance';
+import blockchainRouter from './routes/blockchain';
 
 // Import session cleanup utility
 import { cleanupExpiredSessions } from './utils/auth';
@@ -79,6 +80,8 @@ import measurementsV3Router from './routes/measurements-v3';
 import projectsRouter from './routes/projects';
 import aiRecommendationsRouter from './routes/aiRecommendations';
 import sanctumPlanesRouter from './routes/planes/sanctum';
+import intelligenceRouter from './routes/planes/intelligence';
+import aiOrchestrationRouter from './routes/planes/ai-orchestration';
 
 const app = express();
 
@@ -457,9 +460,16 @@ app.use('/api/cultural-knowledge', culturalKnowledgeRouter);
 app.use('/api/database', apiDatabaseRouter);
 app.use('/api/global-impact-economy', globalImpactEconomyRouter);
 app.use('/api/governance/models', modelGovernanceRouter);
+app.use('/api/v2/blockchain', blockchainRouter);
 
 // ── Atlas Sanctum COS — Five Planes API (v3) ──────────────────────────────────
 app.use('/api/v3/sanctum', sanctumPlanesRouter);
+
+// ── Five Intelligence Models API (v3) ─────────────────────────────────────────
+app.use('/api/v3/intelligence', intelligenceRouter);
+
+// ── AI Orchestration — 13-Layer Mythic System (v3) ───────────────────────────
+app.use('/api/v3/sanctum/ai', aiOrchestrationRouter);
 
 // Root endpoint with API documentation
 app.get('/', (req, res) => {
@@ -814,6 +824,18 @@ setInterval(async () => {
   }
 }, 60 * 60 * 1000); // Run every hour
 
+// Readiness endpoint for orchestration — registered BEFORE server.listen() so
+// orchestrators never receive a 404 during the startup window.
+app.get('/ready', async (req: any, res: any) => {
+  try {
+    const { ok, details } = await checkReadiness();
+    if (ok) return res.status(200).json({ status: 'ready', details });
+    return res.status(503).json({ status: 'not_ready', details });
+  } catch (err: any) {
+    return res.status(500).json({ status: 'error', message: err.message || String(err) });
+  }
+});
+
 // Start server after performing startup checks (fail-fast in prod if secrets missing)
 (async () => {
   try {
@@ -833,14 +855,3 @@ setInterval(async () => {
     console.log(`🔌 WebSocket server ready for real-time connections`);
   });
 })();
-
-// Readiness endpoint for orchestration
-app.get('/ready', async (req: any, res: any) => {
-  try {
-    const { ok, details } = await checkReadiness();
-    if (ok) return res.status(200).json({ status: 'ready', details });
-    return res.status(503).json({ status: 'not_ready', details });
-  } catch (err: any) {
-    return res.status(500).json({ status: 'error', message: err.message || String(err) });
-  }
-});

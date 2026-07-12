@@ -20,6 +20,7 @@ import {
   CircuitBreakerMetrics
 } from './types';
 import { OpenAIProvider } from './providers/openai';
+import { AnthropicProvider } from './providers/anthropic';
 import { TelemetryService } from './observability/telemetry';
 import { CircuitBreaker } from './resilience/circuitBreaker';
 import { CircuitBreakerError } from './types';
@@ -50,7 +51,6 @@ export class AIService {
    * Initialize all configured providers
    */
   private initializeProviders(): void {
-    // Initialize OpenAI
     if (this.config.providers.openai?.enabled) {
       const openai = new OpenAIProvider(this.telemetry);
       openai.configure({
@@ -60,7 +60,14 @@ export class AIService {
       this.providers.set('openai', openai);
     }
 
-    // Initialize other providers here (Anthropic, etc.)
+    if (this.config.providers.anthropic?.enabled) {
+      const anthropic = new AnthropicProvider(this.telemetry);
+      anthropic.configure({
+        apiKey: this.config.providers.anthropic.apiKey,
+        baseUrl: this.config.providers.anthropic.baseUrl
+      });
+      this.providers.set('anthropic', anthropic);
+    }
   }
 
   /**
@@ -130,24 +137,26 @@ export class AIService {
   /**
    * Try fallback providers
    */
-  private async tryFallbackProviders<T>(
-    request: any,
-    operation: string,
+  private async tryFallbackProviders(
+    request: ChatRequest | EmbedRequest | CompletionRequest,
+    operation: 'chat' | 'embed' | 'complete',
     originalProviderId: string
-  ): Promise<any> {
+  ): Promise<ChatResponse | EmbedResponse | CompletionResponse> {
     const fallbacks = this.getFallbackProviders(originalProviderId);
+    const dispatch: Record<'chat' | 'embed' | 'complete', (p: IAIProvider, r: any) => Promise<any>> = {
+      chat: (p, r) => p.chat(r as ChatRequest),
+      embed: (p, r) => p.embed(r as EmbedRequest),
+      complete: (p, r) => p.complete(r as CompletionRequest),
+    };
 
     for (const provider of fallbacks) {
       try {
-        // @ts-ignore - dynamic operation call
-        const response = await provider[operation](request);
-        return response;
+        return await dispatch[operation](provider, request);
       } catch (error) {
         this.telemetry.warn(
           `Fallback to ${provider.id} failed`,
           { operation, error: (error as Error).message }
         );
-        continue;
       }
     }
 
@@ -326,7 +335,7 @@ export class AIServiceFactory {
           timeout: 30000
         },
         anthropic: {
-          enabled: false,
+          enabled: !!(process.env.ANTHROPIC_API_KEY),
           apiKey: process.env.ANTHROPIC_API_KEY || '',
           baseUrl: 'https://api.anthropic.com',
           models: {
@@ -342,7 +351,7 @@ export class AIServiceFactory {
       },
       defaults: {
         primaryProvider: 'openai',
-        fallbackProviders: [],
+        fallbackProviders: ['anthropic'],
         defaultModel: 'gpt-4',
         defaultTemperature: 0.7,
         defaultMaxTokens: 1000

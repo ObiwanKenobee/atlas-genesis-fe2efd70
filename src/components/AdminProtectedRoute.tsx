@@ -141,11 +141,7 @@ const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onSuccess }) => {
             </button>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-slate-700">
-            <p className="text-sm text-slate-400 text-center">
-              Demo credentials: <code className="text-indigo-400">admin@atlas-genesis.com</code> / <code className="text-indigo-400">admin123!</code>
-            </p>
-          </div>
+
         </div>
       </div>
     </div>

@@ -7,7 +7,7 @@ import { PageTransition, InteractiveButton } from '@/components/Interactions';
 import {
   Leaf, LogOut, User, BarChart3, ShoppingCart, Briefcase,
   TrendingUp, Activity, Bell, Settings, Globe, TreePine,
-  ChevronRight, Shield, Wallet, ArrowUpRight, HelpCircle,
+  ChevronRight, Shield, Wallet, ArrowUpRight, Plus, HelpCircle,
   Calculator, Trophy
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -274,6 +274,7 @@ const Dashboard = () => {
     { label: "Explore Bioregions", icon: Globe, href: "/bioregions", color: "bg-emerald-500/10 text-emerald-600" },
     { label: "Cardano Layer", icon: Shield, href: "/cardano-layer", color: "bg-purple-500/10 text-purple-600" },
     { label: "Achievements", icon: Trophy, href: "/profile#achievements", color: "bg-amber-500/10 text-amber-600" },
+    { label: "Alignment", icon: Scale, href: "/alignment", color: "bg-primary/10 text-primary" },
     { label: "Settings", icon: Settings, href: "/settings", color: "bg-muted text-muted-foreground" },
   ];
 

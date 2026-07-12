@@ -142,6 +142,7 @@ export const apiKeyRateLimit = (req: Request, res: Response, next: NextFunction)
 };
 
 // Rate limit monitoring and alerting
+const MAX_RATE_LIMIT_KEYS = 5_000;
 const rateLimitMetrics = new Map<string, {
   totalRequests: number;
   blockedRequests: number;
@@ -150,6 +151,13 @@ const rateLimitMetrics = new Map<string, {
 
 export const monitorRateLimits = (req: Request, res: Response, next: NextFunction) => {
   const key = `${req.ip}:${req.path}`;
+
+  // Evict oldest entry when the map exceeds the cap
+  if (!rateLimitMetrics.has(key) && rateLimitMetrics.size >= MAX_RATE_LIMIT_KEYS) {
+    const firstKey = rateLimitMetrics.keys().next().value;
+    if (firstKey) rateLimitMetrics.delete(firstKey);
+  }
+
   const metrics = rateLimitMetrics.get(key) || {
     totalRequests: 0,
     blockedRequests: 0,

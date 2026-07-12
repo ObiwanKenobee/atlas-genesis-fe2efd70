@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Zap, TrendingUp, Shield, DollarSign, BarChart3 } from "lucide-react";
 
 const Valuation = () => {
-  const [selectedProjectId] = useState<string | undefined>("sample-project-1");
+  const [selectedProjectId] = useState<string | undefined>(undefined);
 
   // Fetch valuation model
   const valuation = useValuationModel(selectedProjectId);
@@ -357,7 +357,7 @@ const Valuation = () => {
 
                 {/* Sample Audit Report */}
                 <div className="border-t pt-6">
-                  <h3 className="font-semibold mb-4">Sample Valuation Audit Report</h3>
+                  <h3 className="font-semibold mb-4">Sample Valuation Audit Report <span className="text-xs font-normal text-muted-foreground">(illustrative — not real project data)</span></h3>
                   <div className="p-4 border rounded-lg bg-blue-50 font-mono text-xs text-slate-700 space-y-2 max-h-96 overflow-y-auto">
                     <p className="font-bold">VALUATION AUDIT REPORT</p>
                     <p>Project ID: project-1</p>

@@ -1,14 +1,11 @@
 import SEO from "@/components/SEO";
 import { useSEO } from "@/hooks/useSEO";
-import EnterpriseHeader from "@/components/EnterpriseHeader";
+import Layout from "@/components/Layout";
 import HeroSection from "@/components/HeroSection";
 import PlatformLayers from "@/components/PlatformLayers";
 import ImpactMetrics from "@/components/ImpactMetrics";
 import TechnologyStack from "@/components/TechnologyStack";
 import CTASection from "@/components/CTASection";
-import Footer from "@/components/Footer";
-import NewsletterBanner from "@/components/NewsletterBanner";
-import BackToTop from "@/components/BackToTop";
 
 const Index = () => {
   const seoData = useSEO({
@@ -157,19 +154,13 @@ const Index = () => {
   return (
     <>
       <SEO {...seoData} />
-      <div className="min-h-screen bg-background">
-        <EnterpriseHeader />
-        <main className="pt-24">
-          <HeroSection />
-          <PlatformLayers />
-          <ImpactMetrics />
-          <TechnologyStack />
-          <CTASection />
-        </main>
-        <Footer />
-        <NewsletterBanner />
-        <BackToTop threshold={300} />
-      </div>
+      <Layout>
+        <HeroSection />
+        <PlatformLayers />
+        <ImpactMetrics />
+        <TechnologyStack />
+        <CTASection />
+      </Layout>
     </>
   );
 };

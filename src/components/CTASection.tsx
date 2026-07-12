@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 const CTASection = () => {
   return (
-    <section className="py-32 relative overflow-hidden bg-regenerative">
+    <section className="py-32 relative overflow-hidden bg-regenerative scroll-mt-16">
       {/* Soft Grid */}
       <div className="absolute inset-0 bg-soft-grid opacity-[0.05] pointer-events-none" />
       {/* Animated Orbs */}
@@ -35,7 +35,7 @@ const CTASection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="max-w-4xl mx-auto text-center glass-panel border border-border/40"
+          className="max-w-4xl mx-auto text-center glass-panel border border-border/40 p-10 md:p-16 rounded-3xl"
         >
           {/* Headline */}
           <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold mb-6">

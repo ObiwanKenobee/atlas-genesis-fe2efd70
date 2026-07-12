@@ -1,7 +1,8 @@
 import express, { Request, Response } from 'express';
-import { query } from '../db';
+import { query, pool } from '../db';
 import { emailService } from '../services/email';
 import { SocketEmitter } from '../utils/socket';
+import { authenticate } from '../middleware/auth';
 
 const router = express.Router();
 
@@ -69,11 +70,12 @@ router.get('/riums/listings', async (req: Request, res: Response) => {
 });
 
 // Create RIU Listing
-router.post('/riums', async (req: Request, res: Response) => {
-  const { sellerId, projectId, quantity, price, impactScore, confidenceInterval } = req.body;
+router.post('/riums', authenticate, async (req: Request, res: Response) => {
+  const sellerId = (req as any).user.id;
+  const { projectId, quantity, price, impactScore, confidenceInterval } = req.body;
 
-  if (!sellerId || !quantity || price === undefined) {
-    return res.status(422).json({ code: 'invalid', message: 'sellerId, quantity, and price required' });
+  if (!quantity || price === undefined) {
+    return res.status(422).json({ code: 'invalid', message: 'quantity and price required' });
   }
 
   try {
@@ -114,99 +116,87 @@ router.post('/riums', async (req: Request, res: Response) => {
 });
 
 // Purchase RIUs
-router.post('/riums/:id/purchase', async (req: Request, res: Response) => {
+router.post('/riums/:id/purchase', authenticate, async (req: Request, res: Response) => {
   const id = req.params.id as string;
-  const { buyerId, quantity, totalPrice } = req.body;
+  const buyerId = (req as any).user.id;
+  const { quantity } = req.body;
 
-  if (!buyerId || !quantity) {
-    return res.status(422).json({ code: 'invalid', message: 'buyerId and quantity required' });
+  if (!quantity || quantity <= 0) {
+    return res.status(422).json({ code: 'invalid', message: 'quantity required and must be positive' });
   }
 
+  const client = await pool.connect();
   try {
-    // Get RIU details
-    const riuResult = await query('SELECT * FROM riums WHERE id = $1', [id]);
+    await client.query('BEGIN');
+
+    // Lock the row to prevent concurrent double-spend
+    const riuResult = await client.query('SELECT * FROM riums WHERE id = $1 FOR UPDATE', [id]);
     if (riuResult.rowCount === 0) {
+      await client.query('ROLLBACK');
       return res.status(404).json({ code: 'not_found' });
     }
 
     const riu = riuResult.rows[0];
     if (riu.quantity < quantity) {
+      await client.query('ROLLBACK');
       return res.status(422).json({ code: 'insufficient_quantity', message: 'Not enough RIUs available' });
     }
 
+    const totalPrice = quantity * riu.price;
+
     // Create transaction
-    const txResult = await query(
+    const txResult = await client.query(
       `INSERT INTO transactions (seller_id, buyer_id, rium_id, quantity, amount, tx_type, status)
        VALUES ($1, $2, $3, $4, $5, 'purchase', 'completed')
        RETURNING *`,
-      [riu.seller_id, buyerId, id, quantity, totalPrice || quantity * riu.price]
+      [riu.seller_id, buyerId, id, quantity, totalPrice]
     );
 
-    // Update RIU quantity
-    await query(
+    // Update RIU quantity atomically
+    await client.query(
       'UPDATE riums SET quantity = quantity - $1 WHERE id = $2',
       [quantity, id]
     );
+
+    await client.query('COMMIT');
 
     // Emit real-time marketplace activity for purchase
     SocketEmitter.emitMarketplaceActivity({
       type: 'purchase',
       listingId: id,
       userId: buyerId,
-      data: {
-        sellerId: riu.seller_id,
-        quantity: quantity,
-        amount: totalPrice || quantity * riu.price,
-        transactionId: txResult.rows[0].id
-      }
+      data: { sellerId: riu.seller_id, quantity, amount: totalPrice, transactionId: txResult.rows[0].id }
     });
 
-    // Notify buyer of successful purchase
     SocketEmitter.emitNotification(buyerId, {
       id: `purchase-${txResult.rows[0].id}`,
       type: 'marketplace',
       title: 'RIU Purchase Successful',
-      message: `You have successfully purchased ${quantity} RIUs for $${totalPrice || quantity * riu.price}.`,
+      message: `You have successfully purchased ${quantity} RIUs for $${totalPrice}.`,
       data: { transactionId: txResult.rows[0].id, listingId: id }
     });
 
-    // Notify seller of sale
     SocketEmitter.emitNotification(riu.seller_id, {
       id: `sale-${txResult.rows[0].id}`,
       type: 'marketplace',
       title: 'RIU Sale Completed',
-      message: `${quantity} of your RIUs have been sold for $${totalPrice || quantity * riu.price}.`,
+      message: `${quantity} of your RIUs have been sold for $${totalPrice}.`,
       data: { transactionId: txResult.rows[0].id, listingId: id }
     });
 
-    // Send purchase confirmation email to buyer
     try {
-      const buyerResult = await query('SELECT email, display_name FROM users WHERE id = $1', [buyerId]);
+      const buyerResult = await query('SELECT email FROM users WHERE id = $1', [buyerId]);
       if (buyerResult.rowCount > 0) {
-        const buyer = buyerResult.rows[0];
-        await emailService.sendMarketplacePurchaseNotification(
-          buyer.email,
-          quantity,
-          totalPrice || quantity * riu.price
-        );
+        await emailService.sendMarketplacePurchaseNotification(buyerResult.rows[0].email, quantity, totalPrice);
       }
     } catch (emailError) {
       console.error('Failed to send purchase confirmation email:', emailError);
     }
 
-    // Send sale notification email to seller
     try {
-      const sellerResult = await query('SELECT email, display_name FROM users WHERE id = $1', [riu.seller_id]);
+      const sellerResult = await query('SELECT email FROM users WHERE id = $1', [riu.seller_id]);
       if (sellerResult.rowCount > 0) {
-        const seller = sellerResult.rows[0];
-        const buyerResult = await query('SELECT display_name FROM users WHERE id = $1', [buyerId]);
-        const buyerName = buyerResult.rowCount > 0 ? buyerResult.rows[0].display_name || 'Anonymous' : 'Anonymous';
-
-        await emailService.sendMarketplaceSaleNotification(
-          seller.email,
-          quantity,
-          totalPrice || quantity * riu.price
-        );
+        await emailService.sendMarketplaceSaleNotification(sellerResult.rows[0].email, quantity, totalPrice);
       }
     } catch (emailError) {
       console.error('Failed to send sale notification email:', emailError);
@@ -217,7 +207,10 @@ router.post('/riums/:id/purchase', async (req: Request, res: Response) => {
       message: `Successfully purchased ${quantity} RIUs`
     });
   } catch (err: any) {
+    await client.query('ROLLBACK').catch(() => {});
     res.status(500).json({ code: 'server_error', message: err.message });
+  } finally {
+    client.release();
   }
 });
 
@@ -270,27 +263,30 @@ router.get('/bonds', async (req: Request, res: Response) => {
 });
 
 // Purchase Bond
-router.post('/bonds/:id/purchase', async (req: Request, res: Response) => {
+router.post('/bonds/:id/purchase', authenticate, async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { buyerId, amount } = req.body;
+  const buyerId = (req as any).user.id;
+  const { amount } = req.body;
 
-  if (!buyerId || !amount) {
-    return res.status(422).json({ code: 'invalid', message: 'buyerId and amount required' });
+  if (!amount || amount <= 0) {
+    return res.status(422).json({ code: 'invalid', message: 'amount required and must be positive' });
   }
 
   try {
-    // Get bond details
-    const bondResult = await query('SELECT * FROM bonds WHERE id = $1', [id]);
+    const bondResult = await query('SELECT * FROM bonds WHERE id = $1 AND status = $2', [id, 'available']);
     if (bondResult.rowCount === 0) {
       return res.status(404).json({ code: 'not_found' });
     }
 
-    // Create bond purchase record
+    const bond = bondResult.rows[0];
+
+    // Derive maturity interval from the bond's actual term_years; 0 = perpetual (100 years)
+    const termYears = bond.term_years > 0 ? bond.term_years : 100;
     const txResult = await query(
       `INSERT INTO bond_purchases (bond_id, buyer_id, amount, purchase_date, maturity_date, status)
-       VALUES ($1, $2, $3, NOW(), NOW() + INTERVAL '5 years', 'active')
+       VALUES ($1, $2, $3, NOW(), NOW() + ($4 || ' years')::INTERVAL, 'active')
        RETURNING *`,
-      [id, buyerId, amount]
+      [id, buyerId, amount, termYears]
     );
 
     res.status(201).json({
@@ -305,45 +301,48 @@ router.post('/bonds/:id/purchase', async (req: Request, res: Response) => {
 // Get Trading Volume
 router.get('/trading-volume', async (req: Request, res: Response) => {
   try {
-    // Return mock trading data for chart
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const volume = months.map((month, i) => ({
-      month,
-      volume: Math.floor(100 + Math.random() * 200),
-      value: Math.floor(1500000 + Math.random() * 500000)
-    }));
+    const result = await query(
+      `SELECT
+         TO_CHAR(DATE_TRUNC('month', created_at), 'Mon') AS month,
+         DATE_TRUNC('month', created_at) AS month_date,
+         COUNT(*) AS volume,
+         COALESCE(SUM(amount), 0) AS value
+       FROM transactions
+       WHERE created_at >= NOW() - INTERVAL '12 months'
+         AND status = 'completed'
+       GROUP BY DATE_TRUNC('month', created_at)
+       ORDER BY month_date ASC`
+    );
 
-    res.json({ data: volume });
+    res.json({ data: result.rows.map(r => ({ month: r.month, volume: parseInt(r.volume), value: parseFloat(r.value) })) });
   } catch (err: any) {
     res.status(500).json({ code: 'server_error', message: err.message });
   }
 });
 
-// Get Transaction History
-router.get('/transactions', async (req: Request, res: Response) => {
-  const { userId, page = 1, size = 20 } = req.query as any;
+// Get Transaction History — scoped to the authenticated user
+router.get('/transactions', authenticate, async (req: Request, res: Response) => {
+  const userId = (req as any).user.id;
+  const { page = 1, size = 20 } = req.query as any;
   const offset = (Number(page) - 1) * Number(size);
 
   try {
-    let query_str = 'SELECT * FROM transactions WHERE 1=1';
-    const params: any[] = [];
+    const result = await query(
+      `SELECT * FROM transactions
+       WHERE seller_id = $1 OR buyer_id = $1
+       ORDER BY created_at DESC
+       LIMIT $2 OFFSET $3`,
+      [userId, Number(size), offset]
+    );
 
-    if (userId) {
-      query_str += ` AND (seller_id = $${params.length + 1} OR buyer_id = $${params.length + 2})`;
-      params.push(userId, userId);
-    }
-
-    query_str += ` ORDER BY created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
-    params.push(Number(size), offset);
-
-    const result = await query(query_str, params);
+    const countResult = await query(
+      'SELECT COUNT(*) as total FROM transactions WHERE seller_id = $1 OR buyer_id = $1',
+      [userId]
+    );
 
     res.json({
       items: result.rows,
-      pagination: {
-        page: Number(page),
-        size: Number(size)
-      }
+      pagination: { page: Number(page), size: Number(size), total: parseInt(countResult.rows[0].total) }
     });
   } catch (err: any) {
     res.status(500).json({ code: 'server_error', message: err.message });

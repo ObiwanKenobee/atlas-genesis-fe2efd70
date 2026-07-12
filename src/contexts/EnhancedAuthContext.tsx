@@ -81,10 +81,14 @@ export const EnhancedAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
         if (savedUser && savedTokens) {
           const parsedUser = JSON.parse(savedUser);
           const parsedTokens = JSON.parse(savedTokens);
-          
+          const isDemo = savedDemoMode === 'true';
+
           setUser(parsedUser);
           setTokens(parsedTokens);
-          apiService.setToken(parsedTokens.accessToken);
+          // Only restore real tokens into the API client — never demo tokens
+          if (!isDemo) {
+            apiService.setToken(parsedTokens.accessToken);
+          }
           setStatus('authenticated');
           
           // Set available dashboards based on user role
@@ -363,13 +367,14 @@ export const EnhancedAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
       const defaultDashboard = ROLE_TO_DASHBOARD[demoUser.role];
       setCurrentDashboard(defaultDashboard);
 
-      // Save to localStorage
+      // Save to localStorage — intentionally do NOT call apiService.setToken
+      // with a demo token; real API calls must not carry fake credentials.
       localStorage.setItem('auth_user', JSON.stringify(user));
-      localStorage.setItem('auth_tokens', JSON.stringify(tokens));
       localStorage.setItem('auth_demo_mode', 'true');
       localStorage.setItem('auth_demo_user', JSON.stringify(demoUser));
       localStorage.setItem('auth_current_dashboard', defaultDashboard);
-      apiService.setToken(tokens.accessToken);
+      // Clear any previously stored real token so demo mode is fully isolated
+      apiService.setToken('');
 
       // Add auth event
       addAuthEvent({
@@ -476,32 +481,19 @@ export const EnhancedAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   }, []);
 
-  // Setup MFA
+  // Setup MFA — not yet implemented server-side
   const setupMFA = useCallback(async (): Promise<{ error: AuthError | null; data?: MFASetupData }> => {
-    // Mock implementation
-    return {
-      error: null,
-      data: {
-        secret: 'JBSWY3DPEHPK3PXP',
-        qrCode: 'otpauth://totp/AtlasGenesis:user@example.com?secret=JBSWY3DPEHPK3PXP&issuer=AtlasGenesis',
-        backupCodes: ['123456', '234567', '345678', '456789', '567890'],
-      },
-    };
+    return { error: { code: 'NOT_IMPLEMENTED', message: 'MFA setup is not yet available.' } };
   }, []);
 
-  // Verify MFA
-  const verifyMFA = useCallback(async (code: string): Promise<{ error: AuthError | null }> => {
-    // Mock implementation
-    if (code.length === 6) {
-      return { error: null };
-    }
-    return { error: { code: 'MFA_INVALID', message: 'Invalid MFA code' } };
+  // Verify MFA — not yet implemented server-side
+  const verifyMFA = useCallback(async (_code: string): Promise<{ error: AuthError | null }> => {
+    return { error: { code: 'NOT_IMPLEMENTED', message: 'MFA verification is not yet available.' } };
   }, []);
 
-  // Disable MFA
+  // Disable MFA — not yet implemented server-side
   const disableMFA = useCallback(async (): Promise<{ error: AuthError | null }> => {
-    // Mock implementation
-    return { error: null };
+    return { error: { code: 'NOT_IMPLEMENTED', message: 'MFA disable is not yet available.' } };
   }, []);
 
   // Update Profile
@@ -530,8 +522,12 @@ export const EnhancedAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   // Change Password
   const changePassword = useCallback(async (currentPassword: string, newPassword: string): Promise<{ error: AuthError | null }> => {
-    // Mock implementation
-    return { error: null };
+    try {
+      await apiService.user.changePassword(currentPassword, newPassword);
+      return { error: null };
+    } catch (err) {
+      return { error: { code: 'CHANGE_PASSWORD_ERROR', message: err instanceof Error ? err.message : 'Password change failed' } };
+    }
   }, []);
 
   // Can Access Dashboard
@@ -608,26 +604,25 @@ export const EnhancedAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
     return session ? [session] : [];
   }, [session]);
 
-  // Revoke Session
-  const revokeSession = useCallback(async (sessionId: string): Promise<{ error: AuthError | null }> => {
-    // Mock implementation
-    return { error: null };
+  // Revoke Session — not yet implemented server-side
+  const revokeSession = useCallback(async (_sessionId: string): Promise<{ error: AuthError | null }> => {
+    return { error: { code: 'NOT_IMPLEMENTED', message: 'Session revocation is not yet available.' } };
   }, []);
 
-  // Revoke All Sessions
+  // Revoke All Sessions — signs out locally as best-effort
   const revokeAllSessions = useCallback(async (): Promise<{ error: AuthError | null }> => {
-    // Mock implementation
+    await signOut();
     return { error: null };
-  }, []);
+  }, [signOut]);
 
   // Get Auth Events
   const getAuthEvents = useCallback((): AuthEvent[] => {
     return authEvents;
   }, [authEvents]);
 
-  // Helper function to add auth event
+  // Helper function to add auth event — capped at 100 to prevent unbounded growth
   const addAuthEvent = useCallback((event: AuthEvent) => {
-    setAuthEvents(prev => [...prev, event]);
+    setAuthEvents(prev => (prev.length >= 100 ? [...prev.slice(1), event] : [...prev, event]));
   }, []);
 
   // Helper function to clear auth data

@@ -45,6 +45,11 @@ const hasDatabaseConfig = !!(process.env.DATABASE_URL || process.env.DATABASE_HO
 // Determine which database to use
 const useMockDatabase = isTestEnvironment || !hasDatabaseConfig;
 
+if (!hasDatabaseConfig && !isTestEnvironment && process.env.NODE_ENV === 'production') {
+  console.error('[db] FATAL: No database configuration found in production. Set DATABASE_URL or DATABASE_HOST.');
+  process.exit(1);
+}
+
 let pool: Pool;
 let query: (text: string, params?: any[]) => Promise<any>;
 

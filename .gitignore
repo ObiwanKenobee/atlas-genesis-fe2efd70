@@ -1,30 +1,372 @@
-# Environment files — NEVER commit real secrets
+# =============================================================================
+# Atlas Sanctum — .gitignore
+#
+# Philosophy: Open the stones, protect the cathedral.
+# See PHILOSOPHY.md for the full open source model.
+#
+# OPEN:   Core protocols, APIs, design philosophy, research, governance model
+# HIDDEN: Secrets, infrastructure configs, operational intelligence, private data
+# =============================================================================
+
+
+# =============================================================================
+# SECRETS & CREDENTIALS — Never commit. Ever.
+# =============================================================================
+
 .env
 .env.*
 !.env.example
 !.env.*.example
 
-# Logs
-logs
+# Key files
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.der
+!*.key.example
+!*.pem.example
+
+# Secret stores
+.vault-token
+vault-secrets/
+secrets/
+**/secrets/
+**/.secrets/
+secret.json
+secrets.json
+credentials.json
+service-account*.json
+*-service-account.json
+
+# Cloud provider credentials
+.aws/credentials
+.aws/config
+.gcp/
+gcp-credentials*.json
+azure-credentials*.json
+.azure/
+
+# API keys (flat files)
+api-keys.txt
+api-keys.json
+*.apikey
+
+# JWT / signing keys
+jwt-secret*
+signing-key*
+private-key*
+public-key*
+keypair*
+
+
+# =============================================================================
+# INFRASTRUCTURE — Protect the operational topology
+# =============================================================================
+
+# Terraform state (contains real resource IDs, IPs, credentials)
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+terraform.tfvars
+terraform.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Kubernetes secrets and sensitive configs
+**/kubernetes/secrets/
+**/k8s/secrets/
+*secret*.yaml
+*secret*.yml
+!*secret*example*
+kubeconfig
+kubeconfig.*
+.kube/
+
+# Helm values with secrets
+values-production.yaml
+values-prod.yaml
+values-staging.yaml
+values-secrets.yaml
+
+# Ansible vault
+*.vault
+ansible/vault*
+group_vars/*/vault*
+
+# SSH
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+known_hosts
+authorized_keys
+
+# Docker secrets
+docker-compose.override.yml
+docker-compose.prod.yml
+docker-compose.production.yml
+!docker-compose.production.yml.example
+
+
+# =============================================================================
+# OPERATIONAL INTELLIGENCE — Live system data
+# =============================================================================
+
+# Logs (may contain PII, internal IPs, stack traces)
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+backend/logs/
 
-node_modules
-dist
-dist-ssr
+# Database dumps and exports
+*.sql.gz
+*.dump
+*.backup
+db-backup/
+database-backup/
+exports/
+
+# Monitoring / alerting configs with internal endpoints
+monitoring/alertmanager-secrets*
+monitoring/grafana-secrets*
+prometheus-secrets*
+
+# Internal network maps
+network-topology*
+internal-ips*
+service-mesh-config*
+
+
+# =============================================================================
+# SECURITY SYSTEMS — Vulnerability details stay private
+# =============================================================================
+
+# Penetration test results
+pentest/
+pentest-results/
+security-audit/
+vulnerability-report*
+cve-analysis*
+
+# Security scan outputs
+.snyk
+snyk-results*
+trivy-results*
+bandit-results*
+semgrep-results*
+sonarqube-results*
+
+# SAST / DAST outputs
+security-scan-results/
+owasp-results/
+zap-results/
+
+
+# =============================================================================
+# PRIVATE & SENSITIVE DATA
+# =============================================================================
+
+# User data exports (GDPR)
+user-data-exports/
+gdpr-exports/
+data-subject-requests/
+
+# Indigenous knowledge marked sovereign or sacred
+# (These are protected by FPIC — Free, Prior, Informed Consent)
+indigenous-knowledge/private/
+indigenous-knowledge/sacred/
+**/sacred/
+**/sovereign-data/
+
+# Internal research not yet published
+research/internal/
+research/unpublished/
+research/embargoed/
+
+# Partner / enterprise agreements
+contracts/
+agreements/
+nda/
+enterprise-configs/
+partner-configs/
+
+
+# =============================================================================
+# AZURE — Deployment configs with real endpoints
+# =============================================================================
+
+azure-parameters.json
+azure-backend-config.json
+azure-database-config.json
+azure-keyvault-config.json
+azure-cdn-config.json
+azure-frontend-config.json
+azure-application-insights.json
+azure-bicep-config.bicep
+!azure-*.example.json
+
+
+# =============================================================================
+# BUILD ARTIFACTS — Generated, not authored
+# =============================================================================
+
+node_modules/
+dist/
+dist-ssr/
+build/
+out/
+.next/
+.nuxt/
+.output/
 *.local
 
-# Editor directories and files
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+.env/
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.sum.bak
+
+# Rust
+target/
+Cargo.lock.bak
+
+
+# =============================================================================
+# EDITOR & OS — Noise
+# =============================================================================
+
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
+!.vscode/settings.json.example
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V500
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# JetBrains
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+\#*\#
+.\#*
+
+
+# =============================================================================
+# TEST ARTIFACTS — Results, not code
+# =============================================================================
+
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+cypress/screenshots/
+cypress/videos/
+e2e/screenshots/
+e2e/videos/
+*.lcov
+
+
+# =============================================================================
+# LOCK FILES — Keep package-lock.json, bun.lock; ignore others
+# =============================================================================
+
+yarn.lock
+pnpm-lock.yaml
+# bun.lock and package-lock.json are intentionally kept
+
+
+# =============================================================================
+# TEMPORARY & SCRATCH
+# =============================================================================
+
+tmp/
+temp/
+.tmp/
+scratch/
+*.tmp
+*.temp
+*.bak
+*.orig
+*.rej
+
+
+# =============================================================================
+# WHAT IS INTENTIONALLY OPEN (documented here for clarity)
+# =============================================================================
+#
+# The following are NOT ignored and are open to the world:
+#
+#   PHILOSOPHY.md              — Mission, ethics, design philosophy
+#   README.md                  — Project overview
+#   docs/                      — Architecture decisions, API contracts
+#   src/sanctum-ai/            — Core AI layer protocols
+#   src/architecture/          — Type system and formal specifications
+#   src/lib/                   — Shared utilities and governance logic
+#   backend/src/sanctum/       — COS plane interfaces
+#   supabase/migrations/       — Database schema (no data)
+#   chain/                     — Blockchain protocol definitions
+#   plaas/                     — Platform-as-a-service layer definitions
+#   .env.example               — Environment variable documentation
+#   openapi.yaml               — API specification
+#   LICENSE.md                 — License with ethical use clause
+#
+# =============================================================================

@@ -11,11 +11,13 @@ import redisClient from '../redisClient';
 import { createEventBus } from './events/eventBus';
 import { getIntelligencePlane } from './planes/intelligence';
 import { getTrustPlane } from './planes/trust';
+import { getValuePlane } from './planes/value';
 import { getCoordinationPlane } from './planes/coordination';
 import { getPlanetaryPlane } from './planes/planetary';
 import type {
   IntelligencePlane,
   TrustPlane,
+  ValuePlane,
   CoordinationPlane,
   PlanetaryPlane,
   EventBusPort,
@@ -25,6 +27,7 @@ import { logger } from '../utils/logger';
 export interface SanctumCOS {
   intelligence: IntelligencePlane;
   trust: TrustPlane;
+  value: ValuePlane;
   coordination: CoordinationPlane;
   planetary: PlanetaryPlane;
   events: EventBusPort;
@@ -37,16 +40,17 @@ export async function getSanctumCOS(io?: any): Promise<SanctumCOS> {
 
   const dbQueryFn = (sql: string, params: unknown[]) => dbQuery(sql, params);
 
-  const [intelligence, trust, planetary, events] = await Promise.all([
+  const [intelligence, trust, value, planetary, events] = await Promise.all([
     getIntelligencePlane(dbQueryFn, redisClient),
     getTrustPlane(dbQueryFn, redisClient),
+    getValuePlane(dbQueryFn, redisClient),
     getPlanetaryPlane(dbQueryFn, redisClient),
     createEventBus(),
   ]);
 
   const coordination = await getCoordinationPlane(dbQueryFn, redisClient, io ?? null);
 
-  _cos = { intelligence, trust, coordination, planetary, events };
+  _cos = { intelligence, trust, value, coordination, planetary, events };
 
   // Cross-plane event wiring
   await wireCrossPlanEvents(_cos);

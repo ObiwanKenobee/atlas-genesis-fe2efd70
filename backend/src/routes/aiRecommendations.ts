@@ -18,7 +18,7 @@ router.get('/carbon-prediction/:projectId', async (req: Request, res: Response) 
     
     const prediction = await aiRecommendationsService.predictCarbonSequestration(
       projectId,
-      period as 'month' | 'quarter' | 'year' | '5year' | '10year' || 'year'
+      (Array.isArray(period) ? period[0] : period) as 'month' | 'quarter' | 'year' | '5year' | '10year' || 'year'
     );
     
     res.json({
@@ -43,9 +43,10 @@ router.get('/recommendations/:userId', async (req: Request, res: Response) => {
     const { userId } = req.params;
     const { limit } = req.query;
     
+    const limitStr = Array.isArray(limit) ? limit[0] : limit;
     const recommendations = await aiRecommendationsService.getPersonalizedRecommendations(
       userId,
-      limit ? parseInt(limit as string) : 5
+      limitStr ? parseInt(limitStr) : 5
     );
     
     res.json({

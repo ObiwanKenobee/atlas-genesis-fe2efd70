@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Leaf, Mail, Lock, User, ArrowRight, Sparkles, 
   Users, Shield, Building2, Globe, TrendingUp, Factory, Award,
-  ChevronRight, LogIn, UserPlus, CheckCircle2, Info, AlertCircle
+  ChevronRight, LogIn, UserPlus, CheckCircle2, Info, AlertCircle, BrainCircuit
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -331,6 +331,14 @@ const Auth = () => {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="flex justify-center mb-8"
         >
+          <Button
+            variant="outline"
+            onClick={() => navigate('/intelligence-architecture')}
+            className="mr-3 border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
+          >
+            <BrainCircuit className="mr-2 h-4 w-4" />
+            Open Intelligence Architecture
+          </Button>
           <div className="inline-flex bg-card/80 backdrop-blur-xl border border-border/50 rounded-lg p-1 shadow-lg">
             <Button
               variant={authMode === 'demo' ? 'default' : 'ghost'}

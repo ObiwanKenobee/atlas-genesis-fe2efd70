@@ -469,7 +469,7 @@ class EnvironmentalMonitoringService {
   // Deforestation Alerts
   // ============================================
 
-  async getDeforestationAlerts(options: { status?: string; severity?: string; limit?: number } = {}): Promise<DeforestationAlert[]> {
+  async getDeforestationAlerts(options: { status?: string; severity?: string; limit?: number; regionId?: string } = {}): Promise<DeforestationAlert[]> {
     const { status, severity, limit = 50 } = options;
     let queryText = 'SELECT * FROM deforestation_alerts WHERE 1=1';
     const params: string[] = [];
@@ -617,14 +617,14 @@ class EnvironmentalMonitoringService {
     `, [
       data.sensorId,
       data.stationId,
-      data.moisture_content || null,
+      data.moistureContent || null,
       data.moistureDepthCm || 15,
       data.nitrogenPpm || null,
       data.phosphorusPpm || null,
       data.potassiumPpm || null,
-      data.ph_level || null,
-      data.organic_matter_percentage || null,
-      data.microbial_biomass_c || null,
+      data.phLevel || null,
+      data.organicMatterPercentage || null,
+      data.microbialBiomassC || null,
       data.respirationRate || null,
       data.enzymeActivity || null,
       data.soilTemperature || null,
@@ -640,13 +640,10 @@ class EnvironmentalMonitoringService {
 
   private calculateSoilQualityScore(data: Partial<SoilSensorReading>): number {
     let score = 100;
-    
-    // Penalize for out-of-range values
     if (data.ph_level && (data.ph_level < 5.5 || data.ph_level > 7.5)) score -= 15;
     if (data.organic_matter_percentage && data.organic_matter_percentage < 2) score -= 20;
     if (data.microbial_biomass_c && data.microbial_biomass_c < 100) score -= 15;
     if (data.moisture_content && (data.moisture_content < 10 || data.moisture_content > 60)) score -= 10;
-    
     return Math.max(0, Math.min(100, score));
   }
 

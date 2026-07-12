@@ -43,7 +43,7 @@ const HeroSection = () => {
   return (
     <section 
       ref={containerRef}
-      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-regenerative pt-20"
+      className="relative min-h-[calc(100vh-6rem)] flex items-center justify-center overflow-hidden bg-regenerative"
     >
       {/* Animated Background Gradient */}
       <motion.div 

@@ -279,4 +279,58 @@ router.patch('/planetary/twin/:entityId', handle(async (req) => {
   return { updated: true };
 }));
 
+// ═══════════════════════════════════════════════════════════
+// VALUE PLANE
+// ═══════════════════════════════════════════════════════════
+
+router.get('/value/market', handle(async (_req) => {
+  const cos = await getSanctumCOS();
+  return cos.value.getMarketStats();
+}));
+
+router.post('/value/listings', handle(async (req) => {
+  const cos = await getSanctumCOS();
+  const user = (req as any).user;
+  return cos.value.createListing({ ...req.body, sellerId: user.id, tenantId: user.tenantId });
+}));
+
+router.post('/value/trade', handle(async (req) => {
+  const cos = await getSanctumCOS();
+  const user = (req as any).user;
+  return cos.value.executeTrade({ ...req.body, buyerId: user.id });
+}));
+
+router.post('/value/credits/mint', handle(async (req) => {
+  const cos = await getSanctumCOS();
+  return cos.value.mintCredits(req.body);
+}));
+
+router.post('/value/credits/retire', handle(async (req) => {
+  const cos = await getSanctumCOS();
+  const { creditIds } = req.body;
+  if (!Array.isArray(creditIds) || creditIds.length === 0) throw new Error('creditIds must be a non-empty array');
+  return cos.value.retireCredits(creditIds);
+}));
+
+router.get('/value/treasury/:tenantId', handle(async (req) => {
+  const cos = await getSanctumCOS();
+  return cos.value.getTreasuryBalance(req.params['tenantId'] as string);
+}));
+
+router.post('/value/treasury/:tenantId/rebalance', handle(async (req) => {
+  const cos = await getSanctumCOS();
+  return cos.value.rebalanceTreasury(req.params['tenantId'] as string);
+}));
+
+router.get('/value/bonds/:bondId/yield', handle(async (req) => {
+  const cos = await getSanctumCOS();
+  return cos.value.getBondYield(req.params['bondId'] as string);
+}));
+
+router.post('/value/payments', handle(async (req) => {
+  const cos = await getSanctumCOS();
+  const user = (req as any).user;
+  return cos.value.processPayment({ ...req.body, userId: user.id });
+}));
+
 export default router;

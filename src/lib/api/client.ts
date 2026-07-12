@@ -96,10 +96,10 @@ class ApiService {
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
 
-        // Don't retry on abort/timeout or client errors
+        // Don't retry on abort/timeout or client errors (4xx)
         if (
           error instanceof Error &&
-          (error.name === 'AbortError' || error.message.includes('4'))
+          (error.name === 'AbortError' || error.name === 'TimeoutError' || error.message.startsWith('API Error: 4'))
         ) {
           throw lastError;
         }
