@@ -209,6 +209,21 @@ export * from './AtlasSanctumCommunication';
 // - Regenerative value flows (cascade effects, leakage modeling, efficiency rates)
 export * from './AtlasSanctumAlgebra';
 
+// Intermediate Algebra — Domain Problem Modeling Layer
+// Maps real-world Atlas problems to symbolic algebraic structures:
+// - Climate: carbon budget constraints (linear C(x) = mx + b)
+// - Climate: ecosystem net rate (break-even linear model)
+// - Food security: two-source allocation (system of two equations)
+// - Infrastructure: optimal land allocation (quadratic vertex optimization)
+// - Health: worker scaling (rational inverse proportionality n₁t₁ = n₂t₂)
+// - Population/economics: growth to target (exponential P(t) = P₀rᵗ)
+// - Governance: multi-constraint feasibility (linear inequality system)
+// - Regenerative value: equilibrium and flow efficiency models
+// - Impact scoring: weighted composite formula evaluation
+// - Uncertainty: Monte Carlo confidence intervals for AI recommendations
+// - Modeling cycle runner: four-step trace for audit and explainability
+export * from './AtlasSanctumIntermediateAlgebra';
+
 // ============================================================================
 // VERSION
 // ============================================================================
