@@ -24,6 +24,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { authenticate } from '../../middleware/auth';
 import { logger } from '../../utils/logger';
 import { getSanctumCOS } from '../../sanctum/orchestrator';
+import { promptInjectionFilter } from '../../middleware/promptInjection';
 
 // Lazy-loaded AI layer singletons (frontend TypeScript modules compiled to JS)
 // In production these run as separate microservices; here they share process memory.
@@ -57,6 +58,8 @@ sentinel.alerts.onAlert(alert => {
 
 const router = Router();
 router.use(authenticate);
+// Scan all AI endpoint inputs for prompt injection before they reach any LLM
+router.use(promptInjectionFilter);
 
 const handle = (fn: (req: Request, res: Response) => Promise<unknown>) =>
   async (req: Request, res: Response, next: NextFunction) => {

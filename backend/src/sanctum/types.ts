@@ -339,7 +339,8 @@ export interface EthicsViolation {
 export type AgentType =
   | 'finance' | 'health' | 'research' | 'investment'
   | 'infrastructure' | 'policy' | 'emergency' | 'education'
-  | 'legal' | 'citizen_assistant' | 'executive_assistant';
+  | 'legal' | 'citizen_assistant' | 'executive_assistant'
+  | 'climate';
 
 export interface AgentTask {
   id: string;
